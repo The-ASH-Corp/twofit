@@ -4,16 +4,16 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import menuIcon from "../../assets/Icons/Menu.svg"
 import closingMenu from "../../assets/Icons/Xvector.svg"
 
-const Header = () => {
+const Header = ({ videoVisible }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
   return (
     <>
       <div
-        className={`fixed top-0 z-6 w-full bg-white ${
-          !open && "border-b border-b-gray-300"
-        }`}
+        className={`fixed top-0 z-6 w-full bg-white 
+          ${!open && "border-b border-b-gray-300"}
+          ${videoVisible && "hidden"}`}
       >
         <div className="flex items-center justify-between mx-4 md:mx-[140px]   p-3">
           <img src={Logo} alt="Logo" className="w-35 h-8" />

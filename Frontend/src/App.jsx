@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Home from "./pages/Home";
 import AllPrograms from "./pages/AllPrograms";
 import OurStory from "./pages/OurStory";
@@ -8,11 +8,19 @@ import Header from "./components/shared/Header";
 import Footer from "./components/shared/Footer";
 import BlogDetails from "./pages/BlogDetails";
 import ProgramDetails from "./components/AllPrograms/ProgramDetails";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 
 function App() {
   const [videoVisible, setVideoVisible] = useState(true);
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [pathname]);
+  // console.log(videoVisible)
   return (
     <>
       <div className="flex flex-col min-h-screen">
@@ -29,7 +37,7 @@ function App() {
             <Route path="/programs/:id" element={<ProgramDetails />} />
             <Route path="/ourstory" element={<OurStory />} />
             <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:blogId" element={<BlogDetails />} />
+            <Route path="/blog/:bid" element={<BlogDetails />} />
             <Route path="/contact" element={<Contact />} />
           </Routes>
         </main>
