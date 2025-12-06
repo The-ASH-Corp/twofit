@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+:root {
+  --font-main: "Bricolage Grotesque", sans-serif;
+}
+
+body {
+  font-family: var(--font-main);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE & Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+
+
+.phone-flag-btn:hover{
+  background-color: red;
+}
