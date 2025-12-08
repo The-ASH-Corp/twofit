@@ -11,8 +11,9 @@ import ProgramDetails from "./components/AllPrograms/ProgramDetails";
 import { useEffect, useState } from "react";
 
 function App() {
-  const [videoVisible, setVideoVisible] = useState(true);
+  const [videoVisible, setVideoVisible] = useState(false);
   const { pathname } = useLocation();
+  console.log(videoVisible)
 
   useEffect(() => {
     window.scrollTo({
@@ -37,7 +38,7 @@ function App() {
             <Route path="/programs/:id" element={<ProgramDetails />} />
             <Route path="/ourstory" element={<OurStory />} />
             <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:bid" element={<BlogDetails />} />
+            <Route path="/blog/:blogId" element={<BlogDetails />} />
             <Route path="/contact" element={<Contact />} />
           </Routes>
         </main>

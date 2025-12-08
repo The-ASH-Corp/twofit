@@ -17,7 +17,7 @@ const PossibleCard = ({ cardData, scrollRef }) => {
               {/* img container */}
               <div
                 className="relative h-[360px] w-[223px] bg-cover bg-center rounded-lg shrink-0"
-                style={{ backgroundImage: `url(http://localhost:5000${data.photo})` }}
+                style={{ backgroundImage: `url(${import.meta.env.VITE_API_URL}${data.photo})` }}
               >
                 <div className="bg-white py-1 px-5 rounded-full absolute bottom-5 left-5">
                   <p className="text-[16px] ">Before</p>

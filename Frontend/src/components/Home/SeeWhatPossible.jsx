@@ -33,7 +33,7 @@ const SeeWhatPossible = () => {
 
     useEffect(()=>{
       axios
-        .get('http://localhost:5000/api/v1/testimonials/')
+        .get('https://outstanding-stillness-production.up.railway.app/api/v1/testimonials/')
         .then((res)=>{
           setUser(res.data.data)
         })

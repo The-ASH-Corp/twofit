@@ -9,7 +9,7 @@ const Faq = () => {
 
   useEffect(() => {
     axios
-      .get('http://localhost:5000/api/v1/faq')
+      .get('https://outstanding-stillness-production.up.railway.app/api/v1/faq')
       .then((response) => {
         setFaqs(response.data.data);
         console.log(response);

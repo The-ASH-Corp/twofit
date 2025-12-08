@@ -9,7 +9,7 @@ export default function Programs() {
 
   useEffect(() => {
     axios
-      .get("https://host-production-c4fc.up.railway.app/api/v1/programs/list")
+      .get("https://outstanding-stillness-production.up.railway.app/api/v1/programs/list")
       .then((response) => {
         setPrograms(response.data.data);
       })

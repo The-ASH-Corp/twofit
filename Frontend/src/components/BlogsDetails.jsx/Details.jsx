@@ -18,7 +18,7 @@ function Details() {
 
     useEffect(() => {
         axios
-            .get(`http://localhost:5000/api/v1/blog/get/${blogId}`)
+            .get(`https://outstanding-stillness-production.up.railway.app/api/v1/blog/get/${blogId}`)
             .then((res) => {
                 console.log("BLOG DATA:", res.data.data); 
                 setBlogsData(res.data.data)
@@ -70,7 +70,7 @@ function Details() {
                                 </div>
                             </div>
                         </div>
-                        <img className='w-full rounded-xl' src={`http://localhost:5000${blogsData.image}`} alt="" />
+                        <img className='w-full rounded-xl' src={`${import.meta.env.VITE_API_URL}${blogsData.image}`} alt="" />
                     </div>
                     <div className='flex flex-col gap-10'>
                         <p className='text-sm'>{blogsData.description}</p>

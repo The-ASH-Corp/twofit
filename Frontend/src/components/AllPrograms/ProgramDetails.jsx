@@ -12,7 +12,7 @@ export const ProgramDetails = () => {
     const [program,setProgram] =useState([])
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/v1/programs/get/${id}`)
+      .get(`https://outstanding-stillness-production.up.railway.app/api/v1/programs/get/${id}`)
       .then((response) => {
         setProgram(response.data.data);
         console.log(response.data.data);
@@ -27,7 +27,7 @@ export const ProgramDetails = () => {
     return (
         <div className='flex flex-col mx-5  md:mx-50 my-12'>
             <div className='  items-center justify-center py-10 md:py-30 '>
-                <img src={`http://localhost:5000${program.photo}`} alt="program-images" className='aspect-3/2 rounded-3xl ' />
+                <img src={`${import.meta.env.VITE_API_URL}${program.photo}`} alt="program-images" className='aspect-3/2 rounded-3xl ' />
             </div>
             <div className='flex flex-col md:flex-row gap-8'>
                 <div className='flex flex-col gap-8'>
