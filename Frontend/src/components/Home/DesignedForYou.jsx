@@ -3,7 +3,7 @@ import Heading from "../shared/Heading";
 import DesignCard from "./DesignCard";
 import { designData } from "../../utils/constants";
 import SlidingArrow from "./SlidingArrow";
-
+ 
 const DesignedForYou = () => {
   const scrollRef = useRef(null);
 
@@ -35,9 +35,9 @@ const DesignedForYou = () => {
           description={"Personalized Program for Optimal Results."}
         />
 
-        <div className="flex items-center justify-center gap-2 w-full">
+        <div className="flex  items-center justify-center gap-2 w-full">
           <DesignCard cardData={designData} scrollRef={scrollRef} />
-        </div>
+         </div>
 
         <SlidingArrow slideLeft={slideLeft} slideRight={slideRight} />
       </div>

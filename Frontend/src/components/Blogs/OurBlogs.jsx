@@ -31,7 +31,7 @@ export default function OurBlogs() {
       <div className='grid grid-cols-1 md:grid-cols-4 gap-x-4 gap-y-10'>
         {blogsData.map((blog, index) => (
           <div key={index} className='flex flex-col justify-center md:justify-between gap-3'>
-            <img src={`http://localhost:5000${blog.image}`} alt="blog image" className='rounded-lg'/>
+            <img src={`http://localhost:5000${blog.image}`} alt="blog image" className='rounded-lg w-full h-full'/>
             <p className='text-sm text-[#1E1E1E]'>{moment(blog.createdAt).format("DD MMMM YYYY")}</p>
             <p className='text-sm font-bold text-[#1E1E1E]'>{blog.heading}</p>
             <p onClick={() => navigate(`/blog/${blog._id}`)} className='underline text-[#0A4F48] text-md cursor-pointer'>Read more</p>

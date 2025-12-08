@@ -24,7 +24,7 @@ export default function ContactForm() {
         }))
     }
     return (
-        <div className=''>
+        <div className='my-8'>
             <div>
                 <div>
                     <Heading heading={"Get in Touch"} description={"We’d love to hear from you."} />
