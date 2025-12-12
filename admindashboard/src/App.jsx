@@ -11,11 +11,14 @@ import ClientsTable from "./pages/clients/ClientsTable";
 import Dashboard from "./pages/Dashboard";
 import ExpertTable from "./pages/experts/ExpertTable";
 import ProgramTable from "./pages/programsList/ProgramTable";
+import Login from "./pages/Login";
 
 function App() {
   return (
     <Router>
       <Routes>
+
+        <Route path="/login" element={<Login/>}/>
         
         <Route path="/" element={<AppLayout />}  >
         <Route path="/" element={<Dashboard/>}/>
