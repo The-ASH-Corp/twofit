@@ -7,7 +7,7 @@ import { ClientColumns } from './ClientColumns'
 export default function ClientsTable() {
   return (
     <div>
-      <BaseTable columns={ClientColumns} data={clientsData} actionLabel="Add Client"/>
+      <BaseTable columns={ClientColumns} data={clientsData} actionLabel="Add Client" actionPath="/addclient"/>
     </div>
   )
 }

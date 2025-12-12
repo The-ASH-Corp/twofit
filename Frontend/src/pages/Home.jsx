@@ -1,7 +1,7 @@
 // Home.jsx
 import React, { useEffect, useRef } from "react";
 import Video from "../components/Home/Video";
-import Programs from "../components/Home/programs";
+import Programs from "../components/Home/Programs";
 import DesignedForYou from "../components/Home/DesignedForYou";
 import SeeWhatPossible from "../components/Home/SeeWhatPossible";
 import Faq from "../components/shared/Faq";

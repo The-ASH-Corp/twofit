@@ -1,6 +1,6 @@
 import React from 'react'
 import Heading from '../shared/Heading'
-import image from '../../assets/images/OurStory_main.svg'
+import image from '../../assets/images/ourstory_main.svg'
 
 
 export default function WhereOurJourneyBegan() {

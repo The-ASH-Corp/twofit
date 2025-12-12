@@ -5,22 +5,22 @@ import DesignCard2 from "../assets/images/Rectangle2.svg"
 import DesignCard3 from "../assets/images/Rectangle3.svg"
 import DesignCard4 from "../assets/images/Rectangle 4.svg";
 import DesignCard5 from "../assets/images/rectangle7.svg";
-import DesignCard6 from "../assets/images/rectangle8.svg";
-import DesignCard7 from "../assets/images/rectangle9.svg";
-import DesignCard8 from "../assets/images/rectangle10.svg";
-import DesignCard9 from "../assets/images/rectangle11.svg";
-import DesignCard10 from "../assets/images/rectangle12.svg";
+import DesignCard6 from "../assets/images/Rectangle8.svg";
+import DesignCard7 from "../assets/images/Rectangle9.svg";
+import DesignCard8 from "../assets/images/Rectangle10.svg";
+import DesignCard9 from "../assets/images/Rectangle11.svg";
+import DesignCard10 from "../assets/images/Rectangle12.svg";
 
 import DesignCardbig1 from "../assets/images/Rectangle1.jpg"
 import DesignCardbig2 from "../assets/images/Rectangle2.jpg"
 import DesignCardbig3 from "../assets/images/Rectangle3.jpg"
 import DesignCardbig4 from "../assets/images/Rectangle4.jpg";
-import DesignCardbig5 from "../assets/images/rectangle7.jpg";
-import DesignCardbig6 from "../assets/images/rectangle8.jpg";
-import DesignCardbig7 from "../assets/images/rectangle9.jpg";
-import DesignCardbig8 from "../assets/images/rectangle10.jpg";
-import DesignCardbig9 from "../assets/images/rectangle11.jpg";
-import DesignCardbig10 from "../assets/images/rectangle12.jpg";
+import DesignCardbig5 from "../assets/images/Rectangle7.jpg";
+import DesignCardbig6 from "../assets/images/Rectangle8.jpg";
+import DesignCardbig7 from "../assets/images/Rectangle9.jpg";
+import DesignCardbig8 from "../assets/images/Rectangle10.jpg";
+import DesignCardbig9 from "../assets/images/Rectangle11.jpg";
+import DesignCardbig10 from "../assets/images/Rectangle12.jpg";
 
 import possibleCard1 from "../assets/images/Rectangle5.svg"
 import possibleCard2 from "../assets/images/Rectangle6.svg"

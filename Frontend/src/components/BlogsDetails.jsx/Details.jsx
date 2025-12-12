@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { blogsdata } from '../../utils/constants'
 import BlogDetails from '../../pages/BlogDetails'
-import fb from "../../assets/Icons/facebookicon.svg"
-import Insta from "../../assets/Icons/instagramicon.svg"
-import X from "../../assets/Icons/xicon.svg"
-import linkedin from "../../assets/Icons/linkedinicon.svg"
-import group from "../../assets/Icons/groupicon.svg"
+import fb from "../../assets/Icons/facebookIcon.svg"
+import Insta from "../../assets/Icons/InstagramIcon.svg"
+import X from "../../assets/Icons/xIcon.svg"
+import linkedin from "../../assets/Icons/linkedinIcon.svg"
+import group from "../../assets/Icons/groupIcon.svg"
 import share from "../../assets/Icons/shareIcon.svg"
 import moment from 'moment'
 import axios from 'axios'

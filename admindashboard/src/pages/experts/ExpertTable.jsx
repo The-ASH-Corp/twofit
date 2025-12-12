@@ -6,7 +6,7 @@ import { expertsData } from './expertData'
 export default function ExpertTable() {
   return (
     <div>
-      <BaseTable columns={ExpertColumns} data={expertsData} actionLabel="Add Expert" />
+      <BaseTable columns={ExpertColumns} data={expertsData} actionLabel="Add Expert"  actionPath="/addexpert" />
     </div>
   )
 }
