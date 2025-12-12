@@ -20,7 +20,7 @@ export const ClientColumns = [
         type="checkbox"
         checked={table.getIsAllRowsSelected()}
         onChange={table.getToggleAllRowsSelectedHandler()}
-        className="w-[12px] h-[12px] cursor-pointer"
+        className="w-3 h-3 cursor-pointer"
       />
     ),
     cell: ({ row }) => (
@@ -28,7 +28,7 @@ export const ClientColumns = [
         type="checkbox"
         checked={row.getIsSelected()}
         onChange={row.getToggleSelectedHandler()}
-        className="w-[12px] h-[12px] cursor-pointer"
+        className="w-3 h-3 cursor-pointer"
       />
     ),
   },
