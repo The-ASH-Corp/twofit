@@ -33,7 +33,11 @@ const Login = () => {
         </div>
         {/* form */}
         <div className="flex flex-col items-center w-full gap-6">
-          <div></div>
+          <div className='w-full flex flex-col items-start'>
+            <form action="">
+                
+            </form>
+          </div>
           <div className="w-full flex justify-between items-center">
             <div className="flex items-center justify-center gap-1">
               <input

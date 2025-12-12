@@ -11,8 +11,6 @@ import ClientsTable from "./pages/clients/ClientsTable";
 import Dashboard from "./pages/Dashboard";
 import ExpertTable from "./pages/experts/ExpertTable";
 import ProgramTable from "./pages/programsList/ProgramTable";
-import { Button } from "./components/ui/button";
-import AddNewClient from "./pages/clients/AddNewClient";
 import Login from "./pages/Login";
 
 function App() {
@@ -24,7 +22,6 @@ function App() {
           <Route path="/" element={<AppLayout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/clients" element={<ClientsTable />} />
-            <Route path="/addClient" element={<AddNewClient />} />
             <Route path="/experts" element={<ExpertTable />} />
             <Route path="/programs" element={<ProgramTable />} />
 
