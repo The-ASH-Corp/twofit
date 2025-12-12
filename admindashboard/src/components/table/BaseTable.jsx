@@ -2,7 +2,7 @@ import {
   useReactTable,
   getCoreRowModel,
   flexRender,
-  getPaginationRowModel,
+  // getPaginationRowModel,
 } from "@tanstack/react-table";
 import { assets } from "../../assets/asset";
 import {useNavigate} from 'react-router-dom'
@@ -68,7 +68,10 @@ export default function BaseTable({ columns, data,actionLabel ,actionPath}) {
               className="border-b border-[#DBDEDD] hover:bg-gray-50 transition"
             >
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="py-5 px-2 text-[11px] font-medium text-black">
+                <td
+                  key={cell.id}
+                  className="py-5 px-2 text-[11px] font-medium text-black"
+                >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}

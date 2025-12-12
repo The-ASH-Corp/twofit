@@ -11,8 +11,6 @@ import ClientsTable from "./pages/clients/ClientsTable";
 import Dashboard from "./pages/Dashboard";
 import ExpertTable from "./pages/experts/ExpertTable";
 import ProgramTable from "./pages/programsList/ProgramTable";
-import ClientForm from "./pages/clients/ClientForm";
-// import AddExpert from "./pages/experts/AddExpert";
 
 function App() {
   return (
@@ -23,7 +21,6 @@ function App() {
         <Route path="/" element={<Dashboard/>}/>
         <Route path="/clients" element={<ClientsTable />} />
         <Route path="/experts" element={<ExpertTable />} />
-        <Route path="/addclient" element={<ClientForm/>}/>
         <Route path="/programs" element={<ProgramTable/>} />
         
         <Route path="/finance" element={<Finance />} />

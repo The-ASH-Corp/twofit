@@ -12,6 +12,26 @@ import filter from './filter.svg'
 import profile from './profileimage.svg'
 import search from './search.svg'
 import menu from './menu.svg'
+import loginPageImg from "./loginPageImg.jpg";
+import NavBarLogo from "./navbarLogo.svg"
 
 
-export const assets={menu,search,profile,filter,dashboard,clients,experts,programs,finance,chats,analytics,website,logo,signout}
+
+export const assets = {
+  menu,
+  search,
+  profile,
+  filter,
+  dashboard,
+  clients,
+  experts,
+  programs,
+  finance,
+  chats,
+  analytics,
+  website,
+  logo,
+  signout,
+  loginPageImg,
+  NavBarLogo,
+};
