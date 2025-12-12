@@ -2,13 +2,16 @@ import {
   useReactTable,
   getCoreRowModel,
   flexRender,
-  getPaginationRowModel,
+  // getPaginationRowModel,
 } from "@tanstack/react-table";
 import { assets } from "../../assets/asset";
 
 import { useState } from "react";
-export default function BaseTable({ columns, data,actionLabel }) {
+
+export default function BaseTable({ columns, data, actionLabel }) {
+
   const [rowSelection, setRowSelection] = useState({});
+
   const table = useReactTable({
     data,
     columns,
@@ -33,9 +36,18 @@ export default function BaseTable({ columns, data,actionLabel }) {
             />
             <img src={assets.filter} className="  w-4 h-4" />
           </div>
-          <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0">All Status</button>
-          <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0">Bulk Actions</button>
-          <button className="bg-[#0A4F48] text-white rounded-md text-[12px] font-semibold px-3 py-0">{actionLabel}</button>
+          <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0">
+            All Status
+          </button>
+          <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0">
+            Bulk Actions
+          </button>
+          <button
+            
+            className="bg-[#0A4F48] text-white rounded-md text-[12px] font-semibold px-3 py-0"
+          >
+            {actionLabel}
+          </button>
         </div>
       </div>
       <table className="w-full text-sm border-collapse">
@@ -64,7 +76,10 @@ export default function BaseTable({ columns, data,actionLabel }) {
               className="border-b border-[#DBDEDD] hover:bg-gray-50 transition"
             >
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="py-5 px-2 text-[11px] font-medium text-black">
+                <td
+                  key={cell.id}
+                  className="py-5 px-2 text-[11px] font-medium text-black"
+                >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
