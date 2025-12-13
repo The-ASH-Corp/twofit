@@ -11,14 +11,16 @@ import ProgramDetails from "./components/AllPrograms/ProgramDetails";
 import { useEffect, useState } from "react";
 
 function App() {
-  const [videoVisible, setVideoVisible] = useState(true);
+  const [videoVisible, setVideoVisible] = useState(false);
   const { pathname } = useLocation();
 
   useEffect(() => {
+    
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
+    
   }, [pathname]);
   // console.log(videoVisible)
   return (
@@ -37,7 +39,7 @@ function App() {
             <Route path="/programs/:id" element={<ProgramDetails />} />
             <Route path="/ourstory" element={<OurStory />} />
             <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:bid" element={<BlogDetails />} />
+            <Route path="/blog/:blogId" element={<BlogDetails />} />
             <Route path="/contact" element={<Contact />} />
           </Routes>
         </main>
