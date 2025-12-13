@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {assets} from "../assets/asset";
 
 const Login = () => {
+    const [showPassword, setShowPassword] = useState(false);
   return (
     <div className="h-screen w-full flex items-center justify-between ">
       {/* image */}
@@ -33,9 +34,34 @@ const Login = () => {
         </div>
         {/* form */}
         <div className="flex flex-col items-center w-full gap-6">
-          <div className='w-full flex flex-col items-start'>
-            <form action="">
-                
+          <div className="w-full flex flex-col items-start">
+            <form action="" className="flex flex-col w-full gap-6">
+              <div className="flex flex-col items-start gap-2">
+                <label htmlFor="" className="text-[11px]">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  className="border w-full rounded-md h-10 p-4 text-[12px]"
+                  placeholder="yourname@example.com"
+                />
+              </div>
+              <div className="relative flex flex-col items-start gap-2">
+                <label htmlFor="" className="text-[11px]">
+                  Password
+                </label>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="border w-full rounded-md h-10 p-4 text-[12px]"
+                  placeholder="Enter your password"
+                />
+                <button
+                  className="absolute bottom-3.5 right-3"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  <img src={assets.HiddenIcon} alt="" />
+                </button>
+              </div>
             </form>
           </div>
           <div className="w-full flex justify-between items-center">
@@ -46,7 +72,9 @@ const Login = () => {
               />
               <span className="text-[12px] ">Remember me</span>
             </div>
-            <p className="text-[12px] font-semibold ">Forgot Password?</p>
+            <button className="text-[12px] font-semibold ">
+              Forgot Password?
+            </button>
           </div>
           <div className="w-full">
             <button className="bg-[#0A4F48] w-full py-3.5 rounded-lg text-white font-semibold text-[16px]">
