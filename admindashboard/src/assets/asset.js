@@ -14,6 +14,7 @@ import search from './search.svg'
 import menu from './menu.svg'
 import loginPageImg from "./loginPageImg.jpg";
 import NavBarLogo from "./navbarLogo.svg"
+import HiddenIcon from "./hiddenIcon.svg"
 
 
 
@@ -34,4 +35,5 @@ export const assets = {
   signout,
   loginPageImg,
   NavBarLogo,
+  HiddenIcon,
 };
