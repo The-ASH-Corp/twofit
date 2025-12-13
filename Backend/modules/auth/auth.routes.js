@@ -5,10 +5,10 @@ import {
   adminLoginController,
   // forgotPasswordController,
   // resetPasswordController
-} from "../controllers/authController.js";
+} from "./auth.controller.js";
 
-import { authMiddleware } from "../middleware/authMiddleware.js";
-import { allowRoles } from "../middleware/roleMiddleware.js";
+import { authMiddleware } from "../../middleware/authMiddleware.js";
+import { allowRoles } from "../../middleware/roleMiddleware.js";
 
 const router = express.Router();
 

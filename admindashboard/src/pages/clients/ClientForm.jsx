@@ -4,6 +4,7 @@ import BaseForm from "../../components/form/BaseForm";
 const fields = [
   {
     section: "Personal Information",
+    position: "left",
     fields: [
       { name: "fullname", label: "Full Name", type: "text" },
       { name: "dob", label: "Date Of Birth", type: "date" },
@@ -21,6 +22,7 @@ const fields = [
 
   {
     section: "Contact Information",
+    position: "left",
     fields: [
       { name: "email", label: "Email Address", type: "email" },
       { name: "phone", label: "Phone Number", type: "text" },
@@ -30,41 +32,63 @@ const fields = [
 
   {
     section: "Health Profile",
+    position: "left",
     fields: [
       { name: "medicalconditions", label: "Medical Conditions", type: "text" },
       { name: "allergy", label: "Allergies", type: "text" },
       { name: "food-pref", label: "Food Preferance", type: "text" },
-      {name:"fitnessgoal",label:"Fitness Goal",type:"text"},
-      {name:"currentWeight",label:"Current Weight",type:"text"},
-      {name:"targetWeight",label:"Target Weight",type:"text"}
-
+      { name: "fitnessgoal", label: "Fitness Goal", type: "text" },
+      { name: "currentWeight", label: "Current Weight", type: "text" },
+      { name: "targetWeight", label: "Target Weight", type: "text" },
     ],
   },
 
   {
-    section:"Program Assignment",
-    fields:[
-        {name:"ptype",label:"Program Type",type:"text"},
-        {name:"duration",label:"Duration",type:"text"},
-        {name:"startDate",label:"Start Date",type:"date"},
-        {name:"endDate",label:"End Date",type:"date"}
-    ]
+    section: "Program Assignment",
+    position: "right",
+    fields: [
+      { name: "ptype", label: "Program Type", type: "text" },
+      { name: "duration", label: "Duration", type: "text" },
+      { name: "startDate", label: "Start Date", type: "date" },
+      { name: "endDate", label: "End Date", type: "date" },
+    ],
   },
   {
-    section:"Expert Assignment",
-    fields:[
-        {name:"dietician",label:"Dietician",type:"text"},
-        {name:"trainer",label:"Trainer",type:"text"},
-        {name:"therapist",label:"Therapist",type:"text"}
-        
-    ]
-  }
+    section: "Expert Assignment",
+    position: "right",
+    fields: [
+      { name: "dietician", label: "Dietician", type: "text" },
+      { name: "trainer", label: "Trainer", type: "text" },
+      { name: "therapist", label: "Therapist", type: "text" },
+    ],
+  },
+  {
+    section: "Account Setup",
+    position: "right",
+    fields: [
+      {
+        name: "autoSendWelcome",
+        label: "Auto-send welcome message",
+        type: "toggle",
+      },
+      {
+        name: "autoSendGuide",
+        label: "Auto-send Onboarding Guide",
+        type: "toggle",
+      },
+      {
+        name: "automatedReminder",
+        label: "Automated Reminders",
+        type: "toggle",
+      },
+    ],
+  },
 ];
 
 const initialValues = {
   fullname: "",
   dob: "",
-  gender: "",//need to add
+  gender: "", //need to add
 };
 
 const schema = Yup.object({
@@ -76,7 +100,7 @@ const schema = Yup.object({
 export default function ClientForm() {
   return (
     <BaseForm
-      heading="Personal Information"
+      
       fields={fields}
       initialValues={initialValues}
       validationSchema={schema}

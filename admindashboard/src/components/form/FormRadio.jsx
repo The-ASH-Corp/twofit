@@ -7,7 +7,7 @@ export default function FormRadio({ label, name, options }) {
 
       <div className="grid grid-cols-2 gap-3 mt-1  w-full ">
         {options.map((opt) => (
-          <label key={opt.value} className="flex items-center   cursor-pointer border border-gray-300 rounded-md   w-full">
+          <label key={opt.value} className="flex items-center   cursor-pointer border border-gray-300 rounded-lg   w-full">
             <Field
               type="radio"
               name={name}

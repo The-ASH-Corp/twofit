@@ -8,7 +8,7 @@ export default function FormInput({ label, name, type = "text" }) {
       <Field
         name={name}
         type={type}
-        className="border border-gray-300 p-2 rounded-md w-full"
+        className="border border-gray-300 p-2 rounded-lg w-full"
       />
 
       <ErrorMessage

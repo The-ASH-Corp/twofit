@@ -20,7 +20,7 @@ export const programListData=[
     duration: 45,
     clients: 25,
     linkedTemplate: "Yes",
-    experts:[ "Trainer", "Physiotherapist"],
+    experts:[ "Trainer"],
     status: "Inactive"
   },
   {
@@ -44,7 +44,7 @@ export const programListData=[
     duration: 21,
     clients: 15,
     linkedTemplate: "Yes",
-    experts: ["Therapist", "Yoga Trainer"],
+    experts: ["Therapist"],
     status: "Inactive"
   },
   {
@@ -60,7 +60,7 @@ export const programListData=[
     duration: 50,
     clients: 14,
     linkedTemplate: "No",
-    experts: ["Physiotherapist"],
+    experts: ["Trainer"],
     status: "Active"
   },
   {
