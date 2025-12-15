@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import router1 from "./routes/index.js";
 import cors from "cors";
+import {connectRedis} from "./redis/redisClient.js"
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use("/uploads", express.static("uploads"));
 
 app.use("/api/v1", router1);
 
+await connectRedis()
 mongoose
   .connect(process.env.MONGOURI)
   .then(() => console.log("connected"))
