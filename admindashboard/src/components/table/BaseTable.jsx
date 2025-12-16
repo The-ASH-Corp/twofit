@@ -7,9 +7,8 @@ import {
 import { assets } from "../../assets/asset";
 
 import { useState } from "react";
-
-export default function BaseTable({ columns, data, actionLabel }) {
-
+export default function BaseTable({ columns, data,actionLabel ,actionPath,pageLabel}) {
+  
   const [rowSelection, setRowSelection] = useState({});
 
   const table = useReactTable({
@@ -25,7 +24,7 @@ export default function BaseTable({ columns, data, actionLabel }) {
   return (
     <div className="bg-white p-[16px] rounded-xl   ">
       <div className="mb-6 flex justify-between">
-        <h2 className="text-[#0A4F48] font-bold text-[16px]">Clients</h2>
+        <h2 className="text-[#0A4F48] font-bold text-[16px]">{pageLabel}</h2>
         <div className="flex gap-3">
           <div className="flex items-center bg-[#F8F8F8] px-3 rounded-lg">
             <img src={assets.search} className="  w-5 h-5  " />

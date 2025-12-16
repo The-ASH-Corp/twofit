@@ -9,7 +9,7 @@ export default function Topbar() {
   return (
     <div className="flex justify-between items-center  ">
       <div>
-        <h2 className="text-2xl font-semibold text-[#0A4F48]">Dashboard</h2>
+        <h2 className="text-2xl font-semibold text-[#0A4F48] ">Dashboard</h2>
       </div>
 
       <div className="flex items-center gap-4">

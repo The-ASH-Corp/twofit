@@ -1,4 +1,4 @@
-import * as service from "../services/authServices.js";
+import * as service from "./auth.service.js";
 
 export const createUserByAdmin = async (req, res) => {
   try {
