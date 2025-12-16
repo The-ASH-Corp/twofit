@@ -1,10 +1,7 @@
 import bcrypt from "bcryptjs";
-import jwt from 'jsonwebtoken'
- import User from "./auth.model.js";
-import {
-  generateAccessToken,
-  generateRefreshToken,
-} from '../../utils/jwt.js'
+import jwt from "jsonwebtoken";
+import User from "./auth.model.js";
+import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.js";
 // import { sendEmail } from "../utils/email.js";
 
 export const adminCreateUser = async ({ email, password, role }) => {
@@ -24,7 +21,8 @@ export const adminCreateUser = async ({ email, password, role }) => {
 };
 
 export const loginUser = async ({ email, password }) => {
-  const user = await User.findOne({ email });
+  const user = await User.findOne({ email }).select("+password")
+
   if (!user) throw new Error("Invalid credentials");
 
   if (user.status !== "active")
@@ -36,6 +34,7 @@ export const loginUser = async ({ email, password }) => {
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
 
+  
   return { user, accessToken, refreshToken };
 };
 
@@ -91,7 +90,6 @@ export const adminLogin = async ({ email, password }) => {
 
 //   return { message: "Reset instructions sent to email" };
 // };
-
 
 // export const resetPassword = async ({ token, newPassword }) => {
 //   try {
