@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "./auth.model.js";
 import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.js";
+import redisClient from "../../redis/redisClient.js";
 // import { sendEmail } from "../utils/email.js";
 
 export const adminCreateUser = async ({ email, password, role }) => {
@@ -21,7 +22,7 @@ export const adminCreateUser = async ({ email, password, role }) => {
 };
 
 export const loginUser = async ({ email, password }) => {
-  const user = await User.findOne({ email }).select("+password")
+  const user = await User.findOne({ email }).select("+password");
 
   if (!user) throw new Error("Invalid credentials");
 
@@ -34,7 +35,10 @@ export const loginUser = async ({ email, password }) => {
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
 
-  
+  await redisClient.set(`refresh:${user._id}`, refreshToken, {
+    EX: 7 * 24 * 60 * 60,
+  });
+
   return { user, accessToken, refreshToken };
 };
 
@@ -49,6 +53,10 @@ export const adminLogin = async ({ email, password }) => {
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
 
+  await redisClient.set(`refresh:${user._id}`, refreshToken, {
+    EX: 7 * 24 * 60 * 60,
+  });
+  
   return { user, accessToken, refreshToken };
 };
 
