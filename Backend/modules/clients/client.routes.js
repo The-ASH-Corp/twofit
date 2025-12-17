@@ -1,10 +1,12 @@
 import express from "express";
-import { getAllClients, getSingleClient } from "./client.controller.js";
+import { deleteClient, getAllClients, getSingleClient, updateClient } from "./client.controller.js";
 
 
 const router =express.Router()
 
-router.get("/all-clients",getAllClients)
+router.get("/all-clients/:page/:liimit",getAllClients)
 router.get("/get-client/:id",getSingleClient)
+router.post("/update-client/:id",updateClient)
+router.delete("/delete-client/:id",deleteClient)
 
 export default router;
