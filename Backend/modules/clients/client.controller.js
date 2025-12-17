@@ -14,7 +14,8 @@ export const getAllClients = async (req, res) => {
 
 export const getSingleClient = async (req, res) => {
   try {
-    const client = await service.getSingleClient(req.params);
+    const {id} = req.params;
+    const client = await service.getSingleClient(id);
     res.status(200).json({
         success: true,
         data : client,

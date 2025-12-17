@@ -3,19 +3,41 @@ import jwt from "jsonwebtoken";
 import User from "./auth.model.js";
 import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.js";
 import redisClient from "../../redis/redisClient.js";
+import { generatePassword } from "../../utils/password.js";
 // import { sendEmail } from "../utils/email.js";
 
-export const adminCreateUser = async ({ email, password, role }) => {
-  const exists = await User.findOne({ email });
+export const adminCreateUser = async (userData) => {
+  const exists = await User.findOne({email:userData.email});
   if (exists) throw new Error("Email already exists");
+
+  const password = generatePassword()
 
   const hashed = await bcrypt.hash(password, 10);
 
   const user = await User.create({
-    email,
+    name: userData.name,
+    email: userData.email,
     password: hashed,
-    role,
+    role:"user",
     status: "active",
+    dob: userData.dob,
+    gender: userData.gender,
+    phone: userData.phone,
+    address: userData.address,
+    currentWeight: userData.currentWeight,
+    targetWeight: userData.targetWeight,
+    medicalConditions: userData.medicalConditions,
+    allergies: userData.allergies,
+    goals: userData.goals,
+    foodPreferances: userData.foodPreferances,
+    profileImage: userData?.profileImage || "",
+    programType: userData.programType,
+    duration: userData.duration,
+    programEndDate: new Date(userData.programEndDate),
+    programStartDate: new Date(userData.programStartDate),
+    dietition: userData.dietition,
+    trainer: userData.trainer,
+    therapist: userData.therapist,
   });
 
   return user;
@@ -56,7 +78,7 @@ export const adminLogin = async ({ email, password }) => {
   await redisClient.set(`refresh:${user._id}`, refreshToken, {
     EX: 7 * 24 * 60 * 60,
   });
-  
+
   return { user, accessToken, refreshToken };
 };
 
