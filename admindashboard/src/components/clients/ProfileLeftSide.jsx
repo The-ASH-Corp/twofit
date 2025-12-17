@@ -8,22 +8,22 @@ const profileInfo = [
     data: "Male",
   },
   {
-    img: assets.GenderVector,
+    img: assets.AgeVector,
     title: "Age",
     data: "29 y/o",
   },
   {
-    img: assets.GenderVector,
+    img: assets.EmailVector,
     title: "Email Address",
     data: "Aarav@gmail.com",
   },
   {
-    img: assets.GenderVector,
+    img: assets.PhoneVector,
     title: "Phone Number",
     data: "+62 811 5567 2345",
   },
   {
-    img: assets.GenderVector,
+    img: assets.HomeVector,
     title: "Address",
     data: "221B Baker Street, London, United Kingdom",
   },
