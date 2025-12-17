@@ -15,7 +15,16 @@ export const createUserByAdmin = async (req, res) => {
 
 export const loginController = async (req, res) => {
   try {
-    const data = await service.loginUser(req.body);
+    let data = await service.loginUser(req.body);
+
+    res.cookie("refreshToken", data.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    });
+
+    delete data.refreshToken;
+
     res.json({ success: true, message: "Login successful", data });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
@@ -24,13 +33,21 @@ export const loginController = async (req, res) => {
 
 export const adminLoginController = async (req, res) => {
   try {
-    const data = await service.adminLogin(req.body);
-    res.json({ success: true, message: "Admin login successful", data });
+    let data = await service.adminLogin(req.body);
+
+    res.cookie("refreshToken", data.refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    });
+
+    delete data.refreshToken;
+
+    res.json({ success: true, message: "Admin Login successful", data });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
 };
-
 
 // export const forgotPasswordController = async (req, res) => {
 //   try {
@@ -55,5 +72,3 @@ export const adminLoginController = async (req, res) => {
 //     res.status(400).json({ success: false, message: err.message });
 //   }
 // };
-
-

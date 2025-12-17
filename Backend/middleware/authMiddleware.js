@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../modules/auth/auth.model.js";
+import { refreshAccessToken } from "../utils/jwt.js";
 
 export const authMiddleware = async (req, res, next) => {
   try {
@@ -18,7 +19,10 @@ export const authMiddleware = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    res.status(401).json({ message: "Invalid token" });
+    if (err.name !== "TokenExpiredError")
+      return res.status(401).json({ message: "Invalid token" });
+
+   return refreshAccessToken(req, res, next);
   }
 };
 

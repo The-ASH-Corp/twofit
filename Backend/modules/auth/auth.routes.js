@@ -18,13 +18,13 @@ router.post(
   "/admin/create-user",
   authMiddleware,
   allowRoles("admin"),
-  validate(adminUserCreateValidator),
+  // validate(adminUserCreateValidator),
   createUserByAdmin
 );
 
 router.post("/auth/login",validate(userLoginSchema), loginController);
 
-router.post("/admin/login", adminLoginController);
+router.post("/admin/login",validate(userLoginSchema), adminLoginController);
 
 //  router.post("/forgot-password", forgotPasswordController);
 
