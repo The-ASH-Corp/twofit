@@ -55,12 +55,18 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-    Duration: { type: Number, required:true},
+    duration: { type: Number, required:true},
 
     programStartDate: { type: Date, required: true },
 
     programEndDate: { type: Date, required: true },
 
+    dietition:{type:mongoose.Schema.Types.ObjectId, required:true},
+
+    trainer:{type:mongoose.Schema.Types.ObjectId,required:true},
+
+    therapist:{type:mongoose.Schema.Types.ObjectId,required:true},
+    
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

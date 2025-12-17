@@ -7,6 +7,8 @@ import testimonialRoutes from "../modules/testimonial/testimonial.routes.js"
 import faqRoutes from "../modules/faq/faq.routes.js"
 import programRoutes from "../modules/allPrograms/allPrograma.route.js"
 import authRoutes from '../modules/auth/auth.routes.js'
+import clientRoutes from "../modules/clients/client.routes.js"
+
 
 const router = express.Router();
 
@@ -17,7 +19,7 @@ router.use("/programs", programRoutes);
 router.use("/testimonials",testimonialRoutes)
 router.use("/faq",faqRoutes)
 router.use('/',authRoutes)
-
+router.use("/clients",clientRoutes)
 
 
 export default router;

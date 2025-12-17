@@ -13,3 +13,32 @@ export const generateRefreshToken = (user) => {
     expiresIn: "7d",
   });
 };
+
+
+export const refreshAccessToken = async(req,res,next)=>{
+const refreshToken = req.cookies.refreshToken;
+
+  if (!refreshToken)
+    return res.status(401).json({ message: "Refresh token missing" });
+
+  try {
+    const decoded = jwt.verify(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET
+    );
+
+    const storedToken = await redisClient.get(`refresh:${decoded._id}`);
+
+    if (!storedToken || storedToken !== refreshToken)
+      return res.status(403).json({ message: "Invalid refresh token" });
+
+    const newAccessToken = generateAccessToken(decoded);
+
+    res.setHeader("x-access-token", newAccessToken);
+
+    req.user = jwt.verify(newAccessToken, process.env.JWT_SECRET);
+    return next();
+  } catch (err) {
+    return res.status(403).json({ message: "Refresh token expired" });
+  }
+};

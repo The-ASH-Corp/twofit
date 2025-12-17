@@ -9,6 +9,8 @@ import {
 
 import { authMiddleware } from "../../middleware/authMiddleware.js";
 import { allowRoles } from "../../middleware/roleMiddleware.js";
+import { validate } from "../../middleware/validate.js";
+import { adminUserCreateValidator, userLoginSchema } from "../../validator/auth.validator.js";
 
 const router = express.Router();
 
@@ -16,12 +18,13 @@ router.post(
   "/admin/create-user",
   authMiddleware,
   allowRoles("admin"),
+  // validate(adminUserCreateValidator),
   createUserByAdmin
 );
 
-router.post("/auth/login", loginController);
+router.post("/auth/login",validate(userLoginSchema), loginController);
 
-router.post("/admin/login", adminLoginController);
+router.post("/admin/login",validate(userLoginSchema), adminLoginController);
 
 //  router.post("/forgot-password", forgotPasswordController);
 
