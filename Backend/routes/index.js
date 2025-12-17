@@ -12,14 +12,15 @@ import clientRoutes from "../modules/clients/client.routes.js"
 
 const router = express.Router();
 
-router.use("/coach", coachRoutes);
-router.use("/blog", blogRoutes);
-router.use("/workout", planRoutes);
-router.use("/programs", programRoutes);
-router.use("/testimonials",testimonialRoutes)
-router.use("/faq",faqRoutes)
 router.use('/',authRoutes)
 router.use("/clients",clientRoutes)
+router.use("/coach", coachRoutes);
+router.use("/workout", planRoutes);
+router.use("/programs", programRoutes);
+
+// router.use("/blog", blogRoutes);
+// router.use("/testimonials",testimonialRoutes)
+// router.use("/faq",faqRoutes)
 
 
 export default router;
