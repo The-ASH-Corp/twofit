@@ -15,6 +15,7 @@ import Login from "./pages/Login";
 import ClientForm from "./pages/clients/ClientForm";
 import ExpertForm from "./pages/experts/ExpertForm";
 import FinanceTable from "./pages/finance/FinanceTable";
+import ClientProfile from "./pages/clients/ClientProfile";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/" element={<AppLayout />}  >
         <Route path="/" element={<Dashboard/>}/>
         <Route path="/clients" element={<ClientsTable />} />
+        <Route path="/clients/clientProfile/:clientId" element={<ClientProfile/>} />
         <Route path="/addclient" element={<ClientForm/>}/>
         <Route path="/experts" element={<ExpertTable />} />
         <Route path="/addexpert" element={<ExpertForm/>}/>
