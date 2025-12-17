@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { assets } from "../../assets/asset";
- 
+
 const menuItems = [
   {
     label: "Dashboard",
@@ -20,10 +20,10 @@ const menuItems = [
         path: "/programs/list",
       },
       {
-        label:"Templates",
-        icon:assets.programs,
-        path:"/programs/template"
-      }
+        label: "Templates",
+        icon: assets.programs,
+        path: "/programs/template",
+      },
     ],
   },
   { label: "Finance", icon: assets.finance, path: "/finance" },
@@ -34,7 +34,7 @@ const menuItems = [
 
 export default function Sidebar() {
   return (
-    <aside className="w-[225px] bg-white   py-6 px-5 flex flex-col">
+    <aside className="w-[225px] h-screen bg-white   py-6 px-5 flex flex-col">
       <h1 className="text-2xl  m-auto my-4 mb-8">
         <img src={assets.logo} className="text-[#66706D]" />
       </h1>
@@ -45,17 +45,20 @@ export default function Sidebar() {
             to={item.path}
             key={item.label}
             className={({ isActive }) =>
-              `flex items-center text-[#66706D] gap-3 w-full px-4 py-3 text-sm font-medium rounded-xl transition
+              `flex items-center justify-between text-[#66706D]  w-full px-4 py-3 text-sm font-medium rounded-xl transition
     ${isActive ? "bg-[#0A4F48] text-white" : "text-gray-600 hover:bg-gray-100"}
   `
             }
           >
-            <img
-              src={item.icon}
-              className="w-5 h-5 text-black object-contain"
-              alt={item.label}
-            />
-            {item.label}
+            <div className="flex items-center gap-3">
+              <img
+                src={item.icon}
+                className="w-5 h-5 text-black object-contain"
+                alt={item.label}
+              />
+              {item.label}
+            </div>
+            {item.Children && <img src={assets.vectorDown} alt="" />}
           </NavLink>
         ))}
       </nav>

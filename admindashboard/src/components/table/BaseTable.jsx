@@ -37,9 +37,18 @@ export default function BaseTable({ columns, data,actionLabel ,actionPath,pageLa
             />
             <img src={assets.filter} className="  w-4 h-4" />
           </div>
-          <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0">All Status</button>
-          <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0">Bulk Actions</button>
-          <button onClick={()=>navigate(actionPath)} className="bg-[#0A4F48] text-white rounded-md text-[12px] font-semibold px-3 py-0">{actionLabel}</button>
+          <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0">
+            All Status
+          </button>
+          <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0">
+            Bulk Actions
+          </button>
+          <button
+            onClick={() => navigate(actionPath)}
+            className="bg-[#0A4F48] text-white rounded-md text-[12px] font-semibold px-3 py-0"
+          >
+            {actionLabel}
+          </button>
         </div>
       </div>
       <table className="w-full text-sm border-collapse">
@@ -66,6 +75,7 @@ export default function BaseTable({ columns, data,actionLabel ,actionPath,pageLa
             <tr
               key={row.id}
               className="border-b border-[#DBDEDD] hover:bg-gray-50 transition"
+              onClick={() => navigate("/clients/clientProfile/:clientId")}
             >
               {row.getVisibleCells().map((cell) => (
                 <td

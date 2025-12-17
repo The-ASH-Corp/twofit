@@ -25,7 +25,7 @@ export default function Topbar() {
 
         <Bell className="w-6 h-6 text-gray-600 cursor-pointer" />
         <img src={assets.menu} />
-        <img src={assets.profile} className="rounded rounded-full" />
+        <img src={assets.profile} className="rounded-full" />
 
         <div className="flex items-center gap-3">
           <div>
