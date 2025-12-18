@@ -1,6 +1,6 @@
 import React from "react";
 import ProfileLeftSide from "@/components/clients/ProfileLeftSide";
-import { assets } from "@/assets/asset";
+import { assets, getBgColor } from "@/assets/asset";
 
 const healthDetails = [
   {
@@ -28,6 +28,47 @@ const healthDetails = [
     data: ["72 kg"],
   },
 ];
+
+const assignedExperts = [
+  {
+    img: assets.tickVector,
+    heading: "Breakfast",
+    contend: "Overnight Oats with Apple Cinnamon...",
+    status: "Completed",
+  },
+  {
+    img: assets.tickVector,
+    heading: "Breakfast",
+    contend: "Overnight Oats with Apple Cinnamon...",
+    status: "Completed",
+  },
+  {
+    img: assets.tickVector,
+    heading: "Breakfast",
+    contend: "Overnight Oats with Apple Cinnamon...",
+    status: "Completed",
+  },
+  {
+    img: assets.tickVector,
+    heading: "Breakfast",
+    contend: "Overnight Oats with Apple Cinnamon...",
+    status: "Completed",
+  },
+  {
+    img: assets.tickVector,
+    heading: "Breakfast",
+    contend: "Overnight Oats with Apple Cinnamon...",
+    status: "Completed",
+  },
+  {
+    img: assets.tickVector,
+    heading: "Breakfast",
+    contend: "Overnight Oats with Apple Cinnamon...",
+    status: "Completed",
+  },
+];
+
+
 
 const ClientProfile = () => {
   return (
@@ -80,29 +121,78 @@ const ClientProfile = () => {
             </button>
           </div>
         </div>
-        <div className="flex items-center justify-between gap-[7.5px] w-full">
-          <div className="p-4 bg-white rounded-lg w-full">
-            <div className="flex flex-col items-start gap-1">
+        <div className="flex items-center  gap-[7.5px] w-full">
+          <div className="p-4 bg-white rounded-2xl w-[50%]">
+            <div className="flex flex-col items-start gap-1 ">
               <span className="text-[11px] text-[#66706D]">Program Type</span>
               <span className="font-bold text-[12px]">Weight Loss</span>
             </div>
           </div>
-          <div className="p-4 bg-white rounded-lg w-full">
-            <div className="flex flex-col items-start gap-1">
+          <div className="p-4 bg-white rounded-2xl w-[50%]">
+            <div className="flex flex-col items-start gap-1 ">
               <span className="text-[11px] text-[#66706D]">Plan Version</span>
               <span className="font-bold text-[12px]">V2</span>
             </div>
           </div>
-          <div className="flex items-center gap-6 p-4 bg-white rounded-lg w-full">
-            <div className="flex flex-col items-start gap-1">
+          <div className="flex items-center gap-6 p-4 bg-white rounded-2xl w-full">
+            <div className="flex flex-col items-start gap-1 w-full">
               <span className="text-[11px] text-[#66706D]">Plan Duration</span>
               <span className="font-bold text-[12px]">60 Days</span>
             </div>
-            <div>dfghj</div>
+            <div className="flex flex-col items-end gap-1 w-full">
+              <p className="text-[12px] text-[#66706D]">
+                <span className="text-[#0A4F48] font-bold">40%</span> / 100%
+              </p>
+              <div className="relative w-25 bg-gray-200 rounded-full h-2 overflow-visible">
+                <div
+                  className="h-full bg-[#F4DBC7] transition-all duration-500 ease-out rounded-l-full"
+                  style={{ width: `40%` }}
+                />
+                <span className="absolute left-[40%] -top-0.5 w-0.5 h-3 bg-[#0A4F48]"></span>
+              </div>
+            </div>
           </div>
         </div>
         {/* Today’s Task */}
-        <div></div>
+        <div className="w-full flex flex-col items-center gap-4 p-4 bg-white rounded-lg">
+          <div className="w-full flex justify-between items-center">
+            <h2 className="font-bold text-[16px] text-[#0A4F48]">
+              Health Details
+            </h2>
+            <button>
+              <img
+                src={assets.threeDotVector}
+                alt="dot menu"
+                className="w-3.5"
+              />
+            </button>
+          </div>
+          <div className="w-full flex flex-col items-center">
+            {assignedExperts.map((items) => (
+              <div className="flex items-center justify-between w-full py-4 border-b border-b-[#DBDEDD]">
+                <div className="flex items-start gap-4">
+                  <div
+                    className="p-3 rounded-full "
+                    style={{ backgroundColor: getBgColor() }}
+                  >
+                    <img src={items.img} alt="" className="w-[17px] h-[17px]" />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="text-[11px] text-[#0A4F48] font-bold">
+                      {items.heading}
+                    </span>
+                    <span className="text-[12px]">{items.contend}</span>
+                  </div>
+                </div>
+                <div className="border border-[#F8D87B] bg-[#FFFAE0] px-2 py-0.5 rounded-full flex items-center">
+                  <span className="text-[#936900] text-[11px] ">
+                    {items.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
       {/* right */}
       <div className="w-[25%] bg-amber-200"></div>

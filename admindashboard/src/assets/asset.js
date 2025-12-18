@@ -23,6 +23,7 @@ import PhoneVector from "./PhoneVector.svg";
 import HomeVector from "./homeVector.svg";
 import threeDotVector from "./ThreeDotVector.svg"
 import profileVector from "./ProfileVector.svg"
+import tickVector from "./tickVector.svg"
 
 export const assets = {
   menu,
@@ -50,4 +51,19 @@ export const assets = {
   HomeVector,
   threeDotVector,
   profileVector,
+  tickVector,
+};
+
+export const getBgColor = () => {
+  const bgarr = [
+    "#feefea",
+    "#fff3ff",
+    "#f2fce4",
+    "#fcffec",
+    "#fffceb",
+    "#def9ec",
+  ];
+  const randomBg = Math.floor(Math.random() * bgarr.length);
+  const color = bgarr[randomBg];
+  return color;
 };
