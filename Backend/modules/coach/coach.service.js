@@ -5,8 +5,10 @@ export const createCoach = async (coach)=> {
     return await CoachModel.create(coach)
 }
 
-export const getAllCoach = async ()=> {
-    return await CoachModel.find().select(
+export const getAllCoach = async (page, limit)=> {
+  const skip = (page - 1) * limit;
+
+    return await CoachModel.find().skip(skip).limit(limit).select(
       "_id name specialization experience image"
     );
 }

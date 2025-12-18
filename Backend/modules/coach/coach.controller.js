@@ -19,7 +19,8 @@ export const createCoach = async(req, res)=> {
 
 export const getAllCoach = async(req, res)=> {
     try {
-        const coachs = await coachService.getAllCoach();
+     const {page,limit} = req.params
+        const coachs = await coachService.getAllCoach(page,limit);
         res
           .status(200)
           .json({
