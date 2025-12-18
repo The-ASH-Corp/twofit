@@ -95,12 +95,10 @@ const ClientProfile = () => {
           </div>
           <div className="flex items-center gap-6 p-4 bg-white rounded-lg w-full">
             <div className="flex flex-col items-start gap-1">
-              <span className="text-[11px] text-[#66706D]">Program Type</span>
-              <span className="font-bold text-[12px]">Weight Loss</span>
+              <span className="text-[11px] text-[#66706D]">Plan Duration</span>
+              <span className="font-bold text-[12px]">60 Days</span>
             </div>
-            <div>
-              dfghj
-            </div>
+            <div>dfghj</div>
           </div>
         </div>
         {/* Today’s Task */}
