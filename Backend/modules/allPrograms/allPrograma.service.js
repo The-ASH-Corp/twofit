@@ -4,8 +4,8 @@ export const createProgram = async (data) => {
   return await programModel.create(data);
 };
 
-export const getAllProgram = async () => {
-  return await programModel.find();
+export const getAllProgram = async (page,limit) => {
+  return await programModel.find().skip((page-1)*limit).limit(limit);
 };
 
 export const getSingleProgram = async (id) => {

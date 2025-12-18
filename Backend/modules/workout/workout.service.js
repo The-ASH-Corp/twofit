@@ -2,8 +2,8 @@ import { WorkoutPlan } from "./workout.model.js";
 import { AssignedPlan } from "./workout.model.js";
 
 
-export const getPlans = async ()=> {
-    return await WorkoutPlan.find();
+export const getPlans = async (page,limit)=> {
+    return await WorkoutPlan.find().skip((page-1)*limit).limit(limit);
 };
 
 export const getSinglePlan = async (planId) => {
