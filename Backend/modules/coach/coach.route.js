@@ -5,7 +5,7 @@ import * as coachController from "./coach.controller.js"
 const router = express.Router();
 
 router.post("/create", coachController.createCoach)
-router.get("/list", coachController.getAllCoach);
+router.get("/list/:page/:limit", coachController.getAllCoach);
 router.put("/assign", coachController.AssignCoachToUser);
 router.get("/get/:coachId", coachController.getCoachById);
 router.put("/update/:coachId", coachController.updateCoachById);
