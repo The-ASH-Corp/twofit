@@ -20,7 +20,8 @@ export const createProgramController = async (req, res) => {
 
 export const getAllProgramController = async (req, res) => {
   try {
-    const program = await getAllProgram();
+    const{page,limit} = req.params
+    const program = await getAllProgram(page,limit);
     res.status(200).json({ status: true, data: program });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });

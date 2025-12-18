@@ -7,7 +7,8 @@ import mongoose from "mongoose";
 
 export const getPlans = async (req, res) => {
   try {
-    const plans = await workoutService.getPlans();
+    const{page,limit} = req.params
+    const plans = await workoutService.getPlans(page,limit);
     res.json({ success: true, data: plans });
   } catch (error) {
     console.log(error)
