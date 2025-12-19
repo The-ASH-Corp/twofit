@@ -11,7 +11,7 @@ export const getPlans = async (req, res) => {
     const plans = await workoutService.getPlans(page,limit);
     res.json({ success: true, data: plans });
   } catch (error) {
-    console.log(error)
+     res.status(400).json({ success: false, message: err.message });
   }
 };
 
@@ -30,13 +30,12 @@ export const getSinglePlan = async (req, res) => {
 
      res.json({ success: true, data: plan });
    } catch (error) {
-    console.log(error)
+    res.status(400).json({ success: false, message: err.message });
    }
 };
 
 export const createPlan = async (req, res) => {
   try {
-    console.log("REQ BODY:", req.body);
     const plan = {
       ...req.body,
       // createdBy: req.user.role,
@@ -50,7 +49,7 @@ export const createPlan = async (req, res) => {
       plan: newPlan,
     });
   } catch (error) {
-    console.log(error)
+     res.status(400).json({ success: false, message: err.message });
   }
 };
 
@@ -67,7 +66,7 @@ export const updatePlan = async (req, res) => {
      await workoutService.updatePlan(req.params.planId, req.body);
      res.json({ success: true, message: "Workout plan updated successfully." });
    } catch (error) {
-    console.log(error)
+     res.status(400).json({ success: false, message: err.message });
    }
 };
 
@@ -87,7 +86,7 @@ export const deletePlan = async (req, res) => {
         message: "Workout plan deleted successfully.",
       });
     } catch (error) {
-      console.log(error)
+       res.status(400).json({ success: false, message: err.message });
     }
 };
 

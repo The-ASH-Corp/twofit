@@ -4,7 +4,7 @@ import { deleteClient, getAllClients, getSingleClient, updateClient } from "./cl
 
 const router =express.Router()
 
-router.get("/all-clients/:page/:liimit",getAllClients)
+router.get("/all-clients/:page/:limit",getAllClients)
 router.get("/get-client/:id",getSingleClient)
 router.post("/update-client/:id",updateClient)
 router.delete("/delete-client/:id",deleteClient)
