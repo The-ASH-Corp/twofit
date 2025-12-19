@@ -54,16 +54,3 @@ export const assets = {
   tickVector,
 };
 
-export const getBgColor = () => {
-  const bgarr = [
-    "#feefea",
-    "#fff3ff",
-    "#f2fce4",
-    "#fcffec",
-    "#fffceb",
-    "#def9ec",
-  ];
-  const randomBg = Math.floor(Math.random() * bgarr.length);
-  const color = bgarr[randomBg];
-  return color;
-};
