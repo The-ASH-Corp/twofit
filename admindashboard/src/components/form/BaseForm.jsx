@@ -110,7 +110,7 @@ export default function BaseForm({
             <h2>Save as Draft</h2>
             <div className="flex gap-2">
               <button className="bg-[#EBF3F2]  rounded-md p-2  ">Cancel</button>
-              <button className="bg-[#0A4F48] p-2 rounded-md text-white">
+              <button className="bg-[#0A4F48] p-2 rounded-md text-white" type="submit">
                 Save & Add Client
               </button>
             </div>

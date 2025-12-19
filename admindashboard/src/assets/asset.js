@@ -19,7 +19,7 @@ import vectorDown from "./VectorDown.svg";
 import GenderVector from "./genderVector.svg";
 import AgeVector from "./ageVector.svg";
 import EmailVector from "./emailVector.svg";
-import PhoneVector from "./PhoneVector.svg";
+import PhoneVector from "./phoneVector.svg";
 import HomeVector from "./homeVector.svg";
 import threeDotVector from "./ThreeDotVector.svg"
 import profileVector from "./ProfileVector.svg"

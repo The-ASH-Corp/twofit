@@ -1,5 +1,7 @@
 import * as Yup from "yup";
 import BaseForm from "../../components/form/BaseForm";
+import { createClient } from "../../redux/features/auth/auth.thunk";
+import { useDispatch } from "react-redux";
 
 const fields = [
   {
@@ -97,15 +99,24 @@ const schema = Yup.object({
   gender: Yup.string().required("Required"),
 });
 
+
+
 export default function ClientForm() {
+
+  
+  const dispatch = useDispatch();
+  const handleUserCreation = async (values) => {
+    
+    const data= await dispatch(createClient(values));
+  
+  };
   return (
     <BaseForm
-      
       fields={fields}
       initialValues={initialValues}
       validationSchema={schema}
       submitLabel="Login"
-      onSubmit={(values) => console.log(values)}
+      onSubmit={(values) => handleUserCreation(values)}
     />
   );
 }

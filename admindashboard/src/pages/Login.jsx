@@ -1,8 +1,23 @@
-import React, { useState } from 'react'
-import {assets} from "../assets/asset";
+import React, { useState } from "react";
+import { assets } from "../assets/asset";
+import { login } from "@/redux/features/auth/auth.thunk";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectToken, selectUser } from "@/redux/features/auth/auth.selectores";
 
 const Login = () => {
-    const [showPassword, setShowPassword] = useState(false);
+  const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+const toekn =useAppSelector(selectToken)
+
+  const handleLogin =async () => {    
+    await  dispatch(login(formData));
+    localStorage.setItem("token",toekn)
+  };
   return (
     <div className="h-screen w-full flex items-center justify-between ">
       {/* image */}
@@ -44,6 +59,9 @@ const Login = () => {
                   type="email"
                   className="border w-full rounded-md h-10 p-4 text-[12px]"
                   placeholder="yourname@example.com"
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                 />
               </div>
               <div className="relative flex flex-col items-start gap-2">
@@ -54,6 +72,9 @@ const Login = () => {
                   type={showPassword ? "text" : "password"}
                   className="border w-full rounded-md h-10 p-4 text-[12px]"
                   placeholder="Enter your password"
+                  onChange={(e) =>
+                    setFormData({ ...formData, password: e.target.value })
+                  }
                 />
                 <button
                   className="absolute bottom-3.5 right-3"
@@ -77,7 +98,7 @@ const Login = () => {
             </button>
           </div>
           <div className="w-full">
-            <button className="bg-[#0A4F48] w-full py-3.5 rounded-lg text-white font-semibold text-[16px]">
+            <button className="bg-[#0A4F48] w-full py-3.5 rounded-lg text-white font-semibold text-[16px]" onClick={handleLogin}>
               Login
             </button>
           </div>
@@ -85,6 +106,6 @@ const Login = () => {
       </div>
     </div>
   );
-}
+};
 
-export default Login
+export default Login;

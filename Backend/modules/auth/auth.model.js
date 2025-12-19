@@ -55,18 +55,24 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-    duration: { type: Number, required:true},
+    duration: { type: Number, required: true },
 
     programStartDate: { type: Date, required: true },
 
     programEndDate: { type: Date, required: true },
 
-    dietition:{type:mongoose.Schema.Types.ObjectId, required:true},
+    dietition: { type: mongoose.Schema.Types.ObjectId, required: true },
 
-    trainer:{type:mongoose.Schema.Types.ObjectId,required:true},
+    trainer: { type: mongoose.Schema.Types.ObjectId, required: true },
 
-    therapist:{type:mongoose.Schema.Types.ObjectId,required:true},
-    
+    therapist: { type: mongoose.Schema.Types.ObjectId, required: true },
+
+    autoSendGuide: { type: Boolean, default: false },
+
+    autoSendWelcome: { type: Boolean, default: false },
+
+    automatedReminder: { type: Boolean, default: false },
+
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

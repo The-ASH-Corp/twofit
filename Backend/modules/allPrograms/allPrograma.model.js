@@ -7,23 +7,23 @@ const programSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    description: {
-      type: String,
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Program",
       required: true,
-      minlength: 10,
     },
-    whatYouGet: [
-      {
-        type: String,
-        required: true,
-      },
-    ],
-    photo: {
-      type: String,
-      required: false,
+    duration: {
+      type: Number,
+      required: true,
     },
-    
+    template: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Template",
+      required: true,
+    },
   },
+  
+
   {
     timestamps: true,
   }
