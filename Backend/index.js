@@ -5,6 +5,10 @@ import router1 from "./routes/index.js";
 import cors from "cors";
 import {connectRedis} from "./redis/redisClient.js"
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
+
+
+
 const app = express();
 
 dotenv.config();
@@ -18,6 +22,10 @@ app.use(cors());
 
 app.use("/uploads", express.static("uploads"));
 app.use(morgan("dev")); 
+app.use(cookieParser())
+
+
+
 app.use("/api/v1", router1);
 
 await connectRedis()

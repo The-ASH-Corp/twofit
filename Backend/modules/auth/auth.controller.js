@@ -18,9 +18,9 @@ export const loginController = async (req, res) => {
     let data = await service.loginUser(req.body);
 
     res.cookie("refreshToken", data.refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
+      httpOnly: false,
+      secure: false,
+      sameSite: "lax",
     });
 
     delete data.refreshToken;

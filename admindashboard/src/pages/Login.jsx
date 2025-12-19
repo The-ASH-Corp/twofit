@@ -3,7 +3,7 @@ import { assets } from "../assets/asset";
 import { login } from "@/redux/features/auth/auth.thunk";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
-import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { selectToken, selectUser } from "@/redux/features/auth/auth.selectores";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -12,13 +12,12 @@ const Login = () => {
     email: "",
     password: "",
   });
+const toekn =useAppSelector(selectToken)
 
   const handleLogin =async () => {    
     await  dispatch(login(formData));
+    localStorage.setItem("token",toekn)
   };
-
-   useAppSelector(selectUser)
-  
   return (
     <div className="h-screen w-full flex items-center justify-between ">
       {/* image */}
