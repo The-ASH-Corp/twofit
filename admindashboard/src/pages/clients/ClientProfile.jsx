@@ -1,6 +1,5 @@
 import React from "react";
 import ProfileLeftSide from "@/components/clients/ProfileLeftSide";
-import { assets } from "@/assets/asset";
 import ProfileCenterSide from "@/components/clients/ProfileCenterSide";
 
 

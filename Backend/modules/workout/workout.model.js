@@ -88,14 +88,14 @@ export const WorkoutPlan = mongoose.model("WorkoutPlan", workoutSchema);
 // export const WorkoutPlan =
 //   mongoose.models.WorkoutPlan || mongoose.model("WorkoutPlan", planSchema);
 
-// const assignedSchema = new mongoose.Schema({
-//   userId: mongoose.Schema.Types.ObjectId,
-//   planId: mongoose.Schema.Types.ObjectId,
-//   startDate: Date,
-//   currentWeek: {
-//     type: Number,
-//     default: 1,
-//   },
-// });
+const assignedSchema = new mongoose.Schema({
+  userId: mongoose.Schema.Types.ObjectId,
+  planId: mongoose.Schema.Types.ObjectId,
+  startDate: Date,
+  currentWeek: {
+    type: Number,
+    default: 1,
+  },
+});
 
-// export const AssignedPlan = mongoose.model("AssignedPlan", assignedSchema);
+export const AssignedPlan = mongoose.model("AssignedPlan", assignedSchema);

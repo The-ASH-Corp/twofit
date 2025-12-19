@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import router1 from "./routes/index.js";
 import cors from "cors";
 import {connectRedis} from "./redis/redisClient.js"
-
+import morgan from "morgan";
 const app = express();
 
 dotenv.config();
@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/uploads", express.static("uploads"));
-
+app.use(morgan("dev")); 
 app.use("/api/v1", router1);
 
 await connectRedis()
