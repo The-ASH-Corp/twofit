@@ -73,7 +73,7 @@ const workoutSchema = new mongoose.Schema({
   weeklySchedule: [weekSchema],
 })
 
-export const Workout = mongoose.model("Workout", workoutSchema);
+export const WorkoutPlan = mongoose.model("WorkoutPlan", workoutSchema);
 // const planSchema = new mongoose.Schema({
 //   name: String,
 //   goal: String,
