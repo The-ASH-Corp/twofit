@@ -24,6 +24,10 @@ import HomeVector from "./homeVector.svg";
 import threeDotVector from "./ThreeDotVector.svg"
 import profileVector from "./ProfileVector.svg"
 import tickVector from "./tickVector.svg"
+import downVector from "./downVector.svg"
+import upVector from "./upVector.svg"
+import bellVector from "./bellVector.svg";
+import greenBellVector from "./greenBellVector.svg";
 
 export const assets = {
   menu,
@@ -52,5 +56,9 @@ export const assets = {
   threeDotVector,
   profileVector,
   tickVector,
+  downVector,
+  upVector,
+  bellVector,
+  greenBellVector,
 };
 
