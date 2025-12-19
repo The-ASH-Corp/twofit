@@ -1,7 +1,6 @@
 import React from "react";
 import ProfileLeftSide from "@/components/clients/ProfileLeftSide";
 import ProfileCenterSide from "@/components/clients/ProfileCenterSide";
-import { Calendar } from "@/components/ui/calendar";
 import ProfileRightSide from "@/components/clients/profileRightSide";
 
 
