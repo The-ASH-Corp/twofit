@@ -96,6 +96,8 @@ const assignedSchema = new mongoose.Schema({
     type: Number,
     default: 1,
   },
-});
+  duration: { type: Number }, // duration in weeks
+  weeklySchedule: [weekSchema],
+})
 
 export const AssignedPlan = mongoose.model("AssignedPlan", assignedSchema);
