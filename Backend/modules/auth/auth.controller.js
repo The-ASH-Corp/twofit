@@ -18,9 +18,9 @@ export const loginController = async (req, res) => {
     let data = await service.loginUser(req.body);
 
     res.cookie("refreshToken", data.refreshToken, {
-      httpOnly: false,
-      secure: false,
-      sameSite: "lax",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
 
     delete data.refreshToken;
@@ -37,8 +37,8 @@ export const adminLoginController = async (req, res) => {
 
     res.cookie("refreshToken", data.refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
 
     delete data.refreshToken;
