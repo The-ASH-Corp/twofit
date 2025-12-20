@@ -1,6 +1,6 @@
 // features/auth/auth.slice.js
 import { createSlice } from "@reduxjs/toolkit";
-import { createClient, login  } from "./auth.thunk";
+import { createClient, login, logout } from "./auth.thunk";
 
 const initialState = {
   user: null,
@@ -40,6 +40,11 @@ const authSlice = createSlice({
       .addCase(createClient.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.user = null;
+        state.token = null;
+        state.status = "idle";
       });
   },
 });

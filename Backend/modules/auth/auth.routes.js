@@ -3,6 +3,7 @@ import {
   createUserByAdmin,
   loginController,
   adminLoginController,
+  logoutController
   // forgotPasswordController,
   // resetPasswordController
 } from "./auth.controller.js";
@@ -22,9 +23,11 @@ router.post(
   createUserByAdmin
 );
 
-router.post("/auth/login",validate(userLoginSchema), loginController);
+router.post("/auth/login", validate(userLoginSchema), loginController);
 
-router.post("/admin/login",validate(userLoginSchema), adminLoginController);
+router.post("/admin/login", validate(userLoginSchema), adminLoginController);
+
+router.post("/auth/logout", authMiddleware, logoutController);
 
 //  router.post("/forgot-password", forgotPasswordController);
 
