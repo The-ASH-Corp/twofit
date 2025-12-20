@@ -18,10 +18,7 @@ export default function BaseForm({
       onSubmit={onSubmit}
     >
       {(formik) => (
-        <Form
-          className="rounded-2xl grid grid-cols-[2.5fr_1fr]
-  gap-4 h-[80vh]"
-        >
+        <Form className="rounded-2xl grid grid-cols-[2.5fr_1fr] gap-4 h-[80vh]">
           {/* LEFT COLUMN */}
           <div className="overflow-y-auto no-scrollbar pr-2">
             {fields

@@ -49,7 +49,7 @@ const assignedExperts = [
 
 const ProfileLeftSide = () => {
   return (
-    <div className="w-[25%] flex flex-col items-center gap-4 ">
+    <div className="w-[25%] flex flex-col items-center gap-4 overflow-auto  no-scrollbar">
       {/* name */}
       <div className="w-full bg-white rounded-lg p-4 pt-7.5">
         <div className="flex flex-col items-center gap-6">

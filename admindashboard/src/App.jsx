@@ -18,11 +18,13 @@ import FinanceTable from "./pages/finance/FinanceTable";
 import ClientProfile from "./pages/clients/ClientProfile";
 import PublicRoutes from "./routes/PublicRoutes";
 import ProtectedRoutes from "./routes/ProtectedRoutes";
+import ExpertProfile from "./pages/experts/ExpertProfile";
 
 function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/login" element={<Login />} />
 
         <Route path="/login" element={<PublicRoutes><Login/></PublicRoutes>}/>
         
@@ -40,6 +42,24 @@ function App() {
         <Route path="analytics" element={<Analytics />} />
         <Route path="/website" element={<Website />} />
 </Route>
+        <Route path="/" element={<AppLayout />}>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/clients" element={<ClientsTable />} />
+          <Route
+            path="/clients/profile/:clientId"
+            element={<ClientProfile />}
+          />
+          <Route path="/addclient" element={<ClientForm />} />
+          <Route path="/experts" element={<ExpertTable />} />
+          <Route path="/experts" element={<ExpertTable />} />
+          <Route path="/experts/profile/:expertId" element={<ExpertProfile />} />
+          <Route path="/programs" element={<ProgramTable />} />
+
+          <Route path="/finance" element={<FinanceTable />} />
+          <Route path="/chats" element={<Chats />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="/website" element={<Website />} />
+        </Route>
       </Routes>
     </Router>
   );
