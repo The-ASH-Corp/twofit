@@ -14,3 +14,15 @@ export const getAllClients = createAsyncThunk(
     }
   }
 );
+
+export const getClient = createAsyncThunk(
+  "client/getClient",
+  async ({id}, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(`/clients/get-client/${id}`);
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to get client");
+    }
+  }
+);
