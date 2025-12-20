@@ -1,6 +1,8 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { assets } from "../../assets/asset";
- 
+import { useDispatch } from "react-redux";
+import { logout } from "@/redux/features/auth/auth.thunk";
+
 const menuItems = [
   {
     label: "Dashboard",
@@ -33,6 +35,15 @@ const menuItems = [
 ];
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLogout = async () => {
+    await dispatch(logout());
+    localStorage.removeItem("token"); 
+    navigate("/login");
+  };
+
   return (
     <aside className="w-[225px] bg-white   py-6 px-5 flex flex-col h-screen">
       <h1 className="text-2xl  m-auto my-4 mb-8">
@@ -60,7 +71,10 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <button className="flex items-center gap-3 mt-auto font-medium text-[#66706D]  px-4 py-3">
+      <button
+        onClick={handleLogout}
+        className="flex items-center gap-3 mt-auto font-medium text-[#66706D]  px-4 py-3"
+      >
         <img src={assets.signout} />
         <h1 className="">Logout</h1>
       </button>

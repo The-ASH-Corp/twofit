@@ -1,3 +1,4 @@
+import redisClient from "../../redis/redisClient.js";
 import * as service from "./auth.service.js";
 
 export const createUserByAdmin = async (req, res) => {
@@ -18,9 +19,9 @@ export const loginController = async (req, res) => {
     let data = await service.loginUser(req.body);
 
     res.cookie("refreshToken", data.refreshToken, {
-      httpOnly: false,
-      secure: false,
-      sameSite: "lax",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
 
     delete data.refreshToken;
@@ -37,13 +38,30 @@ export const adminLoginController = async (req, res) => {
 
     res.cookie("refreshToken", data.refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     });
 
     delete data.refreshToken;
 
     res.json({ success: true, message: "Admin Login successful", data });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+export const logoutController = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    await redisClient.del(`refresh:${userId}`);
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    });
+
+    res.json({ success: true, message: "Logged out successfully" });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
