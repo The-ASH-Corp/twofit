@@ -115,7 +115,18 @@ const ExpertProfile = () => {
           </div>
         </div>
         {/* Role & Specialization */}
-        <div></div>
+        <div className="flex flex-col items-center bg-white w-full rounded-lg p-4">
+          <div className="flex justify-start w-full">
+            <h3 className="text-[#0A4F48] font-bold text-[16px]">
+              Role & Specialization
+            </h3>
+          </div>
+          <div className="flex flex-col items-center gap-4 w-full">
+            <div className="w-full bg-[#F8F8F8] p-3.5 rounded-lg">
+                ddfgh
+            </div>
+          </div>
+        </div>
       </div>
       {/* center */}
       <div className="w-[50%] flex flex-col items-center overflow-auto  no-scrollbar bg-amber-500"></div>

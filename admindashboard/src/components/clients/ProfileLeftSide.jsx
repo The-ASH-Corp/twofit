@@ -73,7 +73,7 @@ const ProfileLeftSide = () => {
               <span className="text-[12px]">02 Jan 2025</span>
             </div>
             <div className="flex items-center justify-between w-full ">
-              <span className="text-[#66706D] text-[12px]">Start Date</span>
+              <span className="text-[#66706D] text-[12px]">End Date</span>
               <span className="text-[12px]">02 Jan 2025</span>
             </div>
           </div>
