@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { getAllClients, getClient } from "./client.thunk";
 
 const initialState = {
   allClients:[],
@@ -28,14 +29,14 @@ const clientSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
-      .addCase(selectClient.pending, (state) => {
+      .addCase(getClient.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(selectClient.fulfilled, (state, action) => {
+      .addCase(getClient.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.selectedClient = action.payload;
       })
-      .addCase(selectClient.rejected, (state, action) => {
+      .addCase(getClient.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });
