@@ -4,8 +4,10 @@ import { login } from "@/redux/features/auth/auth.thunk";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectToken, selectUser } from "@/redux/features/auth/auth.selectores";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigate=useNavigate()
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -17,6 +19,9 @@ const toekn =useAppSelector(selectToken)
   const handleLogin =async () => {    
     await  dispatch(login(formData));
     localStorage.setItem("token",toekn)
+    console.log(toekn)
+    navigate('/')
+
   };
   return (
     <div className="h-screen w-full flex items-center justify-between ">
@@ -50,7 +55,7 @@ const toekn =useAppSelector(selectToken)
         {/* form */}
         <div className="flex flex-col items-center w-full gap-6">
           <div className="w-full flex flex-col items-start">
-            <form action="" className="flex flex-col w-full gap-6">
+            <form action="" className="flex flex-col w-full gap-6" >
               <div className="flex flex-col items-start gap-2">
                 <label htmlFor="" className="text-[11px]">
                   Email Address
@@ -77,6 +82,7 @@ const toekn =useAppSelector(selectToken)
                   }
                 />
                 <button
+               
                   className="absolute bottom-3.5 right-3"
                   onClick={() => setShowPassword(!showPassword)}
                 >
@@ -98,7 +104,7 @@ const toekn =useAppSelector(selectToken)
             </button>
           </div>
           <div className="w-full">
-            <button className="bg-[#0A4F48] w-full py-3.5 rounded-lg text-white font-semibold text-[16px]" onClick={handleLogin}>
+            <button   className="bg-[#0A4F48] w-full py-3.5 rounded-lg text-white font-semibold text-[16px]" onClick={handleLogin}>
               Login
             </button>
           </div>
