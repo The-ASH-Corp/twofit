@@ -8,7 +8,7 @@ import Chats from "./pages/Chats";
 import Analytics from "./pages/Analytics";
 import Website from "./pages/Website";
 import ClientsTable from "./pages/clients/ClientsTable";
-// import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/Dashboard";
 import ExpertTable from "./pages/experts/ExpertTable";
 import ProgramTable from "./pages/programsList/ProgramTable";
 import Login from "./pages/Login";
@@ -29,7 +29,7 @@ function App() {
         <Route path="/login" element={<PublicRoutes><Login/></PublicRoutes>}/>
         
         <Route path="/" element={  <ProtectedRoutes><AppLayout/></ProtectedRoutes> }  >
-        {/* <Route path="/" element={ <ProtectedRoutes><Dashboard/></ProtectedRoutes>}/> */}
+        <Route path="/" element={ <ProtectedRoutes><Dashboard/></ProtectedRoutes>}/>
         <Route path="/clients" element={<ClientsTable />} />
         <Route path="/clients/clientProfile/:clientId" element={<ClientProfile/>} />
         <Route path="/addclient" element={<ClientForm/>}/>
