@@ -40,7 +40,7 @@ const ProfileRightSide = () => {
     const [date, setDate] = useState(new Date(2025, 5, 12));
       const [taskOpen, setTaskOpen] = useState(false)
   return (
-    <div className="w-[25%] flex flex-col items-center gap-4">
+    <div className="w-[25%] flex flex-col items-center gap-4 overflow-auto  no-scrollbar">
       {/* calender */}
       <div className="flex flex-col items-center w-full bg-white rounded-lg">
         <Calendar
