@@ -8,11 +8,17 @@ import { assets } from "../../assets/asset";
 import {useNavigate} from 'react-router-dom'
 
 import { useState } from "react";
-export default function BaseTable({ columns, data,actionLabel ,actionPath,pageLabel}) {
-  
+export default function BaseTable({
+  columns,
+  data,
+  actionLabel,
+  profilePath,
+  actionPath,
+  pageLabel,
+}) {
   const [rowSelection, setRowSelection] = useState({});
 
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const table = useReactTable({
     data,
     columns,
@@ -75,7 +81,7 @@ export default function BaseTable({ columns, data,actionLabel ,actionPath,pageLa
             <tr
               key={row.id}
               className="border-b border-[#DBDEDD] hover:bg-gray-50 transition"
-              onClick={() => navigate("/clients/clientProfile/:clientId")}
+              onClick={() => navigate(profilePath)}
             >
               {row.getVisibleCells().map((cell) => (
                 <td

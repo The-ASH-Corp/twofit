@@ -28,6 +28,7 @@ import downVector from "./downVector.svg"
 import upVector from "./upVector.svg"
 import bellVector from "./bellVector.svg";
 import greenBellVector from "./greenBellVector.svg";
+import star from "./Star.svg"
 
 export const assets = {
   menu,
@@ -60,5 +61,6 @@ export const assets = {
   upVector,
   bellVector,
   greenBellVector,
+  star,
 };
 

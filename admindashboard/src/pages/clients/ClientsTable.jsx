@@ -7,7 +7,14 @@ import { ClientColumns } from './ClientColumns'
 export default function ClientsTable() {
   return (
     <div>
-      <BaseTable columns={ClientColumns} data={clientsData} actionLabel="Add Client" actionPath="/addclient" pageLabel={"Clients"}/>
+      <BaseTable
+        columns={ClientColumns}
+        data={clientsData}
+        actionLabel="Add Client"
+        actionPath="/addclient"
+        profilePath="/clients/profile/:clientId"
+        pageLabel={"Clients"}
+      />
     </div>
-  )
+  );
 }
