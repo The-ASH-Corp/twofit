@@ -24,6 +24,7 @@ const clientSlice = createSlice({
       .addCase(getAllClients.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.allClients = action.payload;
+        state.error = null;
       })
       .addCase(getAllClients.rejected, (state, action) => {
         state.status = "failed";
@@ -35,6 +36,7 @@ const clientSlice = createSlice({
       .addCase(getClient.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.selectedClient = action.payload;
+        state.error = null;
       })
       .addCase(getClient.rejected, (state, action) => {
         state.status = "failed";

@@ -36,9 +36,9 @@ const dailyActivityLog = [
   },
 ];
 
-const ProfileRightSide = () => {
-    const [date, setDate] = useState(new Date(2025, 5, 12));
-      const [taskOpen, setTaskOpen] = useState(false)
+const ProfileRightSide = ({ client }) => {
+  const [date, setDate] = useState(new Date(2025, 5, 12));
+  const [taskOpen, setTaskOpen] = useState(false);
   return (
     <div className="w-[25%] flex flex-col items-center gap-4 overflow-auto  no-scrollbar">
       {/* calender */}
@@ -51,7 +51,10 @@ const ProfileRightSide = () => {
           buttonVariant="ghost"
         />
         <div className="w-full flex flex-col items-center gap-4 p-4">
-          <div className="flex items-center justify-between w-full">
+          <div
+            className="flex items-center justify-between w-full"
+            onClick={() => setTaskOpen(!taskOpen)}
+          >
             <h3 className="text-[16px] font-bold text-[#0A4F48]">
               Missed Tasks
             </h3>
@@ -105,7 +108,7 @@ const ProfileRightSide = () => {
           <div className="flex flex-col items-center w-full gap-2">
             <div className="flex items-center justify-between w-full ">
               <span className="text-[12px] text-[#66706D]">Start</span>
-              <span className="text-[12px]">80.2 kg</span>
+              <span className="text-[12px]">{client.currentWeight} kg</span>
             </div>
             <div className="flex items-center justify-between w-full">
               <span className="text-[12px] text-[#66706D]">Change</span>
@@ -216,6 +219,6 @@ const ProfileRightSide = () => {
       </div>
     </div>
   );
-}
+};
 
 export default ProfileRightSide;

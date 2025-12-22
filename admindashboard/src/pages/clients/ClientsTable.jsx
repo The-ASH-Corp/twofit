@@ -12,7 +12,7 @@ export default function ClientsTable() {
         data={clientsData}
         actionLabel="Add Client"
         actionPath="/addclient"
-        profilePath="/clients/profile/:clientId"
+        profilePath="/clients/profile/69425703ceaa579bbe149425"
         pageLabel={"Clients"}
       />
     </div>
