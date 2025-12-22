@@ -2,7 +2,6 @@ import { useField } from "formik";
 
 export default function FormToggle({ name, label }) {
   const [field, , helpers] = useField(name);
-  console.log(field.value);
 
   return (
     <div className="flex items-center gap-3">

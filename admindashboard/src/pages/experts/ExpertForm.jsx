@@ -1,5 +1,7 @@
 import BaseForm from "@/components/form/BaseForm";
+import { createCoach } from "@/redux/features/coach/coach.thunk";
 import React from "react";
+import { useDispatch } from "react-redux";
 
 export default function ExpertForm() {
   const fields = [
@@ -119,17 +121,32 @@ export default function ExpertForm() {
   ];
 
   const initialValues = {
-  fullname: "",
-  dob: "",
-  gender: "", //need to add
-   ratingIncentive: false,
-  responseTimeIncentive: false,
-  complianceIncentive: false,
+    fullname: "",
+    dob: "",
+    gender: "", //need to add
+    ratingIncentive: false,
+    responseTimeIncentive: false,
+    complianceIncentive: false,
 
-  // Account Setup
-  autoSendWelcome: false,
-  autoSendGuide: false,
-  automatedReminder: false,
-};
-  return <BaseForm fields={fields} initialValues={initialValues}></BaseForm>;
+    // Account Setup
+    autoSendWelcome: false,
+    autoSendGuide: false,
+    automatedReminder: false,
+  };
+
+  const dispatch = useDispatch()
+
+  const handleCoachCreation =async(values)=>{
+    const coach = await dispatch(createCoach(values))
+    console.log(coach);
+    
+  }
+
+  return (
+    <BaseForm
+      fields={fields}
+      initialValues={initialValues}
+      onSubmit={(values) => handleCoachCreation(values)}
+    ></BaseForm>
+  );
 }
