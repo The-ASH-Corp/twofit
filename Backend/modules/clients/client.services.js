@@ -3,7 +3,7 @@ import User from "../auth/auth.model.js";
 export const getAllClient = async (page, limit) => {
   const skip = (page - 1) * limit;
 
-  const clients = await User.find().skip(skip).limit(limit).select("-password");
+  const clients = await User.find({role:"user"}).skip(skip).limit(limit).select("-password");
   return clients;
 };
 

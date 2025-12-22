@@ -12,7 +12,7 @@ export const createCoach = async(req, res)=> {
             data: coach,
           });
 
-    } catch (error) {
+    } catch (err) {
         res.status(400).json({ success: false, message: err.message });
     }
 };
@@ -29,7 +29,7 @@ export const getAllCoach = async(req, res)=> {
           });
 
 
-    } catch (error) {
+    } catch (err) {
          res.status(400).json({ success: false, message: err.message });
     }
 };
@@ -58,7 +58,7 @@ export const getCoachById = async (req, res)=> {
           success: true,
           data: coach,
         });
-    } catch (error) {
+    } catch (err) {
         res.status(400).json({ success: false, message: err.message });
     }
 };
@@ -88,7 +88,7 @@ export const updateCoachById = async (req, res)=> {
           success: true,
           message: "Coach details updated successfully",
         });
-    } catch (error) {
+    } catch (err) {
        res.status(400).json({ success: false, message: err.message });
     }
 };
@@ -117,7 +117,7 @@ export const deleteCoachById = async (req, res)=> {
           success: true,
           message: "Coach deleted successfully",
         });
-      } catch (error) {
+      } catch (err) {
          res.status(400).json({ success: false, message: err.message });
       }
 }
@@ -147,7 +147,7 @@ export const AssignCoachToUser = async (req, res)=> {
       message: "Coach assigned to user successfully",
       data: data,
     });
-  } catch (error) {
+  } catch (err) {
      res.status(400).json({ success: false, message: err.message });
   }
 } 
