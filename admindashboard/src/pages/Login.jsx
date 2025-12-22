@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { assets } from "../assets/asset";
 import { login } from "@/redux/features/auth/auth.thunk";
 import { useDispatch } from "react-redux";
-import { useAppSelector } from "@/redux/store/hooks";
-import { selectToken, selectUser } from "@/redux/features/auth/auth.selectores";
+// import { useAppSelector } from "@/redux/store/hooks";
+// import { selectToken, selectUser } from "@/redux/features/auth/auth.selectores";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -14,12 +14,12 @@ const Login = () => {
     email: "",
     password: "",
   });
-const toekn =useAppSelector(selectToken)
+
 
   const handleLogin =async () => {    
-    await  dispatch(login(formData));
-    localStorage.setItem("token",toekn)
-    console.log(toekn)
+    const data =  await  dispatch(login(formData));
+    localStorage.setItem("token", data.accessToken);
+    console.log(data);
     navigate('/')
 
   };
