@@ -9,8 +9,13 @@ import {
   selectClientError,
 } from "@/redux/features/client/client.selectors";
 import { getAllClients } from "@/redux/features/client/client.thunk";
+import { useNavigate } from "react-router-dom";
 
 export default function ClientsTable() {
+  const navigate = useNavigate();
+  const profilePath = (id)=> {
+        navigate(`/clients/profile/${id}`);
+  }
   const dispatch = useDispatch();
 
   const clients = useAppSelector(selectAllClients);
@@ -19,6 +24,7 @@ export default function ClientsTable() {
 
   useEffect(() => {
     dispatch(getAllClients({ page: 1, limit: 10 }));
+
   }, [dispatch]);
 
   if (status === "loading") return <p>Loading clients...</p>;
@@ -31,7 +37,7 @@ export default function ClientsTable() {
         data={clients}
         actionLabel="Add Client"
         actionPath="/addclient"
-        profilePath="/clients/profile/69425703ceaa579bbe149425"
+        profilePath= {profilePath}
         pageLabel={"Clients"}
         // profilePath="/clients/profile/:clientId"
         // pageLabel="Clients"
