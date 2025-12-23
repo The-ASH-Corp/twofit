@@ -1,33 +1,7 @@
 import { assets } from "@/assets/asset";
 import React from "react";
 
-const profileInfo = [
-  {
-    img: assets.GenderVector,
-    title: "Gender",
-    data: "Male",
-  },
-  {
-    img: assets.AgeVector,
-    title: "Age",
-    data: "29 y/o",
-  },
-  {
-    img: assets.EmailVector,
-    title: "Email Address",
-    data: "Aarav@gmail.com",
-  },
-  {
-    img: assets.PhoneVector,
-    title: "Phone Number",
-    data: "+62 811 5567 2345",
-  },
-  {
-    img: assets.HomeVector,
-    title: "Address",
-    data: "221B Baker Street, London, United Kingdom",
-  },
-];
+
 
 const assignedExperts = [
   {
@@ -47,34 +21,81 @@ const assignedExperts = [
   },
 ];
 
-const ProfileLeftSide = () => {
+const ProfileLeftSide = ({ client }) => {
+
+  const [day, month, year] = client.dob.split("-");
+  const today = new Date();
+  let age = today.getFullYear() - year;
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: "UTC",
+    });
+  };
+  
+
+  const profileInfo = [
+    {
+      img: assets.GenderVector,
+      title: "Gender",
+      data: client.gender,
+    },
+    {
+      img: assets.AgeVector,
+      title: "Age",
+      data: age,
+    },
+    {
+      img: assets.EmailVector,
+      title: "Email Address",
+      data: client.email,
+    },
+    {
+      img: assets.PhoneVector,
+      title: "Phone Number",
+      data: client.phone,
+    },
+    {
+      img: assets.HomeVector,
+      title: "Address",
+      data: client.address,
+    },
+  ];
+
   return (
     <div className="w-[25%] flex flex-col items-center gap-4 overflow-auto  no-scrollbar">
       {/* name */}
       <div className="w-full bg-white rounded-lg p-4 pt-7.5">
         <div className="flex flex-col items-center gap-6">
           <div className="flex flex-col items-center gap-3 px-[29px] pt-6">
-            <h2 className="font-bold text-[16px] ">Aarav Kumar </h2>
+            <h2 className="font-bold text-[16px] ">{client.name}</h2>
             <div className="flex items-center justify-between gap-2 text-[11px]">
               <span className="px-2 py-0.5 bg-[#F0F0F0] rounded-full">
-                Weight Loss
+                {client.goals}
               </span>
               <span className="px-2 py-0.5 bg-[#F0F0F0] rounded-full">
-                60 Days
+                {client.duration} Days
               </span>
               <span className="px-2 py-0.5 bg-[#45C4A2] rounded-full text-white">
-                Active
+                {client.status}
               </span>
             </div>
           </div>
           <div className="flex items-center flex-col gap-2.5 p-3 w-full rounded-lg bg-[#F8F8F8]">
             <div className="flex items-center justify-between w-full ">
               <span className="text-[#66706D] text-[12px]">Start Date</span>
-              <span className="text-[12px]">02 Jan 2025</span>
+              <span className="text-[12px]">
+                {formatDate(client.programStartDate)}
+              </span>
             </div>
             <div className="flex items-center justify-between w-full ">
               <span className="text-[#66706D] text-[12px]">End Date</span>
-              <span className="text-[12px]">02 Jan 2025</span>
+              <span className="text-[12px]">
+                {formatDate(client.programEndDate)}
+              </span>
             </div>
           </div>
         </div>

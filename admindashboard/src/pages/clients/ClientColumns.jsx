@@ -32,33 +32,33 @@ export const ClientColumns = [
       />
     ),
   },
-  { accessorKey: "client", header: "Client Name" },
-  { accessorKey: "program", header: "Program" },
+  { accessorKey: "name", header: "Client Name" },
+  // { accessorKey: "program", header: "Program" },
   { accessorKey: "duration", header: "Duration" },
-  {
-    accessorKey: "experts",
-    header: "Experts",
-    cell: ({ row }) => (
-      <div className="flex gap-2 flex-wrap">
-        {row.original.experts.map((exp) => {
-           const colorClass =
-          expertColors[exp] || "bg-gray-100 text-gray-700 border";
+//   {
+//     accessorKey: "experts",
+//     header: "Experts",
+//     cell: ({ row }) => (
+//       <div className="flex gap-2 flex-wrap">
+//         {row.original.experts.map((exp) => {
+//            const colorClass =
+//           expertColors[exp] || "bg-gray-100 text-gray-700 border";
 
-          return(
-          <span
-            key={exp} 
-            className={`px-2 py-1 text-[11px] rounded-sm ${colorClass}`}
-          >
-            {exp}
-          </span>
-)  })}
-      </div>
-    ),
-  },
-  {accessorKey:"start",header:"Start Date"},
-  {accessorKey:"end",header:"End Date"},
-  {accessorKey:"compliance",header:"Compliance"},
-   { accessorKey: "status", header: "Status" ,
+//           return(
+//           <span
+//             key={exp} 
+//             className={`px-2 py-1 text-[11px] rounded-sm ${colorClass}`}
+//           >
+//             {exp}
+//           </span>
+// )  })}
+//       </div>
+//     ),
+//   },
+  {accessorKey:"programStartDate",header:"Start Date"},
+  {accessorKey:"programEndDate",header:"End Date"},
+  // {accessorKey:"compliance",header:"Compliance"},
+  { accessorKey: "status", header: "Status" ,
     cell:({row})=>{
     
          const status = row.original.status;

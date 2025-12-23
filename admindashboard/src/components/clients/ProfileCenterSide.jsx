@@ -1,32 +1,7 @@
 import { assets } from '@/assets/asset';
 import React from 'react'
 
-const healthDetails = [
-  {
-    heading: "Medical Conditions",
-    data: ["PCOD", "Thyroid"],
-  },
-  {
-    heading: "Allergies",
-    data: ["Peanut", "Dairy"],
-  },
-  {
-    heading: "Food Preference",
-    data: ["Veg"],
-  },
-  {
-    heading: "Fitness Goal",
-    data: ["Weight Loss"],
-  },
-  {
-    heading: "Current Weight",
-    data: ["80.2 kg"],
-  },
-  {
-    heading: "Target Weight",
-    data: ["72 kg"],
-  },
-];
+
 
 const assignedExperts = [
   {
@@ -90,7 +65,35 @@ const statusStyles = {
   },
 };
 
-const ProfileCenterSide = () => {
+const ProfileCenterSide = ({ client }) => {
+
+  const healthDetails = [
+    {
+      heading: "Medical Conditions",
+      data: client.medicalConditions,
+    },
+    {
+      heading: "Allergies",
+      data: client.allergies,
+    },
+    {
+      heading: "Food Preference",
+      data: ["Veg"],
+    },
+    {
+      heading: "Fitness Goal",
+      data: [client.goals],
+    },
+    {
+      heading: "Current Weight",
+      data: [`${client.currentWeight} kg`],
+    },
+    {
+      heading: "Target Weight",
+      data: [`${client.targetWeight} kg`],
+    },
+  ];
+
   return (
     <div className="w-[50%] flex flex-col items-center gap-4 overflow-auto  no-scrollbar">
       {/* Health Details */}
@@ -133,7 +136,7 @@ const ProfileCenterSide = () => {
         <div className="p-4 bg-white rounded-2xl w-[50%]">
           <div className="flex flex-col items-start gap-1 ">
             <span className="text-[11px] text-[#66706D]">Program Type</span>
-            <span className="font-bold text-[12px]">Weight Loss</span>
+            <span className="font-bold text-[12px]">{client.goals}</span>
           </div>
         </div>
         <div className="p-4 bg-white rounded-2xl w-[50%]">
@@ -145,7 +148,9 @@ const ProfileCenterSide = () => {
         <div className="flex items-center gap-6 p-4 bg-white rounded-2xl w-full">
           <div className="flex flex-col items-start gap-1 w-full">
             <span className="text-[11px] text-[#66706D]">Plan Duration</span>
-            <span className="font-bold text-[12px]">60 Days</span>
+            <span className="font-bold text-[12px]">
+              {client.duration} Days
+            </span>
           </div>
           <div className="flex flex-col items-end gap-1 w-full">
             <p className="text-[12px] text-[#66706D]">
@@ -211,6 +216,6 @@ const ProfileCenterSide = () => {
       </div>
     </div>
   );
-}
+};
 
 export default ProfileCenterSide

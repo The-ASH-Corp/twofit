@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { assets } from "../assets/asset";
 import { login } from "@/redux/features/auth/auth.thunk";
 import { useDispatch } from "react-redux";
-import { useAppSelector } from "@/redux/store/hooks";
-import { selectToken, selectUser } from "@/redux/features/auth/auth.selectores";
+// import { useAppSelector } from "@/redux/store/hooks";
+// import { selectToken, selectUser } from "@/redux/features/auth/auth.selectores";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -14,15 +14,32 @@ const Login = () => {
     email: "",
     password: "",
   });
-const toekn =useAppSelector(selectToken)
+// const toekn =useAppSelector(selectToken)
 
-  const handleLogin =async () => {    
-    await  dispatch(login(formData));
-    localStorage.setItem("token",toekn)
-    console.log(toekn)
-    navigate('/')
+  // const handleLogin =async () => {    
+  //   await  dispatch(login(formData));
+  //   localStorage.setItem("token",toekn)
+  //   console.log(toekn)
+  //   navigate('/')
 
-  };
+  // };
+
+  const handleLogin = async () => {
+  try {
+    const result = await dispatch(login(formData)).unwrap();
+
+    // ✅ User is valid
+    localStorage.setItem("token", result.token);
+    console.log("Login success:", result);
+
+    navigate("/");
+  } catch (error) {
+    // ❌ User is invalid
+    console.error("Login failed:", error);
+    alert(error || "Invalid email or password");
+  }
+};
+
   return (
     <div className="h-screen w-full flex items-center justify-between ">
       {/* image */}
