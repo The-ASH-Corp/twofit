@@ -1,17 +1,49 @@
-import { CoachModel } from "./coach.model.js"
+import { generatePassword, hashPassword } from "../../utils/password.js";
+import { CoachModel } from "./coach.model.js";
 
+export const createCoach = async (coach) => {
 
-export const createCoach = async (coach)=> {
-    return await CoachModel.create(coach)
-}
+  const password = hashPassword(generatePassword())
 
-export const getAllCoach = async (page, limit)=> {
+  return await CoachModel.create({
+    name: fullname,
+    dob,
+    gender,
+    password,
+    ratingIncentive,
+    responseTimeIncentive,
+    complianceIncentive,
+    autoSendWelcome,
+    autoSendGuide,
+    automatedReminder,
+    email,
+    phone,
+    address,
+    role,
+    specialization,
+    experience,
+    qualification,
+    certifications,
+    languages,
+    assignedPrograms:chooseProgram,
+    maxClient:clientLimit,
+    workingDays:workingdays,
+    workingHours,
+    breakSlots,
+    maxDailyConsults:dailyConsults,
+    responseTime,
+    salary:baseSalary
+  });
+};
+
+export const getAllCoach = async (page, limit) => {
   const skip = (page - 1) * limit;
 
-    return await CoachModel.find().skip(skip).limit(limit).select(
-      "_id name specialization experience image"
-    );
-}
+  return await CoachModel.find()
+    .skip(skip)
+    .limit(limit)
+    .select("_id name specialization experience image");
+};
 
 export const getCoachById = async (coachId) => {
   return await CoachModel.findById(coachId)
@@ -27,12 +59,12 @@ export const deleteCoachById = async (coachId) => {
   return await CoachModel.findByIdAndDelete(coachId);
 };
 
-export const AssignCoachToUser = async (coachId, userId)=>{
+export const AssignCoachToUser = async (coachId, userId) => {
   return await CoachModel.findByIdAndUpdate(
     coachId,
     { $addToSet: { assignedUsers: userId } },
     { new: true }
-  )
+  );
 };
 
 export const getUsersAssignedToACoach = async (coachId) => {

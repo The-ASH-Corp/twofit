@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { string } from "zod";
 
 const coachSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -11,6 +12,8 @@ const coachSchema = new mongoose.Schema({
 
   phone: { type: String, required: true, unique: true },
 
+  password: { type: String, required: true},
+
   address: { type: String, required: true },
 
   role: { type: String, required: true },
@@ -21,7 +24,7 @@ const coachSchema = new mongoose.Schema({
 
   qualification: { type: String, required: true },
 
-  certification: { type: String, required: true },
+  certifications: { type: String, required: true },
 
   languages: { type: Array, required: true },
 
@@ -55,6 +58,8 @@ const coachSchema = new mongoose.Schema({
 
   maxDailyConsults: { type: Number, required: true },
 
+  responseTime: { type: String, required: true },
+
   salary: { type: Number, required: true },
 
   assignedUsers: [
@@ -63,6 +68,17 @@ const coachSchema = new mongoose.Schema({
       ref: "User",
     },
   ],
+  ratingIncentive: { type: Boolean, default: false },
+
+  responseTimeIncentive: { type: Boolean, default: false },
+
+  complianceIncentive: { type: Boolean, default: false },
+
+  autoSendWelcome: { type: Boolean, default: false },
+
+  autoSendGuide: { type: Boolean, default: false },
+
+  automatedReminder: { type: Boolean, default: false },
 });
 
 export const CoachModel = mongoose.model("Coach", coachSchema);
