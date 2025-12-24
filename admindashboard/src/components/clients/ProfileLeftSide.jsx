@@ -66,6 +66,27 @@ const ProfileLeftSide = ({ client }) => {
     },
   ];
 
+  const compliance = [
+    {
+      title: "Diet",
+      Missed: "Missed Diet: 26",
+      percentage: "55%",
+      color: "#0A4F48",
+    },
+    {
+      title: "Workout",
+      Missed: "Missed Workout: 29",
+      percentage: "30%",
+      color: "#EBF3F2",
+    },
+    {
+      title: "Therapy",
+      Missed: "Missed Therapy: 16",
+      percentage: "15%",
+      color: "#F4DBC7",
+    },
+  ];
+
   return (
     <div className="w-[25%] flex flex-col items-center gap-4 overflow-auto  no-scrollbar">
       {/* name */}
@@ -136,48 +157,25 @@ const ProfileLeftSide = ({ client }) => {
             <span className="text-[16px] font-bold">78%</span>
           </div>
           <div className="flex flex-col items-center w-full gap-4">
-            <div className="relative w-full rounded-l-sm rounded-r-lg pl-4 p-2 bg-[#F8F8F8]">
-              <div className="absolute left-0 top-0 w-2 h-full bg-[#0A4F48] rounded-xs"></div>
-              <div className="w-full flex items-center justify-between">
-                <p className="text-[12px] ">Diet</p>
-                <div className="flex items-center gap-1.5">
-                  <div className="pr-1.5 border-r border-r-[#DBDEDD]">
-                    <p className="text-[10px]">
-                      Missed Diet: <span>26</span>
-                    </p>
+            {compliance.map((items, i) => (
+              <div key={i} className="relative w-full rounded-l-sm rounded-r-lg pl-4 p-2 bg-[#F8F8F8]">
+                <div
+                  className="absolute left-0 top-0 w-2 h-full  rounded-xs"
+                  style={{ background: items.color }}
+                ></div>
+                <div className="w-full flex items-center justify-between">
+                  <p className="text-[12px] ">{items.title}</p>
+                  <div>
+                    <span className="text-[12px] text-[#66706D] px-1.5 border-r border-r-[#DBDEDD]">
+                      {items.Missed}
+                    </span>
+                    <span className="px-1.5 text-[11px] font-bold text-[#0A4F48]">
+                      {items.percentage}
+                    </span>
                   </div>
-                  <p className="text-[#0A4F48] text-[12px] font-bold">82%</p>
                 </div>
               </div>
-            </div>
-            <div className="relative w-full rounded-l-sm rounded-r-lg pl-4 p-2 bg-[#F8F8F8]">
-              <div className="absolute left-0 top-0 w-2 h-full bg-[#F4DBC7] rounded-xs"></div>
-              <div className="w-full flex items-center justify-between">
-                <p className="text-[12px] ">Workout</p>
-                <div className="flex items-center gap-1.5">
-                  <div className="pr-1.5 border-r border-r-[#DBDEDD]">
-                    <p className="text-[10px]">
-                      Missed Diet: <span>29</span>
-                    </p>
-                  </div>
-                  <p className="text-[#0A4F48] text-[12px] font-bold">75%</p>
-                </div>
-              </div>
-            </div>
-            <div className="relative w-full rounded-l-sm rounded-r-lg pl-4 p-2 bg-[#F8F8F8]">
-              <div className="absolute left-0 top-0 w-2 h-full bg-[#EBF3F2] rounded-xs"></div>
-              <div className="w-full flex items-center justify-between">
-                <p className="text-[12px] ">Therapy</p>
-                <div className="flex items-center gap-1.5">
-                  <div className="pr-1.5 border-r border-r-[#DBDEDD]">
-                    <p className="text-[10px]">
-                      Missed Diet: <span>16</span>
-                    </p>
-                  </div>
-                  <p className="text-[#0A4F48] text-[12px] font-bold">68%</p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
         {/* section 2 */}

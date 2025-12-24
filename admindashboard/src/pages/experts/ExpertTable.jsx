@@ -3,6 +3,7 @@ import BaseTable from '../../components/table/BaseTable'
 import { ExpertColumns } from './ExpertColumns'
 import { useDispatch } from 'react-redux';
 import { getAllCoaches } from '@/redux/features/coach/coach.thunk';
+import { useNavigate } from 'react-router-dom';
 
 export default function ExpertTable() {
 
@@ -16,6 +17,11 @@ export default function ExpertTable() {
     setCoaches([{...coache[0],clients}])
   }
 
+  const navigate = useNavigate();
+  const profilePath = (id) => {
+    navigate(`/experts/profile/${id}`);
+  };
+
   useEffect(() => {
     fetchCoachData();
   }, []);
@@ -27,7 +33,7 @@ export default function ExpertTable() {
         data={coaches}
         actionLabel="Add Expert"
         actionPath="/addexpert"
-        profilePath="/experts/profile/:expertId"
+        profilePath={profilePath}
         pageLabel={"Experts"}
       />
     </div>
