@@ -81,7 +81,7 @@ export default function BaseTable({
             <tr
               key={row.id}
               className="border-b border-[#DBDEDD] hover:bg-gray-50 transition"
-              onClick={() => navigate(profilePath)}
+              onClick={() => profilePath(row.original._id)}
             >
               {row.getVisibleCells().map((cell) => (
                 <td
