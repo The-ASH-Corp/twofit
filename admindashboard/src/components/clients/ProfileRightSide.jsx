@@ -36,6 +36,27 @@ const dailyActivityLog = [
   },
 ];
 
+const compliance = [
+  {
+    title: "Chest",
+    Before: "98 cm",
+    after: "96 cm",
+    color: "#0A4F48",
+  },
+  {
+    title: "Waist",
+    Before: "98 cm",
+    after: "96 cm",
+    color: "#EBF3F2",
+  },
+  {
+    title: "Hips",
+    Before: "98 cm",
+    after: "96 cm",
+    color: "#F4DBC7",
+  },
+];
+
 const ProfileRightSide = ({ client }) => {
   const [date, setDate] = useState(new Date(2025, 5, 12));
   const [taskOpen, setTaskOpen] = useState(false);
@@ -76,7 +97,10 @@ const ProfileRightSide = ({ client }) => {
             }`}
           >
             {missedTasks.map((items, i) => (
-              <div key={i} className="bg-[#F8F8F8] w-full rounded-lg p-4 flex flex-col items-start">
+              <div
+                key={i}
+                className="bg-[#F8F8F8] w-full rounded-lg p-4 flex flex-col items-start"
+              >
                 <span className="text-[12px] text-[#66706D]">{items.date}</span>
                 <div>
                   <span className="text-[14px] text-[#0A4F48] font-bold">
@@ -126,48 +150,31 @@ const ProfileRightSide = ({ client }) => {
           </button>
         </div>
         <div className="flex flex-col items-center w-full gap-2.5">
-          <div className="relative w-full rounded-l-sm rounded-r-lg pl-4 p-2 bg-[#F8F8F8]">
-            <div className="absolute left-0 top-0 w-2 h-full bg-[#0A4F48] rounded-xs"></div>
-            <div className="w-full flex items-center justify-between">
-              <p className="text-[12px] ">Chest</p>
-              <div className="flex items-center gap-1.5">
-                <div className="pr-1.5 border-r border-r-[#DBDEDD]">
-                  <p className="text-[10px] text-[#66706D]">
-                    Before <span className="text-black"> 98 cm</span>
-                  </p>
+          {compliance.map((items, i) => (
+            <div
+              key={i}
+              className="relative w-full rounded-l-sm rounded-r-lg pl-4 p-2 bg-[#F8F8F8]"
+            >
+              <div
+                className="absolute left-0 top-0 w-2 h-full  rounded-xs"
+                style={{ background: items.color }}
+              ></div>
+              <div className="w-full flex items-center justify-between">
+                <p className="text-[12px] ">{items.title}</p>
+                <div>
+                  <span className="text-[12px] text-[#66706D] px-1.5 border-r border-r-[#DBDEDD]">
+                    Before{" "}
+                    <span className="text-black text-[10px]">
+                      {items.Before}
+                    </span>
+                  </span>
+                  <span className="px-1.5 text-[11px] font-bold text-[#0A4F48]">
+                    {items.after}
+                  </span>
                 </div>
-                <p className="text-[#0A4F48] text-[12px] font-bold">96 cm</p>
               </div>
             </div>
-          </div>
-          <div className="relative w-full rounded-l-sm rounded-r-lg pl-4 p-2 bg-[#F8F8F8]">
-            <div className="absolute left-0 top-0 w-2 h-full bg-[#F4DBC7] rounded-xs"></div>
-            <div className="w-full flex items-center justify-between">
-              <p className="text-[12px] ">Waist</p>
-              <div className="flex items-center gap-1.5">
-                <div className="pr-1.5 border-r border-r-[#DBDEDD]">
-                  <p className="text-[10px] text-[#66706D]">
-                    Before <span className="text-black"> 89 cm</span>
-                  </p>
-                </div>
-                <p className="text-[#0A4F48] text-[12px] font-bold">89 cm</p>
-              </div>
-            </div>
-          </div>
-          <div className="relative w-full rounded-l-sm rounded-r-lg pl-4 p-2 bg-[#F8F8F8]">
-            <div className="absolute left-0 top-0 w-2 h-full bg-[#EBF3F2] rounded-xs"></div>
-            <div className="w-full flex items-center justify-between">
-              <p className="text-[12px] ">Hips</p>
-              <div className="flex items-center gap-1.5">
-                <div className="pr-1.5 border-r border-r-[#DBDEDD]">
-                  <p className="text-[10px] text-[#66706D]">
-                    Before <span className="text-black">101 cm</span>
-                  </p>
-                </div>
-                <p className="text-[#0A4F48] text-[12px] font-bold">99 cm</p>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
       {/* Daily Activity Log */}
