@@ -4,7 +4,7 @@ import Clients from "./pages/Clients";
 import Experts from "./pages/Experts";
 import Programs from "./pages/Programs";
 import Finance from "./pages/Finance";
-import Chats from "./pages/Chats";
+import Chats from "./pages/chats/Chats";
 import Analytics from "./pages/Analytics";
 import Website from "./pages/Website";
 import ClientsTable from "./pages/clients/ClientsTable";
