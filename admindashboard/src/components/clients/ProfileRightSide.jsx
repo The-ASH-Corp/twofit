@@ -75,8 +75,8 @@ const ProfileRightSide = ({ client }) => {
               taskOpen ? "max-h-[5000px] opacity-100" : "max-h-0 opacity-0"
             }`}
           >
-            {missedTasks.map((items) => (
-              <div className="bg-[#F8F8F8] w-full rounded-lg p-4 flex flex-col items-start">
+            {missedTasks.map((items, i) => (
+              <div key={i} className="bg-[#F8F8F8] w-full rounded-lg p-4 flex flex-col items-start">
                 <span className="text-[12px] text-[#66706D]">{items.date}</span>
                 <div>
                   <span className="text-[14px] text-[#0A4F48] font-bold">
