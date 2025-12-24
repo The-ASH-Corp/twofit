@@ -42,7 +42,6 @@ export const getAllCoach = async (page, limit) => {
   return await CoachModel.find()
     .skip(skip)
     .limit(limit)
-    .select("_id name specialization experience image");
 };
 
 export const getCoachById = async (coachId) => {

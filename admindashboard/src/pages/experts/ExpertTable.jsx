@@ -12,7 +12,8 @@ export default function ExpertTable() {
   const dispatch = useDispatch();
   const fetchCoachData=async()=>{
     const coache =await dispatch(getAllCoaches({page,limit})).unwrap()
-    setCoaches(coache)
+    const clients =coache[0].assignedUsers.length
+    setCoaches([{...coache[0],clients}])
   }
 
   useEffect(() => {
