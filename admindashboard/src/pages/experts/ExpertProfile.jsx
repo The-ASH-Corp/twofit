@@ -123,7 +123,7 @@ const ExpertProfile = () => {
           </div>
           <div className="flex flex-col items-center gap-4 w-full">
             <div className="w-full bg-[#F8F8F8] p-3.5 rounded-lg">
-                ddfgh
+                
             </div>
           </div>
         </div>
