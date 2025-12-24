@@ -137,9 +137,7 @@ export default function ExpertForm() {
   const dispatch = useDispatch()
 
   const handleCoachCreation =async(values)=>{
-    const coach = await dispatch(createCoach(values))
-    console.log(coach);
-    
+    const coach = await dispatch(createCoach(values))    
   }
 
   return (
