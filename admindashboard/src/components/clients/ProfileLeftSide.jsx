@@ -26,6 +26,7 @@ const ProfileLeftSide = ({ client }) => {
   const [day, month, year] = client.dob.split("-");
   const today = new Date();
   let age = today.getFullYear() - year;
+  // console.log(age);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-GB", {
@@ -111,8 +112,8 @@ const ProfileLeftSide = ({ client }) => {
           </button>
         </div>
         <div className="flex flex-col items-start gap-4 w-full">
-          {profileInfo.map((items) => (
-            <div className="flex items-start gap-4">
+          {profileInfo.map((items, i) => (
+            <div className="flex items-start gap-4" key={i}>
               <div className="p-2.5 bg-[#EBF3F2] rounded-full">
                 <img src={items.img} alt="" className="w-3.5" />
               </div>
@@ -187,8 +188,8 @@ const ProfileLeftSide = ({ client }) => {
             </h2>
           </div>
           <div className="flex flex-col items-start gap-4 w-full">
-            {assignedExperts.map((items) => (
-              <div className="flex items-center justify-between w-full">
+            {assignedExperts.map((items, i) => (
+              <div className="flex items-center justify-between w-full" key={i}>
                 <div className="flex items-start gap-4">
                   <div className="p-2.5 bg-[#EBF3F2] rounded-full">
                     <img src={items.img} alt="" className="w-3.5" />

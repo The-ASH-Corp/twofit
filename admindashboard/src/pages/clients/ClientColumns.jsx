@@ -1,8 +1,8 @@
-const expertColors={
-  Dietitian:"bg-[#FFF5ED] text-black",
-  Therapist:"bg-[#E7F9F4] text-black",
-  Trainer:"bg-[#EBF2FE] text-black"
-}
+// const expertColors={
+//   Dietitian:"bg-[#FFF5ED] text-black",
+//   Therapist:"bg-[#E7F9F4] text-black",
+//   Trainer:"bg-[#EBF2FE] text-black"
+// }
 
 const statusColors={
   Active:"bg-[#45C4A2] text-white",

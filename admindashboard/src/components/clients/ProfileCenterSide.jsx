@@ -107,8 +107,8 @@ const ProfileCenterSide = ({ client }) => {
           </button>
         </div>
         <div className="grid grid-cols-2 gap-2.5 w-full">
-          {healthDetails.map((items) => (
-            <div className="p-3.5 bg-[#F8F8F8] rounded-lg w-full">
+          {healthDetails.map((items, i) => (
+            <div key={i} className="p-3.5 bg-[#F8F8F8] rounded-lg w-full">
               <div className="w-full flex flex-col items-start gap-2">
                 <span className="px-1.5 py-1 bg-[#F0F0F0] text-[11px] rounded-sm">
                   {items.heading}
@@ -177,10 +177,10 @@ const ProfileCenterSide = ({ client }) => {
           </button>
         </div>
         <div className="w-full flex flex-col items-center">
-          {assignedExperts.map((items) => {
+          {assignedExperts.map((items, i) => {
             const styles = statusStyles[items.status] || statusStyles.Pending;
             return (
-              <div className="flex items-center justify-between w-full py-4 border-b border-b-[#DBDEDD]">
+              <div key={i} className="flex items-center justify-between w-full py-4 border-b border-b-[#DBDEDD]">
                 <div className="flex items-start gap-4">
                   <div
                     className="p-3 rounded-full "
