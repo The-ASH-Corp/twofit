@@ -48,31 +48,31 @@ const profileInfo = [
   },
 ];
 
-const roleAndSpecialization = [
-  {
-    title: "Role",
-    content: "Dietitian",
-  },
-  {
-    title: "Specialization",
-    content:
-      "PCOD Diet Plans, Therapeutic Diets, Weight-loss Programs, Thyroid",
-  },
-  {
-    title: "Experience",
-    content: "7 Years",
-  },
-  {
-    title: "Certifications",
-    content: "M.Sc. Clinical Nutrition",
-  },
-  {
-    title: "Languages",
-    content: "English, Hindi, Malayalam",
-  },
-];
 
-const ExpertLeftSide = () => {
+
+const ExpertLeftSide = ({ expert }) => {
+  const roleAndSpecialization = [
+    {
+      title: "Role",
+      content: "Dietitian",
+    },
+    {
+      title: "Specialization",
+      content: expert.specialization,
+    },
+    {
+      title: "Experience",
+      content: "7 Years",
+    },
+    {
+      title: "Certifications",
+      content: "M.Sc. Clinical Nutrition",
+    },
+    {
+      title: "Languages",
+      content: "English, Hindi, Malayalam",
+    },
+  ];
   return (
     <div className="w-[25%] flex flex-col items-center gap-4 overflow-auto  no-scrollbar">
       {/* profile */}
@@ -83,7 +83,7 @@ const ExpertLeftSide = () => {
           className="absolute top-7.5 right-5"
         />
         <div className="flex flex-col items-center gap-3 pt-5">
-          <h2 className="font-bold text-[16px] ">Aarav Kumar </h2>
+          <h2 className="font-bold text-[16px] ">{expert.name}</h2>
           <div className="flex items-center justify-between gap-2 text-[11px]">
             <span className="px-2 py-0.5 bg-[#F0F0F0] rounded-full">
               Dietitian
@@ -98,8 +98,11 @@ const ExpertLeftSide = () => {
           </div>
         </div>
         <div className="flex flex-col items-center gap-2.5 w-full">
-          {profile.map((items) => (
-            <div className="flex justify-between items-center w-full p-3 bg-[#F8F8F8] rounded-lg">
+          {profile.map((items, i) => (
+            <div
+              key={i}
+              className="flex justify-between items-center w-full p-3 bg-[#F8F8F8] rounded-lg"
+            >
               <p className="text-[#66706D] text-[12px] ">{items.title}</p>
               <p className="text-[12px]">{items.content}</p>
             </div>
@@ -117,8 +120,8 @@ const ExpertLeftSide = () => {
           </button>
         </div>
         <div className="flex flex-col items-start gap-4 w-full">
-          {profileInfo.map((items) => (
-            <div className="flex items-start gap-4">
+          {profileInfo.map((items, i) => (
+            <div key={i} className="flex items-start gap-4">
               <div className="p-2.5 bg-[#EBF3F2] rounded-full">
                 <img src={items.img} alt="" className="w-3.5" />
               </div>
@@ -157,6 +160,6 @@ const ExpertLeftSide = () => {
       </div>
     </div>
   );
-}
+};
 
 export default ExpertLeftSide
