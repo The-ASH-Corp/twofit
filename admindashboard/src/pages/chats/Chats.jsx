@@ -1,6 +1,6 @@
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { selectAllClients } from "@/redux/features/client/client.selectors";
-import { getAllClients } from "@/redux/features/client/client.thunk";
+// import { getAllClients } from "@/redux/features/client/client.thunk";
 import { socket } from "@/utils/socket";
 import {
   MessageSquare,
@@ -11,21 +11,58 @@ import {
   Settings,
   MessageCircle,
 } from "lucide-react";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 export default function Chats() {
-  const dispatch = useDispatch();
+  const [client, setChatClient] = useState("");
+  const [message, setMessage] = useState("");
+  const user = useSelector(selectUser);
+  // const dispatch = useDispatch();
 
   useEffect(() => {
+    socket.auth = { userId: user._id, token: localStorage.getItem("token") };
+
     socket.connect();
-    dispatch(getAllClients());
+
     return () => socket.disconnect();
   }, []);
 
+
   const clients = useSelector(selectAllClients);
-  const user =useSelector(selectUser)
-  console.log(user)
+
+
+  const chatClient = (client) => {
+    socket.emit("join_room", {
+      roomId: `private:${user._id}_${client}`,
+    });
+    setChatClient(client);
+  };
+
+
+
+  const handleBroadcastChat = () => {
+    socket.emit("broadcast", {
+      roomId: `broadcast_${user._id}`,
+    });
+  };
+
+
+
+  const messageHandlers = (message) => {
+    socket.emit("send_message", {
+      roomId: `private:${user._id}_${client}`,
+      text: message,
+      reciever:client
+    },
+      () => {
+        setMessage("");
+      });
+    };
+    
+
+  
+
   return (
     <div className="flex h-screen bg-[#F5F5F5]">
       {/* Left Sidebar */}
@@ -42,12 +79,12 @@ export default function Chats() {
                 <MessageSquare size={20} className="text-gray-400" />
                 <span className="text-gray-800 font-medium">Chats</span>
               </div>
-              <span className="bg-[#2D7A6D] text-white text-xs font-bold px-2 py-1 rounded-full">
-                7
-              </span>
             </div>
 
-            <div className="flex items-center gap-3 p-3 text-gray-600 cursor-pointer hover:bg-[#FAFAFA]">
+            <div
+              className="flex items-center gap-3 p-3 text-gray-600 cursor-pointer hover:bg-[#FAFAFA]"
+              onClick={handleBroadcastChat}
+            >
               <MessageCircle size={20} />
               <span className="font-medium">Broadcast</span>
             </div>
@@ -99,11 +136,11 @@ export default function Chats() {
 
         {/* Chat List Items */}
         <div className="flex-1 overflow-y-auto">
-          {
-          clients.map((chat, idx) => (
+          {clients.map((chat, idx) => (
             <div
               key={idx}
-              className="flex items-center gap-3 p-4 border-b border-[#F0F0F0] hover:bg-[#FAFAFA] cursor-pointer transition" 
+              className="flex items-center gap-3 p-4 border-b border-[#F0F0F0] hover:bg-[#FAFAFA] cursor-pointer transition"
+              onClick={()=>chatClient(chat._id)}
             >
               <div className="w-12 h-12 rounded-full bg-[#D4A5A0] flex items-center justify-center text-white font-semibold flex-shrink-0">
                 {chat?.name?.split(" ")?.[0]?.[0]}
@@ -131,7 +168,7 @@ export default function Chats() {
         <div className="bg-white border-b border-[#E0E0E0] px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-[#E8B5AD] flex items-center justify-center text-white font-semibold">
-              RS
+              {user?.name?.split(" ")?.[0]?.[0]}
             </div>
             <div>
               <h1 className="text-gray-800 font-semibold">{user.name}</h1>
@@ -148,66 +185,64 @@ export default function Chats() {
 
         {/* Messages Area */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {/* Incoming Message with Audio */}
+          {/* Incoming Message  */}
           <div className="flex gap-3">
-            <div className="w-10 h-10 rounded-full bg-[#D4A5A0] flex-shrink-0"></div>
+            <div className="w-10 h-10 rounded-full bg-[#D4A5A0] shrink-0"></div>
             <div>
               <div className="bg-white rounded-2xl px-4 py-3 max-w-xs">
-                <div className="flex items-center gap-3">
-                  <button className="text-[#2D7A6D] hover:opacity-70">
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </button>
-                  <div className="flex items-center gap-1">
-                    <div className="w-1 h-8 bg-gray-300 rounded-full"></div>
-                    <div className="w-1 h-4 bg-gray-300 rounded-full"></div>
-                    <div className="w-1 h-6 bg-gray-300 rounded-full"></div>
-                  </div>
-                  <span className="text-gray-500 text-xs">11:14 AM</span>
-                </div>
+                <p className="text-gray-800">
+                  This is the body of the incoming message.
+                </p>
               </div>
               <div className="flex gap-2 mt-2 text-xs text-gray-500">
-                <span>0:20</span>
+                <span>11:14 AM</span>
               </div>
             </div>
-            <button className="w-10 h-10 rounded-full bg-[#2D7A6D] text-white flex items-center justify-center flex-shrink-0 hover:opacity-90">
-              ↓
-            </button>
           </div>
-
-
 
           {/* Outgoing Message */}
           <div className="flex gap-3 justify-end">
-            <div className="bg-[#E8F5E9] rounded-2xl px-4 py-3 max-w-sm">
-              <p className="text-gray-800">This is the body of the message.</p>
+            <div>
+              <div className="bg-[#E8F5E9] rounded-2xl px-4 py-3 max-w-xs">
+                <p className="text-gray-800">
+                  This is the body of the Outgoing message.
+                </p>
+              </div>
+              <div className="flex gap-2 mt-2 text-xs text-gray-500">
+                <span>11:16 AM</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Message Input */}
         <div className="bg-white border-t border-[#E0E0E0] px-6 py-4 flex items-center gap-3">
-          <button className="text-gray-600 hover:text-gray-800">
+          {/* <button className="text-gray-600 hover:text-gray-800">
             <Paperclip size={20} />
-          </button>
+          </button> */}
           <input
             type="text"
             placeholder="Type something..."
+            value={message}  
             className="flex-1 bg-gray-100 rounded-full px-4 py-2 text-sm text-gray-800 outline-none placeholder-gray-500 focus:bg-white focus:ring-1 focus:ring-[#2D7A6D]"
+            onChange={(e) => setMessage(e.target.value)}
           />
-          <button className="text-gray-600 hover:text-gray-800">
+          {/* <button className="text-gray-600 hover:text-gray-800">
             <Mic size={20} />
-          </button>
-          <button className="bg-[#2D7A6D] text-white px-6 py-2 rounded-full font-medium hover:opacity-90 transition flex items-center gap-2">
+          </button> */}
+         {message? <button
+          type="submit"
+            className="bg-[#2D7A6D] text-white px-6 py-2 rounded-full font-medium hover:opacity-90 transition flex items-center gap-2"
+            onClick={()=>messageHandlers(message)}
+          >
             <Send size={16} />
             Send
-          </button>
+          </button> : <button
+            className="bg-[#2D7A6D] text-white px-6 py-2 rounded-full font-medium hover:opacity-90 transition flex items-center gap-2 cursor-not-allowed"
+          >
+            <Send size={16} />
+            Send
+          </button> }
         </div>
       </div>
     </div>
