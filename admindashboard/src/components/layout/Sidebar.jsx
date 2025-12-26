@@ -28,6 +28,7 @@ const menuItems = [
       }
     ],
   },
+  {label:"Category",icon:assets.website,path:"/category"},
   { label: "Finance", icon: assets.finance, path: "/finance" },
   { label: "Chats", icon: assets.chats, path: "/chats" },
   { label: "Analytics", icon: assets.analytics, path: "/analytics" },

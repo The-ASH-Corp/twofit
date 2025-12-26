@@ -6,7 +6,7 @@ import { programListData } from './programListData'
 export default function ProgramTable() {
   return (
     <div>
-      <BaseTable columns={ProgramListColumns} data={programListData} pageLabel={"Program List"}/>
+      <BaseTable columns={ProgramListColumns} data={programListData} pageLabel={"Program List"}  actionLabel="Add Program" actionPath="/add-program"/>
     </div>
   )
 }
