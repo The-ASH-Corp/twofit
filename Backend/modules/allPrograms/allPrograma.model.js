@@ -7,20 +7,30 @@ const programSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+    image:{
+      type:String,
+      required:true
+    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Program",
+      ref: "Category",
       required: true,
     },
     duration: {
-      type: Number,
+      type: [Number],
       required: true,
     },
-    template: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Template",
-      required: true,
-    },
+
+    // template: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Template",
+    //   required: true,
+    // },
+    status:{
+      type:String,
+      enum:["Draft","Published"],
+      default:"draft"
+    }
   },
   
 
@@ -29,4 +39,4 @@ const programSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("Program", programSchema);
+export default mongoose.model("ProgramsList", programSchema);
