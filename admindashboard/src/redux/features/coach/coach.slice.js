@@ -22,12 +22,12 @@ const coachSlice = createSlice({
       //get all coach slices
       .addCase(getAllCoaches.pending, (state) => {
         state.status = "loading";
-        state.error = null
+        state.error = null;
       })
       .addCase(getAllCoaches.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.allCoaches = action.payload;
-        state.error = null
+        state.error = null;
       })
       .addCase(getAllCoaches.rejected, (state, action) => {
         state.status = "failed";
@@ -37,32 +37,32 @@ const coachSlice = createSlice({
       // get a Single Coach
       .addCase(getSingleCoach.pending, (state) => {
         state.status = "loading";
-        state.error = null
+        state.error = null;
       })
       .addCase(getSingleCoach.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.selectedCoach = action.payload
-        state.error = null
+        state.selectedCoach = action.payload;
+        state.error = null;
       })
-      .addCase(getSingleCoach.rejected,(state,action)=>{
-        state.status="failed",
-        state.error =action.payload,
-        state.selectedCoach =null
+      .addCase(getSingleCoach.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+        state.selectedCoach = null;
       })
 
-      // create Coach 
-      .addCase(createCoach.pending,(state)=>{
+      // create Coach
+      .addCase(createCoach.pending, (state) => {
         state.status = "loading";
-        state.error = null
+        state.error = null;
       })
-      .addCase(createCoach.fulfilled,(state,action)=>{
+      .addCase(createCoach.fulfilled, (state) => {
         state.status = "succeeded";
-        state.selectedCoach = action.payload
-        state.error = null
+        state.selectedCoach = null;
+        state.error = null;
       })
-      .addCase(createCoach.rejected,(state,action)=>{
-        state.status="failed",
-        state.error =action.payload
+      .addCase(createCoach.rejected, (state, action) => {
+        state.status = "failed"; 
+        state.error = action.payload;
       })
   },
 });
