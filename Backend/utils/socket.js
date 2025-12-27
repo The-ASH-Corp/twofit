@@ -22,78 +22,73 @@ const joinHandler = (io, socket) => {
     socket.join(roomId);
   });
 
-  socket.on("broadcast", () => {
+  socket.on("broadcast", ({ roomId }) => {
     socket.join(roomId);
   });
 };
 
 // save into mongo after redis reach 100 messages or server shutdown
-const flushRoomToMongo = async (roomId,sender,reciever) => {
-  const redisKey = `chat:${roomId}`;
+const flushRoomToMongo = async (roomId, sender, reciever) => {
+  const redisKey = `${roomId}`;
 
   const messages = await redisClient.lRange(redisKey, 0, -1);
   if (!messages.length) return;
 
   const parsedMessages = messages.map(JSON.parse);
 
- await ChatModel.updateOne(
-  { roomId },
-  {
-    $setOnInsert: {
-      roomId,
-      participants: [sender, reciever],
-    },
+  await ChatModel.updateOne(
+    { roomId },
+    {
+      $setOnInsert: {
+        roomId,
+        participants: [sender, reciever],
+      },
 
-    $push: {
-      messages: { $each: parsedMessages },
+      $push: {
+        messages: { $each: parsedMessages },
+      },
     },
-  },
-  { upsert: true }
-);
+    { upsert: true }
+  );
 
   await redisClient.del(redisKey);
 };
 
-
-
 // emergency save for all rooms
-// const flushAllRooms = async () => {
-//   const keys = await redisClient.keys("chat:*");
+export const flushAllRooms = async () => {
+  const keys = await redisClient.keys("private:*");
 
-//   for (const key of keys) {
-//     const roomId = key.replace("chat:", "");
-//     await flushRoomToMongo(roomId);
-//   }
+  for (const key of keys) {
+    const roomId = key.replace("private:", "");
+    await flushRoomToMongo(roomId);
+  }
 
-// redisClient.on("end", async () => {
-//   console.warn("⚠️ Redis connection ended");
-//   await flushAllRooms();
-// });
-
-// };
-
-
-
+  redisClient.on("end", async () => {
+    console.warn("⚠️ Redis connection ended");
+    await flushAllRooms();
+  });
+};
 
 // message Handlers
 const messageHandler = (io, socket) => {
   socket.on("send_message", async ({ roomId, text, reciever }, ack) => {
     const msg = {
+      roomId,
       sender: socket.userId,
       reciever: reciever,
       message: text,
       time: new Date(),
     };
 
-    const redisKey = `chat:${roomId}`;
+    const redisKey = `${roomId}`;
 
     await redisClient.rPush(redisKey, JSON.stringify(msg));
     socket.to(roomId).emit("new_message", msg);
 
     const count = await redisClient.lLen(redisKey);
-
-    if (count >= 100) {
-      await flushRoomToMongo(roomId,socket.userId,reciever);
+    // change according to the message count is saving in Redis 
+    if (count >= 10) {
+      await flushRoomToMongo(roomId, socket.userId, reciever);
     }
     if (typeof ack === "function") {
       ack({ ok: true });
@@ -102,7 +97,6 @@ const messageHandler = (io, socket) => {
 };
 
 export default function initSocket(io) {
-
   io.use(socketAuth);
 
   io.on("connection", (socket) => {
@@ -110,6 +104,10 @@ export default function initSocket(io) {
 
     joinHandler(io, socket);
     messageHandler(io, socket);
+
+    socket.on("leave_room", ({ roomId }) => {
+      socket.leave(roomId);
+    });
 
     // add more handlers here
 

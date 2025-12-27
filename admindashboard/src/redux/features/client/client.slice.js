@@ -12,8 +12,11 @@ const clientSlice = createSlice({
   name: "client",
   initialState,
   reducers: {
-    clearClientError(state) {
+    clearClient(state) {
+      state.allClients=[];
+      state.selectedClient=null;
       state.error = null;
+      state.status="idle"
     },
   },
   extraReducers: (builder) => {
@@ -45,5 +48,5 @@ const clientSlice = createSlice({
   },
 });
 
-export const { clearClientError } = clientSlice.actions;
+export const { clearClient } = clientSlice.actions;
 export default clientSlice.reducer;

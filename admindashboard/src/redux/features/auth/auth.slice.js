@@ -1,6 +1,9 @@
 // features/auth/auth.slice.js
 import { createSlice } from "@reduxjs/toolkit";
 import { createClient, login, logout } from "./auth.thunk";
+import { clearChat } from "../chat/chat.slice";
+import { clearClient } from "../client/client.slice";
+import { clearCoach } from "../coach/coach.slice";
 
 const initialState = {
   user: null,
@@ -34,7 +37,7 @@ const authSlice = createSlice({
       .addCase(createClient.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(createClient.fulfilled, (state, action) => {
+      .addCase(createClient.fulfilled, (state) => {
         state.status = "succeeded";
       })
       .addCase(createClient.rejected, (state, action) => {
@@ -45,6 +48,9 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         state.status = "idle";
+        clearChat();
+        clearClient()
+        clearCoach();
       });
   },
 });

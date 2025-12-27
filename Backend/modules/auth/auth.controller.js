@@ -1,4 +1,5 @@
 import redisClient from "../../redis/redisClient.js";
+import { flushAllRooms } from "../../utils/socket.js";
 import * as service from "./auth.service.js";
 
 export const createUserByAdmin = async (req, res) => {
@@ -53,6 +54,7 @@ export const adminLoginController = async (req, res) => {
 export const logoutController = async (req, res) => {
   try {
     const userId = req.user.id;
+   await flushAllRooms()
     await redisClient.del(`refresh:${userId}`);
 
     res.clearCookie("refreshToken", {
