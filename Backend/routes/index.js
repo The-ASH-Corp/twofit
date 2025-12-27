@@ -8,6 +8,7 @@ import faqRoutes from "../modules/faq/faq.routes.js"
 import programRoutes from "../modules/allPrograms/allPrograma.route.js"
 import authRoutes from '../modules/auth/auth.routes.js'
 import clientRoutes from "../modules/clients/client.routes.js"
+import therapyRouts from "../modules/therapy/therapy.route.js"
 
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router.use("/clients",clientRoutes)
 router.use("/coach", coachRoutes);
 router.use("/workout", planRoutes);
 router.use("/programs", programRoutes);
+router.use("/therapy", therapyRouts);
 
 // router.use("/blog", blogRoutes);
 // router.use("/testimonials",testimonialRoutes)
