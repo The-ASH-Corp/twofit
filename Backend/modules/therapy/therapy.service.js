@@ -22,3 +22,7 @@ export const getTherapy = async (id) => {
 export const updateTherapy = async (id, updatedData) => {
     return await TherapyModel.findByIdAndUpdate( id, updatedData)
 }
+
+export const deleteTherapy = async (id) => {
+    return await TherapyModel.findByIdAndDelete(id)
+}
