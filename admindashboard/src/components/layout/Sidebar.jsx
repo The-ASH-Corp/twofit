@@ -22,13 +22,14 @@ const menuItems = [
         path: "/programs/list",
       },
       {
-        label:"Templates",
-        icon:assets.programs,
-        path:"/programs/template"
-      }
+        label: "Templates",
+        icon: assets.programs,
+        path: "/programs/template",
+      },
     ],
   },
-  {label:"Category",icon:assets.website,path:"/category"},
+  { label: "Category", icon: assets.website, path: "/category" },
+  { label: "Therapy", icon: assets.website, path: "/therapy" },
   { label: "Finance", icon: assets.finance, path: "/finance" },
   { label: "Chats", icon: assets.chats, path: "/chats" },
   { label: "Analytics", icon: assets.analytics, path: "/analytics" },
