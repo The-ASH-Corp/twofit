@@ -9,6 +9,7 @@ import programRoutes from "../modules/allPrograms/allPrograma.route.js"
 import authRoutes from '../modules/auth/auth.routes.js'
 import clientRoutes from "../modules/clients/client.routes.js"
 import categoryRoutes from '../modules/category/category.routes.js'
+import therapyRouts from "../modules/therapy/therapy.route.js"
 
 
 const router = express.Router();
@@ -19,6 +20,7 @@ router.use("/coach", coachRoutes);
 router.use('/category',categoryRoutes)
 // router.use("/workout", planRoutes);
 router.use("/programs", programRoutes);
+router.use("/therapy", therapyRouts);
 
 // router.use("/blog", blogRoutes);
 // router.use("/testimonials",testimonialRoutes)
