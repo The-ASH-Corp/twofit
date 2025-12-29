@@ -7,7 +7,6 @@ import clientRoutes from "../modules/clients/client.routes.js"
 import chatRoutes from "../modules/chat/chat.route.js"
 import therapyRouts from "../modules/therapy/therapy.route.js"
 
-
 const router = express.Router();
 
 router.use('/',authRoutes)
