@@ -72,6 +72,8 @@ export default function Chats() {
     }
   }, [chats]);
 
+  
+
   useEffect(() => {
     const onNewMessage = (msg) => {
       if (!client) return;
@@ -91,16 +93,16 @@ export default function Chats() {
 
     const roomId = getPrivateRoomId(user._id, client._id);
 
-    const localMsg = {
-      roomId,
-      sender: user._id,
-      reciever: client._id,
-      message,
-      time: new Date(),
-    };
+    // const localMsg = {
+    //   roomId,
+    //   sender: user._id,
+    //   reciever: client._id,
+    //   message,
+    //   time: new Date(),
+    // };
 
     // Optimistic UI
-    setMessages((prev) => [...prev, localMsg]);
+    // setMessages((prev) => [...prev, localMsg]);
 
     socket.emit(
       "send_message",

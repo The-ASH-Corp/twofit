@@ -70,31 +70,67 @@ export const flushAllRooms = async () => {
 };
 
 // message Handlers
+// const messageHandler = (io, socket) => {
+//   socket.on("send_message", async ({ roomId, text, reciever }, ack) => {
+//     const msg = {
+//       roomId,
+//       sender: socket.userId,
+//       reciever: reciever,
+//       message: text,
+//       time: new Date(),
+//     };
+
+//     const redisKey = `${roomId}`;
+
+//     await redisClient.rPush(redisKey, JSON.stringify(msg));
+//     socket.to(roomId).emit("new_message", msg);
+
+//     const count = await redisClient.lLen(redisKey);
+//     // change according to the message count is saving in Redis 
+//     if (count >= 10) {
+//       await flushRoomToMongo(roomId, socket.userId, reciever);
+//     }
+//     if (typeof ack === "function") {
+//       ack({ ok: true });
+//     }
+//   });
+// };
+
 const messageHandler = (io, socket) => {
   socket.on("send_message", async ({ roomId, text, reciever }, ack) => {
+    if (!text?.trim()) return;
+
     const msg = {
       roomId,
       sender: socket.userId,
-      reciever: reciever,
+      reciever,
       message: text,
       time: new Date(),
     };
 
-    const redisKey = `${roomId}`;
+    // 1️⃣ Save to Redis (fast)
+    await redisClient.rPush(`${roomId}`, JSON.stringify(msg));
 
-    await redisClient.rPush(redisKey, JSON.stringify(msg));
-    socket.to(roomId).emit("new_message", msg);
+    // 2️⃣ Save to MongoDB IMMEDIATELY (source of truth)
+    await ChatModel.updateOne(
+      { roomId },
+      {
+        $setOnInsert: {
+          roomId,
+          participants: [socket.userId, reciever],
+        },
+        $push: { messages: msg },
+      },
+      { upsert: true }
+    );
 
-    const count = await redisClient.lLen(redisKey);
-    // change according to the message count is saving in Redis 
-    if (count >= 10) {
-      await flushRoomToMongo(roomId, socket.userId, reciever);
-    }
-    if (typeof ack === "function") {
-      ack({ ok: true });
-    }
+    // 3️⃣ Emit realtime
+    io.to(roomId).emit("new_message", msg);
+
+    ack?.({ ok: true });
   });
 };
+
 
 export default function initSocket(io) {
   io.use(socketAuth);

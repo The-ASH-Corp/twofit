@@ -54,7 +54,7 @@ export const adminLoginController = async (req, res) => {
 export const logoutController = async (req, res) => {
   try {
     const userId = req.user.id;
-   await flushAllRooms()
+    await flushAllRooms();
     await redisClient.del(`refresh:${userId}`);
 
     res.clearCookie("refreshToken", {
