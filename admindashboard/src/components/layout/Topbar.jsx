@@ -33,8 +33,8 @@ export default function Topbar() {
 
         <div className="flex items-center gap-3">
           <div>
-            <p className="text-[18px] font-bold">{user.name}</p>
-            <p className="text-xs text-gray-500">{user.role}</p>
+            <p className="text-[18px] font-bold">{user?.name}</p>
+            <p className="text-xs text-gray-500">{user?.role}</p>
           </div>
         </div>
       </div>

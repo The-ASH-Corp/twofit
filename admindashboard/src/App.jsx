@@ -21,32 +21,59 @@ import ProtectedRoutes from "./routes/ProtectedRoutes";
 import ExpertProfile from "./pages/experts/ExpertProfile";
 import ProgramForm from "./pages/programsList/ProgramForm";
 import CategoryForm from "./pages/category/CategoryForm";
+import TherapyForm from "./pages/therapy/therapyForm";
 
 function App() {
   return (
     <Router>
       <Routes>
-        
+        <Route
+          path="/login"
+          element={
+            <PublicRoutes>
+              <Login />
+            </PublicRoutes>
+          }
+        />
 
-        <Route path="/login" element={<PublicRoutes><Login/></PublicRoutes>}/>
-        
-        <Route path="/" element={  <ProtectedRoutes><AppLayout/></ProtectedRoutes> }  >
-        <Route path="/" element={ <ProtectedRoutes><Dashboard/></ProtectedRoutes>}/>
-        <Route path="/clients" element={<ClientsTable />} />
-        <Route path="/clients/clientProfile/:clientId" element={<ClientProfile/>} />
-        <Route path="/addclient" element={<ClientForm/>}/>
-        <Route path="/experts" element={<ExpertTable />} />
-        <Route path="/experts/profile/:expertId" element={<ExpertProfile />} />
-        <Route path="/addexpert" element={<ExpertForm/>}/>
-        <Route path="/category" element={<CategoryForm/>}/>
-        <Route path="/programs" element={<ProgramTable/>} />
-        <Route path="/add-program" element={<ProgramForm/>}/>
-        
-        <Route path="/finance" element={<FinanceTable/>} />
-        <Route path="/chats" element={<Chats />} />
-        <Route path="analytics" element={<Analytics />} />
-        <Route path="/website" element={<Website />} />
-</Route>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoutes>
+              <AppLayout />
+            </ProtectedRoutes>
+          }
+        >
+          <Route
+            path="/"
+            element={
+              <ProtectedRoutes>
+                <Dashboard />
+              </ProtectedRoutes>
+            }
+          />
+          <Route path="/clients" element={<ClientsTable />} />
+          <Route
+            path="/clients/profile/:clientId"
+            element={<ClientProfile />}
+          />
+          <Route path="/addclient" element={<ClientForm />} />
+          <Route path="/experts" element={<ExpertTable />} />
+          <Route
+            path="/experts/profile/:expertId"
+            element={<ExpertProfile />}
+          />
+          <Route path="/addexpert" element={<ExpertForm />} />
+          <Route path="/category" element={<CategoryForm />} />
+          <Route path="/therapy" element={<TherapyForm/>} />
+          <Route path="/programs" element={<ProgramTable />} />
+          <Route path="/add-program" element={<ProgramForm />} />
+
+          <Route path="/finance" element={<FinanceTable />} />
+          <Route path="/chats" element={<Chats />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="/website" element={<Website />} />
+        </Route>
         {/* <Route path="/" element={<AppLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/clients" element={<ClientsTable />} />
