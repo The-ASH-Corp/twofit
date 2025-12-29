@@ -129,11 +129,11 @@ const ExpertRightSide = () => {
                 <img
                   src={assets.pdfVector}
                   alt="pdf vector"
-                  className="w-4 h-4"
+                  className="w-fit h-4"
                 />
               </div>
-              <div>
-                <p className="text-[12px]">{items.name}</p>
+              <div className="flex flex-col items-start shrink pr-2">
+                <p className="text-[12px] wrap-break-word ">{items.name}</p>
                 <p className="text-[11px] text-[#66706D] flex items-center gap-1">
                   PDF{" "}
                   <span className="bg-[#DBDEDD] inline-block w-1 h-1 rounded-full"></span>
