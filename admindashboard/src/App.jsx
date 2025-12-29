@@ -36,6 +36,7 @@ function App() {
         <Route path="/clients/clientProfile/:clientId" element={<ClientProfile/>} />
         <Route path="/addclient" element={<ClientForm/>}/>
         <Route path="/experts" element={<ExpertTable />} />
+        <Route path="/experts/profile/:expertId" element={<ExpertProfile />} />
         <Route path="/addexpert" element={<ExpertForm/>}/>
         <Route path="/category" element={<CategoryForm/>}/>
         <Route path="/programs" element={<ProgramTable/>} />
@@ -56,7 +57,7 @@ function App() {
           <Route path="/addclient" element={<ClientForm />} />
           <Route path="/experts" element={<ExpertTable />} />
           <Route path="/experts" element={<ExpertTable />} />
-          <Route path="/experts/profile/:expertId" element={<ExpertProfile />} />
+          
           <Route path="/programs" element={<ProgramTable />} />
 
           <Route path="/finance" element={<FinanceTable />} />
