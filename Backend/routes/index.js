@@ -12,9 +12,11 @@ const router = express.Router();
 router.use('/',authRoutes)
 router.use("/clients",clientRoutes)
 router.use("/coach", coachRoutes);
-router.use("/workout", planRoutes);
+router.use('/category',categoryRoutes)
+// router.use("/workout", planRoutes);
 router.use("/programs", programRoutes);
 router.use("/chats",chatRoutes)
+router.use("/therapy", therapyRouts);
 
 
 

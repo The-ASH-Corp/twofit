@@ -19,6 +19,8 @@ import ClientProfile from "./pages/clients/ClientProfile";
 import PublicRoutes from "./routes/PublicRoutes";
 import ProtectedRoutes from "./routes/ProtectedRoutes";
 import ExpertProfile from "./pages/experts/ExpertProfile";
+import ProgramForm from "./pages/programsList/ProgramForm";
+import CategoryForm from "./pages/category/CategoryForm";
 
 function App() {
   return (
@@ -35,14 +37,16 @@ function App() {
         <Route path="/addclient" element={<ClientForm/>}/>
         <Route path="/experts" element={<ExpertTable />} />
         <Route path="/addexpert" element={<ExpertForm/>}/>
+        <Route path="/category" element={<CategoryForm/>}/>
         <Route path="/programs" element={<ProgramTable/>} />
+        <Route path="/add-program" element={<ProgramForm/>}/>
         
         <Route path="/finance" element={<FinanceTable/>} />
         <Route path="/chats" element={<Chats />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="/website" element={<Website />} />
 </Route>
-        <Route path="/" element={<AppLayout />}>
+        {/* <Route path="/" element={<AppLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/clients" element={<ClientsTable />} />
           <Route
@@ -59,7 +63,7 @@ function App() {
           <Route path="/chats" element={<Chats />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="/website" element={<Website />} />
-        </Route>
+        </Route> */}
       </Routes>
     </Router>
   );

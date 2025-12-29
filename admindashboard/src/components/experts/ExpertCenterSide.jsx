@@ -6,11 +6,11 @@ const Programs = [
     title: "PCOD",
   },
   {
-    title: "PCOD",
+    title: "Weight Loss",
     template: "V2 Template",
   },
   {
-    title: "PCOD",
+    title: "Thyroid",
   },
 ];
 
