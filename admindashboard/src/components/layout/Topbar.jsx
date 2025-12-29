@@ -3,9 +3,13 @@
 // import { Input } from "@/components/ui/input";
 import { Bell, Settings } from "lucide-react";
 import { assets } from "../../assets/asset";
+import { useSelector } from "react-redux";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 // import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Topbar() {
+
+  const user =useSelector(selectUser)
   return (
     <div className="flex justify-between items-center  ">
       <div>
@@ -29,8 +33,8 @@ export default function Topbar() {
 
         <div className="flex items-center gap-3">
           <div>
-            <p className="text-[18px] font-bold">Oscar Hansen</p>
-            <p className="text-xs text-gray-500">Admin</p>
+            <p className="text-[18px] font-bold">{user.name}</p>
+            <p className="text-xs text-gray-500">{user.role}</p>
           </div>
         </div>
       </div>

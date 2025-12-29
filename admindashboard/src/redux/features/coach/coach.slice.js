@@ -12,7 +12,10 @@ const coachSlice = createSlice({
   name: "coach",
   initialState,
   reducers: {
-    clearCoachError(state) {
+    clearCoach(state) {
+      state.allCoaches =[];
+      state.selectedCoach=null;
+      state.status="idle"
       state.error = null;
     },
   },
@@ -67,5 +70,5 @@ const coachSlice = createSlice({
   },
 });
 
-export const { clearCoachError } = coachSlice.actions;
+export const { clearCoach } = coachSlice.actions;
 export default coachSlice.reducer;

@@ -14,27 +14,16 @@ const Login = () => {
     email: "",
     password: "",
   });
-// const toekn =useAppSelector(selectToken)
 
-  // const handleLogin =async () => {    
-  //   await  dispatch(login(formData));
-  //   localStorage.setItem("token",toekn)
-  //   console.log(toekn)
-  //   navigate('/')
-
-  // };
 
   const handleLogin = async () => {
   try {
     const result = await dispatch(login(formData)).unwrap();
 
-    // ✅ User is valid
-    localStorage.setItem("token", result.token);
-    console.log("Login success:", result);
+    localStorage.setItem("token", result.accessToken);
 
     navigate("/");
   } catch (error) {
-    // ❌ User is invalid
     console.error("Login failed:", error);
     alert(error || "Invalid email or password");
   }
