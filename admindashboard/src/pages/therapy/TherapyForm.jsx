@@ -25,7 +25,7 @@ const TherapyForm = () => {
           {
             name: "Media Attachment",
             label: "Media Attachment",
-            type: "number",
+            type: "file",
           },
         ],
       },
