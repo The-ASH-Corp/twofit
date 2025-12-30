@@ -19,11 +19,10 @@ import FounderClientsTable from "./pages/admin/clients/ClientsTable";
 
 //Admin Pages Imports
 import AdminChats from "./pages/admin/chats/Chats";
-import AdminAnalytics from "./pages/admin/Analytics";
-import AdminWebsite from "./pages/admin/Website";
 import AdminClientsTable from "./pages/admin/clients/ClientsTable";
 import AdminExpertTable from "./pages/admin/experts/ExpertTable";
 import AdminProgramTable from "./pages/admin/programsList/ProgramTable";
+import AdminTherapyForm from "./pages/admin/therapy/TherapyForm";
 //Head Pages Imports
 //Expert Pages Imports
 
@@ -55,7 +54,7 @@ function App() {
           <Route path="chats" element={<FounderChats />} />
     
         </Route>
-
+        
         {/* ADMIN */}
         <Route
           path="/admin"
@@ -69,8 +68,7 @@ function App() {
           <Route path="experts" element={<AdminExpertTable />} />
           <Route path="programs" element={<AdminProgramTable />} />
           <Route path="chats" element={<AdminChats />} />
-          <Route path="analytics" element={<AdminAnalytics />} />
-          <Route path="website" element={<AdminWebsite />} />
+          <Route path="therapy" element={<AdminTherapyForm/>}/>
         </Route>
 
         <Route path="/unauthorized" element={<Unauthorized />} />

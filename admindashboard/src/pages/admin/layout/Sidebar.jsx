@@ -22,13 +22,14 @@ const menuItems = [
         path: "/admin/programs/list",
       },
       {
-        label:"Templates",
-        icon:assets.programs,
-        path:"/admin/programs/template"
-      }
+        label: "Templates",
+        icon: assets.programs,
+        path: "/admin/programs/template",
+      },
     ],
   },
-  {label:"Category",icon:assets.website,path:"/admin/category"},
+  { label: "Therapy", icon: assets.website, path: "/admin/therapy" },
+  { label: "Category", icon: assets.website, path: "/admin/category" },
   { label: "Finance", icon: assets.finance, path: "/admin/finance" },
   { label: "Chats", icon: assets.chats, path: "/admin/chats" },
   { label: "Analytics", icon: assets.analytics, path: "/admin/analytics" },
@@ -41,7 +42,7 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     await dispatch(logout());
-    localStorage.clear()
+    localStorage.clear();
     navigate("/login");
   };
 
