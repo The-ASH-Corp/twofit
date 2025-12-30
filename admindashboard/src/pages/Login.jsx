@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -15,25 +15,35 @@ const Login = () => {
     password: "",
   });
 
+  const ROLE_REDIRECT = {
+  founder: "/founder",
+  head: "/head",
+  admin: "/admin",
+  expert: "/expert",
+};
 
-  const handleLogin = async () => {
+
+
+const handleLogin = async () => {
   try {
     const result = await dispatch(login(formData)).unwrap();
 
-    localStorage.setItem("token", result.accessToken);
+    const role = result.user.role;
 
-    if(result.user.role == "admin"){
-      navigate("/");
-    }else if(result.user.role == "founder"){
-      window.location.href="http://localhost:5174/";
-    }else if(result.user.role == "head"){
-      window.location.href="http://localhost:5175/";
-    }else if(result.user.role == "expert"){
-      window.location.href="http://localhost:5176/"
+    localStorage.setItem("token", result.accessToken);
+    localStorage.setItem("role", role);
+
+    const redirectPath = ROLE_REDIRECT[role];
+
+    if (!redirectPath) {
+      throw new Error("Unknown role");
     }
+
+    navigate(redirectPath, { replace: true });
+
   } catch (error) {
     console.error("Login failed:", error);
-    alert(error || "Invalid email or password");
+    alert(error?.message || "Invalid email or password");
   }
 };
 
@@ -69,7 +79,7 @@ const Login = () => {
         {/* form */}
         <div className="flex flex-col items-center w-full gap-6">
           <div className="w-full flex flex-col items-start">
-            <form action="" className="flex flex-col w-full gap-6" >
+            <form action="" className="flex flex-col w-full gap-6">
               <div className="flex flex-col items-start gap-2">
                 <label htmlFor="" className="text-[11px]">
                   Email Address
@@ -96,7 +106,6 @@ const Login = () => {
                   }
                 />
                 <button
-               
                   className="absolute bottom-3.5 right-3"
                   onClick={() => setShowPassword(!showPassword)}
                 >
@@ -118,7 +127,10 @@ const Login = () => {
             </button>
           </div>
           <div className="w-full">
-            <button   className="bg-[#0A4F48] w-full py-3.5 rounded-lg text-white font-semibold text-[16px]" onClick={handleLogin}>
+            <button
+              className="bg-[#0A4F48] w-full py-3.5 rounded-lg text-white font-semibold text-[16px]"
+              onClick={handleLogin}
+            >
               Login
             </button>
           </div>

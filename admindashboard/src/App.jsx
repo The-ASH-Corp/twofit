@@ -1,70 +1,79 @@
-import AppLayout from "./components/layout/AppLayout";
-import { BrowserRouter as Router, Routes, Route,Navigate } from "react-router-dom";
-import Clients from "./pages/Clients";
-import Experts from "./pages/Experts";
-import Programs from "./pages/Programs";
-import Finance from "./pages/Finance";
-import Chats from "./pages/chats/Chats";
-import Analytics from "./pages/Analytics";
-import Website from "./pages/Website";
-import ClientsTable from "./pages/clients/ClientsTable";
-import Dashboard from "./pages/Dashboard";
-import ExpertTable from "./pages/experts/ExpertTable";
-import ProgramTable from "./pages/programsList/ProgramTable";
+import AppLayout from "./pages/admin/layout/AppLayout";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+
+// Common
+import RoleGuard from "./routes/RoleGuard";
 import Login from "./pages/Login";
-import ClientForm from "./pages/clients/ClientForm";
-import ExpertForm from "./pages/experts/ExpertForm";
-import FinanceTable from "./pages/finance/FinanceTable";
-import ClientProfile from "./pages/clients/ClientProfile";
 import PublicRoutes from "./routes/PublicRoutes";
-import ProtectedRoutes from "./routes/ProtectedRoutes";
-import ExpertProfile from "./pages/experts/ExpertProfile";
-import ProgramForm from "./pages/programsList/ProgramForm";
-import CategoryForm from "./pages/category/CategoryForm";
+import Unauthorized from "./pages/Unauthorized";
+//Founter Pages Imports
+import FounderLayout from "./pages/founder/layout/FounderLayout";
+import FounterDashboard from "./pages/founder/Dashboard";
+import FounderChats from "./pages/admin/chats/Chats";
+import FounderClientsTable from "./pages/admin/clients/ClientsTable";
+
+//Admin Pages Imports
+import AdminChats from "./pages/admin/chats/Chats";
+import AdminAnalytics from "./pages/admin/Analytics";
+import AdminWebsite from "./pages/admin/Website";
+import AdminClientsTable from "./pages/admin/clients/ClientsTable";
+import AdminExpertTable from "./pages/admin/experts/ExpertTable";
+import AdminProgramTable from "./pages/admin/programsList/ProgramTable";
+//Head Pages Imports
+//Expert Pages Imports
 
 function App() {
   return (
     <Router>
       <Routes>
-        
+        {/* Login */}
+        <Route
+          path="/login"
+          element={
+            <PublicRoutes>
+              <Login />
+            </PublicRoutes>
+          }
+        />
 
-        <Route path="/login" element={<PublicRoutes><Login/></PublicRoutes>}/>
-        
-        <Route path="/" element={  <ProtectedRoutes><AppLayout/></ProtectedRoutes> }  >
-        <Route path="/" element={ <ProtectedRoutes><Dashboard/></ProtectedRoutes>}/>
-        <Route path="/clients" element={<ClientsTable />} />
-        <Route path="/clients/clientProfile/:clientId" element={<ClientProfile/>} />
-        <Route path="/addclient" element={<ClientForm/>}/>
-        <Route path="/experts" element={<ExpertTable />} />
-        <Route path="/experts/profile/:expertId" element={<ExpertProfile />} />
-        <Route path="/addexpert" element={<ExpertForm/>}/>
-        <Route path="/category" element={<CategoryForm/>}/>
-        <Route path="/programs" element={<ProgramTable/>} />
-        <Route path="/add-program" element={<ProgramForm/>}/>
-        
-        <Route path="/finance" element={<FinanceTable/>} />
-        <Route path="/chats" element={<Chats />} />
-        <Route path="analytics" element={<Analytics />} />
-        <Route path="/website" element={<Website />} />
-</Route>
-        {/* <Route path="/" element={<AppLayout />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/clients" element={<ClientsTable />} />
-          <Route
-            path="/clients/profile/:clientId"
-            element={<ClientProfile />}
-          />
-          <Route path="/addclient" element={<ClientForm />} />
-          <Route path="/experts" element={<ExpertTable />} />
-          <Route path="/experts" element={<ExpertTable />} />
-          
-          <Route path="/programs" element={<ProgramTable />} />
+        {/* FOUNDER */}
+        <Route
+          path="/founder"
+          element={
+            <RoleGuard allowedRoles={["founder"]}>
+              <FounderLayout />
+            </RoleGuard>
+          }
+        >
+          <Route index element={<FounterDashboard />} />
+          <Route path="clients" element={<FounderClientsTable />} />
+          <Route path="chats" element={<FounderChats />} />
+    
+        </Route>
 
-          <Route path="/finance" element={<FinanceTable />} />
-          <Route path="/chats" element={<Chats />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="/website" element={<Website />} />
-        </Route> */}
+        {/* ADMIN */}
+        <Route
+          path="/admin"
+          element={
+            <RoleGuard allowedRoles={["admin"]}>
+              <AppLayout />
+            </RoleGuard>
+          }
+        >
+          <Route path="clients" element={<AdminClientsTable />} />
+          <Route path="experts" element={<AdminExpertTable />} />
+          <Route path="programs" element={<AdminProgramTable />} />
+          <Route path="chats" element={<AdminChats />} />
+          <Route path="analytics" element={<AdminAnalytics />} />
+          <Route path="website" element={<AdminWebsite />} />
+        </Route>
+
+        <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
     </Router>
   );
