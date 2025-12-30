@@ -16,36 +16,34 @@ const Login = () => {
   });
 
   const ROLE_REDIRECT = {
-  founder: "/founder",
-  head: "/head",
-  admin: "/admin",
-  expert: "/expert",
-};
+    founder: "/founder",
+    head: "/head",
+    admin: "/admin",
+    expert: "/expert",
+    client: "/client",
+  };
 
+  const handleLogin = async () => {
+    try {
+      const result = await dispatch(login(formData)).unwrap();
 
+      const role = result.user.role;
 
-const handleLogin = async () => {
-  try {
-    const result = await dispatch(login(formData)).unwrap();
+      localStorage.setItem("token", result.accessToken);
+      localStorage.setItem("role", role);
 
-    const role = result.user.role;
+      const redirectPath = ROLE_REDIRECT[role];
 
-    localStorage.setItem("token", result.accessToken);
-    localStorage.setItem("role", role);
+      if (!redirectPath) {
+        throw new Error("Unknown role");
+      }
 
-    const redirectPath = ROLE_REDIRECT[role];
-
-    if (!redirectPath) {
-      throw new Error("Unknown role");
+      navigate(redirectPath, { replace: true });
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert(error?.message || "Invalid email or password");
     }
-
-    navigate(redirectPath, { replace: true });
-
-  } catch (error) {
-    console.error("Login failed:", error);
-    alert(error?.message || "Invalid email or password");
-  }
-};
+  };
 
   return (
     <div className="h-screen w-full flex items-center justify-between ">

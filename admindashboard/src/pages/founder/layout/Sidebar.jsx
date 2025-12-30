@@ -9,8 +9,10 @@ const menuItems = [
     icon: assets.dashboard,
     path: "/founder",
   },
-  { label: "Clients", icon: assets.clients, path: "/founder/clients" },
+  { label: "Heads", icon: assets.experts, path: "/founder/heads" },
+  { label: "Admins", icon: assets.experts, path: "/founder/admins" },
   { label: "Experts", icon: assets.experts, path: "/founder/experts" },
+  { label: "Clients", icon: assets.clients, path: "/founder/clients" },
   {
     label: "Programs",
     icon: assets.programs,
@@ -22,17 +24,15 @@ const menuItems = [
         path: "/founder/programs/list",
       },
       {
-        label:"Templates",
-        icon:assets.programs,
-        path:"/founder/programs/template"
-      }
+        label: "Templates",
+        icon: assets.programs,
+        path: "/founder/programs/template",
+      },
     ],
   },
-  {label:"Category",icon:assets.website,path:"/founder/category"},
-  { label: "Finance", icon: assets.finance, path: "/founder/finance" },
-  { label: "Chats", icon: assets.chats, path: "/founder/chats" },
-  { label: "Analytics", icon: assets.analytics, path: "/founder/analytics" },
-  { label: "Website", icon: assets.website, path: "/founder/website" },
+  { label: "Category", icon: assets.website, path: "/founder/category" },
+  { label: "Therapy", icon: assets.website, path: "/founder/therapy" },
+   { label: "Workout", icon: assets.website, path: "/founder/workout" },
 ];
 
 export default function Sidebar() {
@@ -41,7 +41,7 @@ export default function Sidebar() {
 
   const handleLogout = async () => {
     await dispatch(logout());
-    localStorage.clear()
+    localStorage.clear();
 
     navigate("/login");
   };

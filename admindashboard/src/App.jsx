@@ -1,4 +1,3 @@
-import AppLayout from "./pages/admin/layout/AppLayout";
 import {
   BrowserRouter as Router,
   Routes,
@@ -6,7 +5,7 @@ import {
   Navigate,
 } from "react-router-dom";
 
-// Common
+// Common Page Imports
 import RoleGuard from "./routes/RoleGuard";
 import Login from "./pages/Login";
 import PublicRoutes from "./routes/PublicRoutes";
@@ -14,31 +13,43 @@ import Unauthorized from "./pages/Unauthorized";
 //Founter Pages Imports
 import FounderLayout from "./pages/founder/layout/FounderLayout";
 import FounterDashboard from "./pages/founder/Dashboard";
-import FounderChats from "./pages/admin/chats/Chats";
 import FounderClientsTable from "./pages/admin/clients/ClientsTable";
+import FounderHeadsList from "./pages/founder/heads/HeadsList";
+import FounderCategoryList from "./pages/founder/category/CategoryForm"
+import FounderExperList from "./pages/founder/experts/ExpertTable"
+import FounderAdminList from "./pages/founder/admin/AdminsList"
+import FounderProgramsList from "./pages/founder/programsList/ProgramTable"
+import FounderTherapyList from "./pages/founder/therapy/TherapyForm"
+import FounderWorkoutList from "./pages/founder/workout/WorkoutList"
+//Head Pages Imports
+import HeadLayout from "./pages/head/layout/HeadLayout";
+import HeadDashboard from "./pages/head/Dashboard";
+import HeadClientsTable from "./pages/head/clients/ClientsTable";
+import HeadExperList from "./pages/head/experts/ExpertTable"
+import HeadAdminsList from "./pages/head/admin/AdminsList"
 
 //Admin Pages Imports
+import AppLayout from "./pages/admin/layout/AppLayout";
+import AdminDashboard from "./pages/admin/Dashboard";
 import AdminChats from "./pages/admin/chats/Chats";
 import AdminClientsTable from "./pages/admin/clients/ClientsTable";
 import AdminExpertTable from "./pages/admin/experts/ExpertTable";
 import AdminProgramTable from "./pages/admin/programsList/ProgramTable";
 import AdminTherapyForm from "./pages/admin/therapy/TherapyForm";
-//Head Pages Imports
 //Expert Pages Imports
+import ExpertLayout from "./pages/expert/layout/ExpertLayout";
+import ExpertDashboard from "./pages/expert/Dashboard";
+import ExpertClientsTable from "./pages/expert/clients/ClientsTable";
+import ExpertChats from "./pages/expert/chats/Chats";
+// Client Pages Import
 
 function App() {
   return (
     <Router>
       <Routes>
         {/* Login */}
-        <Route
-          path="/login"
-          element={
-            <PublicRoutes>
-              <Login />
-            </PublicRoutes>
-          }
-        />
+        <Route path="/login" element={ <PublicRoutes> <Login />  </PublicRoutes>  }/>
+
 
         {/* FOUNDER */}
         <Route
@@ -50,11 +61,31 @@ function App() {
           }
         >
           <Route index element={<FounterDashboard />} />
+          <Route path="heads" element={<FounderHeadsList />} />
+          <Route path ="admins" element={<FounderAdminList/>}/>
+          <Route path="experts" element={<FounderExperList/>}/>
           <Route path="clients" element={<FounderClientsTable />} />
-          <Route path="chats" element={<FounderChats />} />
-    
+          <Route path ="programs" element={<FounderProgramsList/>}/>
+          <Route path="category" element={<FounderCategoryList />} />
+          <Route path ="therapy" element={<FounderTherapyList/>}/>
+          <Route path ="workout" element={<FounderWorkoutList/>}/>
         </Route>
-        
+
+        {/* HEAD */}
+        <Route
+          path="/head"
+          element={
+            <RoleGuard allowedRoles={["head"]}>
+              <HeadLayout />
+            </RoleGuard>
+          }
+        >
+          <Route index element={<HeadDashboard />} />
+          <Route path="clients" element={<HeadClientsTable />} />
+          <Route path="expert" element={<HeadExperList/>}/>
+          <Route path="admins" element={<HeadAdminsList/>}/>
+        </Route>
+
         {/* ADMIN */}
         <Route
           path="/admin"
@@ -64,13 +95,27 @@ function App() {
             </RoleGuard>
           }
         >
+          <Route index element={<AdminDashboard />} />
           <Route path="clients" element={<AdminClientsTable />} />
           <Route path="experts" element={<AdminExpertTable />} />
-          <Route path="programs" element={<AdminProgramTable />} />
           <Route path="chats" element={<AdminChats />} />
-          <Route path="therapy" element={<AdminTherapyForm/>}/>
         </Route>
 
+        {/* EXPERT */}
+        <Route
+          path="/expert"
+          element={
+            <RoleGuard allowedRoles={["expert"]}>
+              <ExpertLayout />
+            </RoleGuard>
+          }
+        >
+          <Route index element={<ExpertDashboard />} />
+          <Route path="clients" element={<ExpertClientsTable />} />
+          <Route path="chats" element={<ExpertChats />} />
+        </Route>
+
+        <Route path="/*" element={<Unauthorized />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
       </Routes>
     </Router>

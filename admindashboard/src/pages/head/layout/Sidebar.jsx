@@ -7,13 +7,13 @@ const menuItems = [
   {
     label: "Dashboard",
     icon: assets.dashboard,
-    path: "/admin",
+    path: "/head",
   },
-  { label: "Experts", icon: assets.experts, path: "/admin/experts" },
-  { label: "Clients", icon: assets.clients, path: "/admin/clients" },
-  { label: "Finance", icon: assets.finance, path: "/admin/finance" },
-  { label: "Chats", icon: assets.chats, path: "/admin/chats" },
-  
+  { label: "Admins", icon: assets.clients, path: "/head/admins" },
+  { label: "Experts", icon: assets.experts, path: "/head/experts" },
+  { label: "Clients", icon: assets.clients, path: "/head/clients" },
+  { label: "Finance", icon: assets.finance, path: "/head/finance" },
+
 ];
 
 export default function Sidebar() {

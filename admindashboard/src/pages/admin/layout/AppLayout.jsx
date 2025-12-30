@@ -1,9 +1,13 @@
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import TopBar from "./Topbar";
+import { useEffect } from "react";
 
 
 export default function AppLayout() {
+    useEffect(() => {
+    document.title = "Admin Dashboard | Twofit";
+  }, []);
   return (
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
