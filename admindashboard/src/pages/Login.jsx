@@ -22,7 +22,15 @@ const Login = () => {
 
     localStorage.setItem("token", result.accessToken);
 
-    navigate("/");
+    if(result.user.role == "admin"){
+      navigate("/");
+    }else if(result.user.role == "founder"){
+      window.location.href="http://localhost:5174/";
+    }else if(result.user.role == "head"){
+      window.location.href="http://localhost:5175/";
+    }else if(result.user.role == "expert"){
+      window.location.href="http://localhost:5176/"
+    }
   } catch (error) {
     console.error("Login failed:", error);
     alert(error || "Invalid email or password");
