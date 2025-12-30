@@ -1,5 +1,7 @@
 import BaseForm from '@/components/form/BaseForm';
+import { createTherapy } from '@/redux/features/therapy/therapy.thunk';
 import React from 'react'
+import { useDispatch } from 'react-redux';
 
 const TherapyForm = () => {
     const fields = [
@@ -13,17 +15,17 @@ const TherapyForm = () => {
             type: "text",
           },
           {
-            name: "Attach URL",
-            label: "Attach URL",
+            name: "sets",
+            label: "Sets",
             type: "text",
           },
           {
-            name: "Notes",
-            label: "Notes",
+            name: "attachment",
+            label: "Attachment",
             type: "text",
           },
           {
-            name: "Media Attachment",
+            name: "media",
             label: "Media Attachment",
             type: "file",
           },
@@ -32,10 +34,32 @@ const TherapyForm = () => {
     ];
     const initialValues = {
       name: "",
+      sets: "",
+      attachment: "",
+      media: null,
     };
+
+  const dispatch = useDispatch();
+
+
+    const handelSubmit = (value) => {
+      console.log(value);
+      const formData = new FormData();
+
+      formData.append("name", value.name);
+      formData.append("sets", value.sets);
+      formData.append("attachment", value.attachment);
+
+      if (value.media) {
+        formData.append("media", value.media); // ✅ FILE
+      }
+      console.log(formData)
+      dispatch(createTherapy(formData));;
+    };
+
   return (
     <div>
-            <BaseForm fields={fields} initialValues={initialValues} onSubmit={()=>{}}/>
+            <BaseForm fields={fields} initialValues={initialValues} onSubmit={(value)=> handelSubmit(value)}/>
           
         </div>
   )

@@ -22,6 +22,7 @@ import ExpertProfile from "./pages/experts/ExpertProfile";
 import ProgramForm from "./pages/programsList/ProgramForm";
 import CategoryForm from "./pages/category/CategoryForm";
 import TherapyForm from "./pages/therapy/therapyForm";
+import TherapyTable from "./pages/therapy/TherapyTable";
 
 function App() {
   return (
@@ -65,7 +66,8 @@ function App() {
           />
           <Route path="/addexpert" element={<ExpertForm />} />
           <Route path="/category" element={<CategoryForm />} />
-          <Route path="/therapy" element={<TherapyForm/>} />
+          <Route path="/therapy" element={<TherapyTable />} />
+          <Route path="/add-therapy" element={<TherapyForm />} />
           <Route path="/programs" element={<ProgramTable />} />
           <Route path="/add-program" element={<ProgramForm />} />
 
