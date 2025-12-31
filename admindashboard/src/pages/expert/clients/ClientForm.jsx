@@ -108,6 +108,7 @@ export default function ClientForm() {
   const handleUserCreation = async (values) => {
     
     const data= await dispatch(createClient(values));
+    console.log(data)
   
   };
   return (

@@ -4,6 +4,7 @@ import * as therapyService from "./therapy.service.js"
 export const createTherapy = async (req, res) => {
     try {
         const { name, sets, attachment } = req.body;
+        console.log(req.file)
         const therapyData = {
           name,
           sets,
@@ -17,7 +18,9 @@ export const createTherapy = async (req, res) => {
           data: therapy,
         });
     } catch (error) {
+      console.log(error)
         return res.status(400).json({
+
             success: false,
             message: error,
         })
