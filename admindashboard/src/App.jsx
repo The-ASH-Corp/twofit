@@ -21,6 +21,7 @@ import ProtectedRoutes from "./routes/ProtectedRoutes";
 import ExpertProfile from "./pages/experts/ExpertProfile";
 import ProgramForm from "./pages/programsList/ProgramForm";
 import CategoryForm from "./pages/category/CategoryForm";
+import CategoryTable from "./pages/category/CategoryTable";
 
 function App() {
   return (
@@ -37,7 +38,7 @@ function App() {
         <Route path="/addclient" element={<ClientForm/>}/>
         <Route path="/experts" element={<ExpertTable />} />
         <Route path="/addexpert" element={<ExpertForm/>}/>
-        <Route path="/category" element={<CategoryForm/>}/>
+        <Route path="/category" element={<CategoryTable/>}/>
         <Route path="/programs" element={<ProgramTable/>} />
         <Route path="/add-program" element={<ProgramForm/>}/>
         

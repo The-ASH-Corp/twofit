@@ -1,8 +1,8 @@
-const expertColors = {
-  Dietitian: "bg-[#FFF5ED] text-black",
-  Therapist: "bg-[#E7F9F4] text-black",
-  Trainer: "bg-[#EBF2FE] text-black",
-};
+// const expertColors = {
+//   Dietitian: "bg-[#FFF5ED] text-black",
+//   Therapist: "bg-[#E7F9F4] text-black",
+//   Trainer: "bg-[#EBF2FE] text-black",
+// };
 
 const statusColors = {
   Active: "bg-[#45C4A2] text-white",
@@ -30,34 +30,40 @@ export const ProgramListColumns = [
       />
     ),
   },
-  { accessorKey: "name", header: "Program Name" },
+  { accessorKey: "title", header: "Program Name" },
   { accessorKey: "duration", header: "Duration" },
-  { accessorKey: "clients", header: "Clients" },
-  { accessorKey: "linkedTemplate", header: "Linked Template" },
-  {
-  accessorKey: "experts",
-  header: "Experts",
-
-  cell: ({ row }) => {
-    return (
-      <div className="flex gap-1 flex-wrap">
-        {row.original.experts.map((exp) => {
-          const expertColor =
-            expertColors[exp] || "bg-gray-200 text-gray-700";
-
-          return (
-            <span
-              key={exp}
-              className={`px-2 py-1 text-[11px] rounded-sm ${expertColor}`}
-            >
-              {exp}
-            </span>
-          );
-        })}
-      </div>
-    );
-  }
+  { header: "category",
+    cell:({row})=>(
+      <span className=" capitalize">
+      {row.original.category?.name || "—"}
+    </span>
+   )
 },
+  { accessorKey: "linkedTemplate", header: "Linked Template" },
+//   {
+//   accessorKey: "experts",
+//   header: "Experts",
+
+//   cell: ({ row }) => {
+//     return (
+//       <div className="flex gap-1 flex-wrap">
+//         {row.original.experts.map((exp) => {
+//           const expertColor =
+//             expertColors[exp] || "bg-gray-200 text-gray-700";
+
+//           return (
+//             <span
+//               key={exp}
+//               className={`px-2 py-1 text-[11px] rounded-sm ${expertColor}`}
+//             >
+//               {exp}
+//             </span>
+//           );
+//         })}
+//       </div>
+//     );
+//   }
+// },
 
 
   //   {

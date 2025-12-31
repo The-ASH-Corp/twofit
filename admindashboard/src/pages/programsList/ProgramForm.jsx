@@ -1,8 +1,12 @@
 import BaseForm from "@/components/form/BaseForm";
+import { createProgram } from "@/redux/features/program/program.thunk";
 import React from "react";
-
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+ 
 export default function ProgramForm() {
-  const fields = [
+  const navigate=useNavigate()
+   const fields = [
     {
       section: "Program Information",
       position:"left",
@@ -25,8 +29,8 @@ export default function ProgramForm() {
           label: "Status",
           type: "select",
           options: [
-            { label: "Draft", value: "Draft" },
-            { label: "Published", value: "Published" },
+            { label: "Draft", value: "draft" },
+            { label: "Published", value: "published" },
           ],
         },
       ],
@@ -40,9 +44,24 @@ export default function ProgramForm() {
     duration: "",
     status: "",
   };
+
+   const dispatch = useDispatch()
+
+  const handleProgramCreation =async(values)=>{
+    try{
+      const program=await dispatch(createProgram(values)).unwrap()
+      navigate('/programs')
+      
+    }catch(error){
+       console.error("Program creation failed:", error);
+    }
+  
+    // navigate('/programs')
+        
+  }
   return (
     <div>
-      <BaseForm fields={fields} initialValues={initialValues} onSubmit={()=>{}}/>
+      <BaseForm fields={fields} initialValues={initialValues} onSubmit={(values)=>{handleProgramCreation(values)}}/>
     </div>
   );
 }
