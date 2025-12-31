@@ -4,6 +4,7 @@ import * as therapyService from "./therapy.service.js"
 export const createTherapy = async (req, res) => {
     try {
         const { name, sets, attachment } = req.body;
+        console.log(req.file)
         const therapyData = {
           name,
           sets,
@@ -17,7 +18,9 @@ export const createTherapy = async (req, res) => {
           data: therapy,
         });
     } catch (error) {
+      console.log(error)
         return res.status(400).json({
+
             success: false,
             message: error,
         })
@@ -56,6 +59,7 @@ export const getTherapy = async (req, res) => {
 
 export const updateTherapy = async (req, res) => {
     try {
+      // console.log(req.body, req.params.id)
         const therapy = await therapyService.updateTherapy(
           req.params.id,
           req.body
@@ -71,4 +75,21 @@ export const updateTherapy = async (req, res) => {
            message: error,
          });
     }
+}
+
+export const deleteTherapy = async (req, res) => {
+  try {
+    const therapy = await therapyService.deleteTherapy(req.params.id);
+
+    res.status(200).json({
+      success: true,
+      message: "Therapy deleted successfully",
+      data: therapy,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error,
+    });
+  }
 }

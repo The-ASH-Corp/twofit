@@ -58,7 +58,7 @@ const ExpertLeftSide = ({ expert }) => {
     },
     {
       title: "Specialization",
-      content: expert.specialization,
+      content: expert?.specialization,
     },
     {
       title: "Experience",
@@ -83,7 +83,7 @@ const ExpertLeftSide = ({ expert }) => {
           className="absolute top-7.5 right-5"
         />
         <div className="flex flex-col items-center gap-3 pt-5">
-          <h2 className="font-bold text-[16px] ">{expert.name}</h2>
+          <h2 className="font-bold text-[16px] ">{expert?.name}</h2>
           <div className="flex items-center justify-between gap-2 text-[11px]">
             <span className="px-2 py-0.5 bg-[#F0F0F0] rounded-full">
               Dietitian

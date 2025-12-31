@@ -10,6 +10,13 @@ const axiosInstance = axios.create({
   },
 });
 
+export const axiosFile = axios.create({
+  baseURL: ENV.API_BASE_URL,
+  timeout: 10000,
+  withCredentials: true,
+});
+
+
 // Request Interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
