@@ -49,7 +49,7 @@ const TherapyTable = () => {
         columns={therapyColumns}
         // data={clients}
         actionLabel="Add Therapy"
-        actionPath="/add-therapy"
+        actionPath="/founder/add-therapy"
         // profilePath= {profilePath}
         pageLabel={"Therapies"}
       />

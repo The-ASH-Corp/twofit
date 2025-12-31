@@ -19,7 +19,8 @@ import FounderCategoryList from "./pages/founder/category/CategoryForm"
 import FounderExperList from "./pages/founder/experts/ExpertTable"
 import FounderAdminList from "./pages/founder/admin/AdminsList"
 import FounderProgramsList from "./pages/founder/programsList/ProgramTable"
-import FounderTherapyList from "./pages/founder/therapy/TherapyForm"
+import FounderTherapyList from "./pages/founder/therapy/TherapyTable"
+import FounderTherapyForm from "./pages/founder/therapy/TherapyForm"
 import FounderWorkoutList from "./pages/founder/workout/WorkoutList"
 //Head Pages Imports
 import HeadLayout from "./pages/head/layout/HeadLayout";
@@ -48,8 +49,15 @@ function App() {
     <Router>
       <Routes>
         {/* Login */}
-        <Route path="/login" element={ <PublicRoutes> <Login />  </PublicRoutes>  }/>
-
+        <Route
+          path="/login"
+          element={
+            <PublicRoutes>
+              {" "}
+              <Login />{" "}
+            </PublicRoutes>
+          }
+        />
 
         {/* FOUNDER */}
         <Route
@@ -62,13 +70,14 @@ function App() {
         >
           <Route index element={<FounterDashboard />} />
           <Route path="heads" element={<FounderHeadsList />} />
-          <Route path ="admins" element={<FounderAdminList/>}/>
-          <Route path="experts" element={<FounderExperList/>}/>
+          <Route path="admins" element={<FounderAdminList />} />
+          <Route path="experts" element={<FounderExperList />} />
           <Route path="clients" element={<FounderClientsTable />} />
-          <Route path ="programs" element={<FounderProgramsList/>}/>
+          <Route path="programs" element={<FounderProgramsList />} />
           <Route path="category" element={<FounderCategoryList />} />
-          <Route path ="therapy" element={<FounderTherapyList/>}/>
-          <Route path ="workout" element={<FounderWorkoutList/>}/>
+          <Route path="therapy" element={<FounderTherapyList />} />
+          <Route path="add-therapy" element={<FounderTherapyForm />} />
+          <Route path="workout" element={<FounderWorkoutList />} />
         </Route>
 
         {/* HEAD */}
@@ -82,8 +91,8 @@ function App() {
         >
           <Route index element={<HeadDashboard />} />
           <Route path="clients" element={<HeadClientsTable />} />
-          <Route path="expert" element={<HeadExperList/>}/>
-          <Route path="admins" element={<HeadAdminsList/>}/>
+          <Route path="expert" element={<HeadExperList />} />
+          <Route path="admins" element={<HeadAdminsList />} />
         </Route>
 
         {/* ADMIN */}

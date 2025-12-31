@@ -1,5 +1,3 @@
-
-
 export const therapyColumns = [
   {
     id: "select",
