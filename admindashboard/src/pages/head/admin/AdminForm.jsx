@@ -3,7 +3,7 @@ import { createCoach } from "@/redux/features/coach/coach.thunk";
 import React from "react";
 import { useDispatch } from "react-redux";
 
-export default function ExpertForm() {
+export default function AdminForm() {
   const fields = [
     {
       section: "Personal Information",
@@ -37,66 +37,43 @@ export default function ExpertForm() {
       section: "Role Assignment",
       position: "left",
       fields: [
-        { name: "role", label: "Choose Role", type: "text" },
-        { name: "specialization", label: "Specialization", type: "text" },
-        { name: "experience", label: "Experience", type: "text" },
-        { name: "qualification", label: "Qualification", type: "text" },
-        { name: "certifications", label: "Certifications", type: "text" },
-        { name: "languages", label: "Languages", type: "text" },
+        { name: "password", label: "Password", type: "text" },
+        {
+          name: "specialization",
+          label: "Specialization",
+          type: "select",
+          options: [
+            { label: "Fitness", value: "fitness" },
+            { label: "Nutrition", value: "nutrition" },
+            { label: "Therapy", value: "therapy" },
+          ],
+        },
       ],
     },
     {
       section: "Program Assignment",
       position: "left",
       fields: [
-        { name: "chooseProgram", label: "Choose Program", type: "text" },
-      ],
-    },
-    {
-      section: "Work Assignment",
-      position: "right",
-      fields: [
-        { name: "clientLimit", label: "Max Client Limit", type: "text" },
-        { name: "assignedClients", label: "Current Assigned", type: "text" },
         {
-          name: "workingdays",
-          label: "Working Days",
-          type: "radio",
+          name: "chooseProgram",
+          label: "Choose Program",
+          type: "select",
           options: [
-            { label: "Mon-Wed-Fri", value: "mwf" },
-            { label: "Tue-Thu-Sat", value: "tts" },
-            { label: "Mon-Fri", value: "mf" },
+            { label: "PCOD", value: "PCOD" },
+            { label: "Weight Loss", value: "Weightloss" },
+            { label: "Fun", value: "Fun" },
           ],
         },
-        { name: "workingHours", label: "Working Hours", type: "text" },
-        { name: "breakSlots", label: "Break Slots", type: "text" },
-        { name: "dailyConsults", label: "Max Daily Consults", type: "text" },
-        { name: "responseTime", label: "Response Time", type: "text" },
       ],
     },
+
     {
       section: "Salary",
 
       position: "right",
       fields: [{ name: "baseSalary", label: "Base Salary", type: "text" }],
     },
-    {
-      section: "Enable Incentives",
-      position: "right",
-      fields: [
-        { name: "ratingIncentive", label: "Rating Incentives", type: "toggle" },
-        {
-          name: "responseTimeIncentive",
-          label: "Response Time Incentives",
-          type: "toggle",
-        },
-        {
-          name: "complianceIncentive",
-          label: "Compliance Incentives",
-          type: "toggle",
-        },
-      ],
-    },
+
     {
       section: "Account Setup",
       position: "right",
@@ -134,17 +111,18 @@ export default function ExpertForm() {
     automatedReminder: false,
   };
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const handleCoachCreation =async(values)=>{
-    const coach = await dispatch(createCoach(values))    
-  }
+  const handleAdminCreation = async (values) => {
+    // const coach = await dispatch(createCoach(values));
+  };
 
   return (
     <BaseForm
       fields={fields}
       initialValues={initialValues}
-      onSubmit={(values) => handleCoachCreation(values)}
+      onSubmit={(values) => handleAdminCreation(values)}
+      heading={"Admin"}
     ></BaseForm>
   );
 }

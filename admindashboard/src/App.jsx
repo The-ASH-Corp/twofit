@@ -88,7 +88,7 @@ function App() {
           <Route path="clients" element={<HeadClientsTable />} />
           <Route path="experts" element = {<HeadExpertTable/>}/>
           <Route path="finance" element = {<HeadFinanceTable/>}/>
-          <Route path ="add-admin" element={<HeadAddAdmin/>}/>
+          <Route path ="admins/add-admin" element={<HeadAddAdmin/>}/>
           <Route path ="experts/profile/:id" element={<HeadExpertProfile/>}/>
           <Route path ="admins/profile/:id" element={<HeadAdminProfile/>}/>
           <Route path ="clients/profile/:clientId" element={<HeadClientProfile/>}/>

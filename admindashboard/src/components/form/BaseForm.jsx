@@ -2,6 +2,7 @@ import { Formik, Form } from "formik";
 import FormInput from "./FormInput";
 import FormRadio from "./FormRadio";
 import FormToggle from "./ToggleForm";
+import FormSelect from "./FormSelect";
 
 export default function BaseForm({
   fields,
@@ -44,6 +45,16 @@ export default function BaseForm({
                             />
                           </div>
                         );
+                      }else if(field.type=="select"){
+                        return (
+                          <div>
+                            <FormSelect
+                            key={field.name}
+                            label={field.label??"just text"}
+                            name={field.name}
+                            options={field.options}/>
+                          </div>
+                        )
                       }
 
                       return (
@@ -111,7 +122,7 @@ export default function BaseForm({
             <div className="flex gap-2">
               <button className="bg-[#EBF3F2]  rounded-md p-2  ">Cancel</button>
               <button className="bg-[#0A4F48] p-2 rounded-md text-white" type="submit">
-                Save & Add Client
+                Save & Add {heading??"Client"}
               </button>
             </div>
           </div>

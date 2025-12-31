@@ -32,7 +32,7 @@ export default function AdminsList() {
         columns={AdminColumns}
         data={coaches}
         actionLabel="Add Admins"
-        actionPath="/head/add-admin"
+        actionPath="/head/admins/add-admin"
         profilePath={profilePath}
         pageLabel={"Admins"}
       />
