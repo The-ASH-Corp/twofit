@@ -49,12 +49,12 @@ export default function BaseTable({
           <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0">
             Bulk Actions
           </button>
-          <button
+         {actionPath? <button
             onClick={() => navigate(actionPath)}
             className="bg-[#0A4F48] text-white rounded-md text-[12px] font-semibold px-3 py-0"
           >
             {actionLabel}
-          </button>
+          </button>:null}
         </div>
       </div>
       <table className="w-full text-sm border-collapse">

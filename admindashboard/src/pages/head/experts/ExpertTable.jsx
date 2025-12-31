@@ -19,7 +19,7 @@ export default function ExpertTable() {
 
   const navigate = useNavigate();
   const profilePath = (id) => {
-    navigate(`/experts/profile/${id}`);
+    navigate(`/head/experts/profile/${id}`);
   };
 
   useEffect(() => {
@@ -31,8 +31,6 @@ export default function ExpertTable() {
       <BaseTable
         columns={ExpertColumns}
         data={coaches}
-        actionLabel="Add Expert"
-        actionPath="/addexpert"
         profilePath={profilePath}
         pageLabel={"Experts"}
       />

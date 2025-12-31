@@ -27,15 +27,18 @@ import HeadDashboard from "./pages/head/Dashboard";
 import HeadClientsTable from "./pages/head/clients/ClientsTable";
 import HeadExperList from "./pages/head/experts/ExpertTable"
 import HeadAdminsList from "./pages/head/admin/AdminsList"
-
+import HeadFinanceTable from "./pages/head/finance/FinanceTable"
+import HeadExpertTable from "./pages/head/experts/ExpertTable"
+import HeadAddAdmin from "./pages/head/admin/AdminForm"
+import HeadExpertProfile from "./pages/head/experts/ExpertProfile"
+import HeadAdminProfile from "./pages/head/admin/AdminProfile"
+import HeadClientProfile from "./pages/head/clients/ClientProfile"
 //Admin Pages Imports
 import AppLayout from "./pages/admin/layout/AppLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminChats from "./pages/admin/chats/Chats";
 import AdminClientsTable from "./pages/admin/clients/ClientsTable";
 import AdminExpertTable from "./pages/admin/experts/ExpertTable";
-import AdminProgramTable from "./pages/admin/programsList/ProgramTable";
-import AdminTherapyForm from "./pages/admin/therapy/TherapyForm";
 //Expert Pages Imports
 import ExpertLayout from "./pages/expert/layout/ExpertLayout";
 import ExpertDashboard from "./pages/expert/Dashboard";
@@ -49,7 +52,6 @@ function App() {
       <Routes>
         {/* Login */}
         <Route path="/login" element={ <PublicRoutes> <Login />  </PublicRoutes>  }/>
-
 
         {/* FOUNDER */}
         <Route
@@ -81,9 +83,15 @@ function App() {
           }
         >
           <Route index element={<HeadDashboard />} />
-          <Route path="clients" element={<HeadClientsTable />} />
-          <Route path="expert" element={<HeadExperList/>}/>
           <Route path="admins" element={<HeadAdminsList/>}/>
+          <Route path="expert" element={<HeadExperList/>}/>
+          <Route path="clients" element={<HeadClientsTable />} />
+          <Route path="experts" element = {<HeadExpertTable/>}/>
+          <Route path="finance" element = {<HeadFinanceTable/>}/>
+          <Route path ="add-admin" element={<HeadAddAdmin/>}/>
+          <Route path ="experts/profile/:id" element={<HeadExpertProfile/>}/>
+          <Route path ="admins/profile/:id" element={<HeadAdminProfile/>}/>
+          <Route path ="clients/profile/:clientId" element={<HeadClientProfile/>}/>
         </Route>
 
         {/* ADMIN */}
