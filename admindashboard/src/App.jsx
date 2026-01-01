@@ -31,7 +31,12 @@ import HeadDashboard from "./pages/head/Dashboard";
 import HeadClientsTable from "./pages/head/clients/ClientsTable";
 import HeadExperList from "./pages/head/experts/ExpertTable"
 import HeadAdminsList from "./pages/head/admin/AdminsList"
-
+import HeadFinanceTable from "./pages/head/finance/FinanceTable"
+import HeadExpertTable from "./pages/head/experts/ExpertTable"
+import HeadAddAdmin from "./pages/head/admin/AdminForm"
+import HeadExpertProfile from "./pages/head/experts/ExpertProfile"
+import HeadAdminProfile from "./pages/head/admin/AdminProfile"
+import HeadClientProfile from "./pages/head/clients/ClientProfile"
 //Admin Pages Imports
 import AppLayout from "./pages/admin/layout/AppLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -64,8 +69,7 @@ function App() {
           }
         />
 
-        
-        
+        {/* FOUNDER */}
         <Route
           path="/founder"
           element={
@@ -101,9 +105,15 @@ function App() {
           }
         >
           <Route index element={<HeadDashboard />} />
+          <Route path="admins" element={<HeadAdminsList/>}/>
+          <Route path="expert" element={<HeadExperList/>}/>
           <Route path="clients" element={<HeadClientsTable />} />
-          <Route path="expert" element={<HeadExperList />} />
-          <Route path="admins" element={<HeadAdminsList />} />
+          <Route path="experts" element = {<HeadExpertTable/>}/>
+          <Route path="finance" element = {<HeadFinanceTable/>}/>
+          <Route path ="admins/add-admin" element={<HeadAddAdmin/>}/>
+          <Route path ="experts/profile/:id" element={<HeadExpertProfile/>}/>
+          <Route path ="admins/profile/:id" element={<HeadAdminProfile/>}/>
+          <Route path ="clients/profile/:clientId" element={<HeadClientProfile/>}/>
         </Route>
 
         {/* ADMIN */}
