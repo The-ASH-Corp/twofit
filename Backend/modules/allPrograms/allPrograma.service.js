@@ -5,7 +5,7 @@ export const createProgram = async (data) => {
 };
 
 export const getAllProgram = async (page,limit) => {
-  return await programModel.find().skip((page-1)*limit).limit(limit);
+  return await programModel.find().populate("category", "name") .skip((page-1)*limit).limit(limit);
 };
 
 export const getSingleProgram = async (id) => {

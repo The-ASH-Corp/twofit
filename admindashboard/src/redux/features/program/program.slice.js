@@ -1,19 +1,54 @@
-// import axios from "axios";
-// import { createAsyncThunk, isRejectedWithValue } from "@reduxjs/toolkit";
-// import axiosInstance from "@/utils/axiosInstance";
+import { createSlice } from "@reduxjs/toolkit";
+import { createProgram, getAllPrograms } from "./program.thunk";
 
+const initialState = {
+  allPrograms: [],
+  selectedProgram: null,
+  error: null,
+  status: "idle",
+};
 
-// export const getAllCoach=createAsyncThunk('coach/list-coach',async(FormData,{rejectWithValue})=>{
-//     try{
-//         const res=await axiosInstance.post('')
+const programSlice = createSlice({
+  name: "program",
+  initialState,
+  reducers: {
+    clearProgramError(state) {
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
 
-//     }
-//     catch(err){
-//         return rejectWithValue(err.response.data.message)
+      //get all program slices
+      .addCase(getAllPrograms.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(getAllPrograms.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.allPrograms = action.payload;
+        state.error = null;
+      })
+      .addCase(getAllPrograms.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
 
-//     }
+      .addCase(createProgram.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(createProgram.fulfilled, (state) => {
+        state.status = "succeeded";
+        state.selectedProgram = null;
+        state.error = null;
+      })
+      .addCase(createProgram.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      });
+  },
+});
 
-// }
-
-
-
+export const { clearProgramError } = programSlice.actions;
+export default programSlice.reducer;
