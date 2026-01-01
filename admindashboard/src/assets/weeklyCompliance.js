@@ -9,3 +9,11 @@ export  const weeklyCompliance = [
     { day: "Sat", diet: 80, workout: 60, therapy: 70 },
   ];
  
+
+ export const weightProgress = [
+  { date: "W1", weight: 45 },
+  { date: "W2", weight: 49 },
+  { date: "W3", weight: 40 },
+  { date: "W4", weight: 54 },
+  { date: "W5", weight: 57 },
+];

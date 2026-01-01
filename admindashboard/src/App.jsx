@@ -47,6 +47,7 @@ import ExpertChats from "./pages/expert/chats/Chats";
 // Client Pages Import
 import ClientLayout from './pages/client/layout/ClientLayout'
 import ClientDashboard from './pages/client/Dashboard'
+import ClientFeedback from "./pages/client/feedback/Feedback";
 
 function App() {
   return (
@@ -56,11 +57,11 @@ function App() {
         <Route
           path="/login"
           element={
-            <PublicRoutes>
-               {" "}
+            // <PublicRoutes>
+            //    {" "}
               <Login />
-               {" "}
-            </PublicRoutes>
+            //    {" "}
+            // </PublicRoutes>
           }
         />
 
@@ -139,6 +140,7 @@ function App() {
         <Route path="/client" element={<RoleGuard allowedRoles={["user"]}><ClientLayout/></RoleGuard>}>
 
         <Route index element={<ClientDashboard/>}/>
+        <Route path="feedback" element={<ClientFeedback/>}/>
 
 
         </Route>

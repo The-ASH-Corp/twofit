@@ -12,7 +12,7 @@ const menuItems = [
   { label: "Daily Plan", icon: assets.clients, path: "/expert/clients" },
   { label: "Progress", icon: assets.experts, path: "/expert/experts" },
   { label: "Messages", icon: assets.website, path: "/expert/therapy" },
-  { label: "Feedback", icon: assets.website, path: "/expert/category" },
+  { label: "Feedback", icon: assets.website, path: "/client/feedback" },
   { label: "support", icon: assets.finance, path: "/expert/finance" },
 ];
 
