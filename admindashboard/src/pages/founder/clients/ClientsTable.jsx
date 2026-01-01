@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 export default function ClientsTable() {
   const navigate = useNavigate();
   const profilePath = (id)=> {
-        navigate(`/clients/profile/${id}`);
+        navigate(`/founder/clients-profile//${id}`);
   }
   const dispatch = useDispatch();
 
