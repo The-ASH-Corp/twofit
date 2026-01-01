@@ -30,7 +30,7 @@ export const AdminColumns = [
       />
     ),
   },
-  { accessorKey: "name", header: "Expert Name" },
+  { accessorKey: "name", header: "Admin Name" },
    { accessorKey: "role", header: "Role",
     cell:({row})=>{
         const role=row.original.role
@@ -45,34 +45,7 @@ export const AdminColumns = [
     }
    },
      { accessorKey: "specialization", header: "Specialisation" },
-
-  { accessorKey: "clients", header: "Clients" },
- 
-//   {
-//     accessorKey: "experts",
-//     header: "Experts",
-//     cell: ({ row }) => (
-//       <div className="flex gap-2 flex-wrap">
-//         {row.original.experts.map((exp) => {
-//           const colorClass =
-//             expertColors[exp] || "bg-gray-100 text-gray-700 border";
-
-//           return (
-//             <span
-//               key={exp}
-//               className={`px-2 py-1 text-[11px] rounded-sm ${colorClass}`}
-//             >
-//               {exp}
-//             </span>
-//           );
-//         })}
-//       </div>
-//     ),
-//   },
-  { accessorKey: "maxClient", header: "Maximum Limit" },
-  { accessorKey: "rating", header: "Rating" },
-  { accessorKey: "responseTime", header: "Response Time" },
-
+     { accessorKey: "experts", header: "Experts" },
   {
     accessorKey: "status",
     header: "Status",

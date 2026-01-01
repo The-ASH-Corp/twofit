@@ -19,6 +19,7 @@ const adminSchema = new mongoose.Schema({
   autoSendWelcome: { type: Boolean, default: false },
   autoSendGuide: { type: Boolean, default: false },
   automatedReminder: { type: Boolean, default: false },
+  status:{ type:String, default:"Active" }
 });
 
 export const AdminModel = mongoose.model("Admin", adminSchema);
