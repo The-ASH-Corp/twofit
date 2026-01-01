@@ -41,7 +41,7 @@ export default function AdminForm() {
         {
           name: "specialization",
           label: "Specialization",
-          type: "select",
+          type: "multiple",
           options: [
             { label: "Fitness", value: "fitness" },
             { label: "Nutrition", value: "nutrition" },

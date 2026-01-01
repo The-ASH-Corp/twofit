@@ -3,6 +3,7 @@ import FormInput from "./FormInput";
 import FormRadio from "./FormRadio";
 import FormToggle from "./ToggleForm";
 import FormSelect from "./FormSelect";
+import MultipleSelectForm from "./MultipleSelectForm";
 
 export default function BaseForm({
   fields,
@@ -54,6 +55,14 @@ export default function BaseForm({
                             name={field.name}
                             options={field.options}/>
                           </div>
+                        )
+                      } else if (field.type==="multiple"){
+                        return (
+                          <MultipleSelectForm
+                          key={field.name}
+                          label={field.label??"just text"}
+                          name={field.name}
+                          options={field.options}/>
                         )
                       }
 

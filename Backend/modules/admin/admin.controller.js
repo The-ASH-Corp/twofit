@@ -12,3 +12,13 @@ export const getAllAdmins = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 };
+
+
+export const addAdmin =async (req,res)=>{
+  try {
+    const admin = await service.addNewAdmin(req.body)
+    res.status(201).json({success:true,data:admin})
+  } catch (error) {
+    res.status(400).json({success:false,message:error.message})
+  }
+}

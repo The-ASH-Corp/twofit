@@ -2,19 +2,18 @@ import React, { useEffect, useState } from 'react'
 import BaseTable from '../../../components/table/BaseTable'
 import { AdminColumns } from './AdminColumns'
 import { useDispatch } from 'react-redux';
-import { getAllCoaches } from '@/redux/features/coach/coach.thunk';
 import { useNavigate } from 'react-router-dom';
+import { getAllAdmins } from '@/redux/features/admins/admin.thunk';
 
 export default function AdminsList() {
 
-  const [coaches,setCoaches]=useState([])
+  const [admins,setAdmins]=useState([])
   const page =1
   const limit =10
   const dispatch = useDispatch();
-  const fetchCoachData=async()=>{
-    const coache =await dispatch(getAllCoaches({page,limit})).unwrap()
-    const clients =coache[0].assignedUsers.length
-    setCoaches([{...coache[0],clients}])
+  const fetchAdminData=async()=>{
+    const admin =await dispatch(getAllAdmins({page,limit})).unwrap()
+    setAdmins(admin)
   }
 
   const navigate = useNavigate();
@@ -23,14 +22,14 @@ export default function AdminsList() {
   };
 
   useEffect(() => {
-    fetchCoachData();
+    fetchAdminData();
   }, []);
   
   return (
     <div>
       <BaseTable
         columns={AdminColumns}
-        data={coaches}
+        data={admins}
         actionLabel="Add Admins"
         actionPath="/head/admins/add-admin"
         profilePath={profilePath}

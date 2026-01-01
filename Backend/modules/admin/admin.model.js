@@ -12,9 +12,8 @@ const adminSchema = new mongoose.Schema({
     type:Array,
     required: true,
   },
-  program: [
+  program: 
     { type: mongoose.Schema.Types.ObjectId, ref: "Program", required: true },
-  ],
   salary: { type: Number, default: 0 },
   role: { type: String, default: "admin" },
   autoSendWelcome: { type: Boolean, default: false },
