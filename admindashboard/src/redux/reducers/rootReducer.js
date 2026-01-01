@@ -5,6 +5,7 @@ import clientReducer from "../features/client/client.slice";
 import coachReducer from "../features/coach/coach.slice";
 import chatReducer from "../features/chat/chat.slice";
 import therapyReducer from "../features/therapy/therapy.slice"
+import headReducer from "../features/head/head.slice"
 
 export default combineReducers({
   auth: authReducer,
@@ -12,4 +13,5 @@ export default combineReducers({
   coach: coachReducer,
   chat: chatReducer,
   therapy: therapyReducer,
+  head: headReducer,
 });
