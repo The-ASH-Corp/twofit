@@ -20,12 +20,14 @@ const Login = () => {
     head: "/head",
     admin: "/admin",
     expert: "/expert",
-    client: "/client",
+    user: "/client",
   };
 
   const handleLogin = async () => {
     try {
       const result = await dispatch(login(formData)).unwrap();
+      console.log("LOGIN RESPONSE:", result);
+      console.log("USER DETAILS:", result.user);
 
       const role = result.user.role;
 

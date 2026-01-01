@@ -28,7 +28,7 @@ const programSchema = new mongoose.Schema(
     // },
     status:{
       type:String,
-      enum:["Draft","Published"],
+      enum:["draft","published"],
       default:"draft"
     }
   },

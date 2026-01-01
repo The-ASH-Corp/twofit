@@ -6,11 +6,18 @@ import chatReducer from "../features/chat/chat.slice"
 import adminReducer from "../features/admins/admin.slice"
 
 
+import programReducer from "../features/program/program.slice"
+import categoryReducer from "../features/category/category.slice"
+import chatReducer from "../features/chat/chat.slice";
+import therapyReducer from "../features/therapy/therapy.slice"
 
 export default combineReducers({
   auth: authReducer,
   client: clientReducer,
   coach: coachReducer,
+  program:programReducer,
+  category:categoryReducer,
   chat: chatReducer,
   admin:adminReducer,
+  therapy: therapyReducer,
 });

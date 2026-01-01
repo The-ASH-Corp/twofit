@@ -9,17 +9,21 @@ import {
 import RoleGuard from "./routes/RoleGuard";
 import Login from "./pages/Login";
 import PublicRoutes from "./routes/PublicRoutes";
+ 
 import Unauthorized from "./pages/Unauthorized";
 //Founter Pages Imports
 import FounderLayout from "./pages/founder/layout/FounderLayout";
-import FounterDashboard from "./pages/founder/Dashboard";
-import FounderClientsTable from "./pages/admin/clients/ClientsTable";
+import FounderDashboard from "./pages/founder/Dashboard";
+import FounderClientsTable from "./pages/founder/clients/ClientsTable";
+import FounderClientProfile from "./pages/founder/clients/ClientProfile"
 import FounderHeadsList from "./pages/founder/heads/HeadsList";
 import FounderCategoryList from "./pages/founder/category/CategoryForm"
-import FounderExperList from "./pages/founder/experts/ExpertTable"
+import FounderExpertList from "./pages/founder/experts/ExpertTable"
+import FounderExpertProfile from "./pages/founder/experts/ExpertProfile"
 import FounderAdminList from "./pages/founder/admin/AdminsList"
 import FounderProgramsList from "./pages/founder/programsList/ProgramTable"
-import FounderTherapyList from "./pages/founder/therapy/TherapyForm"
+import FounderTherapyList from "./pages/founder/therapy/TherapyTable"
+import FounderTherapyForm from "./pages/founder/therapy/TherapyForm"
 import FounderWorkoutList from "./pages/founder/workout/WorkoutList"
 //Head Pages Imports
 import HeadLayout from "./pages/head/layout/HeadLayout";
@@ -39,19 +43,31 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminChats from "./pages/admin/chats/Chats";
 import AdminClientsTable from "./pages/admin/clients/ClientsTable";
 import AdminExpertTable from "./pages/admin/experts/ExpertTable";
+ 
 //Expert Pages Imports
 import ExpertLayout from "./pages/expert/layout/ExpertLayout";
 import ExpertDashboard from "./pages/expert/Dashboard";
 import ExpertClientsTable from "./pages/expert/clients/ClientsTable";
 import ExpertChats from "./pages/expert/chats/Chats";
 // Client Pages Import
+import ClientLayout from './pages/client/layout/ClientLayout'
+import ClientDashboard from './pages/client/Dashboard'
 
 function App() {
   return (
     <Router>
       <Routes>
         {/* Login */}
-        <Route path="/login" element={ <PublicRoutes> <Login />  </PublicRoutes>  }/>
+        <Route
+          path="/login"
+          element={
+            <PublicRoutes>
+               {" "}
+              <Login />
+               {" "}
+            </PublicRoutes>
+          }
+        />
 
         {/* FOUNDER */}
         <Route
@@ -62,15 +78,21 @@ function App() {
             </RoleGuard>
           }
         >
-          <Route index element={<FounterDashboard />} />
+          <Route index element={<FounderDashboard />} />
           <Route path="heads" element={<FounderHeadsList />} />
-          <Route path ="admins" element={<FounderAdminList/>}/>
-          <Route path="experts" element={<FounderExperList/>}/>
+          <Route path="admins" element={<FounderAdminList />} />
+          <Route path="experts" element={<FounderExpertList />} />
+          <Route path="experts-profile/:id" element={<FounderExpertProfile />} />
           <Route path="clients" element={<FounderClientsTable />} />
-          <Route path ="programs" element={<FounderProgramsList/>}/>
+          <Route
+            path="clients-profile/:id"
+            element={<FounderClientProfile />}
+          />
+          <Route path="programs" element={<FounderProgramsList />} />
           <Route path="category" element={<FounderCategoryList />} />
-          <Route path ="therapy" element={<FounderTherapyList/>}/>
-          <Route path ="workout" element={<FounderWorkoutList/>}/>
+          <Route path="therapy" element={<FounderTherapyList />} />
+          <Route path="add-therapy" element={<FounderTherapyForm />} />
+          <Route path="workout" element={<FounderWorkoutList />} />
         </Route>
 
         {/* HEAD */}
@@ -121,6 +143,14 @@ function App() {
           <Route index element={<ExpertDashboard />} />
           <Route path="clients" element={<ExpertClientsTable />} />
           <Route path="chats" element={<ExpertChats />} />
+        </Route>
+
+        {/* CLIENT */}
+        <Route path="/client" element={<RoleGuard allowedRoles={["user"]}><ClientLayout/></RoleGuard>}>
+
+        <Route index element={<ClientDashboard/>}/>
+
+
         </Route>
 
         <Route path="/*" element={<Unauthorized />} />
