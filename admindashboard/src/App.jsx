@@ -12,11 +12,13 @@ import PublicRoutes from "./routes/PublicRoutes";
 import Unauthorized from "./pages/Unauthorized";
 //Founter Pages Imports
 import FounderLayout from "./pages/founder/layout/FounderLayout";
-import FounterDashboard from "./pages/founder/Dashboard";
-import FounderClientsTable from "./pages/admin/clients/ClientsTable";
+import FounderDashboard from "./pages/founder/Dashboard";
+import FounderClientsTable from "./pages/founder/clients/ClientsTable";
+import FounderClientProfile from "./pages/founder/clients/ClientProfile"
 import FounderHeadsList from "./pages/founder/heads/HeadsList";
 import FounderCategoryList from "./pages/founder/category/CategoryForm"
-import FounderExperList from "./pages/founder/experts/ExpertTable"
+import FounderExpertList from "./pages/founder/experts/ExpertTable"
+import FounderExpertProfile from "./pages/founder/experts/ExpertProfile"
 import FounderAdminList from "./pages/founder/admin/AdminsList"
 import FounderProgramsList from "./pages/founder/programsList/ProgramTable"
 import FounderTherapyList from "./pages/founder/therapy/TherapyTable"
@@ -68,11 +70,16 @@ function App() {
             </RoleGuard>
           }
         >
-          <Route index element={<FounterDashboard />} />
+          <Route index element={<FounderDashboard />} />
           <Route path="heads" element={<FounderHeadsList />} />
           <Route path="admins" element={<FounderAdminList />} />
-          <Route path="experts" element={<FounderExperList />} />
+          <Route path="experts" element={<FounderExpertList />} />
+          <Route path="experts-profile/:id" element={<FounderExpertProfile />} />
           <Route path="clients" element={<FounderClientsTable />} />
+          <Route
+            path="clients-profile/:id"
+            element={<FounderClientProfile />}
+          />
           <Route path="programs" element={<FounderProgramsList />} />
           <Route path="category" element={<FounderCategoryList />} />
           <Route path="therapy" element={<FounderTherapyList />} />

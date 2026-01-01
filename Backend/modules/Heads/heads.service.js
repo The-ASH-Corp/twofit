@@ -1,0 +1,42 @@
+import { generatePassword, hashPassword } from "../../utils/password.js";
+import { HeadsModel } from "./heads.modal.js";
+
+export const createHead = async (head) => {
+  let hashedPassword;
+
+  if (head.password) {
+    console.log(head.password);
+    hashedPassword = await hashPassword(head.password);
+  } else {
+    const newPassword = generatePassword();
+    console.log("Generated Password for head:", newPassword);
+    hashedPassword = await hashPassword(newPassword);
+  }
+
+  return await HeadsModel.create({
+    name: head.name,
+    dob: head.dob,
+    gender: head.gender,
+    email: head.email,
+    phone: head.phone,
+    password: hashedPassword,
+  });
+};
+
+export const getAllHeads = async (page, limit) => {
+  const skip = (page - 1) * limit;
+
+  return await HeadsModel.find().skip(skip).limit(limit);
+};
+
+export const getHeadById = async (id) => {
+  return await HeadsModel.findById(id);
+};
+
+export const updateHead = async (id, updatedData) => {
+  return await HeadsModel.findByIdAndUpdate(id, updatedData);
+};
+
+export const deleteHead = async (id) => {
+  return await HeadsModel.findByIdAndDelete(id);
+};

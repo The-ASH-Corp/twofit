@@ -3,13 +3,22 @@ import { CoachModel } from "./coach.model.js";
 
 export const createCoach = async (coach) => {
 
-  const password = hashPassword(generatePassword())
+  
+  const password = () => {
+    if (coach.password) {
+      return hashPassword(coach.password);
+    } else {
+      const newPassword = generatePassword();
+      console.log("Generated Password for Coach:", newPassword);
+      return hashPassword(newPassword);
+    }
+  }
 
   return await CoachModel.create({
     name: coach.fullname,
     dob: coach.dob,
     gender: coach.gender,
-    password: password,
+    password: password(),
     ratingIncentive: coach.ratingIncentive,
     responseTimeIncentive: coach.responseTimeIncentive,
     complianceIncentive: coach.complianceIncentive,
