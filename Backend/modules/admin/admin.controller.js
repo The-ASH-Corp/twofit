@@ -22,3 +22,15 @@ export const addAdmin =async (req,res)=>{
     res.status(400).json({success:false,message:error.message})
   }
 }
+export const getAdminProfile = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const admin = await service.getAdminById(id);
+    res.status(200).json({
+      success: true,
+      data: admin,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+}

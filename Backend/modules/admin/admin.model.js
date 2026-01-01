@@ -20,6 +20,5 @@ const adminSchema = new mongoose.Schema({
   autoSendGuide: { type: Boolean, default: false },
   automatedReminder: { type: Boolean, default: false },
   status:{ type:String, default:"Active" }
-});
-
+}, { timestamps: true })
 export const AdminModel = mongoose.model("Admin", adminSchema);

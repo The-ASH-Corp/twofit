@@ -44,3 +44,8 @@ export const addNewAdmin = async (adminData) => {
   });
   return newAdmin;
 };
+
+export const getAdminById = async (id) => {
+  const admin = await AdminModel.findById(id).select("-password");
+  return admin;
+};

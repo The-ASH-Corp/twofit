@@ -19,11 +19,25 @@ export const createAdmin = createAsyncThunk(
   "admins/create-admin",
   async (adminData, { rejectWithValue }) => {
     try {
-      const data = await axiosInstance.post("/admin/add-admin",adminData)
+      const data = await axiosInstance.post("/admin/add-admin", adminData);
       return data.data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "creating admin failed"
+      );
+    }
+  }
+);
+
+export const getAdminProfile = createAsyncThunk(
+  "admins/get-admin-profile",
+  async (id, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(`/admin/admin-profile/${id}`);
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Fetching admin profile failed"
       );
     }
   }
