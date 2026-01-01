@@ -9,11 +9,7 @@ import {
 import RoleGuard from "./routes/RoleGuard";
 import Login from "./pages/Login";
 import PublicRoutes from "./routes/PublicRoutes";
-import ProtectedRoutes from "./routes/ProtectedRoutes";
-import ExpertProfile from "./pages/experts/ExpertProfile";
-import ProgramForm from "./pages/programsList/ProgramForm";
-import CategoryForm from "./pages/category/CategoryForm";
-import CategoryTable from "./pages/category/CategoryTable";
+ 
 import Unauthorized from "./pages/Unauthorized";
 //Founter Pages Imports
 import FounderLayout from "./pages/founder/layout/FounderLayout";
@@ -40,14 +36,15 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminChats from "./pages/admin/chats/Chats";
 import AdminClientsTable from "./pages/admin/clients/ClientsTable";
 import AdminExpertTable from "./pages/admin/experts/ExpertTable";
-// import AdminProgramTable from "./pages/admin/programsList/ProgramTable";
-// import AdminTherapyForm from "./pages/admin/therapy/TherapyForm";
+ 
 //Expert Pages Imports
 import ExpertLayout from "./pages/expert/layout/ExpertLayout";
 import ExpertDashboard from "./pages/expert/Dashboard";
 import ExpertClientsTable from "./pages/expert/clients/ClientsTable";
 import ExpertChats from "./pages/expert/chats/Chats";
 // Client Pages Import
+import ClientLayout from './pages/client/layout/ClientLayout'
+import ClientDashboard from './pages/client/Dashboard'
 
 function App() {
   return (
@@ -58,8 +55,9 @@ function App() {
           path="/login"
           element={
             <PublicRoutes>
-              {" "}
-              <Login />{" "}
+               {" "}
+              <Login />
+               {" "}
             </PublicRoutes>
           }
         />
@@ -128,6 +126,14 @@ function App() {
           <Route index element={<ExpertDashboard />} />
           <Route path="clients" element={<ExpertClientsTable />} />
           <Route path="chats" element={<ExpertChats />} />
+        </Route>
+
+        {/* CLIENT */}
+        <Route path="/client" element={<RoleGuard allowedRoles={["user"]}><ClientLayout/></RoleGuard>}>
+
+        <Route index element={<ClientDashboard/>}/>
+
+
         </Route>
 
         <Route path="/*" element={<Unauthorized />} />
