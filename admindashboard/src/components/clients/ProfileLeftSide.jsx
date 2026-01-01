@@ -22,11 +22,10 @@ const assignedExperts = [
 ];
 
 const ProfileLeftSide = ({ client }) => {
-
+  
   const [day, month, year] = client.dob.split("-");
   const today = new Date();
   let age = today.getFullYear() - year;
-  // console.log(age);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-GB", {

@@ -3,7 +3,7 @@ import express from 'express'
  const router=express.Router()
 
 router.post('/create',createCategoryController)
-router.get('/get-all-category/:page/:limit',getAllCategoryController)
+router.get('/list',getAllCategoryController)
 router.get('/list/:catId',getSingleCategoryController)
 router.put('/update/:catId',updateCategoryController)
 router.delete('/delete/:catId',deleteSingleCategoryController)

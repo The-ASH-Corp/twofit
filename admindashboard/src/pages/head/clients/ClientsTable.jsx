@@ -14,7 +14,7 @@ import { useNavigate } from "react-router-dom";
 export default function ClientsTable() {
   const navigate = useNavigate();
   const profilePath = (id)=> {
-        navigate(`/clients/profile/${id}`);
+        navigate(`/head/clients/profile/${id}`);
   }
   const dispatch = useDispatch();
 
@@ -35,12 +35,8 @@ export default function ClientsTable() {
       <BaseTable
         columns={ClientColumns}
         data={clients}
-        actionLabel="Add Client"
-        actionPath="/addclient"
         profilePath= {profilePath}
         pageLabel={"Clients"}
-        // profilePath="/clients/profile/:clientId"
-        // pageLabel="Clients"
       />
     </div>
   );

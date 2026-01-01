@@ -9,42 +9,50 @@ import {
 import RoleGuard from "./routes/RoleGuard";
 import Login from "./pages/Login";
 import PublicRoutes from "./routes/PublicRoutes";
+ 
 import Unauthorized from "./pages/Unauthorized";
 //Founter Pages Imports
 import FounderLayout from "./pages/founder/layout/FounderLayout";
 import FounderDashboard from "./pages/founder/Dashboard";
 import FounderClientsTable from "./pages/founder/clients/ClientsTable";
-import FounderClientProfile from "./pages/founder/clients/ClientProfile"
-import FounderHeadsList from "./pages/founder/heads/HeadsList";
-import FounderCategoryList from "./pages/founder/category/CategoryForm"
-import FounderExpertList from "./pages/founder/experts/ExpertTable"
-import FounderExpertProfile from "./pages/founder/experts/ExpertProfile"
-import FounderAdminList from "./pages/founder/admin/AdminsList"
-import FounderProgramsList from "./pages/founder/programsList/ProgramTable"
-import FounderTherapyList from "./pages/founder/therapy/TherapyTable"
-import FounderTherapyForm from "./pages/founder/therapy/TherapyForm"
-import FounderWorkoutList from "./pages/founder/workout/WorkoutList"
+import FounderClientProfile from "./pages/founder/clients/ClientProfile";
+import FounderHeadsList from "./pages/founder/heads/HeadTable";
+import FounderHeadForm from "./pages/founder/heads/HeadForm"
+import FounderCategoryList from "./pages/founder/category/CategoryForm";
+import FounderExpertList from "./pages/founder/experts/ExpertTable";
+import FounderExpertProfile from "./pages/founder/experts/ExpertProfile";
+import FounderAdminList from "./pages/founder/admin/AdminsList";
+import FounderProgramsList from "./pages/founder/programsList/ProgramTable";
+import FounderTherapyList from "./pages/founder/therapy/TherapyTable";
+import FounderTherapyForm from "./pages/founder/therapy/TherapyForm";
+import FounderWorkoutList from "./pages/founder/workout/WorkoutList";
 //Head Pages Imports
 import HeadLayout from "./pages/head/layout/HeadLayout";
 import HeadDashboard from "./pages/head/Dashboard";
 import HeadClientsTable from "./pages/head/clients/ClientsTable";
 import HeadExperList from "./pages/head/experts/ExpertTable"
 import HeadAdminsList from "./pages/head/admin/AdminsList"
-
+import HeadFinanceTable from "./pages/head/finance/FinanceTable"
+import HeadExpertTable from "./pages/head/experts/ExpertTable"
+import HeadAddAdmin from "./pages/head/admin/AdminForm"
+import HeadExpertProfile from "./pages/head/experts/ExpertProfile"
+import HeadAdminProfile from "./pages/head/admin/AdminProfile"
+import HeadClientProfile from "./pages/head/clients/ClientProfile"
 //Admin Pages Imports
 import AppLayout from "./pages/admin/layout/AppLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminChats from "./pages/admin/chats/Chats";
 import AdminClientsTable from "./pages/admin/clients/ClientsTable";
 import AdminExpertTable from "./pages/admin/experts/ExpertTable";
-// import AdminProgramTable from "./pages/admin/programsList/ProgramTable";
-// import AdminTherapyForm from "./pages/admin/therapy/TherapyForm";
+ 
 //Expert Pages Imports
 import ExpertLayout from "./pages/expert/layout/ExpertLayout";
 import ExpertDashboard from "./pages/expert/Dashboard";
 import ExpertClientsTable from "./pages/expert/clients/ClientsTable";
 import ExpertChats from "./pages/expert/chats/Chats";
 // Client Pages Import
+import ClientLayout from './pages/client/layout/ClientLayout'
+import ClientDashboard from './pages/client/Dashboard'
 
 function App() {
   return (
@@ -72,9 +80,13 @@ function App() {
         >
           <Route index element={<FounderDashboard />} />
           <Route path="heads" element={<FounderHeadsList />} />
+          <Route path="create-head" element={<FounderHeadForm />} />
           <Route path="admins" element={<FounderAdminList />} />
           <Route path="experts" element={<FounderExpertList />} />
-          <Route path="experts-profile/:id" element={<FounderExpertProfile />} />
+          <Route
+            path="experts-profile/:id"
+            element={<FounderExpertProfile />}
+          />
           <Route path="clients" element={<FounderClientsTable />} />
           <Route
             path="clients-profile/:id"
@@ -97,9 +109,18 @@ function App() {
           }
         >
           <Route index element={<HeadDashboard />} />
-          <Route path="clients" element={<HeadClientsTable />} />
-          <Route path="expert" element={<HeadExperList />} />
           <Route path="admins" element={<HeadAdminsList />} />
+          <Route path="expert" element={<HeadExperList />} />
+          <Route path="clients" element={<HeadClientsTable />} />
+          <Route path="experts" element={<HeadExpertTable />} />
+          <Route path="finance" element={<HeadFinanceTable />} />
+          <Route path="admins/add-admin" element={<HeadAddAdmin />} />
+          <Route path="experts/profile/:id" element={<HeadExpertProfile />} />
+          <Route path="admins/profile/:id" element={<HeadAdminProfile />} />
+          <Route
+            path="clients/profile/:clientId"
+            element={<HeadClientProfile />}
+          />
         </Route>
 
         {/* ADMIN */}
@@ -129,6 +150,18 @@ function App() {
           <Route index element={<ExpertDashboard />} />
           <Route path="clients" element={<ExpertClientsTable />} />
           <Route path="chats" element={<ExpertChats />} />
+        </Route>
+
+        {/* CLIENT */}
+        <Route
+          path="/client"
+          element={
+            <RoleGuard allowedRoles={["user"]}>
+              <ClientLayout />
+            </RoleGuard>
+          }
+        >
+          <Route index element={<ClientDashboard />} />
         </Route>
 
         <Route path="/*" element={<Unauthorized />} />
