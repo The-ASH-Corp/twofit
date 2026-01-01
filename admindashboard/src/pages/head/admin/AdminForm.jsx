@@ -1,9 +1,12 @@
 import BaseForm from "@/components/form/BaseForm";
+import { createAdmin } from "@/redux/features/admins/admin.thunk";
 import { createCoach } from "@/redux/features/coach/coach.thunk";
-import React from "react";
+import { getAllPrograms } from "@/redux/features/program/program.thunk";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 export default function AdminForm() {
+  const [programs, setPrograms] = useState([]);
   const fields = [
     {
       section: "Personal Information",
@@ -43,9 +46,9 @@ export default function AdminForm() {
           label: "Specialization",
           type: "multiple",
           options: [
-            { label: "Fitness", value: "fitness" },
-            { label: "Nutrition", value: "nutrition" },
-            { label: "Therapy", value: "therapy" },
+            { label: "thyroid", value: "thyroid" },
+            { label: "weight loss", value: "weight loss" },
+            { label: "fun", value: "fun" },
           ],
         },
       ],
@@ -58,11 +61,11 @@ export default function AdminForm() {
           name: "chooseProgram",
           label: "Choose Program",
           type: "select",
-          options: [
-            { label: "PCOD", value: "PCOD" },
-            { label: "Weight Loss", value: "Weightloss" },
-            { label: "Fun", value: "Fun" },
-          ],
+          options: programs.map((program) => ({
+            key: program._id,
+            label: program.title,
+            value: program.title,
+          })),
         },
       ],
     },
@@ -71,7 +74,7 @@ export default function AdminForm() {
       section: "Salary",
 
       position: "right",
-      fields: [{ name: "baseSalary", label: "Base Salary", type: "text" }],
+      fields: [{ name: "baseSalary", label: "Base Salary", type: "number" }],
     },
 
     {
@@ -101,10 +104,6 @@ export default function AdminForm() {
     fullname: "",
     dob: "",
     gender: "", //need to add
-    ratingIncentive: false,
-    responseTimeIncentive: false,
-    complianceIncentive: false,
-
     // Account Setup
     autoSendWelcome: false,
     autoSendGuide: false,
@@ -112,9 +111,23 @@ export default function AdminForm() {
   };
 
   const dispatch = useDispatch();
+  const fetchPrograms = async () => {
+    const response = await dispatch(
+      getAllPrograms({ page: 1, limit: 10 })
+    ).unwrap();
+    setPrograms(response);
+  };
+  useEffect(() => {
+    fetchPrograms();
+  }, []);
 
   const handleAdminCreation = async (values) => {
-    // const coach = await dispatch(createCoach(values));
+    const selectedProgram = programs.find((program) => program.title == values.chooseProgram);
+    console.log({ ...values, chooseProgram: selectedProgram._id });
+    
+    const admin = await dispatch(createAdmin({ ...values, chooseProgram: selectedProgram._id })).unwrap();
+    console.log(admin);
+    
   };
 
   return (

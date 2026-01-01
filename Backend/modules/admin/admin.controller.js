@@ -15,7 +15,7 @@ export const getAllAdmins = async (req, res) => {
 
 
 export const addAdmin =async (req,res)=>{
-  try {
+  try {        
     const admin = await service.addNewAdmin(req.body)
     res.status(201).json({success:true,data:admin})
   } catch (error) {
