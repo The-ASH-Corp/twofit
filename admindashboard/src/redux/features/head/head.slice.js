@@ -11,46 +11,49 @@ const initialState = {
 const headSlice = createSlice({
   name: "head",
   initialState,
+
   reducers: {
-    clearHeadError(status) {
-      status.error = null;
+    clearHeadError(state) {
+      state.error = null;
     },
-    extraReducers: (builder) => {
-        builder
-          .addCase(createHead.pending, (state) => {
-            state.status = "loading";
-          })
-          .addCase(createHead.fulfilled, (state) => {
-            state.status = "succeeded";
-            // state.head = action.payload;
-          })
-          .addCase(createHead.rejected, (state, action) => {
-            state.status = "failed";
-            state.error = action.payload;
-          })
-          .addCase(getAllHeads.pending, (state) => {
-            state.status = "loading";
-          })
-          .addCase(getAllHeads.fulfilled, (state, action) => {
-            state.status = "succeeded";
-            state.allHeads = action.payload;
-          })
-          .addCase(getAllHeads.rejected, (state, action) => {
-            state.status = "failed";
-            state.error = action.payload;
-          })
-          .addCase(getHead.pending, (state) => {
-            state.status = "loading";
-          })
-          .addCase(getHead.fulfilled, (state, action) => {
-            state.status = "succeeded";
-            state.head = action.payload;
-          })
-          .addCase(getHead.rejected, (state, action) => {
-            state.status = "failed";
-            state.error = action.payload;
-          });
-    }
+  },
+
+  extraReducers: (builder) => {
+    builder
+      .addCase(createHead.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(createHead.fulfilled, (state) => {
+        state.status = "succeeded";
+      })
+      .addCase(createHead.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+
+      .addCase(getAllHeads.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getAllHeads.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.allHeads = action.payload;
+      })
+      .addCase(getAllHeads.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+
+      .addCase(getHead.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getHead.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.head = action.payload;
+      })
+      .addCase(getHead.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      });
   },
 });
 

@@ -15,16 +15,17 @@ import Unauthorized from "./pages/Unauthorized";
 import FounderLayout from "./pages/founder/layout/FounderLayout";
 import FounderDashboard from "./pages/founder/Dashboard";
 import FounderClientsTable from "./pages/founder/clients/ClientsTable";
-import FounderClientProfile from "./pages/founder/clients/ClientProfile"
-import FounderHeadsList from "./pages/founder/heads/HeadsList";
-import FounderCategoryList from "./pages/founder/category/CategoryForm"
-import FounderExpertList from "./pages/founder/experts/ExpertTable"
-import FounderExpertProfile from "./pages/founder/experts/ExpertProfile"
-import FounderAdminList from "./pages/founder/admin/AdminsList"
-import FounderProgramsList from "./pages/founder/programsList/ProgramTable"
-import FounderTherapyList from "./pages/founder/therapy/TherapyTable"
-import FounderTherapyForm from "./pages/founder/therapy/TherapyForm"
-import FounderWorkoutList from "./pages/founder/workout/WorkoutList"
+import FounderClientProfile from "./pages/founder/clients/ClientProfile";
+import FounderHeadsList from "./pages/founder/heads/HeadTable";
+import FounderHeadForm from "./pages/founder/heads/HeadForm"
+import FounderCategoryList from "./pages/founder/category/CategoryForm";
+import FounderExpertList from "./pages/founder/experts/ExpertTable";
+import FounderExpertProfile from "./pages/founder/experts/ExpertProfile";
+import FounderAdminList from "./pages/founder/admin/AdminsList";
+import FounderProgramsList from "./pages/founder/programsList/ProgramTable";
+import FounderTherapyList from "./pages/founder/therapy/TherapyTable";
+import FounderTherapyForm from "./pages/founder/therapy/TherapyForm";
+import FounderWorkoutList from "./pages/founder/workout/WorkoutList";
 //Head Pages Imports
 import HeadLayout from "./pages/head/layout/HeadLayout";
 import HeadDashboard from "./pages/head/Dashboard";
@@ -62,9 +63,8 @@ function App() {
           path="/login"
           element={
             <PublicRoutes>
-               {" "}
-              <Login />
-               {" "}
+              {" "}
+              <Login />{" "}
             </PublicRoutes>
           }
         />
@@ -80,9 +80,13 @@ function App() {
         >
           <Route index element={<FounderDashboard />} />
           <Route path="heads" element={<FounderHeadsList />} />
+          <Route path="create-head" element={<FounderHeadForm />} />
           <Route path="admins" element={<FounderAdminList />} />
           <Route path="experts" element={<FounderExpertList />} />
-          <Route path="experts-profile/:id" element={<FounderExpertProfile />} />
+          <Route
+            path="experts-profile/:id"
+            element={<FounderExpertProfile />}
+          />
           <Route path="clients" element={<FounderClientsTable />} />
           <Route
             path="clients-profile/:id"
@@ -105,15 +109,18 @@ function App() {
           }
         >
           <Route index element={<HeadDashboard />} />
-          <Route path="admins" element={<HeadAdminsList/>}/>
-          <Route path="expert" element={<HeadExperList/>}/>
+          <Route path="admins" element={<HeadAdminsList />} />
+          <Route path="expert" element={<HeadExperList />} />
           <Route path="clients" element={<HeadClientsTable />} />
-          <Route path="experts" element = {<HeadExpertTable/>}/>
-          <Route path="finance" element = {<HeadFinanceTable/>}/>
-          <Route path ="admins/add-admin" element={<HeadAddAdmin/>}/>
-          <Route path ="experts/profile/:id" element={<HeadExpertProfile/>}/>
-          <Route path ="admins/profile/:id" element={<HeadAdminProfile/>}/>
-          <Route path ="clients/profile/:clientId" element={<HeadClientProfile/>}/>
+          <Route path="experts" element={<HeadExpertTable />} />
+          <Route path="finance" element={<HeadFinanceTable />} />
+          <Route path="admins/add-admin" element={<HeadAddAdmin />} />
+          <Route path="experts/profile/:id" element={<HeadExpertProfile />} />
+          <Route path="admins/profile/:id" element={<HeadAdminProfile />} />
+          <Route
+            path="clients/profile/:clientId"
+            element={<HeadClientProfile />}
+          />
         </Route>
 
         {/* ADMIN */}
@@ -146,11 +153,15 @@ function App() {
         </Route>
 
         {/* CLIENT */}
-        <Route path="/client" element={<RoleGuard allowedRoles={["user"]}><ClientLayout/></RoleGuard>}>
-
-        <Route index element={<ClientDashboard/>}/>
-
-
+        <Route
+          path="/client"
+          element={
+            <RoleGuard allowedRoles={["user"]}>
+              <ClientLayout />
+            </RoleGuard>
+          }
+        >
+          <Route index element={<ClientDashboard />} />
         </Route>
 
         <Route path="/*" element={<Unauthorized />} />
