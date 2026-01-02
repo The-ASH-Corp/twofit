@@ -1,9 +1,48 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import BaseTable from '../../../components/table/BaseTable'
+import { AdminColumns } from './AdminColumns'
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { getAllAdmins } from '@/redux/features/admins/admin.thunk';
+import {
+  getAdminError,
+  getAdminStatus,
+  getAdmins,
+} from "@/redux/features/admins/admins.selecters";
 
-const AdminsList = () => {
+export default function AdminsList() {
+  const page = 1;
+  const limit = 15;
+  const dispatch = useDispatch();
+
+  const navigate = useNavigate();
+  const profilePath = (id) => {
+    navigate(`/founder/admins/profile/${id}`);
+  };
+
+  useEffect(() => {
+    dispatch(getAllAdmins({ page, limit }));
+  }, [dispatch]);
+
+  const admins = useSelector(getAdmins);
+  const status = useSelector(getAdminStatus);
+  const error = useSelector(getAdminError);
+
+  console.log(admins);
+
+  if (status === "loading") return <p>Loading...</p>;
+  if (error) return <p className="text-red-500">{error?.error}</p>;
+
   return (
-    <div>AdminsList</div>
-  )
+    <div>
+      <BaseTable
+        columns={AdminColumns}
+        data={admins}
+        // actionLabel="Add Admins"
+        actionPath="/head/admins/add-admin"
+        profilePath={profilePath}
+        pageLabel={"Admins"}
+      />
+    </div>
+  );
 }
-
-export default AdminsList
