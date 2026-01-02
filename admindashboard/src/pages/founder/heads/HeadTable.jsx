@@ -29,13 +29,13 @@ const TherapyTable = () => {
 
   const dispatch = useDispatch();
 
-  const heads = useSelector(selectAllHeads);
-  const status = useSelector(selectHeadStatus);
-  const error = useSelector(selectHeadError);
-
   useEffect(() => {
     dispatch(getAllHeads({ page: 1, limit: 11 }));
   }, [dispatch]);
+
+    const heads = useSelector(selectAllHeads);
+    const status = useSelector(selectHeadStatus);
+    const error = useSelector(selectHeadError);
 
   console.log(heads)
 

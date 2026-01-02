@@ -19,7 +19,7 @@ export default function ExpertTable() {
 
   const navigate = useNavigate();
   const profilePath = (id) => {
-    navigate(`/founder/experts-profile/${id}`);
+    navigate(`/founder/experts/profile/${id}`);
   };
 
   useEffect(() => {
