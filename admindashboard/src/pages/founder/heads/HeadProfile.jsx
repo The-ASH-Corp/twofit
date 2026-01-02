@@ -1,8 +1,8 @@
 import ExpertCenterSide from "@/components/experts/ExpertCenterSide";
 import ExpertLeftSide from "@/components/experts/ExpertLeftSide";
 import ExpertRightSide from "@/components/experts/ExpertRightSide";
-import { getAdminProfile } from "@/redux/features/admins/admin.thunk";
-import { getAdminError, getAdminStatus, getSelectedAdmin } from "@/redux/features/admins/admins.selecters";
+import { selectHead, selectHeadError, selectHeadStatus } from "@/redux/features/head/head.selectors";
+import { getHead } from "@/redux/features/head/head.thunk";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -10,18 +10,18 @@ import { useParams } from "react-router-dom";
 
 
 
-const AdminProfile = () => {
+const ExpertProfile = () => {
   const dispatch = useDispatch();
    const { id } = useParams();
    console.log(id);
 
-     const expert = useSelector(getSelectedAdmin);
-     const status = useSelector(getAdminStatus);
-     const error = useSelector(getAdminError);
+     const expert = useSelector(selectHead);
+     const status = useSelector(selectHeadStatus);
+     const error = useSelector(selectHeadError);
 
    useEffect(() => {
      if (id) {
-       dispatch(getAdminProfile(id));
+       dispatch(getHead(id));
        //  console.log(expert);
      }
    }, [id, dispatch]);
@@ -42,4 +42,4 @@ const AdminProfile = () => {
   );
 };
 
-export default AdminProfile;
+export default ExpertProfile;
