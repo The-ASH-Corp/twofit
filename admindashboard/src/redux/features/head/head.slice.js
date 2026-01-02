@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { createHead, getAllHeads, getHead } from "./head.thunk";
 
 const initialState = {
-  allHeads: null,
+  allHeads: [],
   head: null,
   status: "idle",
   error: null,
