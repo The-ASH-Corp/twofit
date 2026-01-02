@@ -7,6 +7,6 @@ const router =express.Router()
 
 router.get("/all-admins/:page/:limit",adminController.getAllAdmins)
 router.post("/add-admin",validate(adminValidationSchema),adminController.addAdmin)
-
+router.get("/admin-profile/:id",adminController.getAdminProfile)
 
 export default router;
