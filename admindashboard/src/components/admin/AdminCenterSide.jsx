@@ -16,10 +16,10 @@ const AdminCenterSide = ({admin}) => {
           </button>
         </div>
         <div className="w-full flex flex-col items-center gap-3">
-          {admin.specialization.map((items, i) => (
+          {admin?.specialization.map((items, i) => (
             <div
               key={i}
-              className="w-full bg-[#F8F8F8] p-3 flex justify-between items-center rounded-md"
+              className="w-full bg-[#F8F8F8] p-3 flex justify-between items-center rounded-md "
             >
               <span className="text-[12px]">{items}</span>
               <span className="text-[11px] text-[#66706D]">

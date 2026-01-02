@@ -5,7 +5,9 @@ import {
   // getPaginationRowModel,
 } from "@tanstack/react-table";
 import { assets } from "../../assets/asset";
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
+import { MdOutlineKeyboardArrowDown } from "react-icons/md";
+import { BiPlus } from "react-icons/bi";
 
 import { useState } from "react";
 export default function BaseTable({
@@ -15,6 +17,7 @@ export default function BaseTable({
   profilePath,
   actionPath,
   pageLabel,
+  onSearchInputChange,
 }) {
   const [rowSelection, setRowSelection] = useState({});
 
@@ -39,22 +42,29 @@ export default function BaseTable({
             <input
               type="text"
               placeholder="Search anything"
-              className=" w-72 px-[10px] py-[12px] border border-none rounded-xl  w-[250px]"
+              className=" w-72 px-[10px] py-[12px] border border-none rounded-xl  w-[250px] focus:outline-none"
+              onChange={(e) => onSearchInputChange(e)}
             />
             <img src={assets.filter} className="  w-4 h-4" />
           </div>
-          <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0">
+          <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0 flex items-center gap-2 ">
             All Status
+            <MdOutlineKeyboardArrowDown className="w-4 h-4" />
           </button>
-          <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0">
+          <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0 flex items-center gap-2 ">
             Bulk Actions
+            <MdOutlineKeyboardArrowDown className="w-4 h-4" />
           </button>
-         {actionPath? <button
-            onClick={() => navigate(actionPath)}
-            className="bg-[#0A4F48] text-white rounded-md text-[12px] font-semibold px-3 py-0"
-          >
-            {actionLabel}
-          </button>:null}
+          {actionPath ? (
+            <button
+              onClick={() => navigate(actionPath)}
+              className="bg-[#0A4F48] text-white rounded-md text-[12px] font-semibold px-3 py-0 flex items-center gap-2 "
+            >
+              <BiPlus className="w-6 h-6"/>
+
+              {actionLabel}
+            </button>
+          ) : null}
         </div>
       </div>
       <table className="w-full text-sm border-collapse">

@@ -17,8 +17,22 @@ export default function AdminsList() {
   }
 
   const navigate = useNavigate();
+
   const profilePath = (id) => {
     navigate(`/head/admins/profile/${id}`);
+  };
+
+  const searchInpiutHandler = (e) => {
+    const value = e.target.value.toLowerCase();
+    const filteredAdmins = admins.filter((admin) => {
+      return (
+        admin.name.toLowerCase().includes(value)
+      )
+    })
+    setAdmins(filteredAdmins)
+    if (value == '') {
+      fetchAdminData();
+    }
   };
 
   useEffect(() => {
@@ -34,6 +48,7 @@ export default function AdminsList() {
         actionPath="/head/admins/add-admin"
         profilePath={profilePath}
         pageLabel={"Admins"}
+        onSearchInputChange={searchInpiutHandler}
       />
     </div>
   );
