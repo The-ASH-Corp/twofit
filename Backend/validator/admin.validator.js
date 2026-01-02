@@ -5,7 +5,10 @@ export const adminValidationSchema = z.object({
     required_error: "Fullname is required",
     invalid_type_error: "Fullname must be a string",
   }),
-  dob: z.string().regex(/^\d{2}-\d{2}-\d{4}$/, "DOB must be DD-MM-YYYY"),
+  dob: z.string({
+    required_error: "Date of Birth is required",
+    invalid_type_error: "Date of Birth must be a string",
+  }),
   gender: z.enum(["male", "female", "other"], {
     required_error: "Gender is required",
     invalid_type_error: "Gender must be a string",
@@ -27,12 +30,19 @@ export const adminValidationSchema = z.object({
       invalid_type_error: "Password must be a string",
     })
     .min(8, "Password must be at least 8 characters"),
-  specialisation: z.array(z.string(), {
+  specialization: z.array(z.string(), {
     required_error: "Specialisation is Required",
     invalid_type_error: "Specialisation must be string",
   }),
-  program: z.string({
+  chooseProgram: z.string({
     required_error: "Program is Required",
     invalid_type_error: "Program must be string",
   }),
-});
+  baseSalary: z.number({
+    required_error: "Base Salary is Required",
+    invalid_type_error: "Base Salary must be number",
+  }),
+  autoSendWelcome: z.boolean().optional(),
+  autoSendGuide: z.boolean().optional(),
+  automatedReminder: z.boolean().optional(),
+})

@@ -4,7 +4,11 @@ import { AdminColumns } from './AdminColumns'
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getAllAdmins } from '@/redux/features/admins/admin.thunk';
-import { selectAdminError, selectAdminStatus, selectAllAdmin } from '@/redux/features/admins/admins.selecters';
+import {
+  getAdminError,
+  getAdminStatus,
+  getAdmins,
+} from "@/redux/features/admins/admins.selecters";
 
 export default function AdminsList() {
   const page = 1;
@@ -20,9 +24,9 @@ export default function AdminsList() {
     dispatch(getAllAdmins({ page, limit }));
   }, [dispatch]);
 
-  const admins = useSelector(selectAllAdmin);
-  const status = useSelector(selectAdminStatus);
-  const error = useSelector(selectAdminError);
+  const admins = useSelector(getAdmins);
+  const status = useSelector(getAdminStatus);
+  const error = useSelector(getAdminError);
 
   console.log(admins);
 

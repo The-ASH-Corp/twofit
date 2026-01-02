@@ -59,7 +59,7 @@ export default function BaseForm({
                       } else if (field.type==="multiple"){
                         return (
                           <MultipleSelectForm
-                          key={field.name}
+                          key={field._id}
                           label={field.label??"just text"}
                           name={field.name}
                           options={field.options}/>

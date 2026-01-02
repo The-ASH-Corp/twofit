@@ -8,23 +8,44 @@ import { getAllAdmins } from '@/redux/features/admins/admin.thunk';
 export default function AdminsList() {
 
   const [admins,setAdmins]=useState([])
-  const page =1
-  const limit =10
+ 
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
   const dispatch = useDispatch();
   const fetchAdminData=async()=>{
     const admin =await dispatch(getAllAdmins({page,limit})).unwrap()
     setAdmins(admin)
   }
+ const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
 
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+  };
   const navigate = useNavigate();
+
   const profilePath = (id) => {
     navigate(`/head/admins/profile/${id}`);
   };
 
+  const searchInpiutHandler = (e) => {
+    const value = e.target.value.toLowerCase();
+    const filteredAdmins = admins.filter((admin) => {
+      return (
+        admin.name.toLowerCase().includes(value)
+      )
+    })
+    setAdmins(filteredAdmins)
+    if (value == '') {
+      fetchAdminData();
+    }
+  };
+
   useEffect(() => {
     fetchAdminData();
-  }, []);
-  
+  }, [page, limit]);
   return (
     <div>
       <BaseTable
@@ -34,6 +55,11 @@ export default function AdminsList() {
         actionPath="/head/admins/add-admin"
         profilePath={profilePath}
         pageLabel={"Admins"}
+        onSearchInputChange={searchInpiutHandler}
+        handlePageChange={handlePageChange}
+        handleLimitChange={handleLimitChange}
+        page={page}
+        limit={limit}
       />
     </div>
   );
