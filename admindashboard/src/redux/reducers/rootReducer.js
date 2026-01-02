@@ -9,6 +9,7 @@ import adminReducer from "../features/admins/admin.slice"
 import programReducer from "../features/program/program.slice"
 import categoryReducer from "../features/category/category.slice"
 import therapyReducer from "../features/therapy/therapy.slice"
+import headReducer from "../features/head/head.slice"
 
 export default combineReducers({
   auth: authReducer,
@@ -19,4 +20,5 @@ export default combineReducers({
   chat: chatReducer,
   admin:adminReducer,
   therapy: therapyReducer,
+  head: headReducer,
 });
