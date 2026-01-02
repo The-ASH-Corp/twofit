@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import BaseTable from '../../../components/table/BaseTable'
 import { AdminColumns } from './AdminColumns'
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,38 +11,58 @@ import {
 } from "@/redux/features/admins/admins.selecters";
 
 export default function AdminsList() {
-  const page = 1;
-  const limit = 15;
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
+
+  useEffect(() => {
+    dispatch(getAllAdmins({ page, limit }));
+  }, [dispatch, page, limit]);
+
+  const data = useSelector(getAdmins);
+  const status = useSelector(getAdminStatus);
+  const error = useSelector(getAdminError);
+
+  const [admins, setAdmins] = useState([]);
+
+  useEffect(() => {
+    setAdmins(data);
+  }, [data]);
+
+  const searchInputHandler = (e) => {
+    const value = e.target.value.toLowerCase();
+
+    if (!value) {
+      setAdmins(data);
+      return;
+    }
+
+    const filtered = data.filter((admin) =>
+      admin.name?.toLowerCase().includes(value)
+    );
+
+    setAdmins(filtered);
+  };
+
   const profilePath = (id) => {
     navigate(`/founder/admins/profile/${id}`);
   };
 
-  useEffect(() => {
-    dispatch(getAllAdmins({ page, limit }));
-  }, [dispatch]);
-
-  const admins = useSelector(getAdmins);
-  const status = useSelector(getAdminStatus);
-  const error = useSelector(getAdminError);
-
-  console.log(admins);
-
   if (status === "loading") return <p>Loading...</p>;
-  if (error) return <p className="text-red-500">{error?.error}</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div>
-      <BaseTable
-        columns={AdminColumns}
-        data={admins}
-        // actionLabel="Add Admins"
-        actionPath="/head/admins/add-admin"
-        profilePath={profilePath}
-        pageLabel={"Admins"}
-      />
-    </div>
+    <BaseTable
+      columns={AdminColumns}
+      data={admins}
+      profilePath={profilePath}
+      pageLabel="Admins"
+      onSearchInputChange={searchInputHandler}
+      handlePageChange={setPage}
+      handleLimitChange={setLimit}
+      page={page}
+      limit={limit}
+    />
   );
 }

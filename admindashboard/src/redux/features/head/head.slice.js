@@ -49,6 +49,7 @@ const headSlice = createSlice({
       .addCase(getHead.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.head = action.payload;
+        state.error = null
       })
       .addCase(getHead.rejected, (state, action) => {
         state.status = "failed";

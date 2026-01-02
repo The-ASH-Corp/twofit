@@ -132,7 +132,7 @@ const ProfileRightSide = ({ client }) => {
           <div className="flex flex-col items-center w-full gap-2">
             <div className="flex items-center justify-between w-full ">
               <span className="text-[12px] text-[#66706D]">Start</span>
-              <span className="text-[12px]">{client.currentWeight} kg</span>
+              <span className="text-[12px]">{client?.currentWeight} kg</span>
             </div>
             <div className="flex items-center justify-between w-full">
               <span className="text-[12px] text-[#66706D]">Change</span>

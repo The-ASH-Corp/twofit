@@ -12,19 +12,19 @@ import { useParams } from "react-router-dom";
 
 const ExpertProfile = () => {
   const dispatch = useDispatch();
-   const { expertId } = useParams();
-   console.log(expertId)
+   const { id } = useParams();
+   console.log(id);
 
      const expert = useSelector(selectCoachById);
      const status = useSelector(selectCoachStatus);
      const error = useSelector(selectCoachError);
 
    useEffect(() => {
-     if (expertId) {
-       dispatch(getSingleCoach(expertId ));
-      //  console.log(expert);
+     if (id) {
+       dispatch(getSingleCoach(id));
+       //  console.log(expert);
      }
-   }, [expertId, dispatch]);
+   }, [id, dispatch]);
   //  console.log(expert);
 
    if (status === "loading") return <p>Loading...</p>;

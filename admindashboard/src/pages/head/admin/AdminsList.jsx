@@ -30,7 +30,7 @@ export default function AdminsList() {
     navigate(`/head/admins/profile/${id}`);
   };
 
-  const searchInpiutHandler = (e) => {
+  const searchInputHandler = (e) => {
     const value = e.target.value.toLowerCase();
     const filteredAdmins = admins.filter((admin) => {
       return (
@@ -55,7 +55,7 @@ export default function AdminsList() {
         actionPath="/head/admins/add-admin"
         profilePath={profilePath}
         pageLabel={"Admins"}
-        onSearchInputChange={searchInpiutHandler}
+        onSearchInputChange={searchInputHandler}
         handlePageChange={handlePageChange}
         handleLimitChange={handleLimitChange}
         page={page}
