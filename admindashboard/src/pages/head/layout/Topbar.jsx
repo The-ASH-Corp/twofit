@@ -22,7 +22,7 @@ export default function Topbar() {
           <input
             type="text"
             placeholder="Search anything"
-            className=" w-72 px-[10px] py-[12px] border border-none rounded-xl bg-white w-[250px]"
+            className=" w-72 px-[10px] py-[12px] border border-none rounded-xl bg-white w-[250px] focus:outline-none "
           />
           <img src={assets.filter} className="  w-4 h-4" />
         </div>
