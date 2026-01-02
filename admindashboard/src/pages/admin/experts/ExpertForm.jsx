@@ -61,15 +61,29 @@ export default function ExpertForm() {
         {
           name: "workingdays",
           label: "Working Days",
-          type: "radio",
+          type: "checkbox-group",
           options: [
-            { label: "Mon-Wed-Fri", value: "mwf" },
-            { label: "Tue-Thu-Sat", value: "tts" },
-            { label: "Mon-Fri", value: "mf" },
+            { label: "Monday", value: "monday" },
+            { label: "Tuesday", value: "tuesday" },
+            { label: "Wednesday", value: "wednesday" },
+            { label: "Thursday", value: "thursday" },
+            { label: "Friday", value: "friday" },
+            { label: "Saturday", value: "saturday" },
+            { label: "Sunday", value: "sunday" },
           ],
         },
-        { name: "workingHours", label: "Working Hours", type: "text" },
-        { name: "breakSlots", label: "Break Slots", type: "text" },
+        { 
+          type: "time-range", 
+          label: "Working Hours", 
+          startName: "workingHours.startTime", 
+          endName: "workingHours.endTime" 
+        },
+        { 
+          type: "time-range", 
+          label: "Break Slots", 
+          startName: "breakSlots.startTime", 
+          endName: "breakSlots.endTime" 
+        },
         { name: "dailyConsults", label: "Max Daily Consults", type: "text" },
         { name: "responseTime", label: "Response Time", type: "text" },
       ],
@@ -123,12 +137,19 @@ export default function ExpertForm() {
   const initialValues = {
     fullname: "",
     dob: "",
-    gender: "", //need to add
+    gender: "",
+    workingdays: [],
+    workingHours: {
+      startTime: "",
+      endTime: "",
+    },
+    breakSlots: {
+      startTime: "",
+      endTime: "",
+    },
     ratingIncentive: false,
     responseTimeIncentive: false,
     complianceIncentive: false,
-
-    // Account Setup
     autoSendWelcome: false,
     autoSendGuide: false,
     automatedReminder: false,
@@ -137,6 +158,8 @@ export default function ExpertForm() {
   const dispatch = useDispatch()
 
   const handleCoachCreation =async(values)=>{
+    console.log("Form submitted with values:", values);
+    console.log("Selected working days:", values.workingdays);
     const coach = await dispatch(createCoach(values))    
   }
 
@@ -145,6 +168,7 @@ export default function ExpertForm() {
       fields={fields}
       initialValues={initialValues}
       onSubmit={(values) => handleCoachCreation(values)}
+      heading="Expert"
     ></BaseForm>
   );
 }

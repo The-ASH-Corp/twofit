@@ -4,6 +4,8 @@ import FormRadio from "./FormRadio";
 import FormToggle from "./ToggleForm";
 import FormSelect from "./FormSelect";
 import MultipleSelectForm from "./MultipleSelectForm";
+import FormCheckboxGroup from "./FormCheckboxGroup";
+import FormTimeRange from "./FormTimeRange";
 
 export default function BaseForm({
   fields,
@@ -111,6 +113,26 @@ export default function BaseForm({
                           </div>
                         );
                       }
+                       else if(field.type == "checkbox-group"){
+                        return (
+                            <FormCheckboxGroup
+                              key={field.name}
+                              label={field.label}
+                              name={field.name}
+                              options={field.options}
+                            />
+                        )}
+                      else if(field.type == "time-range"){
+                        return (
+                          <div key={field.startName}>
+                            <FormTimeRange
+                              label={field.label}
+                              startName={field.startName}
+                              endName={field.endName}
+                            />
+                          </div>
+                        )}
+
 
                       return (
                         <FormInput
