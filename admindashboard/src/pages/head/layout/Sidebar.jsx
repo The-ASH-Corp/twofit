@@ -36,6 +36,7 @@ export default function Sidebar() {
         {menuItems.map((item) => (
           <NavLink
             to={item.path}
+            end={item.path === "/head"}
             key={item.label}
             className={({ isActive }) =>
               `flex items-center text-[#66706D] gap-3 w-full px-4 py-3 text-sm font-medium rounded-xl transition

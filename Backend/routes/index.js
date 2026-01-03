@@ -6,6 +6,7 @@ import authRoutes from '../modules/auth/auth.routes.js'
 import clientRoutes from "../modules/clients/client.routes.js"
 import chatRoutes from "../modules/chat/chat.route.js"
 import therapyRouts from "../modules/therapy/therapy.route.js"
+import adminRoutes from "../modules/admin/admin.routes.js"
 import headRouts from "../modules/Heads/heads.route.js"
 
 const router = express.Router();
@@ -18,6 +19,7 @@ router.use("/coach", coachRoutes);
 router.use("/programs", programRoutes);
 router.use("/chats",chatRoutes)
 router.use("/therapy", therapyRouts);
+router.use("/admin",adminRoutes)
 router.use("/heads", headRouts);
 
 

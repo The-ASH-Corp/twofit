@@ -2,6 +2,8 @@ import { generatePassword, hashPassword } from "../../utils/password.js";
 import { CoachModel } from "./coach.model.js";
 
 export const createCoach = async (coach) => {
+const newpassword = generatePassword()
+console.log(newpassword);
 
   
   const password = () => {

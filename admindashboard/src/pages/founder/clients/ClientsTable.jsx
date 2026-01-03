@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import BaseTable from "../../../components/table/BaseTable";
 import { ClientColumns } from "./ClientColumns";
 import { useDispatch } from "react-redux";
@@ -12,20 +12,44 @@ import { getAllClients } from "@/redux/features/client/client.thunk";
 import { useNavigate } from "react-router-dom";
 
 export default function ClientsTable() {
-  const navigate = useNavigate();
-  const profilePath = (id)=> {
-        navigate(`/founder/clients-profile//${id}`);
-  }
-  const dispatch = useDispatch();
 
-  const clients = useAppSelector(selectAllClients);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const dispatch = useDispatch();  
+  const navigate = useNavigate();
+
+  const profilePath = (id)=> {
+        navigate(`/founder/clients/profile/${id}`);
+  }
+
+  useEffect(() => {
+    dispatch(getAllClients({ page, limit }));
+  }, [dispatch, page, limit]);
+
+  const data = useAppSelector(selectAllClients);
   const status = useAppSelector(selectClientStatus);
   const error = useAppSelector(selectClientError);
 
-  useEffect(() => {
-    dispatch(getAllClients({ page: 1, limit: 10 }));
+  const [clients, setClient] = useState([]);
 
-  }, [dispatch]);
+  useEffect(()=>{
+    setClient(data)
+  },[data])
+
+  const searchInputHandler = (e) => {
+    const value = e.target.value.toLowerCase();
+
+    if (!value) {
+      setClient(data);
+      return;
+    }
+
+    const filtered = data.filter((client) =>
+      client.name?.toLowerCase().includes(value)
+    );
+
+    setClient(filtered);
+  };
 
   if (status === "loading") return <p>Loading clients...</p>;
   if (error) return <p>{error}</p>;
@@ -35,12 +59,13 @@ export default function ClientsTable() {
       <BaseTable
         columns={ClientColumns}
         data={clients}
-        actionLabel="Add Client"
-        actionPath="/addclient"
-        profilePath= {profilePath}
+        profilePath={profilePath}
         pageLabel={"Clients"}
-        // profilePath="/clients/profile/:clientId"
-        // pageLabel="Clients"
+        onSearchInputChange={searchInputHandler}
+        handlePageChange={setPage}
+        handleLimitChange={setLimit}
+        page={page}
+        limit={limit}
       />
     </div>
   );

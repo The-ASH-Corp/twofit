@@ -18,7 +18,7 @@ export const getAllHeads = async (req, res) => {
   try {
     const { page, limit } = req.params;
     const heads = await headService.getAllHeads(page, limit);
-    res.status(200).json({
+    res.status(201).json({
       success: true,
       data: heads,
     });

@@ -22,11 +22,10 @@ const assignedExperts = [
 ];
 
 const ProfileLeftSide = ({ client }) => {
-
+  
   const [day, month, year] = client.dob.split("-");
   const today = new Date();
   let age = today.getFullYear() - year;
-  // console.log(age);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-GB", {
@@ -42,7 +41,7 @@ const ProfileLeftSide = ({ client }) => {
     {
       img: assets.GenderVector,
       title: "Gender",
-      data: client.gender,
+      data: client?.gender,
     },
     {
       img: assets.AgeVector,
@@ -52,17 +51,17 @@ const ProfileLeftSide = ({ client }) => {
     {
       img: assets.EmailVector,
       title: "Email Address",
-      data: client.email,
+      data: client?.email,
     },
     {
       img: assets.PhoneVector,
       title: "Phone Number",
-      data: client.phone,
+      data: client?.phone,
     },
     {
       img: assets.HomeVector,
       title: "Address",
-      data: client.address,
+      data: client?.address,
     },
   ];
 
@@ -93,16 +92,16 @@ const ProfileLeftSide = ({ client }) => {
       <div className="w-full bg-white rounded-lg p-4 pt-7.5">
         <div className="flex flex-col items-center gap-6">
           <div className="flex flex-col items-center gap-3 px-[29px] pt-6">
-            <h2 className="font-bold text-[16px] ">{client.name}</h2>
+            <h2 className="font-bold text-[16px] ">{client?.name}</h2>
             <div className="flex items-center justify-between gap-2 text-[11px]">
               <span className="px-2 py-0.5 bg-[#F0F0F0] rounded-full">
-                {client.goals}
+                {client?.goals}
               </span>
               <span className="px-2 py-0.5 bg-[#F0F0F0] rounded-full">
-                {client.duration} Days
+                {client?.duration} Days
               </span>
               <span className="px-2 py-0.5 bg-[#45C4A2] rounded-full text-white">
-                {client.status}
+                {client?.status}
               </span>
             </div>
           </div>
@@ -110,13 +109,13 @@ const ProfileLeftSide = ({ client }) => {
             <div className="flex items-center justify-between w-full ">
               <span className="text-[#66706D] text-[12px]">Start Date</span>
               <span className="text-[12px]">
-                {formatDate(client.programStartDate)}
+                {formatDate(client?.programStartDate)}
               </span>
             </div>
             <div className="flex items-center justify-between w-full ">
               <span className="text-[#66706D] text-[12px]">End Date</span>
               <span className="text-[12px]">
-                {formatDate(client.programEndDate)}
+                {formatDate(client?.programEndDate)}
               </span>
             </div>
           </div>
