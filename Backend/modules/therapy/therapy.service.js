@@ -11,9 +11,10 @@ export const  createTherapy = async (therapy) => {
     });
 }
 
-export const getAllTherapy = async () => {
-    return await TherapyModel.find()
-}
+export const getAllTherapy = async (page, limit) => {
+  const skip = (page - 1) * limit;
+  return await TherapyModel.find().skip(skip).limit(limit);
+};
 
 export const getTherapy = async (id) => {
     return await TherapyModel.findById(id)
