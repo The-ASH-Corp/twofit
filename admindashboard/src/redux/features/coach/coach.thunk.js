@@ -5,8 +5,16 @@ import axiosInstance from "../../../utils/axiosInstance";
 
 export const createCoach = createAsyncThunk("coach/createCoach", async (coachDetails, { rejectWithValue }) => {
   try {
-    const data = await axiosInstance.post(`/coach/create`, coachDetails)
-    return data.data
+    const config = coachDetails instanceof FormData 
+      ? {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      : {};
+    
+    const data = await axiosInstance.post(`/coach/create`, coachDetails, config);
+    return data.data;
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || "Failed to Create Expert");
   }

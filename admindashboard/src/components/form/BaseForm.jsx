@@ -6,6 +6,7 @@ import FormSelect from "./FormSelect";
 import MultipleSelectForm from "./MultipleSelectForm";
 import FormCheckboxGroup from "./FormCheckboxGroup";
 import FormTimeRange from "./FormTimeRange";
+import FormFileInput from "./FormFileInput";
 
 export default function BaseForm({
   fields,
@@ -66,6 +67,15 @@ export default function BaseForm({
                           name={field.name}
                           options={field.options}/>
                         )
+                      } else if (field.type === "file") {
+                        return (
+                          <FormFileInput
+                            key={field.name}
+                            label={field.label}
+                            name={field.name}
+                            accept={field.accept}
+                          />
+                        );
                       }
 
                       return (

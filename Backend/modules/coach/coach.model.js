@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { string } from "zod";
 
 const coachSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -16,11 +15,11 @@ const coachSchema = new mongoose.Schema({
 
   address: { type: String, required: true },
 
-  role: { type: String, required: true },
+  role: { type: Array, required: true },
 
-  specialization: { type: String, required: true },
+  specialization: { type: Array, required: true },
 
-  experience: { type: Number, required: true },
+  experience: { type: String, required: true },
 
   qualification: { type: String, required: true },
 
@@ -79,6 +78,7 @@ const coachSchema = new mongoose.Schema({
   autoSendGuide: { type: Boolean, default: false },
 
   automatedReminder: { type: Boolean, default: false },
-});
+  status: { type: String, enum: ["Active", "Inactive"], default: "Active" }
+}, { timestamps: true });
 
 export const CoachModel = mongoose.model("Coach", coachSchema);

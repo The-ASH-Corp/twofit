@@ -5,11 +5,14 @@ import { selectProgramById } from "@/redux/features/program/program.selector";
 import { getProgramById } from "@/redux/features/program/program.thunk";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function ExpertForm() {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const program = useSelector(selectProgramById);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user?.program) {
@@ -43,6 +46,7 @@ export default function ExpertForm() {
         { name: "email", label: "Email Address", type: "email" },
         { name: "phone", label: "Phone Number", type: "text" },
         { name: "address", label: "Address", type: "text" },
+        { name: "password", label: "Password", type: "text" },
       ],
     },
 
@@ -64,7 +68,7 @@ export default function ExpertForm() {
           name: "specialization",
           label: "Specialization",
           type: "multiple",
-          options: user.specialization.map((spec) => ({
+          options: user?.specialization.map((spec) => ({
             label: spec,
             value: spec,
           })),
@@ -72,12 +76,11 @@ export default function ExpertForm() {
         { name: "experience", label: "Experience", type: "text" },
         { name: "qualification", label: "Qualification", type: "text" },
         {
-              name: "certifications",
-              label: "Certifications",
-              type: "file",
-              accept: ".pdf,.jpg,.jpeg,.png",
-              multiple: true,
-            },
+          name: "certifications",
+          label: "Certifications",
+          type: "file",
+          accept: ".pdf,.jpg,.jpeg,.png",
+        },
         {
           name: "languages",
           label: "Languages",
@@ -206,10 +209,48 @@ export default function ExpertForm() {
     autoSendGuide: false,
     automatedReminder: false,
     chooseProgram: user?.program || "",
+    certifications: null,
   };
 
   const handleCoachCreation = async (values) => {
-    const coach = await dispatch(createCoach(values))
+    try {
+
+      const formData = new FormData();
+
+      // Append all form values to FormData
+      Object.keys(values).forEach((key) => {
+        if (key === "certifications" && values[key] instanceof File) {
+          // For file inputs, append the file directly
+          formData.append(key, values[key]);
+        } else if (key === "workingHours" || key === "breakSlots") {
+          // For nested objects, stringify them
+          formData.append(key, JSON.stringify(values[key]));
+        } else if (Array.isArray(values[key])) {
+          // For arrays, stringify
+          formData.append(key, JSON.stringify(values[key]));
+        } else if (typeof values[key] === "boolean") {
+          // For booleans, convert to string explicitly
+          formData.append(key, values[key].toString());
+        } else if (
+          values[key] !== null &&
+          values[key] !== undefined &&
+          values[key] !== ""
+        ) {
+          // For other values
+          formData.append(key, values[key]);
+        }
+      });
+
+      const coach = await dispatch(createCoach(formData));
+      if(coach.meta.requestStatus === "fulfilled"){
+        toast("Coach created successfully", { type: "success" });
+        navigate(-1);
+      }else{
+        toast( "Failed to create coach", { type: "error" });
+      }
+    } catch (err) {
+      toast("Failed to create coach", { type: "error" });
+    }
   };
 
   return (
