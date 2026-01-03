@@ -15,11 +15,19 @@ export const createProgram = createAsyncThunk("program/createProgram", async (pr
 export const getAllPrograms=createAsyncThunk('program/getAllPrograms',async({page,limit},{rejectWithValue})=>{
     try{
         const data=await axiosInstance.get(`/programs/list/${page}/${limit}`)
-        console.log(data.data)
          return data.data; 
         
     }
     catch(error){
         return rejectWithValue(error.response?.data?.message || "Failed to get programs");
+    }
+})
+export const getProgramById=createAsyncThunk('program/getProgramById',async(programId,{rejectWithValue})=>{
+    try{
+        const data=await axiosInstance.get(`/programs/get/${programId}`)
+         return data.data; 
+    }
+    catch(error){
+        return rejectWithValue(error.response?.data?.message || "Failed to get program by id");
     }
 })

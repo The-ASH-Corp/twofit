@@ -1,9 +1,22 @@
 import BaseForm from "@/components/form/BaseForm";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { createCoach } from "@/redux/features/coach/coach.thunk";
-import React from "react";
-import { useDispatch } from "react-redux";
+import { selectProgramById } from "@/redux/features/program/program.selector";
+import { getProgramById } from "@/redux/features/program/program.thunk";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 export default function ExpertForm() {
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const program = useSelector(selectProgramById);
+
+  useEffect(() => {
+    if (user?.program) {
+      dispatch(getProgramById(user.program));
+    }
+  }, [user?.program, dispatch]);
+
   const fields = [
     {
       section: "Personal Information",
@@ -37,19 +50,59 @@ export default function ExpertForm() {
       section: "Role Assignment",
       position: "left",
       fields: [
-        { name: "role", label: "Choose Role", type: "text" },
-        { name: "specialization", label: "Specialization", type: "text" },
+        {
+          name: "role",
+          label: "Choose Role",
+          type: "multiple",
+          options: [
+            { label: "Nutritionist", value: "nutritionist" },
+            { label: "Fitness Expert", value: "fitness_expert" },
+            { label: "Therapist", value: "therapist" },
+          ],
+        },
+        {
+          name: "specialization",
+          label: "Specialization",
+          type: "multiple",
+          options: user.specialization.map((spec) => ({
+            label: spec,
+            value: spec,
+          })),
+        },
         { name: "experience", label: "Experience", type: "text" },
         { name: "qualification", label: "Qualification", type: "text" },
-        { name: "certifications", label: "Certifications", type: "text" },
-        { name: "languages", label: "Languages", type: "text" },
+        {
+              name: "certifications",
+              label: "Certifications",
+              type: "file",
+              accept: ".pdf,.jpg,.jpeg,.png",
+              multiple: true,
+            },
+        {
+          name: "languages",
+          label: "Languages",
+          type: "multiple",
+          options: [
+            { label: "English", value: "english" },
+            { label: "Malayalam", value: "malayalam" },
+            { label: "Tamil", value: "tamil" },
+            { label: "Hindi", value: "hindi" },
+          ],
+        },
       ],
     },
     {
       section: "Program Assignment",
       position: "left",
       fields: [
-        { name: "chooseProgram", label: "Choose Program", type: "text" },
+        {
+          name: "chooseProgram",
+          label: "Choose Program",
+          type: "select",
+          options: program
+            ? [{ label: program.name || program.title, value: program._id }]
+            : [],
+        },
       ],
     },
     {
@@ -57,19 +110,32 @@ export default function ExpertForm() {
       position: "right",
       fields: [
         { name: "clientLimit", label: "Max Client Limit", type: "text" },
-        { name: "assignedClients", label: "Current Assigned", type: "text" },
         {
           name: "workingdays",
           label: "Working Days",
-          type: "radio",
+          type: "checkbox-group",
           options: [
-            { label: "Mon-Wed-Fri", value: "mwf" },
-            { label: "Tue-Thu-Sat", value: "tts" },
-            { label: "Mon-Fri", value: "mf" },
+            { label: "Monday", value: "monday" },
+            { label: "Tuesday", value: "tuesday" },
+            { label: "Wednesday", value: "wednesday" },
+            { label: "Thursday", value: "thursday" },
+            { label: "Friday", value: "friday" },
+            { label: "Saturday", value: "saturday" },
+            { label: "Sunday", value: "sunday" },
           ],
         },
-        { name: "workingHours", label: "Working Hours", type: "text" },
-        { name: "breakSlots", label: "Break Slots", type: "text" },
+        {
+          type: "time-range",
+          label: "Working Hours",
+          startName: "workingHours.startTime",
+          endName: "workingHours.endTime",
+        },
+        {
+          type: "time-range",
+          label: "Break Slots",
+          startName: "breakSlots.startTime",
+          endName: "breakSlots.endTime",
+        },
         { name: "dailyConsults", label: "Max Daily Consults", type: "text" },
         { name: "responseTime", label: "Response Time", type: "text" },
       ],
@@ -123,28 +189,35 @@ export default function ExpertForm() {
   const initialValues = {
     fullname: "",
     dob: "",
-    gender: "", //need to add
+    gender: "",
+    workingdays: [],
+    workingHours: {
+      startTime: "",
+      endTime: "",
+    },
+    breakSlots: {
+      startTime: "",
+      endTime: "",
+    },
     ratingIncentive: false,
     responseTimeIncentive: false,
     complianceIncentive: false,
-
-    // Account Setup
     autoSendWelcome: false,
     autoSendGuide: false,
     automatedReminder: false,
+    chooseProgram: user?.program || "",
   };
 
-  const dispatch = useDispatch()
-
-  const handleCoachCreation =async(values)=>{
-    const coach = await dispatch(createCoach(values))    
-  }
+  const handleCoachCreation = async (values) => {
+    const coach = await dispatch(createCoach(values))
+  };
 
   return (
     <BaseForm
       fields={fields}
       initialValues={initialValues}
       onSubmit={(values) => handleCoachCreation(values)}
+      heading="Expert"
     ></BaseForm>
   );
 }

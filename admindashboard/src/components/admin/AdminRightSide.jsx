@@ -42,7 +42,7 @@ const AdminRightSide = ({admin}) => {
   return (
     <div className="w-[25%] flex flex-col items-center gap-4 overflow-auto  no-scrollbar">
       {/* Response Time */}
-      <div className="w-full flex flex-col gap-3 items-center bg-white rounded-lg p-4">
+      {/* <div className="w-full flex flex-col gap-3 items-center bg-white rounded-lg p-4">
         <div className="flex items-center justify-between w-full">
           <h2 className="text-[#0A4F48] font-bold text-[16px]">
             Response Time
@@ -70,7 +70,7 @@ const AdminRightSide = ({admin}) => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
       {/* Client Compliance */}
       <div className="w-full flex flex-col gap-8 items-center bg-white rounded-lg p-4">
         <div className="flex items-center justify-between w-full">
@@ -112,7 +112,7 @@ const AdminRightSide = ({admin}) => {
         </div>
       </div>
       {/* Documents */}
-      <div className="w-full bg-white rounded-lg p-4 flex flex-col items-center gap-4">
+      {/* <div className="w-full bg-white rounded-lg p-4 flex flex-col items-center gap-4">
         <div className="flex items-center justify-between w-full">
           <h2 className="text-[#0A4F48] font-bold text-[16px]">Documents</h2>
           <button>
@@ -143,7 +143,7 @@ const AdminRightSide = ({admin}) => {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
