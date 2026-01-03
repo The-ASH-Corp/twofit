@@ -30,7 +30,7 @@ const coachSchema = new mongoose.Schema({
   assignedPrograms: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "ProgramType",
+      ref: "ProgramsList",
       required: true,
     },
   ],

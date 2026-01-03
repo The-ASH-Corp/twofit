@@ -88,8 +88,9 @@ export const getAllCoach = async (page, limit) => {
 
 export const getCoachById = async (coachId) => {
   return await CoachModel.findById(coachId)
-    .select("_id name specialization experience bio image")
-    .populate("assignedUsers", "name _id");
+    .select("-password")
+    .populate("assignedUsers", "name _id email")
+    .populate("assignedPrograms");
 };
 
 export const updateCoachById = async (coachId, updatedData) => {
