@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getAdminProfile, getAllAdmins } from "./admin.thunk";
+import { createAdmin, getAdminProfile, getAllAdmins } from "./admin.thunk";
 
 const initialState = {
   admins: [],
@@ -41,6 +41,18 @@ const adminSlice = createSlice({
         state.error = null;
       })
       .addCase(getAdminProfile.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(createAdmin.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(createAdmin.fulfilled, (state) => {
+        state.status = "succeeded";
+        state.error = null;
+      })
+      .addCase(createAdmin.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });
