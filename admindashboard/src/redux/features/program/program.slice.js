@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createProgram, getAllPrograms } from "./program.thunk";
+import { createProgram, getAllPrograms, getProgramById } from "./program.thunk";
 
 const initialState = {
   allPrograms: [],
@@ -44,6 +44,19 @@ const programSlice = createSlice({
         state.error = null;
       })
       .addCase(createProgram.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(getProgramById.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(getProgramById.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.selectedProgram = action.payload;
+        state.error = null;
+      })
+      .addCase(getProgramById.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

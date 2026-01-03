@@ -50,7 +50,7 @@ export default function BaseForm({
                         );
                       }else if(field.type=="select"){
                         return (
-                          <div>
+                          <div  key={field.name}>
                             <FormSelect
                             key={field.name}
                             label={field.label??"just text"}
