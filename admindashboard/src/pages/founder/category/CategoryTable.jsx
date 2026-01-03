@@ -1,5 +1,4 @@
 import React from "react";
-import BaseTable from "../../components/table/BaseTable";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import { useEffect } from "react";
@@ -10,6 +9,7 @@ import {
 } from "@/redux/features/category/category.selector";
 import { getAllCategories } from "@/redux/features/category/category.thunk";
 import { CategoryListColumns } from "./CategoryListColumns";
+import BaseTable from "@/components/table/BaseTable";
 
 export default function CategoryTable() {
   const dispatch = useDispatch();
