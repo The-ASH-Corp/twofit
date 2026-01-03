@@ -1,91 +1,10 @@
 import * as Yup from "yup";
 import BaseForm from "../../../components/form/BaseForm";
 import { createClient } from "../../../redux/features/auth/auth.thunk";
-import { useDispatch } from "react-redux";
-
-const fields = [
-  {
-    section: "Personal Information",
-    position: "left",
-    fields: [
-      { name: "fullname", label: "Full Name", type: "text" },
-      { name: "dob", label: "Date Of Birth", type: "date" },
-      {
-        name: "gender",
-        label: "Gender",
-        type: "radio",
-        options: [
-          { label: "Male", value: "male" },
-          { label: "Female", value: "female" },
-        ],
-      },
-    ],
-  },
-
-  {
-    section: "Contact Information",
-    position: "left",
-    fields: [
-      { name: "email", label: "Email Address", type: "email" },
-      { name: "phone", label: "Phone Number", type: "text" },
-      { name: "address", label: "Address", type: "text" },
-    ],
-  },
-
-  {
-    section: "Health Profile",
-    position: "left",
-    fields: [
-      { name: "medicalconditions", label: "Medical Conditions", type: "text" },
-      { name: "allergy", label: "Allergies", type: "text" },
-      { name: "food-pref", label: "Food Preferance", type: "text" },
-      { name: "fitnessgoal", label: "Fitness Goal", type: "text" },
-      { name: "currentWeight", label: "Current Weight", type: "text" },
-      { name: "targetWeight", label: "Target Weight", type: "text" },
-    ],
-  },
-
-  {
-    section: "Program Assignment",
-    position: "right",
-    fields: [
-      { name: "ptype", label: "Program Type", type: "text" },
-      { name: "duration", label: "Duration", type: "text" },
-      { name: "startDate", label: "Start Date", type: "date" },
-      { name: "endDate", label: "End Date", type: "date" },
-    ],
-  },
-  {
-    section: "Expert Assignment",
-    position: "right",
-    fields: [
-      { name: "dietician", label: "Dietician", type: "text" },
-      { name: "trainer", label: "Trainer", type: "text" },
-      { name: "therapist", label: "Therapist", type: "text" },
-    ],
-  },
-  {
-    section: "Account Setup",
-    position: "right",
-    fields: [
-      {
-        name: "autoSendWelcome",
-        label: "Auto-send welcome message",
-        type: "toggle",
-      },
-      {
-        name: "autoSendGuide",
-        label: "Auto-send Onboarding Guide",
-        type: "toggle",
-      },
-      {
-        name: "automatedReminder",
-        label: "Automated Reminders",
-        type: "toggle",
-      },
-    ],
-  },
-];
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { getProgramById } from "@/redux/features/program/program.thunk";
+import { useEffect, useState } from "react";
 
 const initialValues = {
   fullname: "",
@@ -99,17 +18,147 @@ const schema = Yup.object({
   gender: Yup.string().required("Required"),
 });
 
-
-
 export default function ClientForm() {
-
-  
+  const [program, setProgram] = useState(null);
   const dispatch = useDispatch();
-  const handleUserCreation = async (values) => {
-    
-    const data= await dispatch(createClient(values));
-  
+
+  const user = useSelector(selectUser);
+  const fetchProgram = async () => {
+    const program = await dispatch(getProgramById(user.program));
+    setProgram(program.payload);
   };
+
+  useEffect(() => {
+    fetchProgram();
+  }, []);
+  const fields = [
+    {
+      section: "Personal Information",
+      position: "left",
+      fields: [
+        { name: "fullname", label: "Full Name", type: "text" },
+        { name: "dob", label: "Date Of Birth", type: "date" },
+        {
+          name: "gender",
+          label: "Gender",
+          type: "radio",
+          options: [
+            { label: "Male", value: "male" },
+            { label: "Female", value: "female" },
+          ],
+        },
+      ],
+    },
+
+    {
+      section: "Contact Information",
+      position: "left",
+      fields: [
+        { name: "email", label: "Email Address", type: "email" },
+        { name: "phone", label: "Phone Number", type: "text" },
+        { name: "address", label: "Address", type: "text" },
+      ],
+    },
+
+    {
+      section: "Health Profile",
+      position: "left",
+      fields: [
+        {
+          name: "medicalconditions",
+          label: "Medical Conditions",
+          type: "multiple",
+          options: [
+            { label: "Diabetes", value: "diabetes" },
+            { label: "Hypertension", value: "hypertension" },
+            { label: "Asthma", value: "asthma" },
+            { label: "Heart Disease", value: "heart_disease" },
+            { label: "Obesity", value: "obesity" },
+            { label: "None", value: "none" },
+          ],
+        },
+        { name: "allergy", label: "Allergies", type: "text" },
+        {
+          name: "foodPreference",
+          label: "Food Preference",
+          type: "select",
+          options: [
+            { label: "Vegetarian", value: "vegetarian" },
+            { label: "Non-Vegetarian", value: "non_vegetarian" },
+          ],
+        },
+        {
+          name: "fitnessGoal",
+          label: "Fitness Goal",
+          type: "select",
+          options: [
+            { label: "Weight Loss", value: "weight_loss" },
+            { label: "Muscle Gain", value: "muscle_gain" },
+          ],
+        },
+        { name: "currentWeight", label: "Current Weight", type: "text" },
+        { name: "targetWeight", label: "Target Weight", type: "text" },
+      ],
+    },
+
+    {
+      section: "Program Assignment",
+      position: "right",
+      fields: [
+        {
+          name: "programType",
+          label: "Program Type",
+          type: "select",
+          options: program ? [{ label: program.title, value: program._id }] : [],
+        },
+        { 
+          name: "duration", 
+          label: "Duration", 
+          type: "text",
+          readOnly: true,
+          disabled: true,
+          value: program?.duration || ""
+        },
+        { name: "startDate", label: "Start Date", type: "date" },
+        { name: "endDate", label: "End Date", type: "date" },
+      ],
+    },
+    {
+      section: "Expert Assignment",
+      position: "right",
+      fields: [
+        { name: "dietician", label: "Dietician", type: "text" },
+        { name: "trainer", label: "Trainer", type: "text" },
+        { name: "therapist", label: "Therapist", type: "text" },
+      ],
+    },
+    {
+      section: "Account Setup",
+      position: "right",
+      fields: [
+        {
+          name: "autoSendWelcome",
+          label: "Auto-send welcome message",
+          type: "toggle",
+        },
+        {
+          name: "autoSendGuide",
+          label: "Auto-send Onboarding Guide",
+          type: "toggle",
+        },
+        {
+          name: "automatedReminder",
+          label: "Automated Reminders",
+          type: "toggle",
+        },
+      ],
+    },
+  ];
+
+  const handleUserCreation = async (values) => {
+    const data = await dispatch(createClient(values));
+  };
+
   return (
     <BaseForm
       fields={fields}

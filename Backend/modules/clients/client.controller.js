@@ -4,7 +4,7 @@ export const getAllClients = async (req, res) => {
   try {
     const {page,limit}=req.params
     const clients = await service.getAllClient(page,limit);
-    res.status(201).json({
+    res.status(200).json({
       success: true,
       data: clients,
     });
