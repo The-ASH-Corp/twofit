@@ -17,11 +17,13 @@ import FounderDashboard from "./pages/founder/Dashboard";
 import FounderClientsTable from "./pages/founder/clients/ClientsTable";
 import FounderClientProfile from "./pages/founder/clients/ClientProfile";
 import FounderHeadsList from "./pages/founder/heads/HeadTable";
+import FounderHeadsProfile from "./pages/founder/heads/HeadProfile";
 import FounderHeadForm from "./pages/founder/heads/HeadForm"
 import FounderCategoryList from "./pages/founder/category/CategoryForm";
 import FounderExpertList from "./pages/founder/experts/ExpertTable";
 import FounderExpertProfile from "./pages/founder/experts/ExpertProfile";
 import FounderAdminList from "./pages/founder/admin/AdminsList";
+import FounderAdminProfile from "./pages/founder/admin/AdminProfile"
 import FounderProgramsList from "./pages/founder/programsList/ProgramTable";
 import FounderTherapyList from "./pages/founder/therapy/TherapyTable";
 import FounderTherapyForm from "./pages/founder/therapy/TherapyForm";
@@ -84,16 +86,18 @@ function App() {
         >
           <Route index element={<FounderDashboard />} />
           <Route path="heads" element={<FounderHeadsList />} />
+          <Route path="head/profile/:id" element={<FounderHeadsProfile />} />
           <Route path="create-head" element={<FounderHeadForm />} />
           <Route path="admins" element={<FounderAdminList />} />
+          <Route path="admins/profile/:id" element={<FounderAdminProfile />} />
           <Route path="experts" element={<FounderExpertList />} />
           <Route
-            path="experts-profile/:id"
+            path="experts/profile/:id"
             element={<FounderExpertProfile />}
           />
           <Route path="clients" element={<FounderClientsTable />} />
           <Route
-            path="clients-profile/:id"
+            path="clients/profile/:id"
             element={<FounderClientProfile />}
           />
           <Route path="programs" element={<FounderProgramsList />} />

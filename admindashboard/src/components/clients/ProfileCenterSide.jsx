@@ -70,11 +70,11 @@ const ProfileCenterSide = ({ client }) => {
   const healthDetails = [
     {
       heading: "Medical Conditions",
-      data: client.medicalConditions,
+      data: client?.medicalConditions,
     },
     {
       heading: "Allergies",
-      data: client.allergies,
+      data: client?.allergies,
     },
     {
       heading: "Food Preference",
@@ -82,15 +82,15 @@ const ProfileCenterSide = ({ client }) => {
     },
     {
       heading: "Fitness Goal",
-      data: [client.goals],
+      data: [client?.goals],
     },
     {
       heading: "Current Weight",
-      data: [`${client.currentWeight} kg`],
+      data: [`${client?.currentWeight} kg`],
     },
     {
       heading: "Target Weight",
-      data: [`${client.targetWeight} kg`],
+      data: [`${client?.targetWeight} kg`],
     },
   ];
 
@@ -136,7 +136,7 @@ const ProfileCenterSide = ({ client }) => {
         <div className="p-4 bg-white rounded-2xl w-[50%]">
           <div className="flex flex-col items-start gap-1 ">
             <span className="text-[11px] text-[#66706D]">Program Type</span>
-            <span className="font-bold text-[12px]">{client.goals}</span>
+            <span className="font-bold text-[12px]">{client?.goals}</span>
           </div>
         </div>
         <div className="p-4 bg-white rounded-2xl w-[50%]">
@@ -149,7 +149,7 @@ const ProfileCenterSide = ({ client }) => {
           <div className="flex flex-col items-start gap-1 w-full">
             <span className="text-[11px] text-[#66706D]">Plan Duration</span>
             <span className="font-bold text-[12px]">
-              {client.duration} Days
+              {client?.duration} Days
             </span>
           </div>
           <div className="flex flex-col items-end gap-1 w-full">
