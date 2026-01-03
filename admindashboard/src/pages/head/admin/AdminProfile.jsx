@@ -1,5 +1,6 @@
 import AdminCenterSide from "@/components/admin/AdminCenterSide";
 import AdminLeftSide from "@/components/admin/AdminLeftSide";
+import AdminRightSide from "@/components/admin/AdminRightSide";
 import { getAdminProfile } from "@/redux/features/admins/admin.thunk";
 import { getAdminError, getAdminStatus, getSelectedAdmin } from "@/redux/features/admins/admins.selecters";
 import React, { useEffect } from "react";
@@ -16,7 +17,6 @@ const AdminProfile = () => {
      const admin = useSelector(getSelectedAdmin);
     const status = useSelector(getAdminStatus);
     const error = useSelector(getAdminError);
-console.log(admin ,"admin");
 
    useEffect(() => {
      if (id) {
@@ -34,7 +34,7 @@ console.log(admin ,"admin");
       {/* center */}
       <AdminCenterSide  admin = {admin}/>
       {/* right */}
-      {/* <AdminRightSide  admin = {admin}/> */}
+      <AdminRightSide  admin = {admin}/>
     </div>
   );
 };

@@ -4,13 +4,14 @@ import User from "./auth.model.js";
 import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.js";
 import redisClient from "../../redis/redisClient.js";
 import { generatePassword } from "../../utils/password.js";
-// import { sendEmail } from "../utils/email.js";
+import { AdminModel } from "../../modules/admin/admin.model.js";
+import { HeadsModel } from "../Heads/heads.modal.js";
 
 export const adminCreateUser = async (userData) => {
-  const exists = await User.findOne({email:userData.email});
+  const exists = await User.findOne({ email: userData.email });
   if (exists) throw new Error("Email already exists");
 
-  const password = generatePassword()
+  const password = generatePassword();
 
   const hashed = await bcrypt.hash(password, 10);
 
@@ -18,8 +19,8 @@ export const adminCreateUser = async (userData) => {
     name: userData.name,
     email: userData.email,
     password: hashed,
-    role:"user",
-    status: "active",
+    role: "user",
+    status: "Active",
     dob: userData.dob,
     gender: userData.gender,
     phone: userData.phone,
@@ -44,11 +45,14 @@ export const adminCreateUser = async (userData) => {
 };
 
 export const loginUser = async ({ email, password }) => {
-  const user = await User.findOne({ email }).select("+password");
+  const user =
+    (await User.findOne({ email }).select("+password")) ||
+    (await AdminModel.findOne({ email }).select("+password")) ||
+    (await HeadsModel.findOne({ email }).select("+password"));
 
   if (!user) throw new Error("Invalid credentials");
 
-  if (user.status !== "active")
+  if (user.status !== "Active")
     throw new Error("Your account is inactive. Contact admin.");
 
   const match = await bcrypt.compare(password, user.password);

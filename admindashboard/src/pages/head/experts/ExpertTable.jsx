@@ -8,14 +8,35 @@ import { useNavigate } from 'react-router-dom';
 export default function ExpertTable() {
 
   const [coaches,setCoaches]=useState([])
-  const page =1
-  const limit =10
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+  
   const dispatch = useDispatch();
   const fetchCoachData=async()=>{
     const coache =await dispatch(getAllCoaches({page,limit})).unwrap()
     const clients =coache[0].assignedUsers.length
     setCoaches([{...coache[0],clients}])
   }
+
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+  };
+  const searchInpiutHandler = (e) => {
+    const value = e.target.value.toLowerCase();
+    const filteredAdmins = coaches.filter((admin) => {
+      return (
+        admin.name.toLowerCase().includes(value)
+      )
+    })
+    setCoaches(filteredAdmins)
+    if (value == '') {
+      fetchCoachData();
+    }
+  };
 
   const navigate = useNavigate();
   const profilePath = (id) => {
@@ -33,6 +54,11 @@ export default function ExpertTable() {
         data={coaches}
         profilePath={profilePath}
         pageLabel={"Experts"}
+        onSearchInputChange={searchInpiutHandler}
+        handlePageChange={handlePageChange}
+        handleLimitChange={handleLimitChange}
+        page={page}
+        limit={limit}
       />
     </div>
   );
