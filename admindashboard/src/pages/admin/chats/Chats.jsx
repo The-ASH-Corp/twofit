@@ -8,6 +8,8 @@ import { useDispatch, useSelector } from "react-redux";
 import ChatSidebar from "./ChatSidebar";
 import ChastList from "./ChastList";
 import ChatWindow from "./ChatWindow";
+import Templates from "./Templates";
+import CreateBroadcast from "./CreateBroadcast";
 
 export default function Chats() {
   const [client, setChatClient] = useState(null);
@@ -44,7 +46,7 @@ export default function Chats() {
       socket.off("online_users");
       socket.disconnect();
     };
-  }, [user._id]);
+  }, [user?._id]);
 
   const chatClient = (selectedClient) => {
     if (client) {
@@ -135,24 +137,33 @@ export default function Chats() {
         sideTab={sideTab}
       />
 
-      {/* Center - Chat List */}
-      <ChastList
-        clients={clients}
-        chatClient={chatClient}
-        client={client}
-        onlineUsers={onlineUsers}
-      />
+      {/* Right - Content based on tab */}
+      {sideTab === "Templates" ? (
+        <Templates />
+      ) : sideTab === "Create Broadcast" ? (
+        <CreateBroadcast onCancel={() => handleSideTabs("Chats")} />
+      ) : (
+        <>
+          {/* Center - Chat List */}
+          <ChastList
+            clients={clients}
+            chatClient={chatClient}
+            client={client}
+            onlineUsers={onlineUsers}
+          />
 
-      {/* Right - Chat Window */}
-      <ChatWindow
-        client={client}
-        messages={messages}
-        message={message}
-        setMessage={setMessage}
-        messageHandlers={messageHandlers}
-        user={user}
-        onlineUsers={onlineUsers}
-      />
+          {/* Right - Chat Window */}
+          <ChatWindow
+            client={client}
+            messages={messages}
+            message={message}
+            setMessage={setMessage}
+            messageHandlers={messageHandlers}
+            user={user}
+            onlineUsers={onlineUsers}
+          />
+        </>
+      )}
     </div>
   );
 }
