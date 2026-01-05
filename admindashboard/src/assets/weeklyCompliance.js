@@ -17,3 +17,25 @@ export  const weeklyCompliance = [
   { date: "W4", weight: 54 },
   { date: "W5", weight: 57 },
 ];
+
+
+export const data = [
+  {
+    week: "Week 1",
+    chest: 100,
+    waist: 90,
+    hips: 98,
+  },
+  {
+    week: "Week 2",
+    chest: 98,
+    waist: 87,
+    hips: 96,
+  },
+  {
+    week: "Week 3",
+    chest: 96,
+    waist: 84,
+    hips: 94,
+  },
+];

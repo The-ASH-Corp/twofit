@@ -72,7 +72,10 @@ export default function ExpertCard() {
             </div>
           </div>
           <button
-            onClick={()=>setIsOpen(!isOpen)}
+            onClick={() => {
+              setSelectedExpert(expert);
+              setIsOpen(!isOpen);
+            }}
             className="text-white p-3 bg-[#0A4F48] rounded-xl  mt-4"
           >
             Rate & Review
@@ -80,7 +83,7 @@ export default function ExpertCard() {
         </div>
       ))}
 
-      {isOpen ? <Modal /> : ""}
+      {isOpen ? <Modal expert={selectedExpert} onClose={() => setIsOpen(false)} /> : ""}
     </div>
   );
 }

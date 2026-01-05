@@ -9,13 +9,13 @@ export default function ClientLayout() {
     document.title = "Client Dashboard | Twofit";
   }, []);
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50">
       <Sidebar />
 
-      <div className="flex-1 p-6  ">
+      <div className="flex flex-col flex-1 p-6  ">
         <TopBar />
 
-         <div className="mt-6">
+         <div className="mt-6 flex-1 overflow-y-auto no-scrollbar">
           <Outlet/>
         </div>
       </div>
