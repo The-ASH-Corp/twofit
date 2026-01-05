@@ -19,7 +19,8 @@ export const createCategoryController = async (req, res) => {
  
 export const getAllCategoryController = async (req, res) => {
   try {
-    const categories = await getAllCategory();
+    const { page, limit } = req.params;
+    const categories = await getAllCategory(page, limit);
     return res.status(200).json({
       success: true,
       data: categories,

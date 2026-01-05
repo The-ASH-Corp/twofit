@@ -1,9 +1,9 @@
 import axiosInstance from "@/utils/axiosInstance";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-export const getAllCategories=createAsyncThunk('category/getAllCategories',async(__,{rejectWithValue})=>{
+export const getAllCategories=createAsyncThunk('category/getAllCategories',async({page,limit},{rejectWithValue})=>{
     try{
-        const data=await axiosInstance.get('/category/list')
+        const data = await axiosInstance.get(`/category/list/${page}/${limit}`);
         console.log(data.data)
          return data.data; 
         
