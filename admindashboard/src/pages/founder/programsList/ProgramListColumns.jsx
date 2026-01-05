@@ -40,53 +40,6 @@ export const ProgramListColumns = [
    )
 },
   { accessorKey: "linkedTemplate", header: "Linked Template" },
-//   {
-//   accessorKey: "experts",
-//   header: "Experts",
-
-//   cell: ({ row }) => {
-//     return (
-//       <div className="flex gap-1 flex-wrap">
-//         {row.original.experts.map((exp) => {
-//           const expertColor =
-//             expertColors[exp] || "bg-gray-200 text-gray-700";
-
-//           return (
-//             <span
-//               key={exp}
-//               className={`px-2 py-1 text-[11px] rounded-sm ${expertColor}`}
-//             >
-//               {exp}
-//             </span>
-//           );
-//         })}
-//       </div>
-//     );
-//   }
-// },
-
-
-  //   {
-  //     accessorKey: "experts",
-  //     header: "Experts",
-  //     cell: ({ row }) => (
-  //       <div className="flex gap-2 flex-wrap">
-  //         {row.original.experts.map((exp) => {
-  //           const colorClass =
-  //             expertColors[exp] || "bg-gray-100 text-gray-700 border";
-
-  //           return (
-  //             <span
-  //               key={exp}
-  //               className={`px-2 py-1 text-[11px] rounded-sm ${colorClass}`}
-  //             >
-  //               {exp}
-  //             </span>
-  //           );
-  //         })}
-  //       </div>
-  //     ),
-  //   },
 
   {
     accessorKey: "status",
