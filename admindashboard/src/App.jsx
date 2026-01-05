@@ -11,7 +11,7 @@ import Login from "./pages/Login";
 import PublicRoutes from "./routes/PublicRoutes";
  
 import Unauthorized from "./pages/Unauthorized";
-//Founter Pages Imports
+//Founder Pages Imports
 import FounderLayout from "./pages/founder/layout/FounderLayout";
 import FounderDashboard from "./pages/founder/Dashboard";
 import FounderClientsTable from "./pages/founder/clients/ClientsTable";
@@ -19,7 +19,7 @@ import FounderClientProfile from "./pages/founder/clients/ClientProfile";
 import FounderHeadsList from "./pages/founder/heads/HeadTable";
 import FounderHeadsProfile from "./pages/founder/heads/HeadProfile";
 import FounderHeadForm from "./pages/founder/heads/HeadForm"
-import FounderCategoryList from "./pages/founder/category/CategoryForm";
+import FounderCategoryList from "./pages/founder/category/CategoryTable";
 import FounderExpertList from "./pages/founder/experts/ExpertTable";
 import FounderExpertProfile from "./pages/founder/experts/ExpertProfile";
 import FounderAdminList from "./pages/founder/admin/AdminsList";
@@ -28,6 +28,7 @@ import FounderProgramsList from "./pages/founder/programsList/ProgramTable";
 import FounderTherapyList from "./pages/founder/therapy/TherapyTable";
 import FounderTherapyForm from "./pages/founder/therapy/TherapyForm";
 import FounderWorkoutList from "./pages/founder/workout/WorkoutList";
+import FounderFinanceList from "./pages/founder/finance/FinanceTable";
 //Head Pages Imports
 import HeadLayout from "./pages/head/layout/HeadLayout";
 import HeadDashboard from "./pages/head/Dashboard";
@@ -40,6 +41,7 @@ import HeadAddAdmin from "./pages/head/admin/AdminForm"
 import HeadExpertProfile from "./pages/head/experts/ExpertProfile"
 import HeadAdminProfile from "./pages/head/admin/AdminProfile"
 import HeadClientProfile from "./pages/head/clients/ClientProfile"
+
 //Admin Pages Imports
 import AppLayout from "./pages/admin/layout/AppLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
@@ -86,8 +88,8 @@ function App() {
         >
           <Route index element={<FounderDashboard />} />
           <Route path="heads" element={<FounderHeadsList />} />
-          <Route path="head/profile/:id" element={<FounderHeadsProfile />} />
-          <Route path="create-head" element={<FounderHeadForm />} />
+          <Route path="heads/profile/:id" element={<FounderHeadsProfile />} />
+          <Route path="heads/create" element={<FounderHeadForm />} />
           <Route path="admins" element={<FounderAdminList />} />
           <Route path="admins/profile/:id" element={<FounderAdminProfile />} />
           <Route path="experts" element={<FounderExpertList />} />
@@ -102,6 +104,7 @@ function App() {
           />
           <Route path="programs" element={<FounderProgramsList />} />
           <Route path="category" element={<FounderCategoryList />} />
+          <Route path="finance" element={<FounderFinanceList />} />
           <Route path="therapy" element={<FounderTherapyList />} />
           <Route path="add-therapy" element={<FounderTherapyForm />} />
           <Route path="workout" element={<FounderWorkoutList />} />

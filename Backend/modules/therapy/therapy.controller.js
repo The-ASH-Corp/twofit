@@ -29,7 +29,8 @@ export const createTherapy = async (req, res) => {
 
 export const getAllTherapy = async (req, res) => {
     try {
-        const therapies = await therapyService.getAllTherapy();
+      const { page, limit } = req.params;
+        const therapies = await therapyService.getAllTherapy(page, limit);
         res.status(200).json({
           success: true,
           data: therapies,
