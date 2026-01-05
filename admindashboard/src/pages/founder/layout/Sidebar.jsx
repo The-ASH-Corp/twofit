@@ -52,7 +52,7 @@ export default function Sidebar() {
         <img src={assets.logo} alt="logo" />
       </div>
 
-      {/* Menu */}
+      {/* Navigation */}
       <nav className="space-y-2">
         {menuItems.map((item) => {
           const isOpen = openMenu === item.label;
@@ -63,7 +63,7 @@ export default function Sidebar() {
               {item.children ? (
                 <button
                   onClick={() => setOpenMenu(isOpen ? null : item.label)}
-                  className={`flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-xl transition hover:bg-gray-100 text-[#66706D]
+                  className={`flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-300 text-[#66706D] hover:bg-gray-100
                     `}
                 >
                   <div className="flex items-center gap-3">
@@ -73,8 +73,8 @@ export default function Sidebar() {
 
                   <img
                     src={assets.downVector}
-                    className={`w-3 transition-transform ${
-                      isOpen ? "rotate-180" : ""
+                    className={`w-3 transition-transform duration-300 ${
+                      !isOpen ? "rotate-180" : ""
                     }`}
                   />
                 </button>
@@ -83,7 +83,7 @@ export default function Sidebar() {
                   to={item.path}
                   end={item.path === "/founder"}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 w-full px-4 py-3 text-sm font-medium rounded-xl transition
+                    `flex items-center gap-3 w-full px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-300 
                     ${
                       isActive
                         ? "bg-[#0A4F48] text-white"
@@ -96,25 +96,32 @@ export default function Sidebar() {
                 </NavLink>
               )}
 
-              {/* Children Menu */}
-              {item.children && isOpen && (
-                <div className="ml-6 mt-2 pl-2 flex flex-col gap-2 border-l border-l-[#DBDEDD]">
-                  {item.children.map((child) => (
-                    <NavLink
-                      key={child.label}
-                      to={child.path}
-                      className={({ isActive }) =>
-                        `px-4 py-2 rounded-xl text-[14px] font-semibold transition
-                        ${
-                          isActive
-                            ? "bg-[#0A4F48] text-white"
-                            : "text-[#66706D] hover:bg-gray-100"
-                        }`
-                      }
-                    >
-                      {child.label}
-                    </NavLink>
-                  ))}
+              {/* Children Menu with Transition */}
+              {item.children && (
+                <div
+                  className={`ml-6 pl-2 border-l border-l-[#DBDEDD] overflow-hidden transition-all duration-400 ease-in-out
+                    ${
+                      isOpen ? "max-h-40 opacity-100 mt-2" : "max-h-0 opacity-0"
+                    }`}
+                >
+                  <div className="flex flex-col gap-2 ">
+                    {item.children.map((child) => (
+                      <NavLink
+                        key={child.label}
+                        to={child.path}
+                        className={({ isActive }) =>
+                          `px-4 py-3 rounded-lg text-sm transition-colors duration-200 text-[14px] font-semibold
+                          ${
+                            isActive
+                              ? "bg-[#0A4F48] text-white"
+                              : "text-[#66706D] hover:bg-gray-100"
+                          }`
+                        }
+                      >
+                        {child.label}
+                      </NavLink>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -133,3 +140,5 @@ export default function Sidebar() {
     </aside>
   );
 }
+
+// ml-6 mt-2 pl-2 flex flex-col gap-2 border-l border-l-[#DBDEDD] 
