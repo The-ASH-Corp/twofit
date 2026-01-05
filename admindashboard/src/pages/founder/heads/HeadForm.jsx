@@ -7,27 +7,37 @@ import { useNavigate } from 'react-router-dom';
 const TherapyForm = () => {
     const fields = [
       {
-        section: "Create new head",
+        section: "Personal Information",
         position: "left",
         fields: [
           {
             name: "name",
-            label: "Name",
+            label: "Full Name",
             type: "text",
           },
           {
             name: "dob",
-            label: "DOB",
+            label: "Date Of Birth",
             type: "text",
           },
           {
             name: "gender",
-            label: "gender",
-            type: "text",
+            label: "Gender",
+            type: "radio",
+            options: [
+              { label: "Male", value: "male" },
+              { label: "Female", value: "female" },
+            ],
           },
+        ],
+      },
+      {
+        section: "Contact Information",
+        position: "left",
+        fields: [
           {
             name: "email",
-            label: "email",
+            label: "Email",
             type: "email",
           },
           {
@@ -36,9 +46,52 @@ const TherapyForm = () => {
             type: "text",
           },
           {
-            name: "password",
-            label: "password",
-            type: "text"
+            name: "address",
+            label: "Address",
+            type: "text",
+          },
+        ],
+      },
+      {
+        section: "Role Assignment",
+        position: "right",
+        fields: [
+          {
+            name: "specialization",
+            label: "Specialization",
+            type: "text",
+          },
+          {
+            name: "experience",
+            label: "Experience",
+            type: "text",
+          },
+          {
+            name: "qualification",
+            label: "Qualification",
+            type: "text",
+          },
+        ],
+      },
+      {
+        section: "Program Assignment",
+        position: "right",
+        fields: [
+          {
+            name: "programCategory",
+            label: "Program Category",
+            type: "dropdown",
+          },
+        ],
+      },
+      {
+        section: "Salary",
+        position: "right",
+        fields: [
+          {
+            name: "salary",
+            label: "Base Salary",
+            type: "dropdown",
           },
         ],
       },
