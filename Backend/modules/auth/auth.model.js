@@ -31,8 +31,8 @@ const userSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["active", "inactive"],
-      default: "active",
+      enum: ["Active", "Inactive"],
+      default: "Active",
     },
 
     currentWeight: { type: Number, required: true },
@@ -45,27 +45,27 @@ const userSchema = new mongoose.Schema(
 
     goals: { type: String },
 
-    foodPreferances: { type: String, required: true },
+    foodPreferences: { type: String, required: true },
 
     profileImage: { type: String },
 
     programType: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "ProgramType",
+      ref: "ProgramsList",
       required: true,
     },
 
     duration: { type: Number, required: true },
 
-    programStartDate: { type: Date, required: true },
+    programStartDate: { type: String, required: true },
 
-    programEndDate: { type: Date, required: true },
+    programEndDate: { type: String, required: true },
 
-    dietition: { type: mongoose.Schema.Types.ObjectId, required: true },
+    dietition: { type: mongoose.Schema.Types.ObjectId ,ref:"Coach" },
 
-    trainer: { type: mongoose.Schema.Types.ObjectId, required: true },
+    trainer: { type: mongoose.Schema.Types.ObjectId ,ref:"Coach"  },
 
-    therapist: { type: mongoose.Schema.Types.ObjectId, required: true },
+    therapist: { type: mongoose.Schema.Types.ObjectId ,ref:"Coach"  },
 
     autoSendGuide: { type: Boolean, default: false },
 
@@ -73,7 +73,6 @@ const userSchema = new mongoose.Schema(
 
     automatedReminder: { type: Boolean, default: false },
 
-    createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );

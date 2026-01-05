@@ -13,7 +13,7 @@ export default function Topbar() {
   return (
     <div className="flex justify-between items-center  ">
       <div>
-        <h2 className="text-[24px] font-semibold text-[#0A4F48] ">Good Morning, {user.name}</h2>
+        <h2 className="text-[24px] font-semibold text-[#0A4F48] ">Good Morning, {user?.name}</h2>
         <p className="text-[#66706D] text-[12px] leading-4"> Welcome back to your plan</p>
       </div>
 

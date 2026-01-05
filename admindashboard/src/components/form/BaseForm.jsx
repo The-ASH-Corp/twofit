@@ -6,6 +6,7 @@ import FormSelect from "./FormSelect";
 import MultipleSelectForm from "./MultipleSelectForm";
 import FormCheckboxGroup from "./FormCheckboxGroup";
 import FormTimeRange from "./FormTimeRange";
+import FormFileInput from "./FormFileInput";
 
 export default function BaseForm({
   fields,
@@ -48,24 +49,35 @@ export default function BaseForm({
                             />
                           </div>
                         );
-                      }else if(field.type=="select"){
+                      } else if (field.type == "select") {
                         return (
-                          <div  key={field.name}>
+                          <div key={field.name}>
                             <FormSelect
-                            key={field.name}
-                            label={field.label??"just text"}
-                            name={field.name}
-                            options={field.options}/>
+                              key={field.name}
+                              label={field.label ?? "just text"}
+                              name={field.name}
+                              options={field.options}
+                            />
                           </div>
-                        )
-                      } else if (field.type==="multiple"){
+                        );
+                      } else if (field.type === "multiple") {
                         return (
                           <MultipleSelectForm
-                          key={field._id}
-                          label={field.label??"just text"}
-                          name={field.name}
-                          options={field.options}/>
-                        )
+                            key={field._id}
+                            label={field.label ?? "just text"}
+                            name={field.name}
+                            options={field.options}
+                          />
+                        );
+                      } else if (field.type === "file") {
+                        return (
+                          <FormFileInput
+                            key={field.name}
+                            label={field.label}
+                            name={field.name}
+                            accept={field.accept}
+                          />
+                        );
                       }
 
                       return (
@@ -112,17 +124,16 @@ export default function BaseForm({
                             <FormToggle name={field.name} label={field.label} />
                           </div>
                         );
-                      }
-                       else if(field.type == "checkbox-group"){
+                      } else if (field.type == "checkbox-group") {
                         return (
-                            <FormCheckboxGroup
-                              key={field.name}
-                              label={field.label}
-                              name={field.name}
-                              options={field.options}
-                            />
-                        )}
-                      else if(field.type == "time-range"){
+                          <FormCheckboxGroup
+                            key={field.name}
+                            label={field.label}
+                            name={field.name}
+                            options={field.options}
+                          />
+                        );
+                      } else if (field.type == "time-range") {
                         return (
                           <div key={field.startName}>
                             <FormTimeRange
@@ -131,8 +142,19 @@ export default function BaseForm({
                               endName={field.endName}
                             />
                           </div>
-                        )}
-
+                        );
+                      } else if (field.type == "select") {
+                        return (
+                          <div key={field.name}>
+                            <FormSelect
+                              key={field.name}
+                              label={field.label ?? "just text"}
+                              name={field.name}
+                              options={field.options}
+                            />
+                          </div>
+                        );
+                      }
 
                       return (
                         <FormInput
@@ -152,8 +174,11 @@ export default function BaseForm({
             <h2>Save as Draft</h2>
             <div className="flex gap-2">
               <button className="bg-[#EBF3F2]  rounded-md p-2  ">Cancel</button>
-              <button className="bg-[#0A4F48] p-2 rounded-md text-white" type="submit">
-                Save & Add {heading??"Client"}
+              <button
+                className="bg-[#0A4F48] p-2 rounded-md text-white"
+                type="submit"
+              >
+                Save & Add {heading ?? "Client"}
               </button>
             </div>
           </div>

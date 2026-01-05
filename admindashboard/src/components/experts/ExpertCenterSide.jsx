@@ -1,20 +1,7 @@
 import { assets } from '@/assets/asset';
 import React from 'react'
 
-const Programs = [
-  {
-    title: "PCOD",
-  },
-  {
-    title: "Weight Loss",
-    template: "V2 Template",
-  },
-  {
-    title: "Thyroid",
-  },
-];
-
-const ExpertCenterSide = () => {
+const ExpertCenterSide = ({ expert }) => {
   return (
     <div className="w-[50%] flex flex-col items-center gap-4 overflow-auto  no-scrollbar ">
       {/* Programs */}
@@ -28,7 +15,7 @@ const ExpertCenterSide = () => {
           </button>
         </div>
         <div className="w-full flex flex-col items-center gap-3">
-          {Programs.map((items, i) => (
+          {expert?.assignedPrograms.map((items, i) => (
             <div
               key={i}
               className="w-full bg-[#F8F8F8] p-3 flex justify-between items-center rounded-md"

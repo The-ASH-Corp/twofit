@@ -3,6 +3,16 @@ import mongoose from "mongoose";
 
 export const createCoach = async(req, res)=> {
     try {
+      // Handle file uploads
+      if (req.files) {
+        if (req.files.certifications && req.files.certifications[0]) {
+          req.body.certifications = "/uploads/" + req.files.certifications[0].filename;
+        }
+        if (req.files.photo && req.files.photo[0]) {
+          req.body.photo = "/uploads/" + req.files.photo[0].filename;
+        }
+      }
+     
         const coach = await coachService.createCoach(req.body);
         res
           .status(201)
@@ -12,7 +22,7 @@ export const createCoach = async(req, res)=> {
             data: coach,
           });
 
-    } catch (err) {
+    } catch (err) {        
         res.status(400).json({ success: false, message: err.message });
     }
 };
@@ -169,3 +179,15 @@ export const getUsersAssignedToACoach = async (req, res)=> {
   })
 
 }
+
+export const getCoachesByAdmin = async (req, res) => {
+  try {
+    const coaches = await coachService.getCoachesByAdmin(req.body);
+    res.status(200).json({
+      success: true,
+      data: coaches,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }   
+};

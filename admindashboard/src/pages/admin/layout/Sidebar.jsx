@@ -11,7 +11,7 @@ const menuItems = [
   },
   { label: "Experts", icon: assets.experts, path: "/admin/experts" },
   { label: "Clients", icon: assets.clients, path: "/admin/clients" },
-  { label: "Finance", icon: assets.finance, path: "/admin/finance" },
+  // { label: "Finance", icon: assets.finance, path: "/admin/finance" },
   { label: "Chats", icon: assets.chats, path: "/admin/chats" },
   
 ];

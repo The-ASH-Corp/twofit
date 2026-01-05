@@ -3,29 +3,13 @@ import React from "react";
 
 
 
-const assignedExperts = [
-  {
-    img: assets.profileVector,
-    coach: "Trainer",
-    name: "Rahul Mehta",
-  },
-  {
-    img: assets.profileVector,
-    coach: "Dietitian",
-    name: "Anjali Sharma",
-  },
-  {
-    img: assets.profileVector,
-    coach: "Therapist",
-    name: "Mira Kapoor",
-  },
-];
+
 
 const ProfileLeftSide = ({ client }) => {
-  
-  const [day, month, year] = client.dob.split("-");
+  const [year, , ] = client?.dob?.split("-") || [];
   const today = new Date();
-  let age = today.getFullYear() - year;
+
+  let age = year ? today.getFullYear() - year : null;
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-GB", {
@@ -86,7 +70,25 @@ const ProfileLeftSide = ({ client }) => {
     },
   ];
 
-  return (
+  const assignedExperts = [
+  {
+    img: assets.profileVector,
+    coach: "Trainer",
+    name: client?.trainer?.name||"N/A",
+  },
+  {
+    img: assets.profileVector,
+    coach: "Dietitian",
+    name: client?.dietition?.name||"N/A",
+  },
+  {
+    img: assets.profileVector,
+    coach: "Therapist",
+    name: client?.therapist?.name||"N/A",
+  },
+];
+
+return (
     <div className="w-[25%] flex flex-col items-center gap-4 overflow-auto  no-scrollbar">
       {/* name */}
       <div className="w-full bg-white rounded-lg p-4 pt-7.5">
@@ -95,7 +97,7 @@ const ProfileLeftSide = ({ client }) => {
             <h2 className="font-bold text-[16px] ">{client?.name}</h2>
             <div className="flex items-center justify-between gap-2 text-[11px]">
               <span className="px-2 py-0.5 bg-[#F0F0F0] rounded-full">
-                {client?.goals}
+                {client?.programType?.title}
               </span>
               <span className="px-2 py-0.5 bg-[#F0F0F0] rounded-full">
                 {client?.duration} Days

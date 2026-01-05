@@ -53,7 +53,7 @@ export default function ClientsTable() {
 
   useEffect(() => {
     fetchClientData();
-  }, [page, limit]);
+  }, [page, limit, dispatch]);
 
   if (status === "loading") return <p>Loading clients...</p>;
   if (error) return <p>{error}</p>;
