@@ -179,3 +179,15 @@ export const getUsersAssignedToACoach = async (req, res)=> {
   })
 
 }
+
+export const getCoachesByAdmin = async (req, res) => {
+  try {
+    const coaches = await coachService.getCoachesByAdmin(req.body);
+    res.status(200).json({
+      success: true,
+      data: coaches,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }   
+};

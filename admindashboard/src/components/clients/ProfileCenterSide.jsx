@@ -3,6 +3,33 @@ import React from 'react'
 
 
 
+const statusStyles = {
+  Completed: {
+    bg: "#E6F4F1",
+    textsColor: "#137528",
+    border: "#B7DFBA",
+  },
+  Skipped: {
+    bg: "#FFFAE0",
+    textsColor: "#936900",
+    border: "#F8D87B",
+  },
+  Missed: {
+    bg: "#FFF0ED",
+    textsColor: "#B13116",
+    border: "#FAC6BD",
+  },
+  Pending: {
+    bg: "#F2F3F5",
+    textsColor: "#54595D",
+    border: "#D7DCDF",
+  },
+};
+
+const ProfileCenterSide = ({ client }) => {
+
+  
+
 const assignedExperts = [
   {
     img: assets.tickVector,
@@ -41,32 +68,6 @@ const assignedExperts = [
     status: "Skipped",
   },
 ];
-
-const statusStyles = {
-  Completed: {
-    bg: "#E6F4F1",
-    textsColor: "#137528",
-    border: "#B7DFBA",
-  },
-  Skipped: {
-    bg: "#FFFAE0",
-    textsColor: "#936900",
-    border: "#F8D87B",
-  },
-  Missed: {
-    bg: "#FFF0ED",
-    textsColor: "#B13116",
-    border: "#FAC6BD",
-  },
-  Pending: {
-    bg: "#F2F3F5",
-    textsColor: "#54595D",
-    border: "#D7DCDF",
-  },
-};
-
-const ProfileCenterSide = ({ client }) => {
-
   const healthDetails = [
     {
       heading: "Medical Conditions",
@@ -78,11 +79,11 @@ const ProfileCenterSide = ({ client }) => {
     },
     {
       heading: "Food Preference",
-      data: ["Veg"],
+      data: [client?.foodPreferences],
     },
     {
       heading: "Fitness Goal",
-      data: [client?.goals],
+      data: [client?.goals || client?.programType?.title],
     },
     {
       heading: "Current Weight",
@@ -114,7 +115,7 @@ const ProfileCenterSide = ({ client }) => {
                   {items.heading}
                 </span>
                 <span className="text-[12px] text-[#0A4F48] ">
-                  {items.data.join(", ")}
+                  {items?.data?.join(", ")}
                 </span>
               </div>
             </div>
@@ -136,7 +137,7 @@ const ProfileCenterSide = ({ client }) => {
         <div className="p-4 bg-white rounded-2xl w-[50%]">
           <div className="flex flex-col items-start gap-1 ">
             <span className="text-[11px] text-[#66706D]">Program Type</span>
-            <span className="font-bold text-[12px]">{client?.goals}</span>
+            <span className="font-bold text-[12px]">{client?.programType?.title}</span>
           </div>
         </div>
         <div className="p-4 bg-white rounded-2xl w-[50%]">

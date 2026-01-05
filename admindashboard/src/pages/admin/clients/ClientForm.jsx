@@ -5,6 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { getProgramById } from "@/redux/features/program/program.thunk";
 import { useEffect, useState } from "react";
+import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const initialValues = {
   fullname: "",
@@ -19,18 +22,25 @@ const schema = Yup.object({
 });
 
 export default function ClientForm() {
+
+  const navigate = useNavigate();
   const [program, setProgram] = useState(null);
+  const [coachesOfAdmin, setCoachesOfAdmin] = useState([]);
   const dispatch = useDispatch();
 
   const user = useSelector(selectUser);
+
   const fetchProgram = async () => {
     const program = await dispatch(getProgramById(user.program));
+    const coachessOfAdmin = await dispatch(getAllCoachesByAdmin(user.experts));
     setProgram(program.payload);
+    setCoachesOfAdmin(coachessOfAdmin.payload);
   };
 
   useEffect(() => {
     fetchProgram();
   }, []);
+
   const fields = [
     {
       section: "Personal Information",
@@ -77,7 +87,10 @@ export default function ClientForm() {
             { label: "None", value: "none" },
           ],
         },
-        { name: "allergy", label: "Allergies", type: "text" },
+        { name: "allergy", label: "Allergies", type: "multiple", options: [
+          { label: "Peanuts", value: "peanuts" },
+          { label: "Seafood", value: "seafood" },
+        ] },
         {
           name: "foodPreference",
           label: "Food Preference",
@@ -109,15 +122,17 @@ export default function ClientForm() {
           name: "programType",
           label: "Program Type",
           type: "select",
-          options: program ? [{ label: program.title, value: program._id }] : [],
+          options: program
+            ? [{ label: program.title, value: program._id }]
+            : [],
         },
-        { 
-          name: "duration", 
-          label: "Duration", 
-          type: "text",
-          readOnly: true,
-          disabled: true,
-          value: program?.duration || ""
+        {
+          name: "duration",
+          label: "Duration",
+          type: "select",
+          options: program
+            ? program.duration.map((d) => ({ label: d, value: d }))
+            : [],
         },
         { name: "startDate", label: "Start Date", type: "date" },
         { name: "endDate", label: "End Date", type: "date" },
@@ -127,9 +142,30 @@ export default function ClientForm() {
       section: "Expert Assignment",
       position: "right",
       fields: [
-        { name: "dietician", label: "Dietician", type: "text" },
-        { name: "trainer", label: "Trainer", type: "text" },
-        { name: "therapist", label: "Therapist", type: "text" },
+        {
+          name: "dietician",
+          label: "Dietician",
+          type: "select",
+          options: coachesOfAdmin
+            .filter((coach) => coach.role.includes("Dietician"))
+            .map((coach) => ({ label: coach.name, value: coach._id })),
+        },
+        {
+          name: "trainer",
+          label: "Trainer",
+          type: "select",
+          options: coachesOfAdmin
+            .filter((coach) => coach.role.includes("Trainer"))
+            .map((coach) => ({ label: coach.name, value: coach._id })),
+        },
+        {
+          name: "therapist",
+          label: "Therapist",
+          type: "select",
+          options: coachesOfAdmin
+            .filter((coach) => coach.role.includes("Therapist"))
+            .map((coach) => ({ label: coach.name, value: coach._id })),
+        },
       ],
     },
     {
@@ -156,7 +192,14 @@ export default function ClientForm() {
   ];
 
   const handleUserCreation = async (values) => {
-    const data = await dispatch(createClient(values));
+    const updatedValues = { ...values, adminId: user._id };
+   const client = await dispatch(createClient(updatedValues));
+   if(client.payload.success){
+    toast.success("Client created successfully");
+    navigate(-1);
+   }else{
+    toast.error("Failed to create client");
+   }
   };
 
   return (

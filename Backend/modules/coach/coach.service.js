@@ -1,4 +1,5 @@
 import { generatePassword, hashPassword } from "../../utils/password.js";
+import { AdminModel } from "../admin/admin.model.js";
 import { CoachModel } from "./coach.model.js";
 
 export const createCoach = async (coach) => {
@@ -48,7 +49,7 @@ export const createCoach = async (coach) => {
     }
   };
 
-  return await CoachModel.create({
+  const coachCreated = await CoachModel.create({
     name: coach.fullname,
     dob: coach.dob,
     gender: coach.gender,
@@ -78,6 +79,14 @@ export const createCoach = async (coach) => {
     salary: coach.baseSalary,
     status: "Active",
   });
+
+  await AdminModel.findByIdAndUpdate(
+    coach.adminId,
+    { $addToSet: { experts: coachCreated._id } },
+    { new: true }
+  );
+
+  return coachCreated;
 };
 
 export const getAllCoach = async (page, limit) => {
@@ -114,3 +123,13 @@ export const getUsersAssignedToACoach = async (coachId) => {
     .select("assignedUsers")
     .populate("assignedUsers", "name _id email");
 };
+
+
+export const getCoachesByAdmin = async ({adminIds}) => {
+  let coaches = adminIds.map((adminId) =>
+    CoachModel.findOne( {_id: adminId} )
+      .select("-password")
+      .populate("assignedPrograms")
+  );
+  return await Promise.all(coaches);
+}

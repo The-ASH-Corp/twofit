@@ -214,7 +214,6 @@ export default function ExpertForm() {
 
   const handleCoachCreation = async (values) => {
     try {
-
       const formData = new FormData();
 
       // Append all form values to FormData
@@ -241,12 +240,14 @@ export default function ExpertForm() {
         }
       });
 
-      const coach = await dispatch(createCoach(formData));
-      if(coach.meta.requestStatus === "fulfilled"){
+      const updatedValues = { ...formData, adminId: user._id };
+      const coach = await dispatch(createCoach(updatedValues));
+      
+      if (coach.meta.requestStatus === "fulfilled") {
         toast("Coach created successfully", { type: "success" });
         navigate(-1);
-      }else{
-        toast( "Failed to create coach", { type: "error" });
+      } else {
+        toast("Failed to create coach", { type: "error" });
       }
     } catch (err) {
       toast("Failed to create coach", { type: "error" });

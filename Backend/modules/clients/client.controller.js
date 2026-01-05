@@ -21,7 +21,7 @@ export const getSingleClient = async (req, res) => {
         success: true,
         data : client,
     })
-  } catch (error) {
+  } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
 };
@@ -32,7 +32,7 @@ export const updateClient = async (req, res) => {
     const {id} = req.params
     const updatedClient =await service.updateOneClient(req.body,id)
     res.status(200).json({success: true, data: updatedClient})
-  } catch (error) {
+  } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
 }
@@ -42,7 +42,7 @@ export const deleteClient = async (req, res) => {
     const {id} = req.params
     const deleteClient = await service.deleteOneClient(id)
     res.status(200).json({success:true})
-  } catch (error) {
+  } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
 }
