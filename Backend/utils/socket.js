@@ -1,5 +1,5 @@
 import { ChatModel } from "../modules/chat/chat.model.js";
-import redisClient from "../redis/redisClient.js";
+
 
 // auth middleware for sockeyt.io
 const socketAuth = (socket, next) => {
@@ -61,11 +61,20 @@ const messageHandler = (io, socket) => {
 };
 
 
+
 export default function initSocket(io) {
+  const onlineUsers = new Map(); // userId -> socketId
+  
   io.use(socketAuth);
 
   io.on("connection", (socket) => {
     console.log("User Connected:", socket.userId);
+
+    // Add user to online users
+    onlineUsers.set(socket.userId, socket.id);
+    
+    // Broadcast updated online users list to all clients
+    io.emit("online_users", Array.from(onlineUsers.keys()));
 
     joinHandler(io, socket);
     messageHandler(io, socket);
@@ -74,9 +83,19 @@ export default function initSocket(io) {
       socket.leave(roomId);
     });
 
+    // Get current online users
+    socket.on("get_online_users", (callback) => {
+      callback?.(Array.from(onlineUsers.keys()));
+    });
 
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.userId);
+      
+      // Remove user from online users
+      onlineUsers.delete(socket.userId);
+      
+      // Broadcast updated online users list to all clients
+      io.emit("online_users", Array.from(onlineUsers.keys()));
     });
   });
 }
