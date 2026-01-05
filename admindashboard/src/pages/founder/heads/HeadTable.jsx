@@ -33,7 +33,7 @@ const TherapyTable = () => {
   const navigate = useNavigate();
 
   const profilePath = (id) => {
-    navigate(`/founder/head/profile/${id}`);
+    navigate(`/founder/heads/profile/${id}`);
   };
 
   useEffect(() => {
@@ -77,7 +77,7 @@ const TherapyTable = () => {
         data={heads}
         columns={therapyColumns}
         actionLabel="Add Head"
-        actionPath="/founder/create-head"
+        actionPath="/founder/heads/create"
         profilePath= {profilePath}
         pageLabel={"Heads"}
         onSearchInputChange={searchInputHandler}
