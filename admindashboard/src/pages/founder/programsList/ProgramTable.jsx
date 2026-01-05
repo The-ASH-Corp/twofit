@@ -27,21 +27,20 @@ export default function ProgramTable() {
     setProgram(data)
   },[data])
 
-   const searchInputHandler = (e) => {
-     const value = e.target.value.toLowerCase();
+    const searchInputHandler = (e) => {
+      const value = e.target.value.toLowerCase();
 
-     if (!value) {
-       setProgram(data);
-       return;
-     }
+      if (!value) {
+        setProgram(data);
+        return;
+      }
 
-     const filtered = data.filter((program) =>
-       program.name?.toLowerCase().includes(value)
-     );
+      const filtered = data.filter((programs) =>
+        programs.title?.toLowerCase().includes(value)
+      );
 
-     setProgram(filtered);
-   };
-
+      setProgram(filtered);
+    };
   if (status === "loading") return <p>Loading programs...</p>;
   if (error) return <p>{error}</p>;
   return (
