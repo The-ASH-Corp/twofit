@@ -49,7 +49,11 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminChats from "./pages/admin/chats/Chats";
 import AdminClientsTable from "./pages/admin/clients/ClientsTable";
 import AdminExpertTable from "./pages/admin/experts/ExpertTable";
-
+import AdminFinance from "./pages/admin/finance/FinanceTable"
+import AdminAddExpert from "./pages/admin/experts/ExpertForm"
+import AdminExpertProfile from "./pages/admin/experts/ExpertProfile";
+import AdminClientProfile from "./pages/admin/clients/ClientProfile";
+import AdminAddClient from "./pages/admin/clients/ClientForm";
 //Expert Pages Imports
 import ExpertLayout from "./pages/expert/layout/ExpertLayout";
 import ExpertDashboard from "./pages/expert/Dashboard";
@@ -145,6 +149,11 @@ function App() {
           <Route path="clients" element={<AdminClientsTable />} />
           <Route path="experts" element={<AdminExpertTable />} />
           <Route path="chats" element={<AdminChats />} />
+          <Route path ="finance" element={<AdminFinance/>}/>
+          <Route path="experts/addexpert" element={<AdminAddExpert />} />
+          <Route path="experts/profile/:expertId" element={<AdminExpertProfile />} />
+          <Route path="clients/profile/:id" element={<AdminClientProfile />} />
+          <Route path="clients/addclient" element={<AdminAddClient />} />
         </Route>
 
         {/* EXPERT */}

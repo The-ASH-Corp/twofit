@@ -4,7 +4,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      dashhhh
+     Admin dashboard
     </div>
   )
 }
