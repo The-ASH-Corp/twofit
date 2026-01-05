@@ -3,18 +3,7 @@ import { getChat } from "@/redux/features/chat/chat.selecters";
 import { getChats } from "@/redux/features/chat/chat.thunk";
 import { selectAllClients } from "@/redux/features/client/client.selectors";
 import { socket } from "@/utils/socket";
-import { LuSend } from "react-icons/lu";
-import {
-  MessageSquare,
-  Send,
-  Search,
-  Settings,
-  MessageCircle,
-  Paperclip,
-  Mic,
-} from "lucide-react";
 import { useEffect, useState } from "react";
-import { MdOutlineFindInPage } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import ChatSidebar from "./ChatSidebar";
 import ChastList from "./ChastList";
@@ -131,20 +120,25 @@ export default function Chats() {
     setMessages([]);
   }, [client]);
 
+  const [sideTab, setSideTab] = useState("Chats");
+  const handleSideTabs = (tabName) => {
+    setSideTab(tabName);
+  };
+
   return (
     <div className="flex h-[calc(100vh-120px)]  gap-5">
       {/* Left Sidebar */}
       <ChatSidebar
         clients={clients}
         handleBroadcastChat={handleBroadcastChat}
-        chatClient={chatClient}
-        client={client}
+        handleSideTabs={handleSideTabs}
+        sideTab={sideTab}
       />
 
       {/* Center - Chat List */}
-      <ChastList 
-        clients={clients} 
-        chatClient={chatClient} 
+      <ChastList
+        clients={clients}
+        chatClient={chatClient}
         client={client}
         onlineUsers={onlineUsers}
       />
