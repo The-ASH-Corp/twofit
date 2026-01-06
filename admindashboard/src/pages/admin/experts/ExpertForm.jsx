@@ -1,6 +1,7 @@
 import BaseForm from "@/components/form/BaseForm";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { createCoach } from "@/redux/features/coach/coach.thunk";
+import { refreshProfile } from "@/redux/features/auth/auth.thunk";
 import { selectProgramById } from "@/redux/features/program/program.selector";
 import { getProgramById } from "@/redux/features/program/program.thunk";
 import React, { useEffect } from "react";
@@ -59,9 +60,9 @@ export default function ExpertForm() {
           label: "Choose Role",
           type: "multiple",
           options: [
-            { label: "Nutritionist", value: "nutritionist" },
-            { label: "Fitness Expert", value: "fitness_expert" },
-            { label: "Therapist", value: "therapist" },
+            { label: "Trainer", value: "Trainer" },
+            { label: "Dietician", value: "Dietician" },
+            { label: "Therapist", value: "Therapist" },
           ],
         },
         {
@@ -240,10 +241,13 @@ export default function ExpertForm() {
         }
       });
 
-      const updatedValues = { ...formData, adminId: user._id };
-      const coach = await dispatch(createCoach(updatedValues));
-      
+      if (user?._id) {
+        formData.append("adminId", user._id);
+      }
+      const coach = await dispatch(createCoach(formData));
+
       if (coach.meta.requestStatus === "fulfilled") {
+        await dispatch(refreshProfile(user._id));
         toast("Coach created successfully", { type: "success" });
         navigate(-1);
       } else {
