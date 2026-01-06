@@ -1,3 +1,6 @@
+import AdminCenterSide from "@/components/admin/AdminCenterSide";
+import AdminLeftSide from "@/components/admin/AdminLeftSide";
+import AdminRightSide from "@/components/admin/AdminRightSide";
 import ExpertCenterSide from "@/components/experts/ExpertCenterSide";
 import ExpertLeftSide from "@/components/experts/ExpertLeftSide";
 import ExpertRightSide from "@/components/experts/ExpertRightSide";
@@ -31,21 +34,22 @@ const ExpertProfile = () => {
    if (error) return <p className="text-red-500">{error}</p>;
    
   return (
-    <div className="flex flex-col items-center w-full gap-4 h-[calc(100vh-120px)] overflow-auto  no-scrollbar">
-      {/* heading */}
-      <div className="flex justify-between items-center w-full">
-        <h2 className="text-[#0A4F48] text-[16px] font-bold">
-          Profile Details
-        </h2>
-        <button className="bg-[#0A4F48] px-3.5 py-2.5 text-white text-[12px] font-semibold rounded-lg">
+    <div className="flex flex-col gap-6 w-full h-[calc(100vh-120px)] overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold text-[#0A4F48]">Profile Details</h1>
+        <button className="px-5 py-2 bg-[#0A4F48] text-white rounded-lg text-sm font-bold shadow-sm hover:bg-[#073a35] transition-colors">
           Edit Profile
         </button>
       </div>
-      {/* content */}
-      <div className="flex justify-between items-start gap-4 w-full">
-        <div className="w-[37%] bg-amber-100">d</div>
-        <div className="w-[37%] bg-amber-100">d</div>
-        <div className="w-[26%] bg-amber-100">d</div>
+
+      <div className="flex flex-1 justify-between w-full gap-4 overflow-auto no-scrollbar pb-6">
+        {/* left */}
+        <AdminLeftSide admin={expert} />
+        {/* center */}
+        <AdminCenterSide admin={expert} />
+        {/* right */}
+        <AdminRightSide admin={expert} />
       </div>
     </div>
   );

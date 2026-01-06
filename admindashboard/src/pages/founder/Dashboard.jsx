@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React  from "react";
 import {
   Users,
   UserCheck,
@@ -49,22 +49,22 @@ const Dashboard = () => {
     datasets: [
       {
         label: "Active",
-        data: [75, 80, 78, 85, 82, 90],
-        backgroundColor: "#0A4F48",
+        data: [40, 45, 42, 48, 45, 50],
+        backgroundColor: "#F4DBC7",
         borderRadius: 4,
         barThickness: 12,
       },
       {
         label: "Inactive",
-        data: [40, 45, 42, 48, 45, 50],
-        backgroundColor: "#D1E0DE",
+        data: [50, 55, 52, 58, 55, 54],
+        backgroundColor: "#EBF3F2",
         borderRadius: 4,
         barThickness: 12,
       },
       {
         label: "New",
-        data: [20, 25, 22, 28, 25, 30],
-        backgroundColor: "#45C4A2",
+        data: [30, 35, 32, 38, 35, 30],
+        backgroundColor: "#0A4F48",
         borderRadius: 4,
         barThickness: 12,
       },
@@ -89,73 +89,95 @@ const Dashboard = () => {
     datasets: [
       {
         label: "Diet",
-        data: [60, 65, 70, 68, 72, 75, 74, 76, 78, 80, 79, 82],
+        data: [30, 35, 70, 68, 72, 75, 74, 76, 78, 80, 79, 82],
         backgroundColor: "#0A4F48",
         borderRadius: 4,
+
       },
       {
         label: "Workout",
         data: [40, 45, 50, 48, 52, 55, 63, 65, 67, 69, 68, 70],
-        backgroundColor: "#FFD7A8",
+        backgroundColor: "#F4DBC7",
         borderRadius: 4,
       },
       {
         label: "Therapy",
         data: [30, 35, 40, 38, 42, 45, 52, 54, 56, 58, 57, 60],
-        backgroundColor: "#45C4A2",
+        backgroundColor: "#EBF3F2",
         borderRadius: 4,
       },
     ],
   };
 
-  const newClientsData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+  // const newClientsData = {
+  //   labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+  //   datasets: [
+  //     {
+  //       label: "Clients joined",
+  //       data: [45, 52, 40, 75, 55, 65],
+  //       borderColor: "#0A4F48",
+  //       backgroundColor: (context) => {
+  //         const ctx = context.chart.ctx;
+  //         const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+  //         gradient.addColorStop(0, "rgba(10, 79, 72, 0.1)");
+  //         gradient.addColorStop(1, "rgba(10, 79, 72, 0)");
+  //         return gradient;
+  //       },
+  //       fill: true,
+  //       tension: 0.4,
+  //       borderWidth: 3,
+  //       pointBackgroundColor: "#fff",
+  //       pointBorderColor: "#0A4F48",
+  //       pointBorderWidth: 2,
+  //       pointRadius: 4,
+  //       pointHoverRadius: 6,
+  //     },
+  //   ],
+  // };
+
+  const expertPerformanceData = {
+    labels: ["Task Completion", "Rating", "Clients Assigned"],
     datasets: [
       {
-        label: "Clients joined",
-        data: [45, 52, 40, 75, 55, 65],
-        borderColor: "#0A4F48",
-        backgroundColor: (context) => {
-          const ctx = context.chart.ctx;
-          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-          gradient.addColorStop(0, "rgba(10, 79, 72, 0.1)");
-          gradient.addColorStop(1, "rgba(10, 79, 72, 0)");
-          return gradient;
-        },
-        fill: true,
-        tension: 0.4,
-        borderWidth: 3,
-        pointBackgroundColor: "#fff",
-        pointBorderColor: "#0A4F48",
-        pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6,
+        data: [40, 85, 60],
+        backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
+        borderWidth: 0,
+        cutout: "75%",
+        hoverOffset: 1,
+        spacing: 3,
+        borderRadius: 8,
       },
     ],
   };
 
-  const expertPerformanceData = {
-    labels: ["Response Time", "Rating", "Client Load"],
+  const subAdminPerformanceData = {
+    labels: ["Programs", "Experts", "Clients "],
     datasets: [
       {
         data: [70, 85, 60],
-        backgroundColor: ["#0A4F48", "#45C4A2", "#FFD7A8"],
+        backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
         borderWidth: 0,
         cutout: "75%",
+        hoverOffset: 1,
+        spacing: 3,
+        borderRadius: 8,
       },
     ],
   };
 
   const expertsSummaryData = {
-    labels: ["Trainers", "Dietitians", "Therapists", "Support Staff"],
+    labels: ["Trainers", "Dietitians", "Therapists"],
     datasets: [
       {
-        data: [22, 18, 14, 4],
-        backgroundColor: ["#0A4F48", "#45C4A2", "#FFD7A8", "#D1D5DB"],
+        data: [22, 18, 14],
+        backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
         borderWidth: 0,
         circumference: 180,
         rotation: 270,
         cutout: "80%",
+        hoverOffset: 1,
+        spacing: 3,
+        borderRadius: 6,
       },
     ],
   };
@@ -302,7 +324,7 @@ const Dashboard = () => {
                 {card.value}
               </span>
             </div>
-            <div className={`${card.bg} p-3 rounded-xl`}>{card.icon}</div>
+            <div className={`${card.bg} p-3 rounded-full`}>{card.icon}</div>
           </div>
         ))}
       </div>
@@ -314,9 +336,9 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <DashboardCard title="Client Growth" subTitle="Last 6 Months">
               <div className="flex items-center gap-4 mb-4">
-                <LegendItem color="#0A4F48" label="Active" />
-                <LegendItem color="#D1E0DE" label="Inactive" />
-                <LegendItem color="#45C4A2" label="New" />
+                <LegendItem color="#F4DBC7" label="Active" />
+                <LegendItem color="#DBDEDD" label="Inactive" />
+                <LegendItem color="#0A4F48" label="New" />
               </div>
               <div className="h-64 relative">
                 <Bar data={growthData} options={chartOptions} />
@@ -347,22 +369,42 @@ const Dashboard = () => {
 
           {/* Row 3: New Clients Joined & Expert Performance */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <DashboardCard title="New Clients Joined" subTitle="Last 6 Months">
-              <div className="h-64">
-                <Line
-                  data={newClientsData}
+            <DashboardCard title="Sub Admin Performance" subTitle="Last Months">
+              <div className="h-64 relative flex items-center justify-center">
+                <Doughnut
+                  data={subAdminPerformanceData}
                   options={{
-                    ...chartOptions,
-                    scales: {
-                      ...chartOptions.scales,
-                      y: {
-                        ...chartOptions.scales.y,
-                        max: 100,
-                        ticks: { stepSize: 25, color: "#66706D" },
-                      },
-                    },
+                    plugins: { legend: { display: false } },
+                    maintainAspectRatio: false,
                   }}
                 />
+                {/* <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                  <span className="text-2xl font-bold text-[#0A4F48]">4.6</span>
+                  <span className="text-xs text-[#66706D]">Avg Rating</span>
+                </div> */}
+              </div>
+              <div className="flex justify-between mt-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-xs bg-[#0A4F48]"></div>
+                  <span className="text-[11px] text-[#66706D]">
+                    Programs{" "}
+                    <strong className="text-[#0A4F48] text-[12px]">50%</strong>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-xs bg-[#EBF3F2]"></div>
+                  <span className="text-[11px] text-[#66706D]">
+                    Experts{" "}
+                    <strong className="text-[#0A4F48] text-[12px]">50%</strong>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-xs bg-[#F4DBC7]"></div>
+                  <span className="text-[11px] text-[#66706D]">
+                    Clients{" "}
+                    <strong className="text-[#0A4F48] text-[12px]">73%</strong>
+                  </span>
+                </div>
               </div>
             </DashboardCard>
 
@@ -375,28 +417,33 @@ const Dashboard = () => {
                     maintainAspectRatio: false,
                   }}
                 />
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                {/* <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                   <span className="text-2xl font-bold text-[#0A4F48]">4.6</span>
                   <span className="text-xs text-[#66706D]">Avg Rating</span>
-                </div>
+                </div> */}
               </div>
               <div className="flex justify-between mt-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#0A4F48]"></div>
-                  <span className="text-[11px] text-[#66706D]">
-                    Response Time <strong>1.8 h</strong>
+                  <div className="w-2 h-2 rounded-xs bg-[#0A4F48]"></div>
+                  <span className="text-[12px] text-[#66706D]">
+                    Task Completion{" "}
+                    <strong className="text-[#0A4F48] text-[12px]">
+                      1.8 h
+                    </strong>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#45C4A2]"></div>
-                  <span className="text-[11px] text-[#66706D]">
-                    Rating <strong>4.6</strong>
+                  <div className="w-2 h-2 rounded-xs bg-[#EBF3F2]"></div>
+                  <span className="text-[12px] text-[#66706D]">
+                    Rating{" "}
+                    <strong className="text-[#0A4F48] text-[12px]">4.6</strong>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#FFD7A8]"></div>
-                  <span className="text-[11px] text-[#66706D]">
-                    Client Load <strong>73%</strong>
+                  <div className="w-2 h-2 rounded-xs bg-[#F4DBC7]"></div>
+                  <span className="text-[12px] text-[#66706D]">
+                    Clients Assigned{" "}
+                    <strong className="text-[#0A4F48] text-[12px]">73%</strong>
                   </span>
                 </div>
               </div>
@@ -488,7 +535,7 @@ const Dashboard = () => {
                 <span className="text-[10px] text-[#66706D] font-medium">
                   Total Experts
                 </span>
-                <span className="text-3xl font-bold text-[#0A4F48]">58</span>
+                <span className="text-3xl font-bold text-[#0A4F48]">54</span>
               </div>
             </div>
             <div className="flex flex-col gap-3 mt-4">
@@ -496,7 +543,6 @@ const Dashboard = () => {
                 { label: "Trainers", count: 22, color: "bg-[#0A4F48]" },
                 { label: "Dietitians", count: 18, color: "bg-[#45C4A2]" },
                 { label: "Therapists", count: 14, color: "bg-[#FFD7A8]" },
-                { label: "Support Staff", count: 4, color: "bg-[#D1D5DB]" },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -514,7 +560,7 @@ const Dashboard = () => {
           </div>
 
           {/* Recent Notifications */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col flex-1 overflow-hidden min-h-[500px]">
+          <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col flex-1 overflow-hidden ">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-bold text-[#0A4F48]">
                 Recent Notifications

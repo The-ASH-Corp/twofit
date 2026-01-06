@@ -33,7 +33,7 @@ const ExpertProfile = () => {
   return (
     <div className="flex justify-between w-full gap-4 h-[calc(100vh-120px)]">
       {/* left */}
-      <ExpertLeftSide expert = {expert}/>
+      {/* <ExpertLeftSide expert = {expert}/> */}
       {/* center */}
       <ExpertCenterSide />
       {/* right */}
