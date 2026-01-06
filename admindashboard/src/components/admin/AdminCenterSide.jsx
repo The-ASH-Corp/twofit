@@ -1,29 +1,51 @@
-import { assets } from '@/assets/asset';
-import React from 'react'
+import React from "react";
 
+const AdminCenterSide = ({ admin }) => {
+  const personalInfo = [
+    {
+      title: "Gender",
+      content: admin?.gender || "N/A",
+    },
+    {
+      title: "Age",
+      content: admin?.dob
+        ? `${new Date().getFullYear() - new Date(admin.dob).getFullYear()} y/o`
+        : "N/A",
+    },
+    {
+      title: "Email Address",
+      content: admin?.email || "N/A",
+    },
+    {
+      title: "Phone Number",
+      content: admin?.phone || "N/A",
+    },
+    {
+      title: "Address",
+      content: admin?.address || "N/A",
+    },
+  ];
 
-const AdminCenterSide = ({admin}) => {  
   return (
-    <div className="w-[50%] flex flex-col items-center gap-4 overflow-auto  no-scrollbar ">
-      {/* Programs */}
-      <div className="w-full flex flex-col gap-3 items-center bg-white rounded-lg p-4">
-        <div className="flex items-center justify-between w-full">
-          <h2 className="text-[#0A4F48] font-bold text-[16px]">
-            Personal Info
-          </h2>
-          <button>
-            <img src={assets.threeDotVector} alt="dot menu" className="w-3.5" />
-          </button>
+    <div className="w-[38%] flex flex-col gap-4">
+      <div className="bg-white rounded-2xl p-8 flex flex-col gap-8 shadow-sm ">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-[#0A4F48] font-bold text-lg">Personal Info</h2>
         </div>
-        <div className="w-full flex flex-col items-center gap-3">
-          {admin?.specialization.map((items, i) => (
+
+        {/* Details Table */}
+        <div className="flex flex-col w-full border-t border-gray-50">
+          {personalInfo.map((item, i) => (
             <div
               key={i}
-              className="w-full bg-[#F8F8F8] p-3 flex justify-between items-center rounded-md "
+              className="flex justify-between items-center py-5 border-b border-gray-50"
             >
-              <span className="text-[12px]">{items}</span>
-              <span className="text-[11px] text-[#66706D]">
-                {items.template}
+              <span className="text-[#66706D] text-sm font-medium">
+                {item.title}
+              </span>
+              <span className="text-sm font-bold text-gray-800 text-right max-w-[60%]">
+                {item.content}
               </span>
             </div>
           ))}
@@ -31,6 +53,6 @@ const AdminCenterSide = ({admin}) => {
       </div>
     </div>
   );
-}
+};
 
-export default AdminCenterSide
+export default AdminCenterSide;

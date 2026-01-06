@@ -9,13 +9,13 @@ export default function AppLayout() {
     document.title = "Head Dashboard | Twofit";
   }, []);
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen overflow-hidden bg-gray-50">
       <Sidebar />
 
-      <div className="flex-1 p-6  ">
+      <div className="flex-1 flex flex-col p-6 overflow-hidden ">
         <TopBar />
 
-         <div className="mt-6">
+         <div className="mt-6 flex-1 overflow-auto no-scrollbar">
           <Outlet/>
         </div>
       </div>

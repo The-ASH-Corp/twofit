@@ -10,6 +10,7 @@ import ChastList from "./ChastList";
 import ChatWindow from "./ChatWindow";
 import Templates from "./Templates";
 import CreateBroadcast from "./CreateBroadcast";
+import AutoReminders from "./AutoReminders";
 
 export default function Chats() {
   const [client, setChatClient] = useState(null);
@@ -96,7 +97,7 @@ export default function Chats() {
 
     socket.on("new_message", onNewMessage);
     return () => socket.off("new_message", onNewMessage);
-  }, [client, user._id]);
+  }, [client, user?._id]);
 
   const messageHandlers = () => {
     if (!message.trim() || !client) return;
@@ -132,7 +133,6 @@ export default function Chats() {
       {/* Left Sidebar */}
       <ChatSidebar
         clients={clients}
-        handleBroadcastChat={handleBroadcastChat}
         handleSideTabs={handleSideTabs}
         sideTab={sideTab}
       />
@@ -142,6 +142,8 @@ export default function Chats() {
         <Templates />
       ) : sideTab === "Create Broadcast" ? (
         <CreateBroadcast onCancel={() => handleSideTabs("Chats")} />
+      ) : sideTab === "Auto Reminders" ? (
+        <AutoReminders />
       ) : (
         <>
           {/* Center - Chat List */}

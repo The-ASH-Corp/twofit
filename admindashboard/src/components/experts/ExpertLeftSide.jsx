@@ -15,7 +15,7 @@ const profile = [
   },
   {
     title: "Working Hours",
-    content: `${expert?.workingHours[0]?.startTime} - ${expert?.workingHours[0]?.endTime}`,
+    content: `${expert?.workingHours?.[0]?.startTime} - ${expert?.workingHours?.[0]?.endTime}`,
   },
   {
     title: "Base Salary",
@@ -55,7 +55,7 @@ const profileInfo = [
   const roleAndSpecialization = [
     {
       title: "Role",
-      content: expert?.role.map((r) => r.charAt(0).toUpperCase() + r.slice(1)).join(", "),
+      content: expert?.role?.map((r) => r.charAt(0).toUpperCase() + r.slice(1)).join(", "),
     },
     {
       title: "Specialization",

@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 export default function AdminForm() {
   const [programs, setPrograms] = useState([]);
   const dispatch = useDispatch();
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
 
   const fields = [
     {
@@ -37,14 +37,14 @@ export default function AdminForm() {
         { name: "email", label: "Email Address", type: "email" },
         { name: "phone", label: "Phone Number", type: "text" },
         { name: "address", label: "Address", type: "text" },
+        { name: "password", label: "Password", type: "text" },
       ],
     },
 
     {
       section: "Role Assignment",
-      position: "left",
+      position: "right",
       fields: [
-        { name: "password", label: "Password", type: "text" },
         {
           name: "specialization",
           label: "Specialization",
@@ -55,16 +55,18 @@ export default function AdminForm() {
             { label: "fun", value: "fun" },
           ],
         },
+        { name: "experience", label: "Experience", type: "text" },
+        { name: "qualification", label: "Qualification", type: "text" },
       ],
     },
     {
       section: "Program Assignment",
-      position: "left",
+      position: "right",
       fields: [
         {
           name: "chooseProgram",
           label: "Choose Program",
-          type: "select",
+          type: "multiple",
           options: programs.map((program) => ({
             key: program._id,
             label: program.title,
@@ -125,10 +127,14 @@ export default function AdminForm() {
   }, []);
 
   const handleAdminCreation = async (values) => {
-    const selectedProgram = programs.find((program) => program.title == values.chooseProgram);
-    
+    const selectedProgram = programs.find(
+      (program) => program.title == values.chooseProgram
+    );
+
     try {
-      await dispatch(createAdmin({ ...values, chooseProgram: selectedProgram._id })).unwrap();
+      await dispatch(
+        createAdmin({ ...values, chooseProgram: selectedProgram._id })
+      ).unwrap();
       toast("Admin created successfully", { type: "success" });
       navigate("/head/admins");
     } catch (error) {

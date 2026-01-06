@@ -1,17 +1,13 @@
 import { MessageCircle, MessageSquare } from "lucide-react";
 import React, { useState } from "react";
 import { LuSend } from "react-icons/lu";
-import {
-  MdOutlineFindInPage,
-  MdOutlineKeyboardArrowDown,
-} from "react-icons/md";
+import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
-const ChatSidebar = ({
+export default function ChatSidebar({
   clients,
-  handleBroadcastChat,
   handleSideTabs,
   sideTab,
-}) => {
+})  {
   const [isBroadcastOpen, setIsBroadcastOpen] = useState(false);
 
   const handleBroadcastToggle = () => {
@@ -101,7 +97,7 @@ const ChatSidebar = ({
             <span className="text-sm font-medium">Auto Reminders</span>
           </div>
 
-          <div
+          {/* <div
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer ${
               sideTab === "Delivery Logs"
                 ? "bg-green-100/70"
@@ -111,11 +107,10 @@ const ChatSidebar = ({
           >
             <MdOutlineFindInPage size={18} />
             <span className="text-sm font-medium">Delivery Logs</span>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
   );
 };
 
-export default ChatSidebar;
