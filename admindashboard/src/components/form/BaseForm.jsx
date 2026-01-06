@@ -13,7 +13,7 @@ export default function BaseForm({
   initialValues,
   validationSchema,
   onSubmit,
-  submitLabel,
+  // submitLabel,
   heading,
 }) {
   return (
@@ -169,17 +169,21 @@ export default function BaseForm({
                 </div>
               ))}
           </div>
-          <hr className="col-span-2 w-full text-gray-300" />
-          <div className="col-span-2 flex justify-between items-center text-[12px] font-semibold  ">
-            <h2>Save as Draft</h2>
-            <div className="flex gap-2">
-              <button className="bg-[#EBF3F2]  rounded-md p-2  ">Cancel</button>
-              <button
-                className="bg-[#0A4F48] p-2 rounded-md text-white"
-                type="submit"
-              >
-                Save & Add {heading ?? "Client"}
-              </button>
+          <div className="w-full col-span-2 flex flex-col items-center gap-3">
+            <hr className="w-full text-gray-300" />
+            <div className="flex justify-end items-center text-[12px] font-semibold  w-full">
+              {/* <h2>Save as Draft</h2> */}
+              <div className="flex gap-2">
+                <button className="bg-[#EBF3F2]  rounded-md p-2  ">
+                  Cancel
+                </button>
+                <button
+                  className="bg-[#0A4F48] p-2 rounded-md text-white"
+                  type="submit"
+                >
+                  Save & Add {heading ?? "Client"}
+                </button>
+              </div>
             </div>
           </div>
         </Form>
