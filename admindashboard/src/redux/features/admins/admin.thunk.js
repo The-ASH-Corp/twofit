@@ -42,3 +42,17 @@ export const getAdminProfile = createAsyncThunk(
     }
   }
 );
+
+export const getAllCoachesByAdminId = createAsyncThunk(
+  "coach/getAllCoachesByAdminId",
+  async ({adminId,page,limit}, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(`/admin/get-all-coaches-by-admin/${adminId}/${page}/${limit}`);
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get coaches by admin id"
+      );
+    }
+  }
+);

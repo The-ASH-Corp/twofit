@@ -26,6 +26,7 @@ export default function BaseTable({
   handleLimitChange,
   page,
   limit,
+  totalCount,
 }) {
   const [rowSelection, setRowSelection] = useState({});
 
