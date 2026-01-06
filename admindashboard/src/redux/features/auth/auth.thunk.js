@@ -5,9 +5,9 @@ export const login = createAsyncThunk(
   "auth/login",
   async (credentials, { rejectWithValue }) => {
     try {
-      const data = await axiosInstance.post("/auth/login", credentials);    
+      const data = await axiosInstance.post("/auth/login", credentials);
       return data.data;
-     
+
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Login failed");
     }
@@ -18,7 +18,7 @@ export const createClient = createAsyncThunk(
   "auth/createClient",
   async (clientData, { rejectWithValue }) => {
     try {
-      const data = await axiosInstance.post("/admin/create-user", clientData);  
+      const data = await axiosInstance.post("/admin/create-user", clientData);
 
       return data;
     } catch (error) {
@@ -36,6 +36,18 @@ export const logout = createAsyncThunk(
       return true;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Logout failed");
+    }
+  }
+);
+
+export const refreshProfile = createAsyncThunk(
+  "auth/refreshProfile",
+  async (id, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(`/admin/admin-profile/${id}`);
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to refresh profile");
     }
   }
 );

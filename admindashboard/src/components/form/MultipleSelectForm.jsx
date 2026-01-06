@@ -28,14 +28,14 @@ const MultipleSelectForm = ({ label, name, options }) => {
                         >
                             {field.value && field.value.length > 0
                                 ? options
-                                      .filter(opt => field.value.includes(opt.value))
-                                      .map(opt => opt.label)
-                                      .join(", ")
+                                      ?.filter(opt => field.value.includes(opt.value))
+                                      ?.map(opt => opt.label)
+                                      ?.join(", ")
                                 : "Select..."}
                         </div>
                         {open && (
                             <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
-                                {options.map(opt => (
+                                {options?.map(opt => (
                                     <label
                                         key={opt.value}
                                         className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer"

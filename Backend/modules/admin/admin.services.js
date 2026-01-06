@@ -10,7 +10,7 @@ export const getAllAdmins = async (page, limit) => {
 
   const updated = admins.map((admin) => {
     const obj = admin.toObject();
-    
+
     obj.experts = admin.experts ? admin.experts.length : 0;
     return obj;
   });
@@ -48,4 +48,24 @@ export const addNewAdmin = async (adminData) => {
 export const getAdminById = async (id) => {
   const admin = await AdminModel.findById(id).select("-password");
   return admin;
+};
+
+
+export const getAllCoachesByAdmin = async ({ adminId, page, limit }) => {
+  const skip = (page - 1) * limit;
+  const admin = await AdminModel.findById(adminId).select("experts");
+  const totalCount = admin?.experts?.length || 0;
+
+  const populatedAdmin = await AdminModel.findById(adminId).populate({
+    path: "experts",
+    options: {
+      skip: skip,
+      limit: limit,
+    },
+  });
+
+  return {
+    coaches: populatedAdmin?.experts || [],
+    totalCount: totalCount,
+  };
 };

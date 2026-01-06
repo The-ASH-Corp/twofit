@@ -1,6 +1,6 @@
 // features/auth/auth.slice.js
 import { createSlice } from "@reduxjs/toolkit";
-import { createClient, login, logout } from "./auth.thunk";
+import { createClient, login, logout, refreshProfile } from "./auth.thunk";
 import { clearChat } from "../chat/chat.slice";
 import { clearClient } from "../client/client.slice";
 import { clearCoach } from "../coach/coach.slice";
@@ -51,6 +51,9 @@ const authSlice = createSlice({
         clearChat();
         clearClient()
         clearCoach();
+      })
+      .addCase(refreshProfile.fulfilled, (state, action) => {
+        state.user = action.payload;
       });
   },
 });

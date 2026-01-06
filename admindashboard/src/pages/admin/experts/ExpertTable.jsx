@@ -1,27 +1,37 @@
-import React, { useEffect, useState } from 'react'
-import BaseTable from '../../../components/table/BaseTable'
-import { ExpertColumns } from './ExpertColumns'
-import { useDispatch } from 'react-redux';
-import { getAllCoaches } from '@/redux/features/coach/coach.thunk';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import BaseTable from "../../../components/table/BaseTable";
+import { ExpertColumns } from "./ExpertColumns";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllCoaches } from "@/redux/features/coach/coach.thunk";
+import { useNavigate } from "react-router-dom";
+import { getAllCoachesByAdminId } from "@/redux/features/admins/admin.thunk";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 export default function ExpertTable() {
-
-  const [coaches,setCoaches]=useState([])
-   const [page, setPage] = useState(1);
-     const [limit, setLimit] = useState(10);
+  const user = useSelector(selectUser);
+  const [coaches, setCoaches] = useState([]);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [total, setTotal] = useState(0);
 
   const dispatch = useDispatch();
 
   const fetchCoachData = async () => {
-    const coaches = await dispatch(getAllCoaches({ page, limit })).unwrap();
-    const formattedCoaches = coaches.map(coach => ({
+    const response = await dispatch(
+      getAllCoachesByAdminId({ page, limit, adminId: user._id })
+    ).unwrap();
+    const coachesData = response;
+    const totalCount = response.length;
+
+    console.log(totalCount)
+    const formattedCoaches = coachesData?.map((coach) => ({
       ...coach,
-      clients: coach.assignedUsers.length
+      clients: coach.assignedUsers.length,
     }));
     setCoaches(formattedCoaches);
+    setTotal(totalCount);
   };
-  
+
   const handlePageChange = (newPage) => {
     setPage(newPage);
   };
@@ -29,15 +39,13 @@ export default function ExpertTable() {
   const handleLimitChange = (newLimit) => {
     setLimit(newLimit);
   };
-    const searchInpiutHandler = (e) => {
+  const searchInpiutHandler = (e) => {
     const value = e.target.value.toLowerCase();
     const filteredAdmins = coaches.filter((admin) => {
-      return (
-        admin.name.toLowerCase().includes(value)
-      )
-    })
-    setCoaches(filteredAdmins)
-    if (value == '') {
+      return admin.name.toLowerCase().includes(value);
+    });
+    setCoaches(filteredAdmins);
+    if (value == "") {
       fetchCoachData();
     }
   };
@@ -49,8 +57,8 @@ export default function ExpertTable() {
 
   useEffect(() => {
     fetchCoachData();
-  }, []);
-  
+  }, [page, limit]);
+
   return (
     <div>
       <BaseTable
@@ -60,11 +68,12 @@ export default function ExpertTable() {
         actionPath="/admin/experts/addexpert"
         profilePath={profilePath}
         pageLabel={"Experts"}
-         onSearchInputChange={searchInpiutHandler}
+        onSearchInputChange={searchInpiutHandler}
         handlePageChange={handlePageChange}
         handleLimitChange={handleLimitChange}
         page={page}
         limit={limit}
+        total={total}
       />
     </div>
   );

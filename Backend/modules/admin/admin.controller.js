@@ -2,8 +2,8 @@ import * as service from "./admin.services.js";
 
 export const getAllAdmins = async (req, res) => {
   try {
-    const {page,limit}=req.params
-    const admins = await service.getAllAdmins(page,limit);
+    const { page, limit } = req.params
+    const admins = await service.getAllAdmins(page, limit);
     res.status(201).json({
       success: true,
       data: admins,
@@ -14,12 +14,12 @@ export const getAllAdmins = async (req, res) => {
 };
 
 
-export const addAdmin =async (req,res)=>{
-  try {        
+export const addAdmin = async (req, res) => {
+  try {
     const admin = await service.addNewAdmin(req.body)
-    res.status(201).json({success:true,data:admin})
+    res.status(201).json({ success: true, data: admin })
   } catch (error) {
-    res.status(400).json({success:false,message:error.message})
+    res.status(400).json({ success: false, message: error.message })
   }
 }
 export const getAdminProfile = async (req, res) => {
@@ -34,3 +34,21 @@ export const getAdminProfile = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 }
+
+export const getAllCoachesByAdmin = async (req, res) => {
+  try {
+    const { adminId, page, limit } = req.params;
+    const result = await service.getAllCoachesByAdmin({
+      adminId,
+      page: parseInt(page),
+      limit: parseInt(limit)
+    });
+    res.status(200).json({
+      success: true,
+      data: result.coaches,
+      total: result.totalCount,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
