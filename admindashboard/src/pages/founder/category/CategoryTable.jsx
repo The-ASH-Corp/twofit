@@ -1,5 +1,4 @@
-import React from "react";
-import BaseTable from "../../components/table/BaseTable";
+import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import { useEffect } from "react";
@@ -10,19 +9,41 @@ import {
 } from "@/redux/features/category/category.selector";
 import { getAllCategories } from "@/redux/features/category/category.thunk";
 import { CategoryListColumns } from "./CategoryListColumns";
+import BaseTable from "@/components/table/BaseTable";
 
 export default function CategoryTable() {
-  const dispatch = useDispatch();
-
-  const categories = useAppSelector(selectAllCategories);
-  const status = useAppSelector(selectCategoryStatus);
-  const error = useAppSelector(selectCategoryError);
-
-  console.log("CATEGORIES 👉", categories, Array.isArray(categories));
+  const dispatch = useDispatch(); 
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   useEffect(() => {
-    dispatch(getAllCategories());
-  }, [dispatch]);
+    dispatch(getAllCategories({ page, limit }));
+  }, [dispatch, page, limit]);
+
+    const data = useAppSelector(selectAllCategories);
+    const status = useAppSelector(selectCategoryStatus);
+    const error = useAppSelector(selectCategoryError);
+
+    const [ categories, setCategories] = useState([]);
+
+    useEffect(()=>{
+      setCategories(data)
+    },[data])
+
+  const searchInputHandler = (e) => {
+    const value = e.target.value.toLowerCase();
+
+    if (!value) {
+      setCategories(data);
+      return;
+    }
+
+    const filtered = data.filter((categories) =>
+      categories.name?.toLowerCase().includes(value)
+    );
+
+    setCategories(filtered);
+  };
 
   if (status === "loading") return <p>Loading categories...</p>;
   if (error) return <p>{error}</p>;
@@ -34,6 +55,11 @@ export default function CategoryTable() {
         pageLabel={"Category List"}
         actionLabel="Add Category"
         actionPath="/add-category"
+        onSearchInputChange={searchInputHandler}
+        handlePageChange={setPage}
+        handleLimitChange={setLimit}
+        page={page}
+        limit={limit}
       />
     </div>
   );

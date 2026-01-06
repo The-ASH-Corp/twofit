@@ -4,7 +4,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      dashhhh
+     head Dashboard
     </div>
   )
 }

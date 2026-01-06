@@ -1,0 +1,32 @@
+import { ErrorMessage, Field } from "formik";
+import React from "react";
+
+const FormSelect = ({ label, name, options }) => {
+  return (
+    <div className="flex flex-col w-full">
+      <label className="font-medium">{label}</label>
+
+      <Field
+        as="select"
+        name={name}
+        className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#0A4F48]"
+      >
+        <option value="">Select {label}</option>
+
+        {options?.map((opt) => (
+          <option key={opt.value??opt._id} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </Field>
+
+      <ErrorMessage
+        name={name}
+        component="p"
+        className="text-red-500 text-sm mt-1"
+      />
+    </div>
+  );
+};
+
+export default FormSelect;

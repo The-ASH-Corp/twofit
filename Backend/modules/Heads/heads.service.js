@@ -20,6 +20,12 @@ export const createHead = async (head) => {
     email: head.email,
     phone: head.phone,
     password: hashedPassword,
+    address: head.address,
+    specialization: head.specialization,
+    experience: head.experience,
+    qualification: head.qualification,
+    programCategory: head.programCategory,
+    salary: head.salary,
   });
 };
 

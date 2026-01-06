@@ -1,3 +1,4 @@
+
 import { createSlice } from "@reduxjs/toolkit";
 import { createCoach, getAllCoaches, getSingleCoach } from "./coach.thunk";
 

@@ -14,12 +14,14 @@ export const createTherapy = createAsyncThunk(
 
 export const getAllTherapies = createAsyncThunk(
   "therapy/get-all-therapy",
-  async(_,{ rejectWithValue }) => {
+  async ({ page, limit }, { rejectWithValue }) => {
     try {
-      const data = await axiosInstance.get("/therapy/get-all-therapy");
+      const data = await axiosInstance.get(`/therapy/get-all-therapy/${page}/${limit}`);
       return data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to fetch therapies");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch therapies"
+      );
     }
   }
 );    

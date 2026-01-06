@@ -8,8 +8,9 @@ import { useNavigate } from 'react-router-dom';
 export default function ExpertTable() {
 
   const [coaches,setCoaches]=useState([])
-  const page =1
-  const limit =10
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+  
   const dispatch = useDispatch();
   const fetchCoachData=async()=>{
     const coache =await dispatch(getAllCoaches({page,limit})).unwrap()
@@ -17,9 +18,29 @@ export default function ExpertTable() {
     setCoaches([{...coache[0],clients}])
   }
 
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+  };
+  const searchInpiutHandler = (e) => {
+    const value = e.target.value.toLowerCase();
+    const filteredAdmins = coaches.filter((admin) => {
+      return (
+        admin.name.toLowerCase().includes(value)
+      )
+    })
+    setCoaches(filteredAdmins)
+    if (value == '') {
+      fetchCoachData();
+    }
+  };
+
   const navigate = useNavigate();
   const profilePath = (id) => {
-    navigate(`/experts/profile/${id}`);
+    navigate(`/head/experts/profile/${id}`);
   };
 
   useEffect(() => {
@@ -31,10 +52,13 @@ export default function ExpertTable() {
       <BaseTable
         columns={ExpertColumns}
         data={coaches}
-        actionLabel="Add Expert"
-        actionPath="/addexpert"
         profilePath={profilePath}
         pageLabel={"Experts"}
+        onSearchInputChange={searchInpiutHandler}
+        handlePageChange={handlePageChange}
+        handleLimitChange={handleLimitChange}
+        page={page}
+        limit={limit}
       />
     </div>
   );

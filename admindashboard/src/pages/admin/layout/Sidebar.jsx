@@ -11,7 +11,7 @@ const menuItems = [
   },
   { label: "Experts", icon: assets.experts, path: "/admin/experts" },
   { label: "Clients", icon: assets.clients, path: "/admin/clients" },
-  { label: "Finance", icon: assets.finance, path: "/admin/finance" },
+  // { label: "Finance", icon: assets.finance, path: "/admin/finance" },
   { label: "Chats", icon: assets.chats, path: "/admin/chats" },
   
 ];
@@ -37,6 +37,7 @@ export default function Sidebar() {
           <NavLink
             to={item.path}
             key={item.label}
+            end={item.path === "/admin"}
             className={({ isActive }) =>
               `flex items-center text-[#66706D] gap-3 w-full px-4 py-3 text-sm font-medium rounded-xl transition
     ${isActive ? "bg-[#0A4F48] text-white" : "text-gray-600 hover:bg-gray-100"}

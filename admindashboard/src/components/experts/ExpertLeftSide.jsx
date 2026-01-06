@@ -1,60 +1,61 @@
 import { assets } from '@/assets/asset';
 import React from 'react'
 
+const ExpertLeftSide = ({ expert }) => {
+  console.log("expert left side:", expert);
+
 const profile = [
   {
     title: "Joined Date",
-    content: "14 Feb 2023",
+    content: expert?.createdAt?.split("T")[0],
   },
   {
     title: "Working Days",
-    content: "Mon - Fri",
+    content: expert?.workingDays?.map((day) => day.charAt(0).toUpperCase() + day.slice(1)).join(", "),
   },
   {
     title: "Working Hours",
-    content: "9 - 6",
+    content: `${expert?.workingHours[0]?.startTime} - ${expert?.workingHours[0]?.endTime}`,
   },
   {
     title: "Base Salary",
-    content: "₹34,200/m",
+    content: `₹${expert?.salary}/m`,
   },
 ];
+
 
 const profileInfo = [
   {
     img: assets.GenderVector,
     title: "Gender",
-    data: "Female",
+    data: expert?.gender,
   },
   {
     img: assets.AgeVector,
     title: "Age",
-    data: "32 y/o",
+    data: new Date().getFullYear() - new Date(expert?.dob).getFullYear(),
   },
   {
     img: assets.EmailVector,
     title: "Email Address",
-    data: "Aarav@gmail.com",
+    data: expert?.email,
   },
   {
     img: assets.PhoneVector,
     title: "Phone Number",
-    data: "+62 811 5567 2345",
+    data: expert?.phone,
   },
   {
     img: assets.HomeVector,
     title: "Address",
-    data: "221B Baker Street, London, United Kingdom",
+    data: expert?.address,
   },
 ];
 
-
-
-const ExpertLeftSide = ({ expert }) => {
   const roleAndSpecialization = [
     {
       title: "Role",
-      content: "Dietitian",
+      content: expert?.role.map((r) => r.charAt(0).toUpperCase() + r.slice(1)).join(", "),
     },
     {
       title: "Specialization",
@@ -62,15 +63,15 @@ const ExpertLeftSide = ({ expert }) => {
     },
     {
       title: "Experience",
-      content: "7 Years",
+      content: expert?.experience,
     },
     {
       title: "Certifications",
-      content: "M.Sc. Clinical Nutrition",
+      content: expert?.qualification,
     },
     {
       title: "Languages",
-      content: "English, Hindi, Malayalam",
+      content: expert?.languages.map((lang) => lang.charAt(0).toUpperCase() + lang.slice(1)).join(", "),
     },
   ];
   return (
@@ -86,14 +87,14 @@ const ExpertLeftSide = ({ expert }) => {
           <h2 className="font-bold text-[16px] ">{expert?.name}</h2>
           <div className="flex items-center justify-between gap-2 text-[11px]">
             <span className="px-2 py-0.5 bg-[#F0F0F0] rounded-full">
-              Dietitian
+              {expert?.role[0].charAt(0).toUpperCase() + expert?.role[0].slice(1)}
             </span>
             <span className="px-2 py-0.5 bg-[#F0F0F0] rounded-full flex items-center gap-0.5">
               <img src={assets.star} alt="star" />
-              4.7
+              {expert?.rating || "0"}
             </span>
             <span className="px-2 py-0.5 bg-[#45C4A2] rounded-full text-white">
-              Active
+              {expert?.status}
             </span>
           </div>
         </div>

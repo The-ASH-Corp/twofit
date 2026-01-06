@@ -3,10 +3,10 @@ export const validate=(schema)=> {
     try {
       req.body = schema.parse(req.body);
       next();
-    } catch (err) {
+    } catch (err) {            
       return res.status(400).json({
-        message: "Validation Failed Check all data",
-        errors: err.errors,
+        message: err.message ?? "Validation Failed Check all data",
+        errors: err.issues,
       });
     }
   };

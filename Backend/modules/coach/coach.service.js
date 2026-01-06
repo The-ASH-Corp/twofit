@@ -1,24 +1,59 @@
 import { generatePassword, hashPassword } from "../../utils/password.js";
+import { AdminModel } from "../admin/admin.model.js";
 import { CoachModel } from "./coach.model.js";
 
 export const createCoach = async (coach) => {
+  // Parse JSON stringified fields from FormData
+  const fieldsToParseAsJSON = [
+    "workingHours",
+    "breakSlots",
+    "workingdays",
+    "role",
+    "specialization",
+    "languages",
+  ];
+  const booleanFields = [
+    "ratingIncentive",
+    "responseTimeIncentive",
+    "complianceIncentive",
+    "autoSendWelcome",
+    "autoSendGuide",
+    "automatedReminder",
+  ];
 
+  // Parse JSON strings
+  fieldsToParseAsJSON.forEach((field) => {
+    if (coach[field] && typeof coach[field] === "string") {
+      try {
+        coach[field] = JSON.parse(coach[field]);
+      } catch (e) {
+        console.error(`Failed to parse ${field}:`, e);
+      }
+    }
+  });
+
+  // Convert boolean strings to actual booleans
+  booleanFields.forEach((field) => {
+    if (coach[field] !== undefined) {
+      coach[field] = coach[field] === "true" || coach[field] === true;
+    }
+  });
   
-  const password = () => {
-    if (coach.password) {
-      return hashPassword(coach.password);
+  const password = async (CoachPassword) => {
+    if (CoachPassword) {
+      return await hashPassword(CoachPassword);
     } else {
       const newPassword = generatePassword();
       console.log("Generated Password for Coach:", newPassword);
-      return hashPassword(newPassword);
+      return await hashPassword(newPassword);
     }
-  }
+  };
 
-  return await CoachModel.create({
+  const coachCreated = await CoachModel.create({
     name: coach.fullname,
     dob: coach.dob,
     gender: coach.gender,
-    password: password(),
+    password: await password(coach.password),
     ratingIncentive: coach.ratingIncentive,
     responseTimeIncentive: coach.responseTimeIncentive,
     complianceIncentive: coach.complianceIncentive,
@@ -42,21 +77,29 @@ export const createCoach = async (coach) => {
     maxDailyConsults: coach.dailyConsults,
     responseTime: coach.responseTime,
     salary: coach.baseSalary,
+    status: "Active",
   });
+
+  await AdminModel.findByIdAndUpdate(
+    coach.adminId,
+    { $addToSet: { experts: coachCreated._id } },
+    { new: true }
+  );
+
+  return coachCreated;
 };
 
 export const getAllCoach = async (page, limit) => {
   const skip = (page - 1) * limit;
 
-  return await CoachModel.find()
-    .skip(skip)
-    .limit(limit)
+  return await CoachModel.find().skip(skip).limit(limit);
 };
 
 export const getCoachById = async (coachId) => {
   return await CoachModel.findById(coachId)
-    .select("_id name specialization experience bio image")
-    .populate("assignedUsers", "name _id");
+    .select("-password")
+    .populate("assignedUsers", "name _id email")
+    .populate("assignedPrograms");
 };
 
 export const updateCoachById = async (coachId, updatedData) => {
@@ -80,3 +123,13 @@ export const getUsersAssignedToACoach = async (coachId) => {
     .select("assignedUsers")
     .populate("assignedUsers", "name _id email");
 };
+
+
+export const getCoachesByAdmin = async ({adminIds}) => {
+  let coaches = adminIds.map((adminId) =>
+    CoachModel.findOne( {_id: adminId} )
+      .select("-password")
+      .populate("assignedPrograms")
+  );
+  return await Promise.all(coaches);
+}

@@ -4,51 +4,66 @@ import User from "./auth.model.js";
 import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.js";
 import redisClient from "../../redis/redisClient.js";
 import { generatePassword } from "../../utils/password.js";
-// import { sendEmail } from "../utils/email.js";
+import { AdminModel } from "../../modules/admin/admin.model.js";
+import { HeadsModel } from "../Heads/heads.modal.js";
+import { CoachModel } from "../coach/coach.model.js";
 
 export const adminCreateUser = async (userData) => {
-  const exists = await User.findOne({email:userData.email});
+  const exists = await User.findOne({ email: userData.email });
   if (exists) throw new Error("Email already exists");
-
-  const password = generatePassword()
-
+console.log("Creating user with data:", userData);
+  const password = generatePassword();
+  console.log("Generated Password for User:", password);
   const hashed = await bcrypt.hash(password, 10);
 
   const user = await User.create({
-    name: userData.name,
+    name: userData.fullname,
     email: userData.email,
     password: hashed,
-    role:"user",
-    status: "active",
+    role: "user",
+    status: "Active",
     dob: userData.dob,
     gender: userData.gender,
     phone: userData.phone,
     address: userData.address,
     currentWeight: userData.currentWeight,
     targetWeight: userData.targetWeight,
-    medicalConditions: userData.medicalConditions,
-    allergies: userData.allergies,
+    medicalConditions: userData.medicalconditions,
+    allergies: userData.allergy,
     goals: userData.goals,
-    foodPreferances: userData.foodPreferances,
+    foodPreferences: userData.foodPreference,
     profileImage: userData?.profileImage || "",
     programType: userData.programType,
     duration: userData.duration,
-    programEndDate: new Date(userData.programEndDate),
-    programStartDate: new Date(userData.programStartDate),
-    dietition: userData.dietition,
+    programEndDate: userData.endDate,
+    programStartDate: userData.startDate,
+    dietition: userData.dietician,
     trainer: userData.trainer,
     therapist: userData.therapist,
+    autoSendGuide: userData.autoSendGuide || false,
+    automatedReminder: userData.automatedReminder || false,
+    autoSendWelcome: userData.autoSendWelcome || false,
   });
+  const coaches = [userData.dietician, userData.trainer, userData.therapist];
+
+  await CoachModel.updateMany(
+    { _id: { $in: coaches } },
+    { $addToSet: { assignedUsers: user._id } },
+    { new: true }
+  );
 
   return user;
 };
 
 export const loginUser = async ({ email, password }) => {
-  const user = await User.findOne({ email }).select("+password");
+  const user =
+    (await User.findOne({ email }).select("+password")) ||
+    (await AdminModel.findOne({ email }).select("+password")) ||
+    (await HeadsModel.findOne({ email }).select("+password"));
 
   if (!user) throw new Error("Invalid credentials");
 
-  if (user.status !== "active")
+  if (user.status !== "Active")
     throw new Error("Your account is inactive. Contact admin.");
 
   const match = await bcrypt.compare(password, user.password);

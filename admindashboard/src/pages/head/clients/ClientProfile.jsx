@@ -19,12 +19,11 @@ const ClientProfile = () => {
   const status = useSelector(selectClientStatus);
   const error = useSelector(selectClientError);
 
-  useEffect(() => {
+  useEffect(() => {        
     if (clientId) {
       dispatch(getClient({ id: clientId }));
-      // console.log(client)
-    }
-  }, [clientId, dispatch]);
+    }    
+  }, []);
 
   if (status === "loading") return <p>Loading...</p>;
   if (error) return <p className="text-red-500">{error}</p>;

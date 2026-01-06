@@ -1,9 +1,25 @@
 import BaseForm from "@/components/form/BaseForm";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { createCoach } from "@/redux/features/coach/coach.thunk";
-import React from "react";
-import { useDispatch } from "react-redux";
+import { selectProgramById } from "@/redux/features/program/program.selector";
+import { getProgramById } from "@/redux/features/program/program.thunk";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function ExpertForm() {
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const program = useSelector(selectProgramById);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user?.program) {
+      dispatch(getProgramById(user.program));
+    }
+  }, [user?.program, dispatch]);
+
   const fields = [
     {
       section: "Personal Information",
@@ -30,6 +46,7 @@ export default function ExpertForm() {
         { name: "email", label: "Email Address", type: "email" },
         { name: "phone", label: "Phone Number", type: "text" },
         { name: "address", label: "Address", type: "text" },
+        { name: "password", label: "Password", type: "text" },
       ],
     },
 
@@ -37,19 +54,58 @@ export default function ExpertForm() {
       section: "Role Assignment",
       position: "left",
       fields: [
-        { name: "role", label: "Choose Role", type: "text" },
-        { name: "specialization", label: "Specialization", type: "text" },
+        {
+          name: "role",
+          label: "Choose Role",
+          type: "multiple",
+          options: [
+            { label: "Nutritionist", value: "nutritionist" },
+            { label: "Fitness Expert", value: "fitness_expert" },
+            { label: "Therapist", value: "therapist" },
+          ],
+        },
+        {
+          name: "specialization",
+          label: "Specialization",
+          type: "multiple",
+          options: user?.specialization.map((spec) => ({
+            label: spec,
+            value: spec,
+          })),
+        },
         { name: "experience", label: "Experience", type: "text" },
         { name: "qualification", label: "Qualification", type: "text" },
-        { name: "certifications", label: "Certifications", type: "text" },
-        { name: "languages", label: "Languages", type: "text" },
+        {
+          name: "certifications",
+          label: "Certifications",
+          type: "file",
+          accept: ".pdf,.jpg,.jpeg,.png",
+        },
+        {
+          name: "languages",
+          label: "Languages",
+          type: "multiple",
+          options: [
+            { label: "English", value: "english" },
+            { label: "Malayalam", value: "malayalam" },
+            { label: "Tamil", value: "tamil" },
+            { label: "Hindi", value: "hindi" },
+          ],
+        },
       ],
     },
     {
       section: "Program Assignment",
       position: "left",
       fields: [
-        { name: "chooseProgram", label: "Choose Program", type: "text" },
+        {
+          name: "chooseProgram",
+          label: "Choose Program",
+          type: "select",
+          options: program
+            ? [{ label: program.name || program.title, value: program._id }]
+            : [],
+        },
       ],
     },
     {
@@ -57,19 +113,32 @@ export default function ExpertForm() {
       position: "right",
       fields: [
         { name: "clientLimit", label: "Max Client Limit", type: "text" },
-        { name: "assignedClients", label: "Current Assigned", type: "text" },
         {
           name: "workingdays",
           label: "Working Days",
-          type: "radio",
+          type: "checkbox-group",
           options: [
-            { label: "Mon-Wed-Fri", value: "mwf" },
-            { label: "Tue-Thu-Sat", value: "tts" },
-            { label: "Mon-Fri", value: "mf" },
+            { label: "Monday", value: "monday" },
+            { label: "Tuesday", value: "tuesday" },
+            { label: "Wednesday", value: "wednesday" },
+            { label: "Thursday", value: "thursday" },
+            { label: "Friday", value: "friday" },
+            { label: "Saturday", value: "saturday" },
+            { label: "Sunday", value: "sunday" },
           ],
         },
-        { name: "workingHours", label: "Working Hours", type: "text" },
-        { name: "breakSlots", label: "Break Slots", type: "text" },
+        {
+          type: "time-range",
+          label: "Working Hours",
+          startName: "workingHours.startTime",
+          endName: "workingHours.endTime",
+        },
+        {
+          type: "time-range",
+          label: "Break Slots",
+          startName: "breakSlots.startTime",
+          endName: "breakSlots.endTime",
+        },
         { name: "dailyConsults", label: "Max Daily Consults", type: "text" },
         { name: "responseTime", label: "Response Time", type: "text" },
       ],
@@ -123,28 +192,74 @@ export default function ExpertForm() {
   const initialValues = {
     fullname: "",
     dob: "",
-    gender: "", //need to add
+    gender: "",
+    workingdays: [],
+    workingHours: {
+      startTime: "",
+      endTime: "",
+    },
+    breakSlots: {
+      startTime: "",
+      endTime: "",
+    },
     ratingIncentive: false,
     responseTimeIncentive: false,
     complianceIncentive: false,
-
-    // Account Setup
     autoSendWelcome: false,
     autoSendGuide: false,
     automatedReminder: false,
+    chooseProgram: user?.program || "",
+    certifications: null,
   };
 
-  const dispatch = useDispatch()
+  const handleCoachCreation = async (values) => {
+    try {
+      const formData = new FormData();
 
-  const handleCoachCreation =async(values)=>{
-    const coach = await dispatch(createCoach(values))    
-  }
+      // Append all form values to FormData
+      Object.keys(values).forEach((key) => {
+        if (key === "certifications" && values[key] instanceof File) {
+          // For file inputs, append the file directly
+          formData.append(key, values[key]);
+        } else if (key === "workingHours" || key === "breakSlots") {
+          // For nested objects, stringify them
+          formData.append(key, JSON.stringify(values[key]));
+        } else if (Array.isArray(values[key])) {
+          // For arrays, stringify
+          formData.append(key, JSON.stringify(values[key]));
+        } else if (typeof values[key] === "boolean") {
+          // For booleans, convert to string explicitly
+          formData.append(key, values[key].toString());
+        } else if (
+          values[key] !== null &&
+          values[key] !== undefined &&
+          values[key] !== ""
+        ) {
+          // For other values
+          formData.append(key, values[key]);
+        }
+      });
+
+      const updatedValues = { ...formData, adminId: user._id };
+      const coach = await dispatch(createCoach(updatedValues));
+      
+      if (coach.meta.requestStatus === "fulfilled") {
+        toast("Coach created successfully", { type: "success" });
+        navigate(-1);
+      } else {
+        toast("Failed to create coach", { type: "error" });
+      }
+    } catch (err) {
+      toast("Failed to create coach", { type: "error" });
+    }
+  };
 
   return (
     <BaseForm
       fields={fields}
       initialValues={initialValues}
       onSubmit={(values) => handleCoachCreation(values)}
+      heading="Expert"
     ></BaseForm>
   );
 }

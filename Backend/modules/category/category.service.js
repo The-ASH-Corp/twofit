@@ -19,13 +19,14 @@ export const createCategory= async (data)=>{
   }
 }
 
-export const getAllCategory=async()=>{
-     try {
-    return await categoryModel.find().sort({ createdAt: -1 });
+export const getAllCategory = async (page, limit) => {
+  try {
+    const skip = (page - 1) * limit;
+    return await categoryModel.find().skip(skip).limit(limit)
   } catch (error) {
     throw error;
   }
- }
+};
 
 export const getSingleCategory=async(id)=>{
    try {
