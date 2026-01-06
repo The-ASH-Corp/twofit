@@ -96,7 +96,7 @@ export default function Chats() {
 
     socket.on("new_message", onNewMessage);
     return () => socket.off("new_message", onNewMessage);
-  }, [client, user._id]);
+  }, [client, user?._id]);
 
   const messageHandlers = () => {
     if (!message.trim() || !client) return;
