@@ -30,7 +30,7 @@ export default function DailyPlan() {
 
   return (
     <div className="bg-white rounded-xl p-6 shadow">
-      {/* HEADER */}
+    
       <div className="flex justify-between items-center mb-4">
         <h2 className="font-semibold text-lg">January 2026</h2>
 
@@ -45,15 +45,13 @@ export default function DailyPlan() {
         </div>
       </div>
 
-      {/* DAYS HEADER */}
-      <div className="grid grid-cols-7 text-sm text-gray-500 mb-2">
+       <div className="grid grid-cols-7 text-sm text-gray-500 mb-2">
         {days.map((d) => (
           <div key={d} className="text-center">{d}</div>
         ))}
       </div>
 
-      {/* CALENDAR GRID */}
-      <div className="grid grid-cols-7 border rounded overflow-hidden">
+       <div className="grid grid-cols-7   overflow-hidden">
         {dates.map((date, index) => {
           const fullDate = date
             ? `2025-01-${String(date).padStart(2, "0")}`
@@ -62,7 +60,7 @@ export default function DailyPlan() {
           return (
             <div
               key={index}
-              className="h-32 border p-2 text-sm relative"
+              className="h-32 border border-gray-200  p-2 text-sm relative"
             >
               {date && (
                 <>

@@ -1,10 +1,14 @@
 import { assets } from "@/assets/asset";
 import KpiCard from "@/components/cards/KpiCard";
-import React from "react";
+import React, { useState } from "react";
 import ProgressChart from "../components/ProgressChart";
 import WeightChart from "../components/Measeurement";
+import WeightUpdate from "./WeightUpdate";
+import MeasurementUpdate from "./MeasurementUpdate";
 
 export default function Progress() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [panelType, setPanelType] = useState(null);
   const compliance = [
     {
       title: "Diet",
@@ -65,7 +69,13 @@ export default function Progress() {
             <div className="flex-1 bg-white rounded-2xl p-4 space-y-4 h-full">
               <div className="flex justify-between">
                 <p className="text-[#0A4F48] font-700">Weight Progress</p>
-                <button className="bg-[#0A4F48] text-white px-2 py-1 rounded-md">
+                <button
+                  className="bg-[#0A4F48] text-white px-2 py-1 rounded-md"
+                  onClick={() => {
+                    setIsOpen(true);
+                    setPanelType("weight");
+                  }}
+                >
                   Update
                 </button>
               </div>
@@ -76,7 +86,13 @@ export default function Progress() {
             <div className="flex-1 bg-white rounded-xl p-4 h-full ">
               <div className="flex justify-between">
                 <p className="text-[#0A4F48] font-700">Measurements</p>
-                <button className="bg-[#0A4F48] text-white px-2 py-1 rounded-md">
+                <button
+                  className="bg-[#0A4F48] text-white px-2 py-1 rounded-md"
+                  onClick={() => {
+                    setIsOpen(true);
+                    setPanelType("measurement");
+                  }}
+                >
                   Update
                 </button>
               </div>
@@ -134,6 +150,32 @@ export default function Progress() {
           </div>
         </div>
       </div>
+
+      {isOpen && (
+  <div className="fixed top-5 right-5 bottom-5 rounded-2xl w-[350px] bg-white shadow-xl p-4 z-50 flex flex-col">
+    
+    <div className="flex justify-between items-center mb-6">
+      <h2 className="text-[#0A4F48] font-bold text-[16px]">
+        {panelType === "weight" ? "Update Weight" : "Update Measurements"}
+      </h2>
+
+      <button
+        className="text-[#0A4F48] font-bold"
+        onClick={() => setIsOpen(false)}
+      >
+        ✕
+      </button>
+    </div>
+
+    {/* CONTENT AREA */}
+    <div className="flex-1 overflow-y-auto">
+      {panelType === "weight" && <WeightUpdate />}
+      {panelType === "measurement" && <MeasurementUpdate />}
+    </div>
+
+  </div>
+)}
+
     </>
   );
 }
