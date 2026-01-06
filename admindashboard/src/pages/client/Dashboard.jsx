@@ -3,6 +3,7 @@ import React from "react";
 import ProgressChart from "./components/ProgressChart";
 import { assets } from "@/assets/asset";
 import KpiCard from "@/components/cards/KpiCard";
+import TaskList from "./components/TaskList";
 
 export default function Dashboard() {
   return (
@@ -48,7 +49,12 @@ export default function Dashboard() {
             <ProgressChart />
           </div>
         </div>
+        <div>
+        <h1 className="text-[#0A4F48]  text-[16px] font-bold">My Tasks</h1>
+        <TaskList/>
       </div>
+      </div>
+      
       <div className="bg-white"></div>
     </div>
   );
