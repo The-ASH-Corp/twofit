@@ -63,6 +63,9 @@ import ExpertChats from "./pages/expert/chats/Chats";
 // Client Pages Import
 import ClientLayout from './pages/client/layout/ClientLayout'
 import ClientDashboard from './pages/client/Dashboard'
+import ClientFeedback from "./pages/client/feedback/Feedback";
+import ClientProgress from "./pages/client/progress/Progress";
+import DailyPlan from "./pages/client/dailyPlan/DailyPlan";
 
 function App() {
   return (
@@ -73,9 +76,12 @@ function App() {
           path="/login"
           element={
             <PublicRoutes>
+               {" "}
+              <Login />
               {" "}
-              <Login />{" "}
-            </PublicRoutes>
+           </PublicRoutes>
+           
+               
           }
         />
 
@@ -173,6 +179,9 @@ function App() {
         </Route>
 
         {/* CLIENT */}
+       
+
+
         <Route
           path="/client"
           element={
@@ -182,6 +191,9 @@ function App() {
           }
         >
           <Route index element={<ClientDashboard />} />
+          <Route path="feedback" element={<ClientFeedback />} />
+          <Route path="progress" element={<ClientProgress />} />
+          <Route path="daily-plan" element={<DailyPlan/>} />
         </Route>
 
         <Route path="/*" element={<Unauthorized />} />
