@@ -66,7 +66,7 @@ const TherapyTable = () => {
     };
 
 
-  console.log(heads)
+  // console.log(heads)
 
   if (status === "loading") return <p>Loading...</p>;
   // if (error) return <p className="text-red-500">{error?.error}</p>;

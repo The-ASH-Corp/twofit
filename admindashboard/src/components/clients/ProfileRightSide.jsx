@@ -80,19 +80,17 @@ const ProfileRightSide = ({ client }) => {
               Missed Tasks
             </h3>
             <button onClick={() => setTaskOpen(!taskOpen)}>
-              {!taskOpen ? (
-                <img src={assets.upVector} alt="down vector" className="w-3" />
-              ) : (
-                <img
-                  src={assets.downVector}
-                  alt="down vector"
-                  className="w-3"
-                />
-              )}
+              <img
+                src={assets.downVector}
+                alt="down vector"
+                className={`w-3 transition-transform duration-400 ${
+                  !taskOpen ? "rotate-180" : ""
+                }`}
+              />
             </button>
           </div>
           <div
-            className={`flex flex-col items-center gap-4 w-full overflow-hidden transition-all duration-700 ease-in-out ${
+            className={`flex flex-col items-center gap-4 w-full overflow-hidden transition-all duration-400 ease-in-out ${
               taskOpen ? "max-h-[5000px] opacity-100" : "max-h-0 opacity-0"
             }`}
           >
