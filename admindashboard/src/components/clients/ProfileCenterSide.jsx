@@ -95,7 +95,7 @@ const ProfileCenterSide = ({ client }) => {
   ];
 
   return (
-    <div className="w-[50%] flex flex-col items-center gap-4 overflow-auto  no-scrollbar">
+    <div className="w-[50%] flex flex-col items-center gap-4 overflow-y-auto  no-scrollbar">
       {/* Health Details */}
       <div className="p-4 flex flex-col items-center gap-4 w-full bg-white rounded-lg">
         <div className="w-full flex justify-between items-center">

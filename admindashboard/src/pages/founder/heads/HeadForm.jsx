@@ -18,7 +18,7 @@ const TherapyForm = () => {
           {
             name: "dob",
             label: "Date Of Birth",
-            type: "text",
+            type: "date",
           },
           {
             name: "gender",
@@ -95,6 +95,17 @@ const TherapyForm = () => {
           },
         ],
       },
+      {
+        section: "Password",
+        position: "right",
+        fields: [
+          {
+            name: "password",
+            label: "Create password",
+            type: "dropdown",
+          },
+        ],
+      },
     ];
     const initialValues = {
       name: "",
@@ -112,10 +123,14 @@ const TherapyForm = () => {
 
   return (
     <div>
-            <BaseForm fields={fields} initialValues={initialValues} onSubmit={(value)=> handelSubmit(value)}/>
-          
-        </div>
-  )
+      <BaseForm
+        fields={fields}
+        initialValues={initialValues}
+        heading = {"Head"}
+        onSubmit={(value) => handelSubmit(value)}
+      />
+    </div>
+  );
 }
 
 export default TherapyForm
