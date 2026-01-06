@@ -72,15 +72,12 @@ function App() {
         <Route
           path="/login"
           element={
-            // <PublicRoutes>
-            //    {" "}
-              <Login />
-            //    {" "}
-            // </PublicRoutes>
             <PublicRoutes>
+               {" "}
+              <Login />
               {" "}
-              <Login />{" "}
-            </PublicRoutes>
+           </PublicRoutes>
+           
           }
         />
 
