@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import User from "../modules/auth/auth.model.js";
 import { refreshAccessToken } from "../utils/jwt.js";
+import { AdminModel } from "../modules/admin/admin.model.js";
+import { HeadsModel } from "../modules/Heads/heads.modal.js";
 
 export const authMiddleware = async (req, res, next) => {
   try {
@@ -12,7 +14,10 @@ export const authMiddleware = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    const user = await User.findById(decoded.id).select("-password");
+    let user =
+        (await User.findById(decoded.id).select("-password") ||
+        (await AdminModel.findById(decoded.id).select("-password") ||
+        (await HeadsModel.findById(decoded.id).select("-password"))));
 
     if (!user) return res.status(401).json({ message: "User not found" });
 

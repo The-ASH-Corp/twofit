@@ -3,12 +3,20 @@ import User from "../auth/auth.model.js";
 export const getAllClient = async (page, limit) => {
   const skip = (page - 1) * limit;
 
-  const clients = await User.find({role:"user"}).skip(skip).limit(limit).select("-password");
+  const clients = await User.find({ role: "user" })
+    .skip(skip)
+    .limit(limit)
+    .select("-password");
   return clients;
 };
 
 export const getSingleClient = async (id) => {
-  const client = await User.findById(id).select("-password");
+  const client = await User.findById(id)
+    .select("-password")
+    .populate("programType")
+    .populate("trainer")
+    .populate("dietition")
+    .populate("therapist");
   return client;
 };
 

@@ -13,9 +13,10 @@ const adminSchema = new mongoose.Schema({
     required: true,
   },
   program: 
-    { type: mongoose.Schema.Types.ObjectId, ref: "Program", required: true },
+    { type: mongoose.Schema.Types.ObjectId, ref: "ProgramsList", required: true },
   salary: { type: Number, default: 0 },
   role: { type: String, default: "admin" },
+  experts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Coach" }],
   autoSendWelcome: { type: Boolean, default: false },
   autoSendGuide: { type: Boolean, default: false },
   automatedReminder: { type: Boolean, default: false },

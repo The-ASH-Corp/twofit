@@ -1,4 +1,3 @@
-import { date, success } from "zod";
 import * as headService from "./heads.service.js";
 
 export const createHead = async (req, res) => {

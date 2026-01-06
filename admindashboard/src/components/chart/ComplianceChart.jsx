@@ -7,6 +7,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
+  CartesianGrid,
 } from "recharts";
 import LegendHeader from "./LegendHeader";
 
@@ -16,12 +17,14 @@ export default function ComplianceChart() {
   return (
     <div>
     <LegendHeader/>
-    <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={weeklyCompliance} stackOffset="expand"   >
+    <ResponsiveContainer width="100%" height={220}>
+      <BarChart data={weeklyCompliance} stackOffset="expand"    >
+        <CartesianGrid horizontal={true} vertical={false}/>
         <XAxis dataKey="day" />
         <YAxis
           tickFormatter={(value) => `${Math.round(value * 100)}%`}
           domain={[0, 1]}
+          axisLine={false}
         />
         <Tooltip formatter={(value) => `${Math.round(value * 100)}%`} />
         {/* <Legend /> */}
@@ -46,7 +49,7 @@ export default function ComplianceChart() {
           fill="#F4DBC7"
           radius={[10, 10, 10, 10]}
            stroke="#ffffff"
-          strokeWidth={5}
+          strokeWidth={3}
        
         />
         <Bar
@@ -55,7 +58,7 @@ export default function ComplianceChart() {
           fill="#EBF3F2"
           radius={[10, 10, 10, 10]}
            stroke="#ffffff"
-          strokeWidth={5}
+          strokeWidth={3}
         />
       </BarChart>
     </ResponsiveContainer>

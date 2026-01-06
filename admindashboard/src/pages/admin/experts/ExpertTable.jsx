@@ -13,12 +13,16 @@ export default function ExpertTable() {
 
   const dispatch = useDispatch();
 
-  const fetchCoachData=async()=>{
-    const coache =await dispatch(getAllCoaches({page,limit})).unwrap()
-    const clients =coache[0].assignedUsers.length
-    setCoaches([{...coache[0],clients}])
-  }
- const handlePageChange = (newPage) => {
+  const fetchCoachData = async () => {
+    const coaches = await dispatch(getAllCoaches({ page, limit })).unwrap();
+    const formattedCoaches = coaches.map(coach => ({
+      ...coach,
+      clients: coach.assignedUsers.length
+    }));
+    setCoaches(formattedCoaches);
+  };
+  
+  const handlePageChange = (newPage) => {
     setPage(newPage);
   };
 

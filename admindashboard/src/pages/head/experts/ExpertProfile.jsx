@@ -13,7 +13,6 @@ import { useParams } from "react-router-dom";
 const ExpertProfile = () => {
   const dispatch = useDispatch();
    const { expertId } = useParams();
-   console.log(expertId)
 
      const expert = useSelector(selectCoachById);
      const status = useSelector(selectCoachStatus);
@@ -22,10 +21,8 @@ const ExpertProfile = () => {
    useEffect(() => {
      if (expertId) {
        dispatch(getSingleCoach(expertId ));
-      //  console.log(expert);
      }
    }, [expertId, dispatch]);
-  //  console.log(expert);
 
    if (status === "loading") return <p>Loading...</p>;
    if (error) return <p className="text-red-500">{error}</p>;
