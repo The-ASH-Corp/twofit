@@ -42,6 +42,7 @@ import HeadAddAdmin from "./pages/head/admin/AdminForm"
 import HeadExpertProfile from "./pages/head/experts/ExpertProfile"
 import HeadAdminProfile from "./pages/head/admin/AdminProfile"
 import HeadClientProfile from "./pages/head/clients/ClientProfile"
+import HeadProgramTable from "./pages/head/programsList/ProgramTable"
 
 //Admin Pages Imports
 import AppLayout from "./pages/admin/layout/AppLayout";
@@ -134,6 +135,7 @@ function App() {
             path="clients/profile/:clientId"
             element={<HeadClientProfile />}
           />
+          <Route path="programs" element={<HeadProgramTable />} />
         </Route>
 
         {/* ADMIN */}
