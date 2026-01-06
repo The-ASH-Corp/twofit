@@ -7,10 +7,10 @@ const menuItems = [
   {
     label: "Dashboard",
     icon: assets.dashboard,
-    path: "/expert",
+    path: "/client",
   },
-  { label: "Daily Plan", icon: assets.clients, path: "/expert/clients" },
-  { label: "Progress", icon: assets.experts, path: "/expert/experts" },
+  { label: "Daily Plan", icon: assets.clients, path: "/client/daily-plan" },
+  { label: "Progress", icon: assets.experts, path: "/client/progress" },
   { label: "Messages", icon: assets.website, path: "/expert/therapy" },
   { label: "Feedback", icon: assets.website, path: "/client/feedback" },
   { label: "support", icon: assets.finance, path: "/expert/finance" },
