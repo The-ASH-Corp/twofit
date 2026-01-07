@@ -55,6 +55,7 @@ import AdminAddExpert from "./pages/admin/experts/ExpertForm"
 import AdminExpertProfile from "./pages/admin/experts/ExpertProfile";
 import AdminClientProfile from "./pages/admin/clients/ClientProfile";
 import AdminAddClient from "./pages/admin/clients/ClientForm";
+import AdminProgramTable from "./pages/admin/programsList/ProgramTable";
 //Expert Pages Imports
 import ExpertLayout from "./pages/expert/layout/ExpertLayout";
 import ExpertDashboard from "./pages/expert/Dashboard";
@@ -66,6 +67,7 @@ import ClientDashboard from './pages/client/Dashboard'
 import ClientFeedback from "./pages/client/feedback/Feedback";
 import ClientProgress from "./pages/client/progress/Progress";
 import DailyPlan from "./pages/client/dailyPlan/DailyPlan";
+import ClientChat from "./pages/client/chats/Chats"
 
 function App() {
   return (
@@ -162,6 +164,7 @@ function App() {
           <Route path="experts/profile/:expertId" element={<AdminExpertProfile />} />
           <Route path="clients/profile/:id" element={<AdminClientProfile />} />
           <Route path="clients/addclient" element={<AdminAddClient />} />
+          <Route path="programs" element={<AdminProgramTable />} />
         </Route>
 
         {/* EXPERT */}
@@ -194,6 +197,7 @@ function App() {
           <Route path="feedback" element={<ClientFeedback />} />
           <Route path="progress" element={<ClientProgress />} />
           <Route path="daily-plan" element={<DailyPlan/>} />
+          <Route path="chats" element={<ClientChat/>}/>
         </Route>
 
         <Route path="/*" element={<Unauthorized />} />

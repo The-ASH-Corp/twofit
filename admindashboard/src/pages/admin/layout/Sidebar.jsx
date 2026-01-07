@@ -9,10 +9,11 @@ const menuItems = [
     icon: assets.dashboard,
     path: "/admin",
   },
+  { label: "Programs", icon: assets.programs, path: "/admin/programs" },
   { label: "Experts", icon: assets.experts, path: "/admin/experts" },
   { label: "Clients", icon: assets.clients, path: "/admin/clients" },
-  // { label: "Finance", icon: assets.finance, path: "/admin/finance" },
   { label: "Chats", icon: assets.chats, path: "/admin/chats" },
+  { label: "Finance", icon: assets.finance, path: "/admin/finance" },
   
 ];
 

@@ -5,9 +5,9 @@ const ChastList = ({ clients, chatClient, client, onlineUsers = [] }) => {
   return (
     <div className="w-80  flex flex-col rounded-lg">
         {/* Search and Filters */}
-        <div className="p-4 space-y-4 bg-white rounded-lg">
+        <div className="p-4 space-y-4  rounded-lg">
           <div className="flex items-center gap-2">
-            <div className="flex-1 flex items-center bg-gray-50 rounded-lg px-3 py-2">
+            <div className="flex-1 flex items-center bg-white rounded-lg px-3 py-2">
               <Search size={16} className="text-gray-400" />
               <input
                 type="text"
@@ -17,19 +17,6 @@ const ChastList = ({ clients, chatClient, client, onlineUsers = [] }) => {
             </div>
             <button className="p-2 hover:bg-gray-50 rounded-lg">
               <Settings size={16} className="text-gray-500" />
-            </button>
-          </div>
-
-          {/* Tab Filters */}
-          <div className="flex gap-3 ">
-            <button className="text-xs font-medium text-white bg-[#2D7A6D] px-4 py-1.5 rounded-md">
-              All
-            </button>
-            <button className="text-xs font-medium text-gray-600 hover:text-gray-800">
-              Clients
-            </button>
-            <button className="text-xs font-medium text-gray-600 hover:text-gray-800">
-              Experts
             </button>
           </div>
         </div>
@@ -52,10 +39,10 @@ const ChastList = ({ clients, chatClient, client, onlineUsers = [] }) => {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-gray-800 font-medium text-sm truncate">
+                <h3 className="text-[#0A4F48] font-medium text-sm truncate"> 
                   {chat.name}
                 </h3>
-                <p className="text-gray-500 text-xs capitalize">{chat.role}</p>
+                <p className=" text-xs capitalize ">{chat?.role?.join(", ")}</p>
               </div>
               <span className="text-gray-400 text-[10px] whitespace-nowrap">
                 01:45 PM
