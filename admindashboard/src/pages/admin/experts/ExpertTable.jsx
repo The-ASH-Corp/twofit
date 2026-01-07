@@ -23,10 +23,10 @@ export default function ExpertTable() {
     const coachesData = response;
     const totalCount = response.length;
 
-    console.log(totalCount)
+    console.log(totalCount);
     const formattedCoaches = coachesData?.map((coach) => ({
       ...coach,
-      clients: coach.assignedUsers.length,
+      clients: coach.assignedUsers ? coach.assignedUsers.length : 0,
     }));
     setCoaches(formattedCoaches);
     setTotal(totalCount);
@@ -73,7 +73,7 @@ export default function ExpertTable() {
         handleLimitChange={handleLimitChange}
         page={page}
         limit={limit}
-        total={total}
+        totalCount={total}
       />
     </div>
   );
