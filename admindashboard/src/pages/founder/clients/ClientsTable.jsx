@@ -55,7 +55,7 @@ export default function ClientsTable() {
   if (error) return <p>{error}</p>;
 
   return (
-    <div>
+    <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
       <BaseTable
         columns={ClientColumns}
         data={clients}
