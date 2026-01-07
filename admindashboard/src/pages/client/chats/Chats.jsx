@@ -2,6 +2,7 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { getChat } from "@/redux/features/chat/chat.selecters";
 import { getChats } from "@/redux/features/chat/chat.thunk";
 import { selectAllClients } from "@/redux/features/client/client.selectors";
+import { selectAllCoaches } from "@/redux/features/coach/coach.selector";
 import { socket } from "@/utils/socket";
 import {
   MessageSquare,
@@ -14,12 +15,15 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function Chats() {
-  const [client, setChatClient] = useState(null);
+  // const [client, setChatClient] = useState(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
 
+  const[expert,setChatExpert]=useState(null)
+  const experts=useSelector(selectAllCoaches)
+
   const user = useSelector(selectUser);
-  const clients = useSelector(selectAllClients);
+  // const clients = useSelector(selectAllClients);
   const chats = useSelector(getChat);
   const dispatch = useDispatch();
 
@@ -45,14 +49,14 @@ export default function Chats() {
     const roomId = getPrivateRoomId(user._id, selectedClient._id);
 
     socket.emit("join_room", { roomId });
-    setChatClient(selectedClient);
+    setChatExpert(selectedClient);
   };
 
-  const handleBroadcastChat = () => {
-    socket.emit("broadcast", {
-      roomId: `broadcast_${user._id}`,
-    });
-  };
+  // const handleBroadcastChat = () => {
+  //   socket.emit("broadcast", {
+  //     roomId: `broadcast_${user._id}`,
+  //   });
+  // };
 
   useEffect(() => {
     if (!client) return;
@@ -115,14 +119,14 @@ export default function Chats() {
   return (
     <div className="flex h-screen bg-[#F5F5F5]">
       {/* Left Sidebar */}
-      <div className="w-64 bg-white border-r border-[#E0E0E0] flex flex-col rounded-xl ">
+      {/* <div className="w-64 bg-white border-r border-[#E0E0E0] flex flex-col rounded-xl ">
         <div className="p-6">
           <h2 className="text-gray-600 text-sm font-semibold uppercase tracking-wide mb-4">
             Category
-          </h2>
+          </h2> */}
 
           {/* Sidebar Items */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <div className="flex items-center justify-between p-3 bg-[#F5F5F5] rounded-lg cursor-pointer hover:bg-[#EFEFEF]">
               <div className="flex items-center gap-3">
                 <MessageSquare size={20} className="text-gray-400" />
@@ -136,9 +140,9 @@ export default function Chats() {
             >
               <MessageCircle size={20} />
               <span className="font-medium">Broadcast</span>
-            </div>
+            </div> */}
 
-            <div className="flex items-center gap-3 p-3 text-gray-600 cursor-pointer hover:bg-[#FAFAFA]">
+            {/* <div className="flex items-center gap-3 p-3 text-gray-600 cursor-pointer hover:bg-[#FAFAFA]">
               <MessageCircle size={20} />
               <span className="font-medium">Auto Reminders</span>
             </div>
@@ -149,7 +153,7 @@ export default function Chats() {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Center - Chat List */}
       <div className="w-80 bg-white border-r border-[#E0E0E0] flex flex-col">
@@ -170,7 +174,7 @@ export default function Chats() {
           </div>
 
           {/* Tab Filters */}
-          <div className="flex gap-4 border-b border-[#E0E0E0] pb-2">
+          {/* <div className="flex gap-4 border-b border-[#E0E0E0] pb-2">
             <button className="text-sm font-medium text-white bg-[#2D7A6D] px-3 py-1 rounded">
               All
             </button>
@@ -180,7 +184,7 @@ export default function Chats() {
             <button className="text-sm font-medium text-gray-600 hover:text-gray-800">
               Experts
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Chat List Items */}
