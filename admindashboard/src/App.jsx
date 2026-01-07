@@ -67,6 +67,7 @@ import ClientDashboard from './pages/client/Dashboard'
 import ClientFeedback from "./pages/client/feedback/Feedback";
 import ClientProgress from "./pages/client/progress/Progress";
 import DailyPlan from "./pages/client/dailyPlan/DailyPlan";
+import ClientChat from "./pages/client/chats/Chats"
 
 function App() {
   return (
@@ -196,6 +197,7 @@ function App() {
           <Route path="feedback" element={<ClientFeedback />} />
           <Route path="progress" element={<ClientProgress />} />
           <Route path="daily-plan" element={<DailyPlan/>} />
+          <Route path="chats" element={<ClientChat/>}/>
         </Route>
 
         <Route path="/*" element={<Unauthorized />} />
