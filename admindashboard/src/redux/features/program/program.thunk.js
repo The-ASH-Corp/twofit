@@ -15,7 +15,7 @@ export const createProgram = createAsyncThunk("program/createProgram", async (pr
 export const getAllPrograms=createAsyncThunk('program/getAllPrograms',async({page,limit},{rejectWithValue})=>{
     try{
         const data=await axiosInstance.get(`/programs/list/${page}/${limit}`)
-         return data.data; 
+         return data; 
         
     }
     catch(error){

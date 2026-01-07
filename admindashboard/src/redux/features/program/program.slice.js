@@ -5,6 +5,7 @@ const initialState = {
   allPrograms: [],
   selectedProgram: null,
   error: null,
+  totalProgram: 0,
   status: "idle",
 };
 
@@ -26,7 +27,8 @@ const programSlice = createSlice({
       })
       .addCase(getAllPrograms.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.allPrograms = action.payload;
+        state.allPrograms = action.payload.data;
+        state.totalProgram = action.payload.totalProgram;
         state.error = null;
       })
       .addCase(getAllPrograms.rejected, (state, action) => {

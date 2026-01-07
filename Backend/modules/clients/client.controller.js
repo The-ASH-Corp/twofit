@@ -3,10 +3,11 @@ import * as service from "./client.services.js";
 export const getAllClients = async (req, res) => {
   try {
     const { page, limit } = req.params
-    const clients = await service.getAllClient(page, limit);
+    const {clients, totalCount} = await service.getAllClient(page, limit);
     res.status(200).json({
       success: true,
       data: clients,
+      totalCount
     });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
