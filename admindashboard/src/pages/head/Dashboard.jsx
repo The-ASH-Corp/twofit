@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Users,
   UserCheck,
@@ -27,6 +27,8 @@ import {
   Filler,
 } from "chart.js";
 import { Bar, Line, Doughnut } from "react-chartjs-2";
+import { getDashboardData } from "@/redux/features/head/head.thunk";
+import { useDispatch } from "react-redux";
 
 ChartJS.register(
   CategoryScale,
@@ -141,6 +143,14 @@ export default function Dashboard() {
       time: "3 Days Ago",
     },
   ];
+  const [dashboardData, setDashboardData] = useState({});
+const dispatch =useDispatch()
+  useEffect(() => {
+    dispatch(getDashboardData()).then((res) => {
+      setDashboardData(res.payload);
+    });
+  }, []);
+
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA]">
       <div className="flex gap-6 lg:flex-row flex-col">
@@ -151,19 +161,19 @@ export default function Dashboard() {
             {[
               {
                 label: "Total Clients",
-                value: "1,245",
+                value: dashboardData?.totalClients,
                 icon: <GraduationCap size={22} className="text-white" />,
                 bg: "bg-[#0A4F48]",
               },
               {
                 label: "Total Programs",
-                value: "12",
+                value: dashboardData?.totalPrograms,
                 icon: <BookOpen size={22} className="text-[#0A4F48]" />,
                 bg: "bg-[#FAF3E0]",
               },
               {
-                label: "Sub Admins",
-                value: "34",
+                label: "Admins",
+                value: dashboardData?.totalAdmins,
                 icon: <UserCircle size={22} className="text-white" />,
                 bg: "bg-[#0A4F48]",
               },
@@ -313,14 +323,14 @@ export default function Dashboard() {
                 <span className="text-[10px] text-[#66706D] font-medium">
                   Total Experts
                 </span>
-                <span className="text-3xl font-bold text-[#0A4F48]">58</span>
+                <span className="text-3xl font-bold text-[#0A4F48]">{dashboardData?.totalExperts}</span>
               </div>
             </div>
             <div className="flex flex-col gap-4 mt-2">
               {[
-                { label: "Trainers", count: 22, color: "bg-[#0A4F48]" },
-                { label: "Dietitians", count: 18, color: "bg-[#EBF3F2]" },
-                { label: "Therapists", count: 14, color: "bg-[#FAF3E0]" },
+                { label: "Trainers", count: dashboardData?.totalTrainers, color: "bg-[#0A4F48]" },
+                { label: "Dietitians", count: dashboardData?.totalDietitians, color: "bg-[#EBF3F2]" },
+                { label: "Therapists", count: dashboardData?.totalTherapists, color: "bg-[#FAF3E0]" },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">

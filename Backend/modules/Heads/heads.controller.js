@@ -54,9 +54,21 @@ export const deleteHead = async (req, res) => {
   try {
     const head = await headService.deleteHead(req.params.id);
     res.status(200).json({
-        success: true,
-        date: head
+      success: true,
+      date: head
     })
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
+export const getDashboardData = async (req, res) => {
+  try {
+    const head = await headService.getDashboardData();
+    res.status(200).json({
+      success: true,
+      data: head,
+    });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }

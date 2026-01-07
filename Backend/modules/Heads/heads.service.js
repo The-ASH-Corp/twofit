@@ -1,4 +1,8 @@
 import { generatePassword, hashPassword } from "../../utils/password.js";
+import { AdminModel } from "../admin/admin.model.js";
+import allProgramaModel from "../allPrograms/allPrograma.model.js";
+import User from "../auth/auth.model.js";
+import { CoachModel } from "../coach/coach.model.js";
 import { HeadsModel } from "./heads.modal.js";
 
 export const createHead = async (head) => {
@@ -45,4 +49,24 @@ export const updateHead = async (id, updatedData) => {
 
 export const deleteHead = async (id) => {
   return await HeadsModel.findByIdAndDelete(id);
+};
+
+export const getDashboardData = async () => {
+  const totalClients = await User.countDocuments({ role: "user" });
+  const totalPrograms = await allProgramaModel.countDocuments();
+  const totalAdmins = await AdminModel.countDocuments();
+  const totalExperts = await CoachModel.countDocuments();
+  const totalTrainers = await CoachModel.countDocuments({ role: "Trainer" });
+  const totalDietitians = await CoachModel.countDocuments({ role: "Dietitian" });
+  const totalTherapists = await CoachModel.countDocuments({ role: "Therapist" });
+
+  return {
+    totalClients,
+    totalPrograms,
+    totalAdmins,
+    totalExperts,
+    totalTrainers,
+    totalDietitians,
+    totalTherapists,
+  };
 };
