@@ -38,7 +38,7 @@ export const ExpertColumns = [
 
         return (
         <span className={`px-2 py-1 text-[11px] rounded-xl ${expertColor}`}>
-          {role}
+          {role?.join(", ")}
         </span>
       );
 
