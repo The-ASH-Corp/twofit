@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   MoreHorizontal,
   ChevronDown,
@@ -28,6 +28,7 @@ ChartJS.register(
 );
 
 const ExpertCenterSide = ({ expert }) => {
+  console.log(expert?.assignedUsers);
   const ratingData = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
     datasets: [
@@ -135,6 +136,33 @@ const ExpertCenterSide = ({ expert }) => {
     },
   ];
 
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [isLimitOpen, setIsLimitOpen] = useState(false);
+
+  const totalResults = expert?.assignedUsers?.length || 0;
+  const totalPages = Math.ceil(totalResults / itemsPerPage);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = (expert?.assignedUsers || []).slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const handleLimitChange = (limit) => {
+    setItemsPerPage(limit);
+    setCurrentPage(1);
+    setIsLimitOpen(false);
+  };
+
   return (
     <div className="flex-1 flex flex-col gap-6 overflow-y-auto no-scrollbar pb-6 px-1">
       {/* Rating Score Card */}
@@ -153,39 +181,49 @@ const ExpertCenterSide = ({ expert }) => {
 
         {/* Client Feedback Section */}
         <div className="mt-8">
-          <div className="flex items-center justify-between mb-4">
+          <div
+            className="flex items-center justify-between mb-4 cursor-pointer"
+            onClick={() => setIsFeedbackOpen(!isFeedbackOpen)}
+          >
             <h3 className="text-sm font-bold text-[#0A4F48]">
               Client Feedback
             </h3>
-            <ChevronDown size={18} className="text-gray-400" />
+            <ChevronDown
+              size={18}
+              className={`text-gray-400 transition-transform duration-300 ${
+                isFeedbackOpen ? "rotate-180" : ""
+              }`}
+            />
           </div>
-          <div className="space-y-6">
-            {feedback.map((item, i) => (
-              <div
-                key={i}
-                className="flex flex-col gap-2 pb-6 border-b border-gray-50 last:border-0 last:pb-0"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] font-bold text-[#66706D]">
-                    {item.name}
-                  </span>
-                  <div className="flex text-[#FFD7A8]">
-                    {[...Array(5)].map((_, idx) => (
-                      <Star
-                        key={idx}
-                        size={10}
-                        fill={idx < item.rating ? "currentColor" : "none"}
-                        stroke={idx < item.rating ? "none" : "currentColor"}
-                      />
-                    ))}
+          {isFeedbackOpen && (
+            <div className="space-y-6">
+              {feedback.map((item, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col gap-2 pb-6 border-b border-gray-50 last:border-0 last:pb-0"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-[10px] font-bold text-[#66706D]">
+                      {item.name}
+                    </span>
+                    <div className="flex text-[#FFD7A8]">
+                      {[...Array(5)].map((_, idx) => (
+                        <Star
+                          key={idx}
+                          size={10}
+                          fill={idx < item.rating ? "currentColor" : "none"}
+                          stroke={idx < item.rating ? "none" : "currentColor"}
+                        />
+                      ))}
+                    </div>
                   </div>
+                  <p className="text-[11px] text-[#011412] leading-relaxed">
+                    {item.text}
+                  </p>
                 </div>
-                <p className="text-[11px] text-[#011412] leading-relaxed">
-                  {item.text}
-                </p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -249,7 +287,8 @@ const ExpertCenterSide = ({ expert }) => {
               Assigned Clients
             </h3>
             <span className="text-xs text-[#66706D] font-medium">
-              14 <span className="mx-1 text-gray-300">|</span> Max 30
+              {totalResults} <span className="mx-1 text-gray-300">|</span> Max
+              30
             </span>
           </div>
           <MoreHorizontal size={20} className="text-gray-400" />
@@ -265,16 +304,16 @@ const ExpertCenterSide = ({ expert }) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
-            {assignedClients.map((client, i) => (
+            {currentItems.map((client, i) => (
               <tr key={i} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 text-xs font-medium text-[#011412]">
                   {client.name}
                 </td>
                 <td className="px-6 py-4 text-xs text-[#011412]">
-                  {client.program}
+                  {client.programType?.title || "N/A"}
                 </td>
                 <td className="px-6 py-4 text-xs font-bold text-[#011412]">
-                  {client.compliance}
+                  {client.compliance ?? "N/A"}
                 </td>
                 <td className="px-6 py-4">
                   <span
@@ -296,28 +335,63 @@ const ExpertCenterSide = ({ expert }) => {
         <div className="p-6 border-t border-gray-50 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-xs text-[#66706D]">Show</span>
-            <div className="flex items-center gap-2 px-2 py-1 bg-[#F8F9FA] border border-gray-100 rounded text-xs font-medium text-[#66706D]">
-              10 <ChevronDown size={12} />
+            <div className="relative">
+              <div
+                className="flex items-center gap-2 px-2 py-1 bg-[#F8F9FA] border border-gray-100 rounded text-xs font-medium text-[#66706D] cursor-pointer"
+                onClick={() => setIsLimitOpen(!isLimitOpen)}
+              >
+                {itemsPerPage} <ChevronDown size={12} />
+              </div>
+              {isLimitOpen && (
+                <div className="absolute bottom-full mb-2 bg-white border border-gray-100 rounded shadow-lg z-10 w-full overflow-hidden">
+                  {[5, 10, 20, 50].map((limit) => (
+                    <div
+                      key={limit}
+                      className="px-2 py-1.5 text-xs text-[#66706D] hover:bg-[#F8F9FA] cursor-pointer"
+                      onClick={() => handleLimitChange(limit)}
+                    >
+                      {limit}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            <span className="text-xs text-[#66706D]">of 40 results</span>
+            <span className="text-xs text-[#66706D]">
+              of {totalResults} results
+            </span>
           </div>
           <div className="flex items-center gap-1">
-            <button className="p-1.5 text-gray-300 hover:text-[#0A4F48] transition-colors">
+            <button
+              className={`p-1.5 transition-colors ${
+                currentPage === 1
+                  ? "text-gray-300 pointer-events-none"
+                  : "text-gray-400 hover:text-[#0A4F48]"
+              }`}
+              onClick={() => handlePageChange(currentPage - 1)}
+            >
               <ChevronLeft size={16} />
             </button>
-            <button className="w-8 h-8 rounded-md bg-[#0A4F48] text-white text-xs font-bold">
-              1
-            </button>
-            <button className="w-8 h-8 rounded-md text-[#66706D] text-xs font-bold hover:bg-gray-50 transition-colors">
-              2
-            </button>
-            <button className="w-8 h-8 rounded-md text-[#66706D] text-xs font-bold hover:bg-gray-50 transition-colors">
-              3
-            </button>
-            <button className="w-8 h-8 rounded-md text-[#66706D] text-xs font-bold hover:bg-gray-50 transition-colors">
-              5
-            </button>
-            <button className="p-1.5 text-[#0A4F48] hover:text-[#083a35] transition-colors">
+            {[...Array(totalPages)].map((_, i) => (
+              <button
+                key={i + 1}
+                className={`w-8 h-8 rounded-md text-xs font-bold transition-colors ${
+                  currentPage === i + 1
+                    ? "bg-[#0A4F48] text-white"
+                    : "text-[#66706D] hover:bg-gray-50"
+                }`}
+                onClick={() => handlePageChange(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              className={`p-1.5 transition-colors ${
+                currentPage === totalPages || totalPages === 0
+                  ? "text-gray-300 pointer-events-none"
+                  : "text-[#0A4F48] hover:text-[#083a35]"
+              }`}
+              onClick={() => handlePageChange(currentPage + 1)}
+            >
               <ChevronRight size={16} />
             </button>
           </div>
