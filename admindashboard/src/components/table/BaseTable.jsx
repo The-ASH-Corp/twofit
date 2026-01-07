@@ -93,7 +93,7 @@ export default function BaseTable({
   const paginationRange = getPaginationRange() || [];
 
   return (
-    <div className="bg-white p-[16px] rounded-xl flex flex-col max-h-[80vh] overflow-hidden">
+    <div className="bg-white p-[16px] rounded-xl flex flex-col  overflow-hidden">
       <div className="mb-6 flex justify-between">
         <h2 className="text-[#0A4F48] font-bold text-[16px]">{pageLabel}</h2>
         <div className="flex gap-3">

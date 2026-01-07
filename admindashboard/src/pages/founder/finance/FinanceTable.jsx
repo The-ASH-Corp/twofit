@@ -7,9 +7,13 @@ import FinanceKpi from './FinanceKpi'
 
 export default function FinanceTable() {
   return (
-    <div>
-        <FinanceKpi/>
-      <BaseTable columns={FinanceColumns} data={financeData} pageLabel={"Finance List"}/>
+    <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
+      <FinanceKpi />
+      <BaseTable
+        columns={FinanceColumns}
+        data={financeData}
+        pageLabel={"Finance List"}
+      />
     </div>
-  )
+  );
 }
