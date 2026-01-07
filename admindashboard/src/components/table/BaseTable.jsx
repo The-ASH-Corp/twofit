@@ -37,11 +37,79 @@ export default function BaseTable({
     getCoreRowModel: getCoreRowModel(),
     state: { rowSelection },
     onRowSelectionChange: setRowSelection,
-    // getPaginationRowModel,
     enableRowSelection: true,
   });
 
- 
+  const totalPages = Math.ceil(totalCount / limit);
+
+  const getPaginationRange = () => {
+    const totalPageCount = totalPages;
+    const siblingCount = 1;
+
+    // Pages count is determined as siblingCount + firstPage + lastPage + currentPage + 2*DOTS
+    const totalPageNumbers = siblingCount + 5;
+
+    /*
+      Case 1:
+      If the number of pages is less than the page numbers we want to show in our
+      paginationComponent, we return the range [1..totalPageCount]
+    */
+    if (totalPageNumbers >= totalPageCount) {
+      return range(1, totalPageCount);
+    }
+
+    /*
+      Calculate left and right sibling index and make sure they are within range 1 and totalPageCount
+    */
+    const leftSiblingIndex = Math.max(page - siblingCount, 1);
+    const rightSiblingIndex = Math.min(page + siblingCount, totalPageCount);
+
+    /*
+      We do not show dots just when there is just one page number to be inserted between the extremes of sibling and the page limits i.e 1 and totalPageCount. Hence we are using leftSiblingIndex > 2 and rightSiblingIndex < totalPageCount - 2
+    */
+    const shouldShowLeftDots = leftSiblingIndex > 2;
+    const shouldShowRightDots = rightSiblingIndex < totalPageCount - 2;
+
+    const firstPageIndex = 1;
+    const lastPageIndex = totalPageCount;
+
+    /*
+      Case 2: No left dots to show, but rights dots to be shown
+    */
+    if (!shouldShowLeftDots && shouldShowRightDots) {
+      const leftItemCount = 3 + 2 * siblingCount;
+      const leftRange = range(1, leftItemCount);
+
+      return [...leftRange, "...", totalPageCount];
+    }
+
+    /*
+      Case 3: No right dots to show, but left dots to be shown
+    */
+    if (shouldShowLeftDots && !shouldShowRightDots) {
+      const rightItemCount = 3 + 2 * siblingCount;
+      const rightRange = range(
+        totalPageCount - rightItemCount + 1,
+        totalPageCount
+      );
+      return [firstPageIndex, "...", ...rightRange];
+    }
+
+    /*
+      Case 4: Both left and right dots to be shown
+    */
+    if (shouldShowLeftDots && shouldShowRightDots) {
+      const middleRange = range(leftSiblingIndex, rightSiblingIndex);
+      return [firstPageIndex, "...", ...middleRange, "...", lastPageIndex];
+    }
+  };
+
+  const range = (start, end) => {
+    let length = end - start + 1;
+    return Array.from({ length }, (_, idx) => idx + start);
+  };
+
+  const paginationRange = getPaginationRange() || [];
 
   return (
     <div className="bg-white p-[16px] rounded-xl flex flex-col max-h-[80vh] overflow-hidden">
@@ -53,7 +121,7 @@ export default function BaseTable({
             <input
               type="text"
               placeholder="Search anything"
-              className=" w-72 px-[10px] py-[12px] border border-none rounded-xl  w-[250px] focus:outline-none"
+              className=" w-72 px-[10px] py-[12px] border border-none rounded-xl  w-[250px] focus:outline-none bg-transparent"
               onChange={(e) => onSearchInputChange(e)}
             />
             <img src={assets.filter} className="  w-4 h-4" />
@@ -118,29 +186,75 @@ export default function BaseTable({
           </tbody>
         </table>
       </div>
-      <div className="flex gap-3 mt-4 items-center justify-between bg-white py-2">
-        <div className="flex gap-3">
-          <p>Show</p>
-          <select
-            onChange={(e) => handleLimitChange(Number(e.target.value))}
-            value={limit}
-            className="focus:outline-none bg-[#F0F0F0] px-2 py-1 rounded flex items-center"
-          >
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-          </select>
+
+      {/* Pagination */}
+      <div className="flex items-center justify-between py-4 mt-auto">
+        <div className="flex items-center gap-3 text-sm text-[#66706D] font-medium">
+          <span>Show</span>
+          <div className="relative">
+            <select
+              value={limit}
+              onChange={(e) => handleLimitChange(Number(e.target.value))}
+              className="appearance-none pl-3 pr-8 py-1.5 bg-white border border-gray-200 rounded-lg cursor-pointer focus:outline-none"
+            >
+              <option value={8}>8</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+            <MdOutlineKeyboardArrowDown className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500" />
+          </div>
+
+          <span>of {totalCount} results</span>
         </div>
-        <div>
+
+        <div className="flex items-center gap-2">
           <button
-            onClick={() => handlePageChange(page - 1)}
+            onClick={() => handlePageChange(Math.max(1, page - 1))}
             disabled={page === 1}
+            className={`w-10 h-10 flex items-center justify-center rounded-lg ${
+              page === 1
+                ? "bg-gray-100 text-gray-300 cursor-not-allowed"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+            }`}
           >
-            <MdOutlineKeyboardArrowLeft />
+            <MdOutlineKeyboardArrowLeft size={18} />
           </button>
-          <span className="bg-[#F0F0F0] px-3 py-1 rounded">{page}</span>
-          <button onClick={() => handlePageChange(page + 1)}>
-            <MdOutlineKeyboardArrowRight />
+
+          {paginationRange.map((pageNumber, idx) => {
+            if (pageNumber === "...") {
+              return (
+                <span key={idx} className="px-1 text-gray-400 font-bold">
+                  ...
+                </span>
+              );
+            }
+
+            return (
+              <button
+                key={idx}
+                onClick={() => handlePageChange(pageNumber)}
+                className={`w-10 h-10 flex items-center justify-center rounded-lg text-sm font-bold transition-colors ${
+                  page === pageNumber
+                    ? "bg-[#0A4F48] text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                {pageNumber}
+              </button>
+            );
+          })}
+
+          <button
+            onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
+            disabled={page === totalPages}
+            className={`w-10 h-10 flex items-center justify-center rounded-lg ${
+              page === totalPages
+                ? "bg-gray-100 text-gray-300 cursor-not-allowed"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+            }`}
+          >
+            <MdOutlineKeyboardArrowRight size={18} />
           </button>
         </div>
       </div>
