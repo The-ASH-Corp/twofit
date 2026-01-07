@@ -1,30 +1,34 @@
-import { assets } from '@/assets/asset';
-import React from 'react'
-import DonutChart from './Chart';
+import React from "react";
+import { MoreHorizontal, FileText } from "lucide-react";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Doughnut } from "react-chartjs-2";
 
-const clientCompliance = [
-  {
-    title: "High ",
-    clients: "0 clients",
-    percentage: "0%",
-    color: "#0A4F48",
-  },
-  {
-    title: "Medium ",
-    clients: "0 clients",
-    percentage: "0%",
-    color: "#EBF3F2",
-  },
-  {
-    title: "Low ",
-    clients: "0 clients",
-    percentage: "0%",
-    color: "#F4DBC7",
-  },
-];
-
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const ExpertRightSide = ({ expert }) => {
+  const complianceData = {
+    labels: ["High", "Medium", "Low"],
+    datasets: [
+      {
+        data: [55, 30, 15],
+        backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
+        borderWidth: 0,
+        cutout: "80%",
+        borderRadius: 4,
+        spacing: 2,
+      },
+    ],
+  };
+
+  const complianceOptions = {
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false },
+    },
+    maintainAspectRatio: false,
+    responsive: true,
+  };
+
   const documents = [
     {
       name: "Employment_Contract_CliffVilliam_T1003.pdf",
@@ -39,110 +43,128 @@ const ExpertRightSide = ({ expert }) => {
       size: "2.2 MB",
     },
   ];
+
   return (
-    <div className="w-[25%] flex flex-col items-center gap-4 overflow-auto  no-scrollbar">
-      {/* Response Time */}
-      <div className="w-full flex flex-col gap-3 items-center bg-white rounded-lg p-4">
-        <div className="flex items-center justify-between w-full">
-          <h2 className="text-[#0A4F48] font-bold text-[16px]">
-            Response Time
-          </h2>
-          <button>
-            <img src={assets.threeDotVector} alt="dot menu" className="w-3.5" />
+    <div className="w-[300px] flex flex-col gap-6 overflow-y-auto no-scrollbar pb-6">
+      {/* Response Time Card */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-base font-bold text-[#0A4F48]">Response Time</h3>
+          <button className="text-gray-400">
+            <MoreHorizontal size={20} />
           </button>
         </div>
-        <div className="w-full flex flex-col items-center gap-3">
-          <div className="w-full bg-[#F8F8F8] p-3 flex justify-between items-center rounded-md">
-            <span className="text-[11px] text-[#66706D]">
+        <div className="space-y-3">
+          <div className="flex justify-between items-center p-3 bg-[#F8F9FA] rounded-xl">
+            <span className="text-xs text-[#66706D] font-medium">
               Average Response Time
             </span>
-            <span className="text-[12px] ">{expert?.responseTime}</span>
+            <span className="text-sm font-bold text-[#011412] tracking-tight">
+              {expert?.responseTime || "1h 12m"}
+            </span>
           </div>
-          <div className="w-full bg-[#F8F8F8] p-3 flex justify-between items-center rounded-md">
-            <span className="text-[11px] text-[#66706D]">Fast Responses</span>
-            <div>
-              <span className="text-[12px] text-[#66706D] px-1.5 border-r border-r-[#DBDEDD]">
-                under {expert?.responseTime.split(" ")[0]}h
+          <div className="flex justify-between items-center p-3 bg-[#F8F9FA] rounded-xl">
+            <span className="text-xs text-[#66706D] font-medium">
+              Fast Responses
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-[#66706D] pr-2 border-r border-gray-200">
+                under 2h
               </span>
-              <span className="px-1.5 text-[11px] font-bold text-[#0A4F48]">
-                94%
-              </span>
+              <span className="text-xs font-bold text-[#0A4F48]">94%</span>
             </div>
           </div>
         </div>
       </div>
-      {/* Client Compliance */}
-      <div className="w-full flex flex-col gap-8 items-center bg-white rounded-lg p-4">
-        <div className="flex items-center justify-between w-full">
-          <h2 className="text-[#0A4F48] font-bold text-[16px]">
+
+      {/* Client Compliance Card */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-base font-bold text-[#0A4F48]">
             Client Compliance
-          </h2>
-          <button>
-            <img src={assets.threeDotVector} alt="dot menu" className="w-3.5" />
+          </h3>
+          <button className="text-gray-400">
+            <MoreHorizontal size={20} />
           </button>
         </div>
-        <div className="w-full flex flex-col items-center gap-10">
-          <div>
-            <DonutChart percentage={0} high={0} medium={0} low={0} />
+
+        <div className="relative h-44 mb-8">
+          <Doughnut data={complianceData} options={complianceOptions} />
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-[10px] text-[#66706D] font-medium">
+              Avg Compliance
+            </span>
+            <span className="text-2xl font-bold text-[#011412]">73%</span>
           </div>
-          <div className="flex flex-col items-center w-full gap-2.5">
-            {clientCompliance.map((items, i) => (
+        </div>
+
+        <div className="space-y-3">
+          {[
+            { label: "High", count: 12, percent: "55%", color: "bg-[#0A4F48]" },
+            {
+              label: "Medium",
+              count: 19,
+              percent: "30%",
+              color: "bg-[#EBF3F2]",
+            },
+            { label: "Low", count: 10, percent: "15%", color: "bg-[#F4DBC7]" },
+          ].map((item, i) => (
+            <div
+              key={i}
+              className="flex items-center justify-between p-3 bg-[#F8F9FA] rounded-xl relative overflow-hidden"
+            >
               <div
-                key={i}
-                className="relative w-full rounded-l-sm rounded-r-lg pl-4 p-2 bg-[#F8F8F8]"
-              >
-                <div
-                  className="absolute left-0 top-0 w-2 h-full  rounded-xs"
-                  style={{ background: items.color }}
-                ></div>
-                <div className="w-full flex items-center justify-between">
-                  <p className="text-[12px] ">{items.title}</p>
-                  <div>
-                    <span className="text-[12px] text-[#66706D] px-1.5 border-r border-r-[#DBDEDD]">
-                      {items.clients}
-                    </span>
-                    <span className="px-1.5 text-[11px] font-bold text-[#0A4F48]">
-                      {items.percentage}
-                    </span>
-                  </div>
+                className={`absolute left-0 top-0 bottom-0 w-1.5 ${item.color}`}
+              ></div>
+              <span className="text-xs font-bold text-[#011412] ml-1">
+                {item.label}
+              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-[#66706D] font-medium pr-2 border-r border-gray-200">
+                  {item.count} clients
+                </span>
+                <span className="text-xs font-bold text-[#011412]">
+                  {item.percent}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Documents Card */}
+      <div className="bg-white rounded-2xl p-6 shadow-sm flex-1">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-base font-bold text-[#0A4F48]">Documents</h3>
+          <button className="text-gray-400">
+            <MoreHorizontal size={20} />
+          </button>
+        </div>
+        <div className="space-y-4">
+          {(expert?.certifications
+            ? [{ name: expert.certifications, size: "2.4 MB" }]
+            : documents
+          ).map((doc, i) => (
+            <div key={i} className="flex items-center gap-4">
+              <div className="p-2.5 bg-[#FAF3E0] rounded-lg text-[#DAA520]">
+                <FileText size={20} />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs font-bold text-[#011412] truncate">
+                  {doc.name}
+                </span>
+                <div className="flex items-center gap-1.5 text-[10px] text-[#66706D]">
+                  <span className="uppercase">PDF</span>
+                  <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                  <span>{doc.size}</span>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-      {/* Documents */}
-      <div className="w-full bg-white rounded-lg p-4 flex flex-col items-center gap-4">
-        <div className="flex items-center justify-between w-full">
-          <h2 className="text-[#0A4F48] font-bold text-[16px]">Documents</h2>
-          <button>
-            <img src={assets.threeDotVector} alt="dot menu" className="w-3.5" />
-          </button>
-        </div>
-        <div className="w-full flex flex-col items-center gap-5.5">
-            <div
-              className="w-full flex items-center gap-4 justify-start"
-            >
-              <div className="bg-[#F4DBC7] p-2 rounded-md">
-                <img
-                  src={assets.pdfVector}
-                  alt="pdf vector"
-                  className="w-fit h-4"
-                />
-              </div>
-              <div className="flex flex-col items-start shrink pr-2">
-                <p className="text-[12px] wrap-break-word ">{expert?.certifications}</p>
-                <p className="text-[11px] text-[#66706D] flex items-center gap-1">
-                  PDF{" "}
-                  <span className="bg-[#DBDEDD] inline-block w-1 h-1 rounded-full"></span>
-                  {2.4} MB
-                </p>
-              </div>
             </div>
+          ))}
         </div>
       </div>
     </div>
   );
-}
+};
 
-export default ExpertRightSide
+export default ExpertRightSide;
