@@ -1,7 +1,6 @@
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { getChat } from "@/redux/features/chat/chat.selecters";
 import { getChats } from "@/redux/features/chat/chat.thunk";
-import { selectAllClients } from "@/redux/features/client/client.selectors";
 import { socket } from "@/utils/socket";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,21 +10,14 @@ import ChatWindow from "./ChatWindow";
 import Templates from "./Templates";
 import CreateBroadcast from "./CreateBroadcast";
 import AutoReminders from "./AutoReminders";
+import { getAllCoachesByAdminId } from "@/redux/features/admins/admin.thunk";
+import { selectAllCoaches } from "@/redux/features/coach/coach.selector";
 
 export default function Chats() {
-  const [client, setChatClient] = useState(null);
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [onlineUsers, setOnlineUsers] = useState([]);
-
   const user = useSelector(selectUser);
-  const clients = useSelector(selectAllClients);
-  const chats = useSelector(getChat);
-  const dispatch = useDispatch();
-
-  const getPrivateRoomId = (u1, u2) => `private:${[u1, u2].sort().join("_")}`;
 
   useEffect(() => {
+    fetchAllExperts();
     socket.auth = {
       userId: user._id,
       token: localStorage.getItem("token"),
@@ -48,6 +40,23 @@ export default function Chats() {
       socket.disconnect();
     };
   }, [user?._id]);
+
+  const [client, setChatClient] = useState(null);
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
+  const clients = useSelector(selectAllCoaches);
+
+  const fetchAllExperts=()=>{
+    dispatch(getAllCoachesByAdminId({adminId:user._id,page:1,limit:100}))
+  }
+
+  const chats = useSelector(getChat);
+  const dispatch = useDispatch();
+
+  const getPrivateRoomId = (u1, u2) => `private:${[u1, u2].sort().join("_")}`;
+
 
   const chatClient = (selectedClient) => {
     if (client) {

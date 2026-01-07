@@ -22,8 +22,8 @@ const ChatWindow = ({
                 {client?.name?.split(" ")?.[0]?.[0]}
               </div>
               <div>
-                <h1 className="text-gray-800 font-semibold">{client.name}</h1>
-                <p className="text-gray-500 text-sm">{client.role}</p>
+                <h1 className="text-[#0A4F48] font-semibold">{client.name}</h1>
+                <p className=" text-sm">{client?.role?.join(", ")}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -85,7 +85,7 @@ const ChatWindow = ({
 
           {/* Message Input */}
           <div className="bg-white rounded-b-lg px-6 py-4">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-2">
               <button className="text-gray-400 hover:text-gray-600 transition">
                 <Paperclip size={20} />
               </button>
