@@ -53,16 +53,18 @@ export default function AdminsList() {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <BaseTable
-      columns={AdminColumns}
-      data={admins}
-      profilePath={profilePath}
-      pageLabel="Admins"
-      onSearchInputChange={searchInputHandler}
-      handlePageChange={setPage}
-      handleLimitChange={setLimit}
-      page={page}
-      limit={limit}
-    />
+    <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
+      <BaseTable
+        columns={AdminColumns}
+        data={admins}
+        profilePath={profilePath}
+        pageLabel="Admins"
+        onSearchInputChange={searchInputHandler}
+        handlePageChange={setPage}
+        handleLimitChange={setLimit}
+        page={page}
+        limit={limit}
+      />
+    </div>
   );
 }

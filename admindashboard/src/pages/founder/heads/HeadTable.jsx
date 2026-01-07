@@ -72,13 +72,13 @@ const TherapyTable = () => {
   // if (error) return <p className="text-red-500">{error?.error}</p>;
 
   return (
-    <div>
+    <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
       <BaseTable
         data={heads}
         columns={therapyColumns}
         actionLabel="Add Head"
         actionPath="/founder/heads/create"
-        profilePath= {profilePath}
+        profilePath={profilePath}
         pageLabel={"Heads"}
         onSearchInputChange={searchInputHandler}
         handlePageChange={setPage}

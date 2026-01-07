@@ -64,7 +64,7 @@ const TherapyTable = () => {
   // if (error) return <p className="text-red-500">{error?.error}</p>;
 
   return (
-    <div>
+    <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
       <BaseTable
         data={therapy}
         columns={therapyColumns}

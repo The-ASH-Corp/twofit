@@ -45,21 +45,21 @@ const WorkoutList = () => {
   
     if (status === "loading") return <p>Loading...</p>;
   return (
-    <div>
+    <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
       <BaseTable
-      data={heads}
-              columns={workoutColumns}
-              actionLabel="Add workout"
-              actionPath="/founder/workout/create"
-              pageLabel={"Workouts"}
-              onSearchInputChange={searchInputHandler}
-              handlePageChange={setPage}
-              handleLimitChange={setLimit}
-              page={page}
-              limit={limit}
+        data={heads}
+        columns={workoutColumns}
+        actionLabel="Add workout"
+        actionPath="/founder/workout/create"
+        pageLabel={"Workouts"}
+        onSearchInputChange={searchInputHandler}
+        handlePageChange={setPage}
+        handleLimitChange={setLimit}
+        page={page}
+        limit={limit}
       />
     </div>
-  )
+  );
 }
 
 export default WorkoutList

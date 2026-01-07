@@ -48,7 +48,7 @@ export default function CategoryTable() {
   if (status === "loading") return <p>Loading categories...</p>;
   if (error) return <p>{error}</p>;
   return (
-    <div>
+    <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
       <BaseTable
         columns={CategoryListColumns}
         data={categories}
