@@ -44,13 +44,19 @@ ChartJS.register(
 );
 export default function Dashboard() {
  
-
+ const [dashboardData, setDashboardData] = useState({});
+const dispatch =useDispatch()
+  useEffect(() => {
+    dispatch(getDashboardData()).then((res) => {
+      setDashboardData(res.payload);
+    });
+  }, []);
   const expertsSummaryData = {
     labels: ["Trainers", "Dietitians", "Therapists", "Support Staff"],
     datasets: [
       {
-        data: [22, 18, 14, 4],
-        backgroundColor: ["#0A4F48", "#45C4A2", "#FFD7A8", "#D1D5DB"],
+        data: [dashboardData?.totalTrainers, dashboardData?.totalDietitians, dashboardData?.totalTherapists],
+        backgroundColor: ["#0A4F48", "#45C4A2", "#FFD7A8"],
         borderWidth: 0,
         circumference: 180,
         rotation: 270,
@@ -143,13 +149,7 @@ export default function Dashboard() {
       time: "3 Days Ago",
     },
   ];
-  const [dashboardData, setDashboardData] = useState({});
-const dispatch =useDispatch()
-  useEffect(() => {
-    dispatch(getDashboardData()).then((res) => {
-      setDashboardData(res.payload);
-    });
-  }, []);
+ 
 
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA]">

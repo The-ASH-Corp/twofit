@@ -137,7 +137,7 @@ function App() {
           <Route path="experts" element={<HeadExpertTable />} />
           <Route path="finance" element={<HeadFinanceTable />} />
           <Route path="admins/add-admin" element={<HeadAddAdmin />} />
-          <Route path="experts/profile/:id" element={<HeadExpertProfile />} />
+          <Route path="experts/profile/:expertId" element={<HeadExpertProfile />} />
           <Route path="admins/profile/:id" element={<HeadAdminProfile />} />
           <Route
             path="clients/profile/:clientId"
