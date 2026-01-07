@@ -4,25 +4,38 @@ import { ClientColumns } from "./ClientColumns";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import {
-  selectAllClients,
   selectClientStatus,
   selectClientError,
 } from "@/redux/features/client/client.selectors";
-import { getAllClients } from "@/redux/features/client/client.thunk";
+import { getClientsBasedOnCoach } from "@/redux/features/client/client.thunk";
 import { useNavigate } from "react-router-dom";
+import { selectAllCoaches } from "@/redux/features/coach/coach.selector";
+import { getAllCoachesByAdminId } from "@/redux/features/admins/admin.thunk";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 export default function ClientsTable() {
+  const coachIds = useAppSelector(selectAllCoaches);
+  const user = useAppSelector(selectUser);
   const status = useAppSelector(selectClientStatus);
   const error = useAppSelector(selectClientError);
   const [clients, setClients] = useState([]);
+  const [clientsLength, setClientsLength] = useState(0);
 
-    const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  if (coachIds.length === 0) {
+    dispatch(getAllCoachesByAdminId(user._id, page, limit));
+  }
 
   const fetchClientData = async () => {
-    const client = await dispatch(getAllClients({ page, limit })).unwrap();
-    setClients(client);
+    const client = await dispatch(
+      getClientsBasedOnCoach({ coachIds, page, limit })
+    ).unwrap();
+    setClients(client.data);
+    setClientsLength(client.total);
   };
+
   const navigate = useNavigate();
 
   const handlePageChange = (newPage) => {
@@ -48,8 +61,6 @@ export default function ClientsTable() {
   };
   const dispatch = useDispatch();
 
-
-
   useEffect(() => {
     fetchClientData();
   }, [page, limit, dispatch]);
@@ -71,6 +82,7 @@ export default function ClientsTable() {
         onSearchInput={searchInpiutHandler}
         page={page}
         limit={limit}
+        totalCount={clientsLength}
       />
     </div>
   );
