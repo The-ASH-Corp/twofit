@@ -1,18 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import {
-  Users,
-  UserCheck,
-  FileText,
-  Layout,
   MoreHorizontal,
   Bell,
-  TrendingUp,
   ChevronDown,
-  Flame,
-  CheckCircle2,
-  AlertCircle,
   MessageSquare,
   RefreshCw,
+  GraduationCap,
+  BookOpen,
+  UserCircle,
 } from "lucide-react";
 import {
   Chart as ChartJS,
@@ -27,7 +22,7 @@ import {
   Legend,
   Filler,
 } from "chart.js";
-import { Bar, Line, Doughnut } from "react-chartjs-2";
+import { Bar, Doughnut } from "react-chartjs-2";
 
 ChartJS.register(
   CategoryScale,
@@ -41,36 +36,23 @@ ChartJS.register(
   Legend,
   Filler
 );
-
-const AdminDashboard = () => {
-  // Mock Data for Charts
-  const growthData = {
-    labels: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+export default function Dashboard() {
+  const performanceData = {
+    labels: ["Programs", "Experts", "Clients"],
     datasets: [
       {
-        label: "Active",
-        data: [75, 80, 78, 85, 82, 90],
-        backgroundColor: "#0A4F48",
-        borderRadius: 4,
-        barThickness: 12,
-      },
-      {
-        label: "Inactive",
-        data: [40, 45, 42, 48, 45, 50],
-        backgroundColor: "#D1E0DE",
-        borderRadius: 4,
-        barThickness: 12,
-      },
-      {
-        label: "New",
-        data: [20, 25, 22, 28, 25, 30],
-        backgroundColor: "#45C4A2",
-        borderRadius: 4,
-        barThickness: 12,
+        data: [50, 20, 30],
+        backgroundColor: ["#0A4F48", "#E6EFEE", "#FFD7A8"],
+        borderWidth: 0,
+        rotation: 270,
+        cutout: "80%",
+        hoverOffset: 15,
+        rotation: 270,
+        spacing: 1,
+        borderRadius: 8,
       },
     ],
   };
-
   const complianceData = {
     labels: [
       "Jan",
@@ -89,59 +71,83 @@ const AdminDashboard = () => {
     datasets: [
       {
         label: "Diet",
-        data: [60, 65, 70, 68, 72, 75, 74, 76, 78, 80, 79, 82],
+        data: [20, 30, 25, 35, 30, 40, 35, 45, 40, 50, 45, 55],
         backgroundColor: "#0A4F48",
-        borderRadius: 4,
+        borderRadius: 6,
+        barThickness: 16,
       },
       {
         label: "Workout",
-        data: [40, 45, 50, 48, 52, 55, 63, 65, 67, 69, 68, 70],
+        data: [35, 40, 45, 40, 50, 45, 55, 50, 60, 55, 65, 60],
         backgroundColor: "#FFD7A8",
-        borderRadius: 4,
+        borderRadius: 6,
+        barThickness: 16,
       },
       {
         label: "Therapy",
-        data: [30, 35, 40, 38, 42, 45, 52, 54, 56, 58, 57, 60],
-        backgroundColor: "#45C4A2",
-        borderRadius: 4,
+        data: [25, 20, 30, 25, 35, 30, 40, 35, 45, 40, 50, 45],
+        backgroundColor: "#E6EFEE",
+        borderRadius: 6,
+        barThickness: 16,
       },
     ],
   };
 
-  const newClientsData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    datasets: [
-      {
-        label: "Clients joined",
-        data: [45, 52, 40, 75, 55, 65],
-        borderColor: "#0A4F48",
-        backgroundColor: (context) => {
-          const ctx = context.chart.ctx;
-          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-          gradient.addColorStop(0, "rgba(10, 79, 72, 0.1)");
-          gradient.addColorStop(1, "rgba(10, 79, 72, 0)");
-          return gradient;
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: "#fff",
+        titleColor: "#000",
+        bodyColor: "#666",
+        borderColor: "#eee",
+        borderWidth: 1,
+        padding: 10,
+      },
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { font: { size: 10 }, color: "#66706D" },
+      },
+      y: {
+        beginAtZero: true,
+        max: 100,
+        ticks: {
+          stepSize: 25,
+          font: { size: 10 },
+          color: "#66706D",
+          callback: (value) => value + "%",
         },
-        fill: true,
-        tension: 0.4,
-        borderWidth: 3,
-        pointBackgroundColor: "#fff",
-        pointBorderColor: "#0A4F48",
-        pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6,
+        grid: { color: "#F0F0F0" },
       },
-    ],
+    },
   };
-
-  const expertPerformanceData = {
-    labels: ["Response Time", "Rating", "Client Load"],
+  const growthData = {
+    labels: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     datasets: [
       {
-        data: [70, 85, 60],
-        backgroundColor: ["#0A4F48", "#45C4A2", "#FFD7A8"],
-        borderWidth: 0,
-        cutout: "75%",
+        label: "Active",
+        data: [75, 80, 78, 85, 82, 90],
+        backgroundColor: "#E6EFEE",
+        borderRadius: 4,
+        barThickness: 8,
+      },
+      {
+        label: "Inactive",
+        data: [40, 45, 42, 48, 45, 50],
+        backgroundColor: "#F2F2F2",
+        borderRadius: 4,
+        barThickness: 8,
+      },
+      {
+        label: "New",
+        data: [60, 70, 65, 80, 75, 85],
+        backgroundColor: "#0A4F48",
+        borderRadius: 4,
+        barThickness: 8,
       },
     ],
   };
@@ -156,55 +162,17 @@ const AdminDashboard = () => {
         circumference: 180,
         rotation: 270,
         cutout: "80%",
+        hoverOffset: 15,
+        spacing: 1,
+        borderRadius: 8,
       },
     ],
   };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: false,
-      },
-      tooltip: {
-        backgroundColor: "#fff",
-        titleColor: "#000",
-        bodyColor: "#666",
-        borderColor: "#eee",
-        borderWidth: 1,
-        padding: 10,
-        displayColors: true,
-        usePointStyle: true,
-      },
-    },
+  const stackedOptions = {
+    ...chartOptions,
     scales: {
-      x: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          font: {
-            size: 11,
-          },
-          color: "#66706D",
-        },
-      },
-      y: {
-        beginAtZero: true,
-        max: 100,
-        ticks: {
-          stepSize: 25,
-          font: {
-            size: 11,
-          },
-          color: "#66706D",
-          callback: (value) => value + "%",
-        },
-        grid: {
-          color: "#f0f0f0",
-        },
-      },
+      x: { ...chartOptions.scales.x, stacked: true },
+      y: { ...chartOptions.scales.y, stacked: true },
     },
   };
 
@@ -259,146 +227,72 @@ const AdminDashboard = () => {
       time: "3 Days Ago",
     },
   ];
-
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA]">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          {
-            label: "Total Clients",
-            value: "1,245",
-            icon: <Users size={20} className="text-[#0A4F48]" />,
-            bg: "bg-[#EBF3F2]",
-          },
-          {
-            label: "Active Clients",
-            value: "86",
-            icon: <UserCheck size={20} className="text-[#DAA520]" />,
-            bg: "bg-[#FAF3E0]",
-          },
-          {
-            label: "Total Programs",
-            value: "34",
-            icon: <FileText size={20} className="text-[#0A4F48]" />,
-            bg: "bg-[#EBF3F2]",
-          },
-          {
-            label: "Active Programs",
-            value: "86",
-            icon: <Layout size={20} className="text-[#DAA520]" />,
-            bg: "bg-[#FAF3E0]",
-          },
-        ].map((card, i) => (
-          <div
-            key={i}
-            className="bg-white p-5 rounded-2xl flex items-center justify-between shadow-sm"
-          >
-            <div className="flex flex-col gap-1">
-              <span className="text-sm text-[#66706D] font-medium">
-                {card.label}
-              </span>
-              <span className="text-2xl font-bold text-[#0A4F48]">
-                {card.value}
-              </span>
-            </div>
-            <div className={`${card.bg} p-3 rounded-xl`}>{card.icon}</div>
-          </div>
-        ))}
-      </div>
-
       <div className="flex gap-6 lg:flex-row flex-col">
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col gap-6">
-          {/* Row 2: Client Growth & Client Compliance */}
+          {/* Row 1: Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                label: "Total Clients",
+                value: "1,245",
+                icon: <GraduationCap size={22} className="text-white" />,
+                bg: "bg-[#0A4F48]",
+              },
+              {
+                label: "Total Programs",
+                value: "12",
+                icon: <BookOpen size={22} className="text-[#0A4F48]" />,
+                bg: "bg-[#FAF3E0]",
+              },
+              {
+                label: "Sub Admins",
+                value: "34",
+                icon: <UserCircle size={22} className="text-white" />,
+                bg: "bg-[#0A4F48]",
+              },
+            ].map((card, i) => (
+              <div
+                key={i}
+                className="bg-white p-5 rounded-2xl flex items-center justify-between shadow-sm border border-gray-50 h-[100px]"
+              >
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[12px] text-[#66706D] font-medium">
+                    {card.label}
+                  </span>
+                  <span className="text-2xl font-bold text-[#0A4F48]">
+                    {card.value}
+                  </span>
+                </div>
+                <div className={`${card.bg} p-2.5 rounded-full`}>
+                  {card.icon}
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Row 2: Sub Admin & Expert Performance */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <DashboardCard title="Client Growth" subTitle="Last 6 Months">
-              <div className="flex items-center gap-4 mb-4">
-                <LegendItem color="#0A4F48" label="Active" />
-                <LegendItem color="#D1E0DE" label="Inactive" />
-                <LegendItem color="#45C4A2" label="New" />
+              <div className="flex gap-4 mb-4">
+                <LegendItem color="#F2F2F2" label="Active" />
+                <LegendItem color="#E6EFEE" label="Inactive" />
+                <LegendItem color="#0A4F48" label="New" />
               </div>
-              <div className="h-64 relative">
+              <div className="h-64">
                 <Bar data={growthData} options={chartOptions} />
               </div>
             </DashboardCard>
 
             <DashboardCard title="Client Compliance" subTitle="Last Year">
-              <div className="flex items-center gap-4 mb-4">
-                <LegendItem color="#0A4F48" label="Diet" />
+              <div className="flex gap-4 mb-4">
+                <LegendItem color="#E6EFEE" label="Diet" />
                 <LegendItem color="#FFD7A8" label="Workout" />
-                <LegendItem color="#45C4A2" label="Therapy" />
+                <LegendItem color="#0A4F48" label="Therapy" />
               </div>
               <div className="h-64">
-                <Bar
-                  data={complianceData}
-                  options={{
-                    ...chartOptions,
-                    scales: {
-                      ...chartOptions.scales,
-                      x: { ...chartOptions.scales.x, stacked: true },
-                      y: { ...chartOptions.scales.y, stacked: true },
-                    },
-                  }}
-                />
-              </div>
-            </DashboardCard>
-          </div>
-
-          {/* Row 3: New Clients Joined & Expert Performance */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <DashboardCard title="New Clients Joined" subTitle="Last 6 Months">
-              <div className="h-64">
-                <Line
-                  data={newClientsData}
-                  options={{
-                    ...chartOptions,
-                    scales: {
-                      ...chartOptions.scales,
-                      y: {
-                        ...chartOptions.scales.y,
-                        max: 100,
-                        ticks: { stepSize: 25, color: "#66706D" },
-                      },
-                    },
-                  }}
-                />
-              </div>
-            </DashboardCard>
-
-            <DashboardCard title="Expert Performance" subTitle="Last Months">
-              <div className="h-64 relative flex items-center justify-center">
-                <Doughnut
-                  data={expertPerformanceData}
-                  options={{
-                    plugins: { legend: { display: false } },
-                    maintainAspectRatio: false,
-                  }}
-                />
-                <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span className="text-2xl font-bold text-[#0A4F48]">4.6</span>
-                  <span className="text-xs text-[#66706D]">Avg Rating</span>
-                </div>
-              </div>
-              <div className="flex justify-between mt-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#0A4F48]"></div>
-                  <span className="text-[11px] text-[#66706D]">
-                    Response Time <strong>1.8 h</strong>
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#45C4A2]"></div>
-                  <span className="text-[11px] text-[#66706D]">
-                    Rating <strong>4.6</strong>
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-[#FFD7A8]"></div>
-                  <span className="text-[11px] text-[#66706D]">
-                    Client Load <strong>73%</strong>
-                  </span>
-                </div>
+                <Bar data={complianceData} options={stackedOptions} />
               </div>
             </DashboardCard>
           </div>
@@ -418,25 +312,24 @@ const AdminDashboard = () => {
                 <thead>
                   <tr className="bg-[#F8F9FA] text-[11px] uppercase tracking-wider text-[#66706D] font-bold">
                     <th className="px-6 py-4">Client Name</th>
-                    <th className="px-6 py-4">Report Type</th>
+                    <th className="px-6 py-4">Task Type</th>
                     <th className="px-6 py-4">Expert</th>
                     <th className="px-6 py-4">Submitted By</th>
                     <th className="px-6 py-4">Date & Time</th>
-                    <th className="px-6 py-4">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {progressReports.map((report, i) => (
                     <tr key={i} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-800">
+                      <td className="px-6 py-4 text-sm font-medium text-[#0A4F48]">
                         {report.name}
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#66706D]">
+                      <td className="px-6 py-4 text-sm text-[#011412]">
                         {report.type}
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <span
-                          className={`px-2.5 py-1 rounded-md text-[10px] font-bold ${
+                          className={`px-3 py-1 rounded-md text-[10px] font-bold ${
                             report.expert === "Dietitian"
                               ? "bg-[#FAF3E0] text-[#DAA520]"
                               : report.expert === "Trainer"
@@ -447,17 +340,11 @@ const AdminDashboard = () => {
                           {report.expert}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#66706D]">
+                      <td className="px-6 py-4 text-sm text-[#011412]">
                         {report.submittedBy}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#66706D]">
                         {report.time}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#66706D]">
-                        <MoreHorizontal
-                          size={18}
-                          className="cursor-pointer hover:text-gray-900"
-                        />
                       </td>
                     </tr>
                   ))}
@@ -469,38 +356,41 @@ const AdminDashboard = () => {
 
         {/* Right Sidebar */}
         <div className="lg:w-80 flex flex-col gap-6">
-          {/* Experts Gauge Card */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-bold text-[#0A4F48]">Experts</h3>
+          {/* Experts Gauge Card at the top of Sidebar */}
+          <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col h-[400px] border border-gray-50">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-base font-bold text-[#0A4F48]">Experts</h3>
               <MoreHorizontal size={20} className="text-gray-400" />
             </div>
-            <div className="h-48 relative flex items-center justify-center">
-              <Doughnut
-                data={expertsSummaryData}
-                options={{
-                  plugins: { legend: { display: false } },
-                  maintainAspectRatio: false,
-                  cutout: "80%",
-                }}
-              />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[10%] flex flex-col items-center">
+            <div className="flex-1 relative flex items-center justify-center -mt-12">
+              <div className="w-full h-48">
+                <Doughnut
+                  data={expertsSummaryData}
+                  options={{
+                    plugins: { legend: { display: false } },
+                    maintainAspectRatio: false,
+                    cutout: "80%",
+                  }}
+                />
+              </div>
+              <div className="absolute top-[70%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
                 <span className="text-[10px] text-[#66706D] font-medium">
                   Total Experts
                 </span>
                 <span className="text-3xl font-bold text-[#0A4F48]">58</span>
               </div>
             </div>
-            <div className="flex flex-col gap-3 mt-4">
+            <div className="flex flex-col gap-4 mt-2">
               {[
                 { label: "Trainers", count: 22, color: "bg-[#0A4F48]" },
-                { label: "Dietitians", count: 18, color: "bg-[#45C4A2]" },
-                { label: "Therapists", count: 14, color: "bg-[#FFD7A8]" },
-                { label: "Support Staff", count: 4, color: "bg-[#D1D5DB]" },
+                { label: "Dietitians", count: 18, color: "bg-[#EBF3F2]" },
+                { label: "Therapists", count: 14, color: "bg-[#FAF3E0]" },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-sm ${item.color}`}></div>
+                    <div
+                      className={`w-2.5 h-2.5 rounded-[2px] ${item.color}`}
+                    ></div>
                     <span className="text-xs text-[#66706D] font-medium">
                       {item.label}
                     </span>
@@ -512,7 +402,38 @@ const AdminDashboard = () => {
               ))}
             </div>
           </div>
-
+          <div className="bg-white p-6 rounded-2xl shadow-sm">
+            <h3 className="text-lg font-bold text-[#0A4F48] mb-6">
+              Expert Performance
+            </h3>
+            <div className="h-44 mb-6">
+              <Doughnut
+                data={performanceData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { display: false } },
+                }}
+              />
+            </div>
+            <div className="space-y-4">
+              <PerformanceRow
+                color="bg-[#0A4F48]"
+                label="Programs"
+                value="50%"
+              />
+              <PerformanceRow
+                color="bg-[#E6EFEE]"
+                label="Experts"
+                value="20%"
+              />
+              <PerformanceRow
+                color="bg-[#FFD7A8]"
+                label="Clients"
+                value="30%"
+              />
+            </div>
+          </div>
           {/* Recent Notifications */}
           <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col flex-1 overflow-hidden min-h-[500px]">
             <div className="flex items-center justify-between mb-6">
@@ -570,7 +491,7 @@ const AdminDashboard = () => {
       </div>
     </div>
   );
-};
+}
 
 const DashboardCard = ({ title, subTitle, children }) => (
   <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col">
@@ -584,14 +505,24 @@ const DashboardCard = ({ title, subTitle, children }) => (
   </div>
 );
 
-const LegendItem = ({ color, label }) => (
+const LegendItem = ({ color, label, value }) => (
   <div className="flex items-center gap-2">
     <div
-      className="w-2.5 h-2.5 rounded-sm"
+      className="w-2.5 h-2.5 rounded-[2px]"
       style={{ backgroundColor: color }}
     ></div>
-    <span className="text-xs text-[#66706D] font-medium">{label}</span>
+    <span className="text-[11px] text-[#66706D] font-medium whitespace-nowrap">
+      {label} <strong className="text-[#0A4F48]">{value}</strong>
+    </span>
   </div>
 );
 
-export default AdminDashboard;
+const PerformanceRow = ({ color, label, value }) => (
+  <div className="flex items-center justify-between">
+    <div className="flex items-center gap-2">
+      <div className={`w-2 h-2 rounded-sm ${color}`}></div>
+      <span className="text-xs font-medium text-[#66706D]">{label}</span>
+    </div>
+    <span className="text-xs font-bold text-[#0A4F48]">{value}</span>
+  </div>
+);
