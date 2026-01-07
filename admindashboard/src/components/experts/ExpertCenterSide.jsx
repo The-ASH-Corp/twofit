@@ -228,7 +228,8 @@ const ExpertCenterSide = ({ expert }) => {
       </div>
 
       {/* Programs & Chat Monitoring Row */}
-      <div className=" gap-6 grid grid-cols-1 md:grid-cols-2">
+
+      <div className=" gap-6 ">
         {/* Programs */}
         <div className="bg-white rounded-2xl p-5 shadow-sm">
           <div className="flex justify-between items-center mb-4">
@@ -252,29 +253,6 @@ const ExpertCenterSide = ({ expert }) => {
                   {tag}
                 </span>
               ))}
-          </div>
-        </div>
-
-        {/* Chat Monitoring (Mini) */}
-        <div className="bg-white rounded-2xl p-5 shadow-sm flex items-center justify-between">
-          <div className="flex flex-col gap-1">
-            <h3 className="text-sm font-bold text-[#0A4F48]">
-              Chat Monitoring
-            </h3>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-[#0A4F48]">
-                MK
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[10px] text-[#66706D]">Therapist</span>
-                <span className="text-[11px] font-semibold text-[#011412]">
-                  Mira Kapoor
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="bg-[#0A4F48] p-2.5 rounded-lg text-white">
-            <MessageSquare size={18} />
           </div>
         </div>
       </div>

@@ -69,7 +69,7 @@ const ExpertRightSide = ({ expert }) => {
             </span>
             <div className="flex items-center gap-2">
               <span className="text-[10px] text-[#66706D] pr-2 border-r border-gray-200">
-                under 2h
+                {expert?.responseTime || "1h 12m"}
               </span>
               <span className="text-xs font-bold text-[#0A4F48]">94%</span>
             </div>
