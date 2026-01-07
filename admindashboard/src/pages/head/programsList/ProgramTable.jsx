@@ -6,6 +6,7 @@ import { getAllPrograms } from '@/redux/features/program/program.thunk'
 import { useAppSelector } from '@/redux/store/hooks'
 import { useEffect } from 'react'
 import { selectAllPrograms, selectProgramError, selectProgramStatus, selectTotalProgramCount } from '@/redux/features/program/program.selector'
+import { SyncLoader } from 'react-spinners'
 
 export default function ProgramTable() {
 
@@ -42,7 +43,11 @@ export default function ProgramTable() {
 
       setProgram(filtered);
     };
-  if (status === "loading") return <p>Loading programs...</p>;
+  if (status === "loading") return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#11b350" loading margin={2} size={20} />
+      </div>
+    );
   if (error) return <p>{error}</p>;
   return (
     <div>
