@@ -1,10 +1,32 @@
 import BaseForm from '@/components/form/BaseForm';
+import { selectAllCategories, selectCategoryError, selectCategoryStatus } from '@/redux/features/category/category.selector';
+import { getAllCategories } from '@/redux/features/category/category.thunk';
 import { createHead } from '@/redux/features/head/head.thunk';
-import React from 'react'
+import { useAppSelector } from '@/redux/store/hooks';
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 const TherapyForm = () => {
+  const dispatch = useDispatch(); 
+   
+  
+    useEffect(() => {
+      dispatch(getAllCategories({ page : 1, limit :100 }));
+    }, []);
+
+    const data = useAppSelector(selectAllCategories);
+    // const status = useAppSelector(selectCategoryStatus);
+    // const error = useAppSelector(selectCategoryError);
+
+    const [ categories, setCategories] = useState([]);
+    
+        useEffect(()=>{
+          setCategories(data)
+        },[data])
+
+        console.log(categories)
+
     const fields = [
       {
         section: "Personal Information",
@@ -91,7 +113,10 @@ const TherapyForm = () => {
             name: "programCategory",
             label: "Program Category",
             type: "select",
-            options: []
+            options: categories.map((items)=> ({
+              label: items.name,
+              value: items._id
+            }))
           },
         ],
       },
@@ -122,7 +147,6 @@ const TherapyForm = () => {
       name: "",
     };
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   
 
