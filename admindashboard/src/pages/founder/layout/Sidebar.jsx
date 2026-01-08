@@ -29,8 +29,8 @@ const menuItems = [
     ],
   },
   { label: "Finance", icon: assets.website, path: "/founder/finance" },
-  { label: "Therapy", icon: assets.website, path: "/founder/therapy" },
-  { label: "Workout", icon: assets.website, path: "/founder/workout" },
+  // { label: "Therapy", icon: assets.website, path: "/founder/therapy" },
+  // { label: "Workout", icon: assets.website, path: "/founder/workout" },
 ];
 
 export default function Sidebar() {
@@ -64,7 +64,7 @@ export default function Sidebar() {
                 <button
                   onClick={() => setOpenMenu(isOpen ? null : item.label)}
                   className={`flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-300 text-[#66706D] hover:bg-gray-100
-                    `}
+                    ${isOpen && "bg-gray-100"}`}
                 >
                   <div className="flex items-center gap-3">
                     <img src={item.icon} className="w-5 h-5" />

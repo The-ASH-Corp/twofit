@@ -49,7 +49,7 @@ const WorkoutList = () => {
   if (status === "loading")
     return (
       <div className="flex justify-center items-center h-[calc(100vh-120px)]">
-        <SyncLoader color="#11b350" loading margin={2} size={20} />
+        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
       </div>
     );
   return (

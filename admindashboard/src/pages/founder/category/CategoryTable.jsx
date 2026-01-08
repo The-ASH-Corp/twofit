@@ -54,7 +54,7 @@ export default function CategoryTable() {
         data={categories}
         pageLabel={"Category List"}
         actionLabel="Add Category"
-        actionPath="/add-category"
+        actionPath="/founder/category/create"
         onSearchInputChange={searchInputHandler}
         handlePageChange={setPage}
         handleLimitChange={setLimit}

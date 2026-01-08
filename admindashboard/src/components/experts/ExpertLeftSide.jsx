@@ -9,6 +9,7 @@ import {
   Phone,
   MapPin,
 } from "lucide-react";
+import { useMatch } from "react-router-dom";
 
 const ExpertLeftSide = ({ expert }) => {
   const profileDetails = [
@@ -85,6 +86,10 @@ const ExpertLeftSide = ({ expert }) => {
     },
   ];
 
+  const isFounderPage = useMatch("/founder/experts/profile/:id") 
+  const isHeadPage = useMatch("/head/experts/profile/:id")
+  // console.log(isFounderPage);
+
   return (
     <div className="w-[280px] flex flex-col gap-6 overflow-y-auto no-scrollbar pb-6">
       {/* Profile Card */}
@@ -131,17 +136,19 @@ const ExpertLeftSide = ({ expert }) => {
       </div>
 
       {/* Chat Monitoring */}
-      <div className="bg-white rounded-2xl p-5 shadow-sm">
-        <h3 className="text-sm font-bold text-[#0A4F48] mb-1">
-          Chat Monitoring
-        </h3>
-        <p className="text-[10px] text-[#66706D] mb-4">
-          Monitor expert-client chats
-        </p>
-        <button className="w-full py-2.5 bg-[#0A4F48] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#083a35] transition-colors">
-          <MessageSquare size={16} /> View Chat
-        </button>
-      </div>
+      {(!isFounderPage && !isHeadPage) && (
+        <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <h3 className="text-sm font-bold text-[#0A4F48] mb-1">
+            Chat Monitoring
+          </h3>
+          <p className="text-[10px] text-[#66706D] mb-4">
+            Monitor expert-client chats
+          </p>
+          <button className="w-full py-2.5 bg-[#0A4F48] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#083a35] transition-colors">
+            <MessageSquare size={16} /> View Chat
+          </button>
+        </div>
+      )}
 
       {/* Personal Info */}
       <div className="bg-white rounded-2xl p-6 shadow-sm">

@@ -20,11 +20,13 @@ import FounderHeadsList from "./pages/founder/heads/HeadTable";
 import FounderHeadsProfile from "./pages/founder/heads/HeadProfile";
 import FounderHeadForm from "./pages/founder/heads/HeadForm"
 import FounderCategoryList from "./pages/founder/category/CategoryTable";
+import FounderCategoryForm from "./pages/founder/category/CategoryForm";
 import FounderExpertList from "./pages/founder/experts/ExpertTable";
 import FounderExpertProfile from "./pages/founder/experts/ExpertProfile";
 import FounderAdminList from "./pages/founder/admin/AdminsList";
 import FounderAdminProfile from "./pages/founder/admin/AdminProfile"
 import FounderProgramsList from "./pages/founder/programsList/ProgramTable";
+import FounderProgramsForm from "./pages/founder/programsList/ProgramForm";
 import FounderTherapyList from "./pages/founder/therapy/TherapyTable";
 import FounderTherapyForm from "./pages/founder/therapy/TherapyForm";
 import FounderWorkoutList from "./pages/founder/workout/WorkoutList";
@@ -114,7 +116,9 @@ function App() {
             element={<FounderClientProfile />}
           />
           <Route path="programs" element={<FounderProgramsList />} />
+          <Route path="programs/create" element={<FounderProgramsForm />} />
           <Route path="category" element={<FounderCategoryList />} />
+          <Route path="category/create" element={<FounderCategoryForm />} />
           <Route path="finance" element={<FounderFinanceList />} />
           <Route path="therapy" element={<FounderTherapyList />} />
           <Route path="add-therapy" element={<FounderTherapyForm />} />
@@ -138,7 +142,10 @@ function App() {
           <Route path="experts" element={<HeadExpertTable />} />
           <Route path="finance" element={<HeadFinanceTable />} />
           <Route path="admins/add-admin" element={<HeadAddAdmin />} />
-          <Route path="experts/profile/:expertId" element={<HeadExpertProfile />} />
+          <Route
+            path="experts/profile/:expertId"
+            element={<HeadExpertProfile />}
+          />
           <Route path="admins/profile/:id" element={<HeadAdminProfile />} />
           <Route
             path="clients/profile/:clientId"
@@ -160,9 +167,12 @@ function App() {
           <Route path="clients" element={<AdminClientsTable />} />
           <Route path="experts" element={<AdminExpertTable />} />
           <Route path="chats" element={<AdminChats />} />
-          <Route path ="finance" element={<AdminFinance/>}/>
+          <Route path="finance" element={<AdminFinance />} />
           <Route path="experts/addexpert" element={<AdminAddExpert />} />
-          <Route path="experts/profile/:expertId" element={<AdminExpertProfile />} />
+          <Route
+            path="experts/profile/:expertId"
+            element={<AdminExpertProfile />}
+          />
           <Route path="clients/profile/:id" element={<AdminClientProfile />} />
           <Route path="clients/addclient" element={<AdminAddClient />} />
           <Route path="programs" element={<AdminProgramTable />} />
@@ -196,8 +206,8 @@ function App() {
           <Route index element={<ClientDashboard />} />
           <Route path="feedback" element={<ClientFeedback />} />
           <Route path="progress" element={<ClientProgress />} />
-          <Route path="daily-plan" element={<DailyPlan/>} />
-          <Route path="chats" element={<ClientChat/>}/>
+          <Route path="daily-plan" element={<DailyPlan />} />
+          <Route path="chats" element={<ClientChat />} />
         </Route>
 
         <Route path="/*" element={<Unauthorized />} />

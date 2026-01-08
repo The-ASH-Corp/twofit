@@ -17,19 +17,19 @@ export default function Topbar() {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="flex items-center bg-white px-3 rounded-lg">
+        {/* <div className="flex items-center bg-white px-3 rounded-lg">
           <img src={assets.search} className="  w-5 h-5  " />
           <input
             type="text"
             placeholder="Search anything"
-            className=" w-72 px-[10px] py-[12px] border border-none rounded-xl bg-white w-[250px]"
+            className="  px-2.5 py-3 border border-none rounded-xl bg-white w-[250px]"
           />
           <img src={assets.filter} className="  w-4 h-4" />
-        </div>
+        </div> */}
 
         <Bell className="w-6 h-6 text-gray-600 cursor-pointer" />
         <img src={assets.menu} />
-        <img src={assets.profile} className="rounded rounded-full" />
+        <img src={assets.profile} className=" rounded-full" />
 
         <div className="flex items-center gap-3">
           <div>
