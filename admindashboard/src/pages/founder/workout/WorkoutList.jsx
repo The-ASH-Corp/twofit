@@ -53,7 +53,7 @@ const WorkoutList = () => {
       </div>
     );
   return (
-    <div>
+    <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
       <BaseTable
         data={heads}
         columns={workoutColumns}
@@ -68,6 +68,6 @@ const WorkoutList = () => {
       />
     </div>
   );
-};
+}
 
 export default WorkoutList;

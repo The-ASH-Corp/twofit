@@ -36,7 +36,7 @@ const ClientProfile = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="flex justify-between w-full gap-4 h-[calc(100vh-120px)]">
+    <div className="flex justify-between w-full gap-4 h-[calc(100vh-120px)] ">
       <ProfileLeftSide client={client} />
       <ProfileCenterSide client={client} />
       <ProfileRightSide client={client} />
