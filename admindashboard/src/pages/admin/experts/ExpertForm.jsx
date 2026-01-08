@@ -58,7 +58,7 @@ export default function ExpertForm() {
         {
           name: "role",
           label: "Choose Role",
-          type: "multiple",
+          type: "select",
           options: [
             { label: "Trainer", value: "Trainer" },
             { label: "Dietician", value: "Dietician" },
