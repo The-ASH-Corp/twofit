@@ -9,6 +9,8 @@ export const createHead = async (req, res) => {
       data: head,
     });
   } catch (error) {
+    console.log(error);
+    
     res.status(400).json({ success: false, message: error.message });
   }
 };
