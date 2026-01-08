@@ -1,19 +1,34 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
-import User from "../modules/auth/auth.model.js";
 
 dotenv.config();
+
+const founderSchema = new mongoose.Schema({
+
+  name :{ type: String, required: true },
+  email: { type: String, required: true, unique: true, trim: true },
+
+  password: { type: String, required: true},
+
+  role: { type: String, required: true },
+
+  status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
+
+}, { timestamps: true });
+
+export const FounderModel = mongoose.model("Founder", founderSchema);
+
 
 const seedAdmin = async () => {
   try {
     await mongoose.connect(process.env.MONGOURI);
     console.log(" Database connected");
 
-    const email = "admin@twofit.com";
-    const password = "Admin@2025";
+    const email = "founder@twofit.com";
+    const password = "Founder@2025";
 
-    const existing = await User.findOne({ email });
+    const existing = await FounderModel.findOne({ email });
 
     if (existing) {
       console.log(" Admin already exists. Skipping seed.");
@@ -22,11 +37,12 @@ const seedAdmin = async () => {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    const adminUser = await User.create({
+    const adminUser = await FounderModel.create({
+      name:"Founder",
       email,
       password: hashedPassword,
-      role: "admin",
-      active: true,
+      role: "founder",
+      status: "Active",
     });
 
     console.log(" Admin created successfully!");
@@ -41,4 +57,4 @@ const seedAdmin = async () => {
   }
 };
 
-seedAdmin();
+// seedAdmin();

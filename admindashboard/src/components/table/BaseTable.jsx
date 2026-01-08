@@ -14,6 +14,8 @@ import {
 import { BiPlus } from "react-icons/bi";
 
 import { useState } from "react";
+import { BsDatabaseAdd } from "react-icons/bs";
+
 export default function BaseTable({
   columns,
   data,
@@ -52,7 +54,6 @@ export default function BaseTable({
       return range(1, totalPageCount);
     }
 
-
     const leftSiblingIndex = Math.max(page - siblingCount, 1);
     const rightSiblingIndex = Math.min(page + siblingCount, totalPageCount);
 
@@ -62,7 +63,6 @@ export default function BaseTable({
     const firstPageIndex = 1;
     const lastPageIndex = totalPageCount;
 
-    
     if (!shouldShowLeftDots && shouldShowRightDots) {
       const leftItemCount = 3 + 2 * siblingCount;
       const leftRange = range(1, leftItemCount);
@@ -127,46 +127,56 @@ export default function BaseTable({
           ) : null}
         </div>
       </div>
-      <div className="overflow-x-auto overflow-y-auto flex-1 min-h-0">
-        <table className="w-full text-sm border-collapse">
-          <thead className="bg-[#F8F8F8] ">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    key={header.id}
-                    className="text-left py-3 px-2 font-semibold text-black"
-                  >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
+      {data.length > 0 ? (
+        <div className="overflow-x-auto overflow-y-auto flex-1 min-h-0">
+          <table className="w-full text-sm border-collapse">
+            <thead className="bg-[#F8F8F8] ">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th
+                      key={header.id}
+                      className="text-left py-3 px-2 font-semibold text-black"
+                    >
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
 
-          <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr
-                key={row.id}
-                className="border-b border-[#DBDEDD] hover:bg-gray-50 transition"
-                onClick={() => profilePath(row.original._id)}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <td
-                    key={cell.id}
-                    className="py-5 px-2 text-[11px] font-medium text-black"
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            <tbody>
+              {table.getRowModel().rows.map((row) => (
+                <tr
+                  key={row.id}
+                  className="border-b border-[#DBDEDD] hover:bg-gray-50 transition"
+                  onClick={() => profilePath(row.original._id)}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td
+                      key={cell.id}
+                      className="py-5 px-2 text-[11px] font-medium text-black"
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="flex items-center justify-center h-full flex-col gap-2">
+          <BsDatabaseAdd size={60} />
+          <p className="text-center">Please add some data</p>
+        </div>
+      )}
 
       {/* Pagination */}
       <div className="flex items-center justify-between py-4 mt-auto">

@@ -7,6 +7,7 @@ import { generatePassword } from "../../utils/password.js";
 import { AdminModel } from "../../modules/admin/admin.model.js";
 import { HeadsModel } from "../Heads/heads.modal.js";
 import { CoachModel } from "../coach/coach.model.js";
+import { FounderModel } from "../../seeds/createAdmin.js";
 
 export const adminCreateUser = async (userData) => {
   const exists = await User.findOne({ email: userData.email });
@@ -59,7 +60,8 @@ export const loginUser = async ({ email, password }) => {
   const user =
     (await User.findOne({ email }).select("+password")) ||
     (await AdminModel.findOne({ email }).select("+password")) ||
-    (await HeadsModel.findOne({ email }).select("+password"));
+    (await HeadsModel.findOne({ email }).select("+password")) ||
+    (await FounderModel.findOne({ email }).select("+password"));
 
   if (!user) throw new Error("Invalid credentials");
 
