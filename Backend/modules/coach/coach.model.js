@@ -15,7 +15,7 @@ const coachSchema = new mongoose.Schema({
 
   address: { type: String, required: true },
 
-  role: { type: Array, required: true },
+  role: { type: String, required: true },
 
   specialization: { type: Array, required: true },
 
