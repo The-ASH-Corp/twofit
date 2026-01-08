@@ -62,11 +62,18 @@ export const loginUser = async ({ email, password }) => {
     (await AdminModel.findOne({ email }).select("+password")) ||
     (await HeadsModel.findOne({ email }).select("+password")) ||
     (await FounderModel.findOne({ email }).select("+password"));
+     (await CoachModel.findOne({email}).select("+password"))
 
   if (!user) throw new Error("Invalid credentials");
 
   if (user.status !== "Active")
     throw new Error("Your account is inactive. Contact admin.");
+ const roles = Array.isArray(user.role) ? user.role : [user.role];
+
+//   if (roles.includes("user") && user.status !== "Active") {
+//     throw new Error("Your account is inactive. Contact admin.");
+//   }
+
 
   const match = await bcrypt.compare(password, user.password);
   if (!match) throw new Error("Invalid credentials");
