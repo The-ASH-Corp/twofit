@@ -143,7 +143,7 @@ export default function FinanceKpi() {
                 <p className="text-[12px]">Client Extends Program</p>
               </label>
               <div className="flex flex-col items-start gap-2 w-full">
-                <p className="text-[11px]">Rating</p>
+                <p className="text-[11px]">Per Duration</p>
                 <div className="flex flex-col items-center gap-4 w-full">
                   <div className="flex items-center justify-between w-full gap-2">
                     <span className="p-3 bg-[#F8F8F8] rounded-xl text-[11px]">
@@ -205,7 +205,9 @@ export default function FinanceKpi() {
             <p className="text-[11px] text-[#66706D]">
               All incentives apply only to Experts.
             </p>
-            <button className="bg-[#0A4F48] w-full rounded-lg py-2.5 text-white font-semibold">Save & Update</button>
+            <button className="bg-[#0A4F48] w-full rounded-lg py-2.5 text-white font-semibold">
+              Save & Update
+            </button>
           </div>
         </div>
       )}
