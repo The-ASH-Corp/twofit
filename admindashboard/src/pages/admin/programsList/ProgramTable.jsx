@@ -5,8 +5,7 @@ import { useDispatch } from 'react-redux'
 import { getAllPrograms } from '@/redux/features/program/program.thunk'
 import { useAppSelector } from '@/redux/store/hooks'
 import { useEffect } from 'react'
-import { selectAllPrograms, selectProgramError, selectProgramStatus, selectTotalProgramCount } from '@/redux/features/program/program.selector'
-import { SyncLoader } from 'react-spinners'
+import { selectAllPrograms, selectProgramError, selectProgramStatus } from '@/redux/features/program/program.selector'
 
 export default function ProgramTable() {
 
@@ -18,7 +17,6 @@ export default function ProgramTable() {
     dispatch(getAllPrograms({ page, limit }));
   }, [dispatch, page, limit]);
 
-  const totalProgramCount = useAppSelector(selectTotalProgramCount);
   const data = useAppSelector(selectAllPrograms);
   const status = useAppSelector(selectProgramStatus);
   const error = useAppSelector(selectProgramError);
@@ -43,11 +41,7 @@ export default function ProgramTable() {
 
       setProgram(filtered);
     };
-  if (status === "loading") return (
-      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
-        <SyncLoader color="#11b350" loading margin={2} size={20} />
-      </div>
-    );
+  if (status === "loading") return <p>Loading programs...</p>;
   if (error) return <p>{error}</p>;
   return (
     <div>
@@ -61,7 +55,6 @@ export default function ProgramTable() {
         handleLimitChange={setLimit}
         page={page}
         limit={limit}
-        totalCount={totalProgramCount}
       />
     </div>
   );

@@ -4,35 +4,42 @@ import AdminRightSide from "@/components/admin/AdminRightSide";
 import ExpertCenterSide from "@/components/experts/ExpertCenterSide";
 import ExpertLeftSide from "@/components/experts/ExpertLeftSide";
 import ExpertRightSide from "@/components/experts/ExpertRightSide";
-import { selectHead, selectHeadError, selectHeadStatus } from "@/redux/features/head/head.selectors";
+import {
+  selectHead,
+  selectHeadError,
+  selectHeadStatus,
+} from "@/redux/features/head/head.selectors";
 import { getHead } from "@/redux/features/head/head.thunk";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-
-
-
+import { SyncLoader } from "react-spinners";
 
 const ExpertProfile = () => {
   const dispatch = useDispatch();
-   const { id } = useParams();
-   console.log(id);
+  const { id } = useParams();
+  console.log(id);
 
-     const expert = useSelector(selectHead);
-     const status = useSelector(selectHeadStatus);
-     const error = useSelector(selectHeadError);
+  const expert = useSelector(selectHead);
+  const status = useSelector(selectHeadStatus);
+  const error = useSelector(selectHeadError);
 
-   useEffect(() => {
-     if (id) {
-       dispatch(getHead(id));
-       //  console.log(expert);
-     }
-   }, [id, dispatch]);
+  useEffect(() => {
+    if (id) {
+      dispatch(getHead(id));
+      //  console.log(expert);
+    }
+  }, [id, dispatch]);
   //  console.log(expert);
 
-   if (status === "loading") return <p>Loading...</p>;
-   if (error) return <p className="text-red-500">{error}</p>;
-   
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#11b350" loading margin={2} size={20} />
+      </div>
+    );
+  if (error) return <p className="text-red-500">{error}</p>;
+
   return (
     <div className="flex flex-col gap-6 w-full h-[calc(100vh-120px)] overflow-hidden">
       {/* Header */}

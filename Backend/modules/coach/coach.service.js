@@ -38,7 +38,7 @@ export const createCoach = async (coach) => {
       coach[field] = coach[field] === "true" || coach[field] === true;
     }
   });
-  
+
   const password = async (CoachPassword) => {
     if (CoachPassword) {
       return await hashPassword(CoachPassword);
@@ -98,7 +98,13 @@ export const getAllCoach = async (page, limit) => {
 export const getCoachById = async (coachId) => {
   return await CoachModel.findById(coachId)
     .select("-password")
-    .populate("assignedUsers", "name _id email")
+    .populate({
+      path: "assignedUsers",
+      select: "-password",
+      populate: {
+        path: "programType",
+      },
+    })
     .populate("assignedPrograms");
 };
 

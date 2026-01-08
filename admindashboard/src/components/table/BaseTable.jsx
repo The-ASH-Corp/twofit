@@ -93,7 +93,7 @@ export default function BaseTable({
   const paginationRange = getPaginationRange() || [];
 
   return (
-    <div className="bg-white p-[16px] rounded-xl flex flex-col max-h-[80vh] overflow-hidden">
+    <div className="bg-white p-4 rounded-xl flex flex-col  overflow-hidden">
       <div className="mb-6 flex justify-between">
         <h2 className="text-[#0A4F48] font-bold text-[16px]">{pageLabel}</h2>
         <div className="flex gap-3">
@@ -102,7 +102,7 @@ export default function BaseTable({
             <input
               type="text"
               placeholder="Search anything"
-              className=" w-72 px-[10px] py-[12px] border border-none rounded-xl  w-[250px] focus:outline-none bg-transparent"
+              className=" w-72 px-2.5 py-3 border border-none rounded-xl   focus:outline-none bg-transparent"
               onChange={(e) => onSearchInputChange(e)}
             />
             <img src={assets.filter} className="  w-4 h-4" />

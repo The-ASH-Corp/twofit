@@ -55,6 +55,7 @@ import AdminAddExpert from "./pages/admin/experts/ExpertForm"
 import AdminExpertProfile from "./pages/admin/experts/ExpertProfile";
 import AdminClientProfile from "./pages/admin/clients/ClientProfile";
 import AdminAddClient from "./pages/admin/clients/ClientForm";
+import AdminProgramTable from "./pages/admin/programsList/ProgramTable";
 //Expert Pages Imports
 import ExpertLayout from "./pages/expert/layout/ExpertLayout";
 import ExpertDashboard from "./pages/expert/Dashboard";
@@ -136,7 +137,7 @@ function App() {
           <Route path="experts" element={<HeadExpertTable />} />
           <Route path="finance" element={<HeadFinanceTable />} />
           <Route path="admins/add-admin" element={<HeadAddAdmin />} />
-          <Route path="experts/profile/:id" element={<HeadExpertProfile />} />
+          <Route path="experts/profile/:expertId" element={<HeadExpertProfile />} />
           <Route path="admins/profile/:id" element={<HeadAdminProfile />} />
           <Route
             path="clients/profile/:clientId"
@@ -163,6 +164,7 @@ function App() {
           <Route path="experts/profile/:expertId" element={<AdminExpertProfile />} />
           <Route path="clients/profile/:id" element={<AdminClientProfile />} />
           <Route path="clients/addclient" element={<AdminAddClient />} />
+          <Route path="programs" element={<AdminProgramTable />} />
         </Route>
 
         {/* EXPERT */}

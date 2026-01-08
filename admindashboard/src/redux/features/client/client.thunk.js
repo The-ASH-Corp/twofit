@@ -8,7 +8,7 @@ export const getAllClients = createAsyncThunk(
   async ({page,limit}, { rejectWithValue }) => {
     try {
       const data = await axiosInstance.get(`/clients/all-clients/${page}/${limit}`);
-      return data.data;
+      return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to get clients");
     }
@@ -23,6 +23,18 @@ export const getClient = createAsyncThunk(
       return data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to get client");
+    }
+  }
+);
+
+export const getClientsBasedOnCoach = createAsyncThunk(
+  "client/getClientsBasedOnCoach",
+  async ({coachIds,page,limit}, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.post(`/clients/get-all-users-based-on-coach-for-admin`,{coachIds,page,limit});    
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to get clients");
     }
   }
 );

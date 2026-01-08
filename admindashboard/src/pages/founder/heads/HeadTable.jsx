@@ -1,10 +1,14 @@
-import BaseTable from '@/components/table/BaseTable'
-import React, { useEffect, useState } from 'react'
-import { therapyColumns } from './Headcolumns';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAllHeads } from '@/redux/features/head/head.thunk';
-import { selectAllHeads, selectHeadStatus } from '@/redux/features/head/head.selectors';
-import { useNavigate } from 'react-router-dom';
+import BaseTable from "@/components/table/BaseTable";
+import React, { useEffect, useState } from "react";
+import { therapyColumns } from "./Headcolumns";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllHeads } from "@/redux/features/head/head.thunk";
+import {
+  selectAllHeads,
+  selectHeadStatus,
+} from "@/redux/features/head/head.selectors";
+import { useNavigate } from "react-router-dom";
+import { SyncLoader } from "react-spinners";
 
 const TherapyTable = () => {
   // const therapyData = [
@@ -40,45 +44,49 @@ const TherapyTable = () => {
     dispatch(getAllHeads({ page, limit }));
   }, [dispatch, page, limit]);
 
-    const data = useSelector(selectAllHeads);
-    const status = useSelector(selectHeadStatus);
-    // const error = useSelector(selectHeadError);
+  const data = useSelector(selectAllHeads);
+  const status = useSelector(selectHeadStatus);
+  // const error = useSelector(selectHeadError);
 
-    const [ heads, setHeads] = useState([])
+  const [heads, setHeads] = useState([]);
 
-    useEffect(()=>{
-      setHeads(data)
-    },[data])
+  useEffect(() => {
+    setHeads(data);
+  }, [data]);
 
-    const searchInputHandler = (e) => {
-      const value = e.target.value.toLowerCase();
+  const searchInputHandler = (e) => {
+    const value = e.target.value.toLowerCase();
 
-      if (!value) {
-        setHeads(data);
-        return;
-      }
+    if (!value) {
+      setHeads(data);
+      return;
+    }
 
-      const filtered = data.filter((head) =>
-        head.name?.toLowerCase().includes(value)
-      );
+    const filtered = data.filter((head) =>
+      head.name?.toLowerCase().includes(value)
+    );
 
-      setHeads(filtered);
-    };
-
+    setHeads(filtered);
+  };
 
   // console.log(heads)
 
-  if (status === "loading") return <p>Loading...</p>;
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#11b350" loading margin={2} size={20} />
+      </div>
+    );
   // if (error) return <p className="text-red-500">{error?.error}</p>;
 
   return (
-    <div>
+    <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
       <BaseTable
         data={heads}
         columns={therapyColumns}
         actionLabel="Add Head"
         actionPath="/founder/heads/create"
-        profilePath= {profilePath}
+        profilePath={profilePath}
         pageLabel={"Heads"}
         onSearchInputChange={searchInputHandler}
         handlePageChange={setPage}
@@ -88,6 +96,6 @@ const TherapyTable = () => {
       />
     </div>
   );
-}
+};
 
-export default TherapyTable
+export default TherapyTable;

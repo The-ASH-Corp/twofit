@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getAllClients, getClient } from "./client.thunk";
+import { getAllClients, getClient, getClientsBasedOnCoach } from "./client.thunk";
 
 const initialState = {
   allClients:[],
   selectedClient:null,
+  totalCount:0,
   error:null,
   status:"idle",
 };
@@ -26,7 +27,8 @@ const clientSlice = createSlice({
       })
       .addCase(getAllClients.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.allClients = action.payload;
+        state.allClients = action.payload.data;
+        state.totalCount = action.payload.totalCount;
         state.error = null;
       })
       .addCase(getAllClients.rejected, (state, action) => {
@@ -44,7 +46,19 @@ const clientSlice = createSlice({
       .addCase(getClient.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
-      });
+      })
+      .addCase(getClientsBasedOnCoach.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getClientsBasedOnCoach.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.allClients = action.payload.data;
+        state.error = null;
+      })
+      .addCase(getClientsBasedOnCoach.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
   },
 });
 

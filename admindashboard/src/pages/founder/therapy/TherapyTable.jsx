@@ -1,9 +1,13 @@
-import BaseTable from '@/components/table/BaseTable'
-import React, { useEffect, useState } from 'react'
-import { therapyColumns } from './Therapycolumns';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAllTherapies } from '@/redux/features/therapy/therapy.thunk';
-import { selectAllTherapies, selectTherapyStatus } from '@/redux/features/therapy/therapy.selectors';
+import BaseTable from "@/components/table/BaseTable";
+import React, { useEffect, useState } from "react";
+import { therapyColumns } from "./Therapycolumns";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllTherapies } from "@/redux/features/therapy/therapy.thunk";
+import {
+  selectAllTherapies,
+  selectTherapyStatus,
+} from "@/redux/features/therapy/therapy.selectors";
+import { SyncLoader } from "react-spinners";
 
 const TherapyTable = () => {
   // const therapyData = [
@@ -41,9 +45,9 @@ const TherapyTable = () => {
 
   const [therapy, setTherapy] = useState([]);
 
-  useEffect(()=>{
-    setTherapy(data)
-  },[data])
+  useEffect(() => {
+    setTherapy(data);
+  }, [data]);
 
   const searchInputHandler = (e) => {
     const value = e.target.value.toLowerCase();
@@ -60,11 +64,16 @@ const TherapyTable = () => {
     setTherapy(filtered);
   };
 
-  if (status === "loading") return <p>Loading...</p>;
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#11b350" loading margin={2} size={20} />
+      </div>
+    );
   // if (error) return <p className="text-red-500">{error?.error}</p>;
 
   return (
-    <div>
+    <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
       <BaseTable
         data={therapy}
         columns={therapyColumns}
@@ -80,6 +89,6 @@ const TherapyTable = () => {
       />
     </div>
   );
-}
+};
 
-export default TherapyTable
+export default TherapyTable;

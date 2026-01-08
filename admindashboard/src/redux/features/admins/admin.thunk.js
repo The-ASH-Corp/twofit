@@ -8,7 +8,7 @@ export const getAllAdmins = createAsyncThunk(
       const data = await axiosInstance.get(
         `/admin/all-admins/${page}/${limit}`
       );
-      return data.data;
+      return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Login failed");
     }

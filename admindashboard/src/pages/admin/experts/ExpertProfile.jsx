@@ -10,6 +10,7 @@ import { getSingleCoach } from "@/redux/features/coach/coach.thunk";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { SyncLoader } from "react-spinners";
 
 const ExpertProfile = () => {
   const dispatch = useDispatch();
@@ -25,16 +26,23 @@ const ExpertProfile = () => {
     }
   }, [expertId, dispatch]);
 
-  if (status === "loading") return <p>Loading...</p>;
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#11b350" loading margin={2} size={20} />
+      </div>
+    );
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="flex justify-between w-full gap-4 h-[calc(100vh-120px)]">
-      {/* left */}
+    <div className="flex gap-6 w-full min-h-[calc(100vh-110px)] bg-[#F8F9FA] p-2 overflow-hidden">
+      {/* left sidebar */}
       <ExpertLeftSide expert={expert} />
-      {/* center */}
+
+      {/* center content */}
       <ExpertCenterSide expert={expert} />
-      {/* right */}
+
+      {/* right sidebar */}
       <ExpertRightSide expert={expert} />
     </div>
   );
