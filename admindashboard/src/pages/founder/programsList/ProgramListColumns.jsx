@@ -32,13 +32,7 @@ export const ProgramListColumns = [
   },
   { accessorKey: "title", header: "Program Name" },
   { accessorKey: "duration", header: "Duration" },
-  { header: "category",
-    cell:({row})=>(
-      <span className=" capitalize">
-      {row.original.category?.name || "—"}
-    </span>
-   )
-},
+  { accessorKey: "category", header: "category"},
   { accessorKey: "linkedTemplate", header: "Linked Template" },
 
   {
