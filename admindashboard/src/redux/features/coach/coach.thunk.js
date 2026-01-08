@@ -35,7 +35,9 @@ export const getAllCoaches = createAsyncThunk(
       const data = await axiosInstance.get(
         `/coach/get-all-coaches/${page}/${limit}`
       );
+       console.log(data)
       return data.data;
+     
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to get coaches"

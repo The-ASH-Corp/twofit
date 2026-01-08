@@ -56,3 +56,17 @@ export const getAllCoachesByAdminId = createAsyncThunk(
     }
   }
 );
+
+export const getDashboardData = createAsyncThunk(
+  "admins/getDashboardData",
+  async (adminId, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(`/admin/dashboard-data/${adminId}`);
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get dashboard data"
+      );
+    }
+  }
+);
