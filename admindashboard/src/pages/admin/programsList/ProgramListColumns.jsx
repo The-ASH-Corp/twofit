@@ -1,16 +1,13 @@
-// const expertColors = {
-//   Dietitian: "bg-[#FFF5ED] text-black",
-//   Therapist: "bg-[#E7F9F4] text-black",
-//   Trainer: "bg-[#EBF2FE] text-black",
-// };
-
 const statusColors = {
   Active: "bg-[#45C4A2] text-white",
   Inactive: "bg-[#66706D] text-white",
   Suspended: "bg-[#FB5858] text-white",
 };
 
+import { useNavigate } from "react-router-dom";
+
 export const ProgramListColumns = [
+  // ... existing columns ...
   {
     id: "select",
     header: ({ table }) => (
@@ -32,13 +29,12 @@ export const ProgramListColumns = [
   },
   { accessorKey: "title", header: "Program Name" },
   { accessorKey: "duration", header: "Duration" },
-  { header: "category",
-    cell:({row})=>(
-      <span className=" capitalize">
-      {row.original.category?.name || "—"}
-    </span>
-   )
-},
+  {
+    header: "category",
+    cell: ({ row }) => (
+      <span className=" capitalize">{row.original.category?.name || "—"}</span>
+    ),
+  },
   { accessorKey: "linkedTemplate", header: "Linked Template" },
 
   {
@@ -55,5 +51,21 @@ export const ProgramListColumns = [
       );
     },
   },
-  { id: "actions", header: "Action", cell: () => "⋯" },
+  {
+    id: "actions",
+    header: "Action",
+    cell: ({ row }) => <ActionCell row={row} />,
+  },
 ];
+
+const ActionCell = ({ row }) => {
+  const navigate = useNavigate();
+  return (
+    <button
+      onClick={() => navigate("/admin/programs/create")}
+      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#EBF3F2] hover:bg-[#dceceb] text-[#0A4F48] text-[11px] font-bold rounded-lg transition-colors"
+    >
+      View Plan
+    </button>
+  );
+};
