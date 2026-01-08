@@ -6,10 +6,10 @@ import {
   getSingleProgramController,
   updateSingleProgramController,
 } from "./allPrograma.controller.js";
-import {uploader} from "../../middleware/upload.js";
+import { uploader } from "../../middleware/upload.js";
 
 const router = express.Router();
-router.post("/create", uploader.single("photo"), createProgramController);
+router.post("/create", uploader.fields([{ name: "photo", maxCount: 1 }]), createProgramController);
 router.get("/list/:page/:limit", getAllProgramController);
 router.get("/get/:id", getSingleProgramController);
 router.put("/update/:id", updateSingleProgramController);
