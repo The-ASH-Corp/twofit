@@ -9,7 +9,7 @@ import {
 import RoleGuard from "./routes/RoleGuard";
 import Login from "./pages/Login";
 import PublicRoutes from "./routes/PublicRoutes";
- 
+
 import Unauthorized from "./pages/Unauthorized";
 //Founder Pages Imports
 import FounderLayout from "./pages/founder/layout/FounderLayout";
@@ -56,6 +56,7 @@ import AdminExpertProfile from "./pages/admin/experts/ExpertProfile";
 import AdminClientProfile from "./pages/admin/clients/ClientProfile";
 import AdminAddClient from "./pages/admin/clients/ClientForm";
 import AdminProgramTable from "./pages/admin/programsList/ProgramTable";
+import PlanForm from "./pages/admin/programsList/PlanForm";
 //Expert Pages Imports
 import ExpertLayout from "./pages/expert/layout/ExpertLayout";
 import ExpertDashboard from "./pages/expert/Dashboard";
@@ -77,11 +78,11 @@ function App() {
         <Route
           path="/login"
           element={
-            // <PublicRoutes>
-              //  {" "}
+            <PublicRoutes>
+              {" "}
               <Login />
-              // {" "}
-          //  </PublicRoutes>
+              {" "}
+            </PublicRoutes>
            
                
           }
@@ -165,6 +166,7 @@ function App() {
           <Route path="clients/profile/:id" element={<AdminClientProfile />} />
           <Route path="clients/addclient" element={<AdminAddClient />} />
           <Route path="programs" element={<AdminProgramTable />} />
+          <Route path="programs/create" element={<PlanForm />} />
         </Route>
 
         {/* EXPERT */}
@@ -182,8 +184,6 @@ function App() {
         </Route>
 
         {/* CLIENT */}
-       
-
 
         <Route
           path="/client"

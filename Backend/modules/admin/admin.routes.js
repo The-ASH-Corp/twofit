@@ -10,4 +10,5 @@ router.post("/add-admin",validate(adminValidationSchema),adminController.addAdmi
 router.get("/admin-profile/:id",adminController.getAdminProfile)
 router.get("/get-all-coaches-by-admin/:adminId/:page/:limit", adminController.getAllCoachesByAdmin);
 
+router.get("/dashboard-data/:adminId",adminController.getDashboardData)
 export default router;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   MoreHorizontal,
   Bell,
@@ -23,6 +23,10 @@ import {
   Filler,
 } from "chart.js";
 import { Bar, Doughnut } from "react-chartjs-2";
+import { useDispatch } from "react-redux";
+import { getDashboardData } from "@/redux/features/admins/admin.thunk";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 ChartJS.register(
   CategoryScale,
@@ -37,6 +41,19 @@ ChartJS.register(
   Filler
 );
 export default function Dashboard() {
+const [dashboardData, setDashboardData] = useState(null);
+const dispatch = useDispatch();
+const user =useAppSelector(selectUser)
+
+const getDashboardDatas =async () => {
+ const data =await dispatch(getDashboardData(user._id))
+ setDashboardData(data.payload)
+};
+
+  useEffect(() => {
+    getDashboardDatas();
+  }, []);
+
   const performanceData = {
     labels: ["Programs", "Experts", "Clients"],
     datasets: [
@@ -47,7 +64,6 @@ export default function Dashboard() {
         rotation: 270,
         cutout: "80%",
         hoverOffset: 15,
-        rotation: 270,
         spacing: 1,
         borderRadius: 8,
       },
@@ -70,25 +86,31 @@ export default function Dashboard() {
     ],
     datasets: [
       {
-        label: "Diet",
-        data: [20, 30, 25, 35, 30, 40, 35, 45, 40, 50, 45, 55],
+        label: "Therapy",
+        data: [15, 25, 30, 10, 60, 22, 28, 62, 25, 45, 28, 50],
         backgroundColor: "#0A4F48",
-        borderRadius: 6,
-        barThickness: 16,
+        borderRadius: 10,
+        borderWidth: 4,
+        borderColor: "#FFFFFF",
+        barThickness: 24,
       },
       {
         label: "Workout",
-        data: [35, 40, 45, 40, 50, 45, 55, 50, 60, 55, 65, 60],
-        backgroundColor: "#FFD7A8",
-        borderRadius: 6,
-        barThickness: 16,
+        data: [62, 22, 42, 45, 12, 32, 45, 18, 50, 48, 45, 22],
+        backgroundColor: "#F4DBC7",
+        borderRadius: 10,
+        borderWidth: 4,
+        borderColor: "#FFFFFF",
+        barThickness: 24,
       },
       {
-        label: "Therapy",
-        data: [25, 20, 30, 25, 35, 30, 40, 35, 45, 40, 50, 45],
-        backgroundColor: "#E6EFEE",
-        borderRadius: 6,
-        barThickness: 16,
+        label: "Diet",
+        data: [23, 53, 28, 45, 28, 46, 27, 20, 25, 7, 27, 28],
+        backgroundColor: "#EBF3F2",
+        borderRadius: 10,
+        borderWidth: 4,
+        borderColor: "#FFFFFF",
+        barThickness: 24,
       },
     ],
   };
@@ -100,28 +122,45 @@ export default function Dashboard() {
       legend: { display: false },
       tooltip: {
         backgroundColor: "#fff",
-        titleColor: "#000",
-        bodyColor: "#666",
-        borderColor: "#eee",
+        titleColor: "#0A4F48",
+        titleFont: { size: 14, weight: "bold" },
+        bodyColor: "#66706D",
+        bodyFont: { size: 12 },
+        borderColor: "rgba(0,0,0,0.05)",
         borderWidth: 1,
-        padding: 10,
+        padding: 12,
+        boxPadding: 8,
+        usePointStyle: true,
+        cornerRadius: 12,
+        callbacks: {
+          label: (context) => {
+            let label = context.dataset.label || "";
+            if (label) {
+              label += ": ";
+            }
+            if (context.parsed.y !== null) {
+              label += context.parsed.y + "%";
+            }
+            return label;
+          },
+        },
       },
     },
     scales: {
       x: {
         grid: { display: false },
-        ticks: { font: { size: 10 }, color: "#66706D" },
+        ticks: { font: { size: 11 }, color: "#66706D" },
       },
       y: {
         beginAtZero: true,
         max: 100,
         ticks: {
           stepSize: 25,
-          font: { size: 10 },
+          font: { size: 11 },
           color: "#66706D",
           callback: (value) => value + "%",
         },
-        grid: { color: "#F0F0F0" },
+        grid: { color: "#F0F0F0", drawBorder: false },
       },
     },
   };
@@ -131,33 +170,33 @@ export default function Dashboard() {
       {
         label: "Active",
         data: [75, 80, 78, 85, 82, 90],
-        backgroundColor: "#E6EFEE",
+        backgroundColor: "#F4DBC7",
         borderRadius: 4,
-        barThickness: 8,
+        barThickness: 12,
       },
       {
         label: "Inactive",
         data: [40, 45, 42, 48, 45, 50],
-        backgroundColor: "#F2F2F2",
+        backgroundColor: "#EBF3F2",
         borderRadius: 4,
-        barThickness: 8,
+        barThickness: 12,
       },
       {
         label: "New",
         data: [60, 70, 65, 80, 75, 85],
         backgroundColor: "#0A4F48",
         borderRadius: 4,
-        barThickness: 8,
+        barThickness: 12,
       },
     ],
   };
 
   const expertsSummaryData = {
-    labels: ["Trainers", "Dietitians", "Therapists", "Support Staff"],
+    labels: ["Trainers", "Dietitians", "Therapists", ],
     datasets: [
       {
-        data: [22, 18, 14, 4],
-        backgroundColor: ["#0A4F48", "#45C4A2", "#FFD7A8", "#D1D5DB"],
+        data: [dashboardData?.totalTrainers||0, dashboardData?.totalDietitians||0, dashboardData?.totalTherapists||0],
+        backgroundColor: ["#0A4F48", "#45C4A2", "#FFD7A8",],
         borderWidth: 0,
         circumference: 180,
         rotation: 270,
@@ -227,6 +266,8 @@ export default function Dashboard() {
       time: "3 Days Ago",
     },
   ];
+  console.log(dashboardData);
+  
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA]">
       <div className="flex gap-6 lg:flex-row flex-col">
@@ -236,20 +277,20 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                label: "Total Clients",
-                value: "1,245",
+                label: "Clients",
+                value: dashboardData?.totalClients||0,
                 icon: <GraduationCap size={22} className="text-white" />,
                 bg: "bg-[#0A4F48]",
               },
               {
                 label: "Total Programs",
-                value: "12",
+                value: dashboardData?.totalPrograms||0,
                 icon: <BookOpen size={22} className="text-[#0A4F48]" />,
                 bg: "bg-[#FAF3E0]",
               },
               {
-                label: "Sub Admins",
-                value: "34",
+                label: "Experts",
+                value: dashboardData?.totalExperts||0,
                 icon: <UserCircle size={22} className="text-white" />,
                 bg: "bg-[#0A4F48]",
               },
@@ -287,8 +328,8 @@ export default function Dashboard() {
 
             <DashboardCard title="Client Compliance" subTitle="Last Year">
               <div className="flex gap-4 mb-4">
-                <LegendItem color="#E6EFEE" label="Diet" />
-                <LegendItem color="#FFD7A8" label="Workout" />
+                <LegendItem color="#EBF3F2" label="Diet" />
+                <LegendItem color="#F4DBC7" label="Workout" />
                 <LegendItem color="#0A4F48" label="Therapy" />
               </div>
               <div className="h-64">
@@ -377,14 +418,14 @@ export default function Dashboard() {
                 <span className="text-[10px] text-[#66706D] font-medium">
                   Total Experts
                 </span>
-                <span className="text-3xl font-bold text-[#0A4F48]">58</span>
+                <span className="text-3xl font-bold text-[#0A4F48]">{dashboardData?.totalExperts||0}</span>
               </div>
             </div>
             <div className="flex flex-col gap-4 mt-2">
               {[
-                { label: "Trainers", count: 22, color: "bg-[#0A4F48]" },
-                { label: "Dietitians", count: 18, color: "bg-[#EBF3F2]" },
-                { label: "Therapists", count: 14, color: "bg-[#FAF3E0]" },
+                { label: "Trainers", count: dashboardData?.totalTrainers||0, color: "bg-[#0A4F48]" },
+                { label: "Dietitians", count: dashboardData?.totalDietitians||0, color: "bg-[#EBF3F2]" },
+                { label: "Therapists", count: dashboardData?.totalTherapists||0, color: "bg-[#FAF3E0]" },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -508,10 +549,10 @@ const DashboardCard = ({ title, subTitle, children }) => (
 const LegendItem = ({ color, label, value }) => (
   <div className="flex items-center gap-2">
     <div
-      className="w-2.5 h-2.5 rounded-[2px]"
+      className="w-3 h-3 rounded-full"
       style={{ backgroundColor: color }}
     ></div>
-    <span className="text-[11px] text-[#66706D] font-medium whitespace-nowrap">
+    <span className="text-[13px] text-[#66706D] font-medium whitespace-nowrap">
       {label} <strong className="text-[#0A4F48]">{value}</strong>
     </span>
   </div>
