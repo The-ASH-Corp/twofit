@@ -17,7 +17,7 @@ const programSchema = new mongoose.Schema(
       required: true,
     },
     duration: {
-      type: [Number],
+      type: Array,
       required: true,
     },
 

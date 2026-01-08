@@ -1,23 +1,48 @@
 import BaseForm from "@/components/form/BaseForm";
+import { selectAllCategories } from "@/redux/features/category/category.selector";
+import { getAllCategories } from "@/redux/features/category/category.thunk";
 import { createProgram } from "@/redux/features/program/program.thunk";
-import React from "react";
+import { useAppSelector } from "@/redux/store/hooks";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
- 
+
 export default function ProgramForm() {
-  const navigate=useNavigate()
-   const fields = [
+  const navigate = useNavigate();
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAllCategories({ page: 1, limit: 100 }));
+  }, []);
+
+  const data = useAppSelector(selectAllCategories);
+
+  const fields = [
     {
       section: "Program Information",
-      position:"left",
+      position: "left",
       fields: [
         { name: "title", label: "Program Name", type: "text" },
-        { name: "image", label: "Choose Image", type: "file" },
-        { name: "category", label: "Choose Your Category", type: "select" ,options:[]},
+        {
+          name: "image",
+          label: "Choose Image",
+          type: "file",
+          accept: ".pdf,.jpg,.jpeg,.png",
+        },
+        {
+          name: "category",
+          label: "Choose Your Category",
+          type: "select",
+          options: data.map((items) => ({
+            label: items.name,
+            value: items._id,
+          })),
+        },
         {
           name: "duration",
           label: "Duration",
-          type: "select",
+          type: "multiple",
           options: [
             { label: "30 Days", value: 30 },
             { label: "60 Days", value: 60 },
@@ -45,23 +70,39 @@ export default function ProgramForm() {
     status: "",
   };
 
-   const dispatch = useDispatch()
+  const handleProgramCreation = async (values) => {
+    try {
+      const formData = new FormData();
 
-  const handleProgramCreation =async(values)=>{
-    try{
-      const program=await dispatch(createProgram(values)).unwrap()
-      navigate('/programs')
-      
-    }catch(error){
-       console.error("Program creation failed:", error);
+      Object.keys(values).forEach((key) => {
+        if (key === "image" && values[key] instanceof File) {
+          formData.append("photo", values[key]);
+        } else if (Array.isArray(values[key])) {
+          formData.append(key, JSON.stringify(values[key]));
+        } else if (
+          values[key] !== null &&
+          values[key] !== undefined &&
+          values[key] !== ""
+        ) {
+          formData.append(key, values[key]);
+        }
+      });
+
+      const program = await dispatch(createProgram(formData)).unwrap();
+      navigate("/programs");
+    } catch (error) {
+      console.error("Program creation failed:", error);
     }
-  
-    // navigate('/programs')
-        
-  }
+  };
   return (
     <div>
-      <BaseForm fields={fields} initialValues={initialValues} onSubmit={(values)=>{handleProgramCreation(values)}}/>
+      <BaseForm
+        fields={fields}
+        initialValues={initialValues}
+        onSubmit={(values) => {
+          handleProgramCreation(values);
+        }}
+      />
     </div>
   );
 }
