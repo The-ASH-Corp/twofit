@@ -77,11 +77,11 @@ function App() {
         <Route
           path="/login"
           element={
-            // <PublicRoutes>
-              //  {" "}
+            <PublicRoutes>
+              {" "}
               <Login />
-              // {" "}
-          //  </PublicRoutes>
+              {" "}
+            </PublicRoutes>
            
                
           }

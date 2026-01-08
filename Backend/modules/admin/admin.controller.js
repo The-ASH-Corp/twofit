@@ -53,3 +53,17 @@ export const getAllCoachesByAdmin = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 };
+
+
+export const getDashboardData = async (req, res) => {
+  try {
+    const { adminId } = req.params;
+    const result = await service.getDashboardData(adminId);
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};

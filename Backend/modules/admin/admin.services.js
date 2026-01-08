@@ -1,4 +1,7 @@
 import { generatePassword, hashPassword } from "../../utils/password.js";
+import allProgramaModel from "../allPrograms/allPrograma.model.js";
+import User from "../auth/auth.model.js";
+import { CoachModel } from "../coach/coach.model.js";
 import { AdminModel } from "./admin.model.js";
 
 export const getAllAdmins = async (page, limit) => {
@@ -72,4 +75,38 @@ export const getAllCoachesByAdmin = async ({ adminId, page, limit }) => {
     coaches: populatedAdmin?.experts || [],
     totalCount: totalCount,
   };
+};
+
+export const getDashboardData = async (adminId) => {
+
+  const totalPrograms = await allProgramaModel.countDocuments();
+  const totalExperts = await AdminModel.find({_id:adminId}).select("experts").populate("experts");
+
+  const query = {
+    $or: [
+      { trainer: { $in: totalExperts?.experts } },
+      { dietition: { $in: totalExperts?.experts } },
+      { therapist: { $in: totalExperts?.experts } },
+    ],
+    role: "user",
+  };
+
+  const clients = await User.find(query)
+
+  const totalClients = clients?.length;
+  const totalCoaches = totalExperts[0].experts?.length;
+
+  const totalTrainers =await totalExperts[0].experts?.filter((expert) => expert.role.includes("Trainer"))?.length;
+  const totalDietitians =await totalExperts[0].experts?.filter((expert) => expert.role.includes("Dietician"))?.length;
+  const totalTherapists =await totalExperts[0].experts?.filter((expert) => expert.role.includes("Therapist"))?.length;
+
+  return {
+    totalPrograms,
+    totalExperts:totalExperts[0].experts?.length,
+    totalClients,
+    totalCoaches,
+    totalTrainers,
+    totalDietitians,
+    totalTherapists,
+  }
 };
