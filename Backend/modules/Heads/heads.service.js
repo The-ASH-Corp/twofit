@@ -24,6 +24,7 @@ export const createHead = async (head) => {
     phone: head.phone,
     password: hashedPassword,
     address: head.address,
+    status:"Active",
     specialization: head.specialization,
     experience: head.experience,
     qualification: head.qualification,
