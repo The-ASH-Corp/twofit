@@ -8,6 +8,7 @@ const categorySchema = new mongoose.Schema(
     //   enum: ["Weight Management", "Disease Management"],
       unique: true,
     },
+    programLimit: { type: Number, require: true}
   },
   { timestamps: true }
 );
