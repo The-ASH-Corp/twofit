@@ -2,12 +2,12 @@ import User from "../auth/auth.model.js";
 
 export const getAllClient = async (page, limit) => {
   const skip = (page - 1) * limit;
-
+const totalCount = await User.countDocuments({ role: "user" });
   const clients = await User.find({ role: "user" })
     .skip(skip)
     .limit(limit)
     .select("-password");
-  return clients;
+  return {clients, totalCount};
 };
 
 export const getSingleClient = async (id) => {

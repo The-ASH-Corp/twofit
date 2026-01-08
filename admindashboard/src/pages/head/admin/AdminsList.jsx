@@ -8,14 +8,15 @@ import { getAllAdmins } from '@/redux/features/admins/admin.thunk';
 export default function AdminsList() {
 
   const [admins,setAdmins]=useState([])
- 
+  const [totalCount,setTotalCount]=useState(0)
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
   const dispatch = useDispatch();
   const fetchAdminData=async()=>{
     const admin =await dispatch(getAllAdmins({page,limit})).unwrap()
-    setAdmins(admin)
+    setAdmins(admin.data)
+    setTotalCount(admin.total)
   }
  const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -60,6 +61,7 @@ export default function AdminsList() {
         handleLimitChange={handleLimitChange}
         page={page}
         limit={limit}
+        totalCount={totalCount}
       />
     </div>
   );
