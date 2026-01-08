@@ -9,4 +9,6 @@ router.get("/get-head/:id", headsController.getHeadById);
 router.put("/update/:id", headsController.updateHead);
 router.delete("/delete/:id", headsController.deleteHead);
 
+router.get("/dashboard-data", headsController.getDashboardData)
+
 export default router;

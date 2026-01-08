@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react'
-import BaseTable from '../../../components/table/BaseTable'
-import { AdminColumns } from './AdminColumns'
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { getAllAdmins } from '@/redux/features/admins/admin.thunk';
+import React, { useEffect, useState } from "react";
+import BaseTable from "../../../components/table/BaseTable";
+import { AdminColumns } from "./AdminColumns";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { getAllAdmins } from "@/redux/features/admins/admin.thunk";
 import {
   getAdminError,
   getAdminStatus,
   getAdmins,
 } from "@/redux/features/admins/admins.selecters";
+import { SyncLoader } from "react-spinners";
 
 export default function AdminsList() {
   const [page, setPage] = useState(1);
@@ -49,7 +50,12 @@ export default function AdminsList() {
     navigate(`/founder/admins/profile/${id}`);
   };
 
-  if (status === "loading") return <p>Loading...</p>;
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#11b350" loading margin={2} size={20} />
+      </div>
+    );
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (

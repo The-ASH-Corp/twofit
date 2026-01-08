@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import BaseTable from "../../../components/table/BaseTable";
 import { ExpertColumns } from "./ExpertColumns";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllCoaches } from "@/redux/features/coach/coach.thunk";
 import { useNavigate } from "react-router-dom";
 import { getAllCoachesByAdminId } from "@/redux/features/admins/admin.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";

@@ -8,7 +8,7 @@ export const getAllClients = createAsyncThunk(
   async ({page,limit}, { rejectWithValue }) => {
     try {
       const data = await axiosInstance.get(`/clients/all-clients/${page}/${limit}`);
-      return data.data;
+      return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to get clients");
     }

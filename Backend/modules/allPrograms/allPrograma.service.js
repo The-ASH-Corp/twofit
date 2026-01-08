@@ -5,7 +5,9 @@ export const createProgram = async (data) => {
 };
 
 export const getAllProgram = async (page,limit) => {
-  return await programModel.find().skip((page-1)*limit).limit(limit);
+  const totalProgram = await programModel.countDocuments();
+  const program = await programModel.find().skip((page-1)*limit).limit(limit);
+  return {program,totalProgram};
 };
 
 export const getSingleProgram = async (id) => {

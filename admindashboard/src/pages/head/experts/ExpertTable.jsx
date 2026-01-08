@@ -15,7 +15,7 @@ export default function ExpertTable() {
   const fetchCoachData=async()=>{
     const coache =await dispatch(getAllCoaches({page,limit})).unwrap()
     const clients =coache[0].assignedUsers.length
-    setCoaches([{...coache[0],clients}])
+    setCoaches(coache)
   }
 
   const handlePageChange = (newPage) => {
@@ -59,6 +59,7 @@ export default function ExpertTable() {
         handleLimitChange={handleLimitChange}
         page={page}
         limit={limit}
+        totalCount={coaches.length}
       />
     </div>
   );
