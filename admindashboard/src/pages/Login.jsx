@@ -26,29 +26,68 @@ const Login = () => {
     user: "/client",
   };
 
+ 
+  // const handleLogin = async () => {
+  //   try {
+  //     const result = await dispatch(login(formData)).unwrap();
+  //     console.log("LOGIN RESPONSE:", result);
+  //     console.log("USER DETAILS:", result.user);
+
+  //     const role = result.user.role;
+
+  //     localStorage.setItem("token", result.accessToken);
+  //     localStorage.setItem("role", role);
+
+  //     const redirectPath = ROLE_REDIRECT[role];
+
+  //     if (!redirectPath) {
+  //       throw new Error("Unknown role");
+  //     }
+
+  //     navigate(redirectPath, { replace: true });
+  //   } catch (error) {
+  //     console.error("Login failed:", error);
+  //     alert(error?.message || "Invalid email or password");
+  //   }
+  // };
+
+  const resolveRole = (role) => {
+  if (!role) return null;
+
+  const normalizedRole = role.toLowerCase();
+
+  if (["therapist", "dietician", "trainer"].includes(normalizedRole)) {
+    return "expert";
+  }
+
+  return normalizedRole;
+};
+
   const handleLogin = async () => {
-    try {
-      const result = await dispatch(login(formData)).unwrap();
-      console.log("LOGIN RESPONSE:", result);
-      console.log("USER DETAILS:", result.user);
+  try {
+    const result = await dispatch(login(formData)).unwrap();
 
-      const role = result.user.role;
+    const finalRole = resolveRole(result.user.role);
 
-      localStorage.setItem("token", result.accessToken);
-      localStorage.setItem("role", role);
+    localStorage.setItem("token", result.accessToken);
+    localStorage.setItem("role", finalRole);
 
-      const redirectPath = ROLE_REDIRECT[role];
+    const redirectPath = ROLE_REDIRECT[finalRole];
 
-      if (!redirectPath) {
-        throw new Error("Unknown role");
-      }
-
-      navigate(redirectPath, { replace: true });
-    } catch (error) {
-      console.error("Login failed:", error);
-      alert(error?.message || "Invalid email or password");
+    if (!redirectPath) {
+      throw new Error("Unknown role");
     }
-  };
+
+    navigate(redirectPath, { replace: true });
+  } catch (error) {
+    console.error("Login failed:", error);
+    alert(error?.message || "Invalid email or password");
+  }
+};
+
+
+
+  
 
   return (
     <div className="h-screen w-full flex items-center justify-between ">
