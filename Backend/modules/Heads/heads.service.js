@@ -9,7 +9,6 @@ export const createHead = async (head) => {
   let hashedPassword;
 
   if (head.password) {
-    console.log(head.password);
     hashedPassword = await hashPassword(head.password);
   } else {
     const newPassword = generatePassword();

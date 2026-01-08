@@ -8,21 +8,26 @@ import {
 
 export const createProgramController = async (req, res) => {
   try {
-    if (req.file) {
-      req.body.photo = "/uploads/" + req.file.filename;
+    if (req.files && req.files.photo && req.files.photo[0]) {
+      req.body.image = "/uploads/" + req.files.photo[0].filename;
+    }
+    if (req.body.duration) {
+      req.body.duration = JSON.parse(req.body.duration);
     }
     const program = await createProgram(req.body);
     res.status(200).json({ status: true, data: program });
   } catch (err) {
+    console.log(err);
+
     res.status(400).json({ success: false, message: err.message });
   }
 };
 
 export const getAllProgramController = async (req, res) => {
   try {
-    const{page,limit} = req.params
-    const {program,totalProgram} = await getAllProgram(page,limit);
-    res.status(200).json({ status: true, data: program ,totalProgram });
+    const { page, limit } = req.params
+    const { program, totalProgram } = await getAllProgram(page, limit);
+    res.status(200).json({ status: true, data: program, totalProgram });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }

@@ -7,7 +7,7 @@ const headsSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, trim: true },
   phone: { type: String, required: true, unique: true },
   address: { type: String, required: true },
-  specialization: { type: String, required: true },
+  specialization: { type: Array, required: true },
   experience: { type: String, required: true },
   qualification: { type: String, required: true },
   programCategory: { type: String, required: true },

@@ -5,7 +5,16 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const createProgram = createAsyncThunk("program/createProgram", async (programDetails, { rejectWithValue }) => {
   try {
-    const data = await axiosInstance.post(`/programs/create`, programDetails)
+     const config =
+        programDetails instanceof FormData
+          ? {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            }
+          : {};
+
+    const data = await axiosInstance.post(`/programs/create`, programDetails,config)
     return data.data
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || "Failed to Create Program");
