@@ -7,6 +7,8 @@ import {
   Trash2,
   Upload,
   Check,
+  Edit2,
+  X,
 } from "lucide-react";
 
 export default function PlanForm() {
@@ -20,11 +22,13 @@ export default function PlanForm() {
           id: 1,
           name: "Day 1",
           expanded: true,
+          exercises: [], // Initial empty exercises
         },
         {
           id: 2,
           name: "Day 2",
           expanded: false,
+          exercises: [],
         },
       ],
     },
@@ -85,6 +89,7 @@ export default function PlanForm() {
             id: week.days.length + 1,
             name: `Day ${week.days.length + 1}`,
             expanded: true,
+            exercises: [],
           };
           return { ...week, days: [...week.days, newDay] };
         }
@@ -104,6 +109,79 @@ export default function PlanForm() {
           return {
             ...week,
             days: week.days.filter((day) => day.id !== dayId),
+          };
+        }
+        return week;
+      })
+    );
+  };
+
+  const addExercise = (weekId, dayId, exercise) => {
+    setWeeks(
+      weeks.map((week) => {
+        if (week.id === weekId) {
+          return {
+            ...week,
+            days: week.days.map((day) => {
+              if (day.id === dayId) {
+                return {
+                  ...day,
+                  exercises: [
+                    ...(day.exercises || []),
+                    { ...exercise, id: Date.now() },
+                  ],
+                };
+              }
+              return day;
+            }),
+          };
+        }
+        return week;
+      })
+    );
+  };
+
+  const updateExercise = (weekId, dayId, exercise) => {
+    setWeeks(
+      weeks.map((week) => {
+        if (week.id === weekId) {
+          return {
+            ...week,
+            days: week.days.map((day) => {
+              if (day.id === dayId) {
+                return {
+                  ...day,
+                  exercises: (day.exercises || []).map((ex) =>
+                    ex.id === exercise.id ? { ...ex, ...exercise } : ex
+                  ),
+                };
+              }
+              return day;
+            }),
+          };
+        }
+        return week;
+      })
+    );
+  };
+
+  const removeExercise = (weekId, dayId, exerciseId) => {
+    setWeeks(
+      weeks.map((week) => {
+        if (week.id === weekId) {
+          return {
+            ...week,
+            days: week.days.map((day) => {
+              if (day.id === dayId) {
+                return {
+                  ...day,
+                  exercises: (day.exercises || []).filter(
+                    (ex) => ex.id !== exerciseId
+                  ),
+                };
+              }
+              return day;
+            }),
           };
         }
         return week;
@@ -157,10 +235,10 @@ export default function PlanForm() {
           {weeks.map((week) => (
             <div
               key={week.id}
-              className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden"
+              className="bg-white rounded-2xl border border-gray-100 shadow-sm"
             >
               {/* Week Header */}
-              <div className="p-4 flex items-center justify-between bg-white">
+              <div className="p-4 flex items-center justify-between bg-white rounded-t-2xl">
                 <h3 className="text-base font-bold text-[#011412]">
                   {week.name}
                 </h3>
@@ -186,7 +264,7 @@ export default function PlanForm() {
               </div>
 
               {week.expanded && (
-                <div className="p-4 pt-0 border-t border-gray-50">
+                <div className="p-4 pt-0 border-t border-gray-50 rounded-b-2xl">
                   {/* Week Input */}
                   <div className="my-4">
                     <label className="block text-xs font-bold text-[#011412] mb-1.5">
@@ -205,10 +283,10 @@ export default function PlanForm() {
                     {week.days.map((day) => (
                       <div
                         key={day.id}
-                        className="border border-gray-100 rounded-xl overflow-hidden"
+                        className="border border-gray-100 rounded-xl"
                       >
                         {/* Day Header */}
-                        <div className="p-3 flex items-center justify-between bg-gray-50/50">
+                        <div className="p-3 flex items-center justify-between bg-gray-50/50 rounded-t-xl">
                           <span className="text-sm font-bold text-[#011412]">
                             {day.name}
                           </span>
@@ -235,8 +313,21 @@ export default function PlanForm() {
 
                         {/* Day Content */}
                         {day.expanded && (
-                          <div className="p-4 bg-white flex flex-col gap-6">
-                            <PlanSection title="Workout Plan" type="workout" />
+                          <div className="p-4 bg-white flex flex-col gap-6 rounded-b-xl">
+                            <PlanSection
+                              title="Workout Plan"
+                              type="workout"
+                              exercises={day.exercises || []}
+                              onAddExercise={(exercise) =>
+                                addExercise(week.id, day.id, exercise)
+                              }
+                              onUpdateExercise={(exercise) =>
+                                updateExercise(week.id, day.id, exercise)
+                              }
+                              onRemoveExercise={(exerciseId) =>
+                                removeExercise(week.id, day.id, exerciseId)
+                              }
+                            />
                           </div>
                         )}
                       </div>
@@ -265,21 +356,6 @@ export default function PlanForm() {
         </div>
       </div>
 
-      {/* Right Sidebar */}
-      {/* <div className="w-full lg:w-80 flex flex-col gap-6">
-        <SidebarCard title="Plan Media">
-          <div className="flex flex-col items-center justify-center p-8 text-center">
-            <p className="text-xs text-gray-400">No Data Found</p>
-          </div>
-        </SidebarCard>
-        <SidebarCard title="Change Logs">
-          <div className="flex flex-col items-center justify-center p-8 text-center">
-            <p className="text-xs text-gray-400">No Data Found</p>
-          </div>
-        </SidebarCard>
-
-      </div> */}
-
       {/* Bottom Actions */}
       <div className="fixed bottom-0 right-0 bg-gray-50 border-t border-gray-200 p-4 z-10 left-0 lg:left-[225px]">
         {/* Adjust lg:pl-64 based on your actual sidebar width if resizing */}
@@ -303,15 +379,51 @@ export default function PlanForm() {
   );
 }
 
-const SidebarCard = ({ title, children }) => (
-  <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-50">
-    <h3 className="text-sm font-bold text-[#0A4F48] mb-4">{title}</h3>
-    {children}
-  </div>
-);
-
-const PlanSection = ({ title, type }) => {
+const PlanSection = ({
+  title,
+  type,
+  exercises = [],
+  onAddExercise,
+  onUpdateExercise,
+  onRemoveExercise,
+}) => {
   const [isOpen, setIsOpen] = useState(true);
+  const [editingId, setEditingId] = useState(null);
+
+  // Local state for the form
+  const [formState, setFormState] = useState({
+    name: "",
+    notes: "",
+    url: "",
+    mediaName: "",
+  });
+
+  const handleAddOrUpdate = () => {
+    if (!formState.name) return; // Simple validation
+
+    if (editingId) {
+      onUpdateExercise({ ...formState, id: editingId });
+      setEditingId(null);
+    } else {
+      onAddExercise(formState);
+    }
+    setFormState({ name: "", notes: "", url: "", mediaName: "" }); // Reset form
+  };
+
+  const handleEditClick = (exercise) => {
+    setEditingId(exercise.id);
+    setFormState({
+      name: exercise.name,
+      notes: exercise.notes || "",
+      url: exercise.url || "",
+      mediaName: exercise.mediaName || "",
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setFormState({ name: "", notes: "", url: "", mediaName: "" });
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -330,102 +442,117 @@ const PlanSection = ({ title, type }) => {
 
       {isOpen && (
         <div className="flex flex-col gap-4">
-          {/* Input Row 1 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <InputGroup
-              label={type === "workout" ? "Exercise Name" : "Therapy Type"}
-              placeholder={
-                type === "workout"
-                  ? "Enter Exercise Name"
-                  : "Select Therapy Type"
-              }
-            />
-            <InputGroup
-              label={type === "workout" ? "Notes" : "Attach URL"}
-              placeholder={type === "workout" ? "Add Notes" : "Paste link here"}
-            />
-          </div>
-          {/* Input Row 2 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {type === "workout" && (
-              <InputGroup label="Attach URL" placeholder="Paste link here" />
-            )}
-            {type === "therapy" && (
-              <InputGroup label="Notes" placeholder="Add Notes" />
-            )}
-
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold text-[#011412]">
-                Media Attachment
-              </label>
-              <div className="flex border border-gray-200 rounded-xl overflow-hidden">
-                <button className="flex items-center gap-2 px-4 py-2.5 bg-[#EBF3F2] text-[#011412] text-xs font-bold whitespace-nowrap">
-                  Upload File
+          {/* Input Form for New/Edit Exercise */}
+          <div className="flex flex-col gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+            <div className="flex items-center justify-between">
+              <h5 className="text-xs font-bold text-[#0A4F48] uppercase tracking-wider">
+                {editingId ? "Edit Exercise" : "Add New Exercise"}
+              </h5>
+              {editingId && (
+                <button
+                  onClick={handleCancelEdit}
+                  className="text-xs text-red-500 font-bold hover:underline"
+                >
+                  Cancel Edit
                 </button>
-                <input
-                  type="text"
-                  placeholder={
-                    type === "workout"
-                      ? "Upload Exercise Video"
-                      : "Upload Video, Audio and Photos"
-                  }
-                  className="w-full px-4 py-2.5 text-xs outline-none text-gray-500 placeholder:text-gray-400"
-                  readOnly
-                />
-              </div>
+              )}
             </div>
-          </div>
 
-          {/* Existing Items (Mock) */}
-          {type === "workout" && (
-            <div className="flex flex-col gap-2 mt-2">
-              <ExistingItem name="Bodyweight Squats" checked={true} />
-              <ExistingItem name="Glute Bridges" checked={false} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <InputGroup
+                label={type === "workout" ? "Exercise Name" : "Therapy Type"}
+                placeholder={
+                  type === "workout"
+                    ? "Enter Exercise Name"
+                    : "Select Therapy Type"
+                }
+                value={formState.name}
+                onChange={(e) =>
+                  setFormState({ ...formState, name: e.target.value })
+                }
+              />
+              <InputGroup
+                label={type === "workout" ? "Notes" : "Attach URL"}
+                placeholder={
+                  type === "workout" ? "Add Notes" : "Paste link here"
+                }
+                value={type === "workout" ? formState.notes : formState.url}
+                onChange={(e) =>
+                  setFormState({
+                    ...formState,
+                    [type === "workout" ? "notes" : "url"]: e.target.value,
+                  })
+                }
+              />
             </div>
-          )}
-
-          {/* Create Exercise Form (Green Box) - Only for Workout in screenshot, but generic here */}
-          {type === "workout" && (
-            <div className="bg-[#F8F9FA] p-4 rounded-xl border border-gray-100 mt-2">
-              <div className="flex items-center justify-between mb-4">
-                <h5 className="text-xs font-bold text-[#011412]">
-                  Create Exercise
-                </h5>
-                <button className="px-4 py-1.5 bg-[#0A4F48] text-white text-[10px] font-bold rounded-lg shadow-sm">
-                  Update
-                </button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <InputGroup
-                  label="Exercise Name"
-                  placeholder="Enter Exercise Name"
-                  bg="white"
-                />
-                <InputGroup label="Notes" placeholder="Add Notes" bg="white" />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Input Row 2 */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {type === "workout" && (
                 <InputGroup
                   label="Attach URL"
                   placeholder="Paste link here"
-                  bg="white"
+                  value={formState.url}
+                  onChange={(e) =>
+                    setFormState({ ...formState, url: e.target.value })
+                  }
                 />
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-[#011412]">
-                    Media Attachment
-                  </label>
-                  <div className="flex border border-gray-200 rounded-xl overflow-hidden bg-white">
-                    <button className="flex items-center gap-2 px-4 py-2.5 bg-[#EBF3F2] text-[#011412] text-xs font-bold whitespace-nowrap">
-                      Upload File
-                    </button>
-                    <input
-                      type="text"
-                      placeholder="Upload Exercise Video"
-                      className="w-full px-4 py-2.5 text-xs outline-none text-gray-500 placeholder:text-gray-400 bg-white"
-                      readOnly
-                    />
-                  </div>
+              )}
+              {type === "therapy" && (
+                <InputGroup
+                  label="Notes"
+                  placeholder="Add Notes"
+                  value={formState.notes}
+                  onChange={(e) =>
+                    setFormState({ ...formState, notes: e.target.value })
+                  }
+                />
+              )}
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-[#011412]">
+                  Media Attachment
+                </label>
+                <div className="flex border border-gray-200 rounded-xl overflow-hidden bg-white">
+                  <button className="flex items-center gap-2 px-4 py-2.5 bg-[#EBF3F2] text-[#011412] text-xs font-bold whitespace-nowrap hover:bg-[#dceceb] transition-colors">
+                    <Upload size={14} />
+                    Upload File
+                  </button>
+                  <input
+                    type="text"
+                    placeholder={
+                      type === "workout"
+                        ? "Upload Exercise Video"
+                        : "Upload Video, Audio and Photos"
+                    }
+                    className="w-full px-4 py-2.5 text-xs outline-none text-gray-500 placeholder:text-gray-400 bg-white"
+                    readOnly
+                    value={formState.mediaName}
+                  />
                 </div>
               </div>
+            </div>
+
+            <button
+              onClick={handleAddOrUpdate}
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-[#0A4F48] text-white text-xs font-bold rounded-lg shadow-sm hover:bg-[#08443e] transition-all w-full md:w-fit md:place-self-end"
+            >
+              {editingId ? <Check size={14} /> : <Plus size={14} />}
+              {editingId ? "Update Exercise" : "Add Exercise"}
+            </button>
+          </div>
+
+          {/* List of Added Exercises (Moved Below) */}
+          {type === "workout" && exercises.length > 0 && (
+            <div className="flex flex-col gap-2 mt-2">
+              {exercises.map((ex) => (
+                <ExistingItem
+                  key={ex.id}
+                  name={ex.name}
+                  checked={true}
+                  onEdit={() => handleEditClick(ex)}
+                  onRemove={() => onRemoveExercise(ex.id)}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -434,7 +561,13 @@ const PlanSection = ({ title, type }) => {
   );
 };
 
-const InputGroup = ({ label, placeholder, bg = "transparent" }) => (
+const InputGroup = ({
+  label,
+  placeholder,
+  bg = "transparent",
+  value,
+  onChange,
+}) => (
   <div className="flex flex-col gap-1.5">
     <label className="text-xs font-bold text-[#011412]">{label}</label>
     <input
@@ -443,28 +576,74 @@ const InputGroup = ({ label, placeholder, bg = "transparent" }) => (
       className={`w-full p-3 ${
         bg === "white" ? "bg-white" : "bg-white"
       } border border-gray-200 rounded-xl text-xs outline-none focus:border-[#0A4F48] transition-colors placeholder:text-gray-400`}
+      value={value}
+      onChange={onChange}
     />
   </div>
 );
 
-const ExistingItem = ({ name, checked }) => (
-  <div
-    className={`p-3 rounded-xl flex items-center justify-between ${
-      checked ? "bg-[#F8F9FA]" : "bg-[#F8F9FA]"
-    } border border-gray-50`}
-  >
-    <div className="flex items-center gap-3">
-      <div
-        className={`w-5 h-5 rounded-md flex items-center justify-center border transition-colors ${
-          checked ? "bg-[#0A4F48] border-[#0A4F48]" : "bg-white border-gray-200"
-        }`}
-      >
-        {checked && <Check size={12} className="text-white" />}
+const ExistingItem = ({ name, checked, onRemove, onEdit }) => {
+  const [showMenu, setShowMenu] = useState(false);
+
+  return (
+    <div
+      className={`p-3 rounded-xl flex items-center justify-between ${
+        checked ? "bg-[#F8F9FA]" : "bg-[#F8F9FA]"
+      } border border-gray-50 transition-all hover:border-gray-200 relative`}
+    >
+      <div className="flex items-center gap-3">
+        <div
+          className={`w-5 h-5 rounded-md flex items-center justify-center border transition-colors ${
+            checked
+              ? "bg-[#0A4F48] border-[#0A4F48]"
+              : "bg-white border-gray-200"
+          }`}
+        >
+          {checked && <Check size={12} className="text-white" />}
+        </div>
+        <span className="text-xs font-bold text-[#011412]">{name}</span>
       </div>
-      <span className="text-xs font-bold text-[#011412]">{name}</span>
+
+      <div className="relative">
+        <button
+          onClick={() => setShowMenu(!showMenu)}
+          className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded"
+        >
+          <MoreHorizontal size={16} />
+        </button>
+
+        {showMenu && (
+          <div className="absolute right-0 top-8 bg-white border border-gray-100 shadow-xl rounded-lg p-1 min-w-[100px] z-50 flex flex-col gap-1">
+            <button
+              onClick={() => {
+                onEdit();
+                setShowMenu(false);
+              }}
+              className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50 rounded-md w-full text-left"
+            >
+              <Edit2 size={12} />
+              Edit
+            </button>
+            <button
+              onClick={() => {
+                onRemove();
+                setShowMenu(false);
+              }}
+              className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-500 hover:bg-red-50 rounded-md w-full text-left"
+            >
+              <Trash2 size={12} />
+              Delete
+            </button>
+          </div>
+        )}
+      </div>
+      {/* Overlay to close menu when clicking outside */}
+      {showMenu && (
+        <div
+          className="fixed inset-0 z-0 bg-transparent"
+          onClick={() => setShowMenu(false)}
+        />
+      )}
     </div>
-    <button className="text-gray-400 hover:text-gray-600">
-      <MoreHorizontal size={16} />
-    </button>
-  </div>
-);
+  );
+};
