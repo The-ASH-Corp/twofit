@@ -12,6 +12,11 @@ import {
 } from "lucide-react";
 
 export default function PlanForm() {
+  const [programDetails, setProgramDetails] = useState({
+    name: "Weight Loss",
+    duration: "30 Days",
+  });
+
   const [weeks, setWeeks] = useState([
     {
       id: 1,
@@ -212,8 +217,11 @@ export default function PlanForm() {
               {["30 Days", "60 Days", "90 Days"].map((dur, i) => (
                 <button
                   key={i}
+                  onClick={() =>
+                    setProgramDetails({ ...programDetails, duration: dur })
+                  }
                   className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                    i === 0
+                    programDetails.duration === dur
                       ? "bg-[#EBF3F2] text-[#0A4F48] border-transparent"
                       : "bg-white text-[#66706D] border-gray-200"
                   }`}
