@@ -4,11 +4,7 @@
 //   Trainer: "bg-[#EBF2FE] text-black",
 // };
 
-const statusColors = {
-  Active: "bg-[#45C4A2] text-white",
-  Inactive: "bg-[#66706D] text-white",
-  Suspended: "bg-[#FB5858] text-white",
-};
+
 
 export const CategoryListColumns = [
   {
@@ -31,21 +27,9 @@ export const CategoryListColumns = [
     ),
   },
   { accessorKey: "name", header: "Category Name" },
-   
-
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = row.original.status;
-      const colorClass = statusColors[status] || "bg-gray-200 text-gray-700";
-
-      return (
-        <span className={`px-2 py-1 text-[11px] rounded-xl ${colorClass}`}>
-          {status}
-        </span>
-      );
-    },
-  },
+  { accessorKey: "programLimit", header: "Programs" },
+  { accessorKey: "name", header: "Sub Admins" },
+  { accessorKey: "name", header: "Experts" },
+  { accessorKey: "name", header: "Clients" },
   { id: "actions", header: "Action", cell: () => "⋯" },
 ];
