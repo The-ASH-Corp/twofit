@@ -15,4 +15,6 @@ router.get("/get/:id", getSingleProgramController);
 router.put("/update/:id", updateSingleProgramController);
 router.delete("/delete/:id", deleteProgramController);
 
+router.get("/get-all-programs-by-category/:category", getAllProgramController)
+
 export default router;

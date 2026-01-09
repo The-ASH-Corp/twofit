@@ -1,15 +1,28 @@
 import BaseForm from "@/components/form/BaseForm";
 import { createAdmin } from "@/redux/features/admins/admin.thunk";
-import { getAllPrograms } from "@/redux/features/program/program.thunk";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { getAllProgramsByCategory } from "@/redux/features/program/program.thunk";
+import { useAppSelector } from "@/redux/store/hooks";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export default function AdminForm() {
+  const user = useAppSelector(selectUser)
   const [programs, setPrograms] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const fetchPrograms = async () => { 
+    const response = await dispatch(
+      getAllProgramsByCategory(user.programCategory)
+    ).unwrap();
+    setPrograms(response);
+  };
+  useEffect(() => {
+    fetchPrograms();
+  }, []);
 
   const fields = [
     {
@@ -121,15 +134,7 @@ export default function AdminForm() {
     automatedReminder: false,
   };
 
-  const fetchPrograms = async () => {  //list the programs under his head
-    const response = await dispatch(
-      getAllPrograms({ page: 1, limit: 10 })
-    ).unwrap();
-    setPrograms(response.data);
-  };
-  useEffect(() => {
-    fetchPrograms();
-  }, []);
+  
 
   const handleAdminCreation = async (values) => {
     const selectedProgram = programs.find(
@@ -146,7 +151,6 @@ export default function AdminForm() {
       toast("Failed to create admin", { type: "error" });
     }
   };
-
   return (
     <BaseForm
       fields={fields}

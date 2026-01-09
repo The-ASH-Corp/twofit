@@ -42,7 +42,7 @@ const ChastList = ({ clients, chatClient, client, onlineUsers = [] }) => {
                 <h3 className="text-[#0A4F48] font-medium text-sm truncate"> 
                   {chat.name}
                 </h3>
-                <p className=" text-xs capitalize ">{chat?.role?.join(", ")}</p>
+                <p className=" text-xs capitalize ">{chat?.role}</p>
               </div>
               <span className="text-gray-400 text-[10px] whitespace-nowrap">
                 01:45 PM
