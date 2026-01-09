@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 import {
   ChevronDown,
   ChevronUp,
@@ -10,6 +11,9 @@ import {
   Edit2,
   X,
 } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { createNewPlan } from "@/redux/features/plans/plan.thunk";
+import { toast } from "react-toastify";
 
 export default function PlanForm() {
   const [programDetails, setProgramDetails] = useState({
@@ -36,18 +40,6 @@ export default function PlanForm() {
           exercises: [],
         },
       ],
-    },
-    {
-      id: 2,
-      name: "Week 2",
-      expanded: false,
-      days: [],
-    },
-    {
-      id: 3,
-      name: "Week 3",
-      expanded: false,
-      days: [],
     },
   ]);
 
@@ -192,6 +184,33 @@ export default function PlanForm() {
         return week;
       })
     );
+  };
+  const dispatch = useDispatch();
+  const location = useLocation();
+
+  const handleSave = async () => {
+    const cleanedWeeks = weeks.map((week) => ({
+      name: week.name,
+      days: week.days.map((day) => ({
+        name: day.name,
+        exercises: (day.exercises || []).map((ex) => {
+          const { id, ...rest } = ex;
+          return rest;
+        }),
+      })),
+    }));
+
+    const payload = {
+      ...programDetails,
+      program: location.state?.programId,
+      weeks: cleanedWeeks,
+    };
+    const data = await dispatch(createNewPlan(payload));
+    if (data.payload.success) {
+      toast.success(data.payload.message);
+    } else {
+      toast.error(data.payload.message);
+    }
   };
 
   return (
@@ -375,7 +394,10 @@ export default function PlanForm() {
               <button className="bg-[#EBF3F2] rounded-md p-2 min-w-[80px]">
                 Cancel
               </button>
-              <button className="bg-[#0A4F48] p-2 rounded-md text-white min-w-[120px]">
+              <button
+                onClick={handleSave}
+                className="bg-[#0A4F48] p-2 rounded-md text-white min-w-[120px]"
+              >
                 Save & Add Plan
               </button>
             </div>
