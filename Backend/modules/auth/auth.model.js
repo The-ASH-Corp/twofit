@@ -36,6 +36,26 @@ const userSchema = new mongoose.Schema(
     },
 
     currentWeight: { type: Number, required: true },
+    weightHistory: [
+      {
+        weight: { type: Number, required: true },
+        date: { type: Date, default: Date.now },
+      },
+    ],
+    measurements: {
+      chest: { type: Number },
+      waist: { type: Number },
+      hip: { type: Number },
+    },
+
+    measurementHistory: [
+      {
+        chest: { type: Number },
+        waist: { type: Number },
+        hip: { type: Number },
+        date: { type: Date, default: Date.now },
+      },
+    ],
 
     targetWeight: { type: Number, required: true },
 
@@ -61,11 +81,11 @@ const userSchema = new mongoose.Schema(
 
     programEndDate: { type: String, required: true },
 
-    dietition: { type: mongoose.Schema.Types.ObjectId ,ref:"Coach" },
+    dietition: { type: mongoose.Schema.Types.ObjectId, ref: "Coach" },
 
-    trainer: { type: mongoose.Schema.Types.ObjectId ,ref:"Coach"  },
+    trainer: { type: mongoose.Schema.Types.ObjectId, ref: "Coach" },
 
-    therapist: { type: mongoose.Schema.Types.ObjectId ,ref:"Coach"  },
+    therapist: { type: mongoose.Schema.Types.ObjectId, ref: "Coach" },
 
     autoSendGuide: { type: Boolean, default: false },
 
