@@ -12,7 +12,6 @@ import { FounderModel } from "../../seeds/createAdmin.js";
 export const adminCreateUser = async (userData) => {
   const exists = await User.findOne({ email: userData.email });
   if (exists) throw new Error("Email already exists");
-console.log("Creating user with data:", userData);
   const password = generatePassword();
   console.log("Generated Password for User:", password);
   const hashed = await bcrypt.hash(password, 10);
@@ -31,7 +30,7 @@ console.log("Creating user with data:", userData);
     targetWeight: userData.targetWeight,
     medicalConditions: userData.medicalconditions,
     allergies: userData.allergy,
-    goals: userData.goals,
+    goals: userData.fitnessGoal,
     foodPreferences: userData.foodPreference,
     profileImage: userData?.profileImage || "",
     programType: userData.programType,

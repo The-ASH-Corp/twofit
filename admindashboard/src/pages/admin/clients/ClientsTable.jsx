@@ -14,6 +14,8 @@ import { getAllCoachesByAdminId } from "@/redux/features/admins/admin.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 export default function ClientsTable() {
+  const dispatch = useDispatch();
+
   const coachIds = useAppSelector(selectAllCoaches);
   const user = useAppSelector(selectUser);
   const status = useAppSelector(selectClientStatus);
@@ -59,7 +61,6 @@ export default function ClientsTable() {
   const profilePath = (id) => {
     navigate(`/admin/clients/profile/${id}`);
   };
-  const dispatch = useDispatch();
 
   useEffect(() => {
     fetchClientData();
