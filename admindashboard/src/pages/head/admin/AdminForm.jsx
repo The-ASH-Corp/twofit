@@ -49,11 +49,16 @@ export default function AdminForm() {
           name: "specialization",
           label: "Specialization",
           type: "multiple",
-          options: [
-            { label: "thyroid", value: "thyroid" },
-            { label: "weight loss", value: "weight loss" },
-            { label: "fun", value: "fun" },
-          ],
+           options: [
+              { label: "pcod", value: "pcod" },
+              { label: "thyroid", value: "thyroid" },
+              {label:"astma",value:"astma"},
+              {label:"diabetes",value:"diabetes"},
+              {label:"hypertension",value:"hypertension"},
+              {label:"obesity",value:"obesity"},
+              {label:"osteoporosis",value:"osteoporosis"},
+              {label:"polycystic ovarian syndrome",value:"polycystic ovarian syndrome"},
+            ],
         },
         { name: "experience", label: "Experience", type: "text" },
         { name: "qualification", label: "Qualification", type: "text" },
@@ -116,7 +121,7 @@ export default function AdminForm() {
     automatedReminder: false,
   };
 
-  const fetchPrograms = async () => {
+  const fetchPrograms = async () => {  //list the programs under his head
     const response = await dispatch(
       getAllPrograms({ page: 1, limit: 10 })
     ).unwrap();

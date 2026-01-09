@@ -43,26 +43,32 @@ ChartJS.register(
   Filler
 );
 export default function Dashboard() {
- 
- const [dashboardData, setDashboardData] = useState({});
-const dispatch =useDispatch()
+  const [dashboardData, setDashboardData] = useState({});
+  const dispatch = useDispatch();
   useEffect(() => {
     dispatch(getDashboardData()).then((res) => {
       setDashboardData(res.payload);
     });
   }, []);
+  const trainers = dashboardData?.totalTrainers || 0;
+  const dietitians = dashboardData?.totalDietitians || 0;
+  const therapists = dashboardData?.totalTherapists || 0;
+  const hasExperts = trainers > 0 || dietitians > 0 || therapists > 0;
+
   const expertsSummaryData = {
-    labels: ["Trainers", "Dietitians", "Therapists", "Support Staff"],
+    labels: hasExperts ? ["Trainers", "Dietitians", "Therapists"] : ["No Data"],
     datasets: [
       {
-        data: [dashboardData?.totalTrainers, dashboardData?.totalDietitians, dashboardData?.totalTherapists],
-        backgroundColor: ["#0A4F48", "#45C4A2", "#FFD7A8"],
+        data: hasExperts ? [trainers, dietitians, therapists] : [1],
+        backgroundColor: hasExperts
+          ? ["#0A4F48", "#45C4A2", "#FFD7A8"]
+          : ["#E5E7EB"],
         borderWidth: 0,
         circumference: 180,
         rotation: 270,
         cutout: "80%",
-        hoverOffset: 15,
-        spacing: 1,
+        hoverOffset: hasExperts ? 15 : 0,
+        spacing: hasExperts ? 1 : 0,
         borderRadius: 8,
       },
     ],
@@ -149,7 +155,6 @@ const dispatch =useDispatch()
       time: "3 Days Ago",
     },
   ];
- 
 
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA]">
@@ -323,14 +328,28 @@ const dispatch =useDispatch()
                 <span className="text-[10px] text-[#66706D] font-medium">
                   Total Experts
                 </span>
-                <span className="text-3xl font-bold text-[#0A4F48]">{dashboardData?.totalExperts}</span>
+                <span className="text-3xl font-bold text-[#0A4F48]">
+                  {dashboardData?.totalExperts}
+                </span>
               </div>
             </div>
             <div className="flex flex-col gap-4 mt-2">
               {[
-                { label: "Trainers", count: dashboardData?.totalTrainers, color: "bg-[#0A4F48]" },
-                { label: "Dietitians", count: dashboardData?.totalDietitians, color: "bg-[#EBF3F2]" },
-                { label: "Therapists", count: dashboardData?.totalTherapists, color: "bg-[#FAF3E0]" },
+                {
+                  label: "Trainers",
+                  count: dashboardData?.totalTrainers,
+                  color: "bg-[#0A4F48]",
+                },
+                {
+                  label: "Dietitians",
+                  count: dashboardData?.totalDietitians,
+                  color: "bg-[#EBF3F2]",
+                },
+                {
+                  label: "Therapists",
+                  count: dashboardData?.totalTherapists,
+                  color: "bg-[#FAF3E0]",
+                },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
