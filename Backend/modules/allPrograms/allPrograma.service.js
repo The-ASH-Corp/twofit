@@ -21,3 +21,7 @@ export const updateProgram = async (id, data) => {
 export const deleteProgram = async (id) => {
   return await programModel.findByIdAndDelete(id);
 };
+
+export const getAllProgramByCategory =async(category)=>{
+    return await programModel.find({category})
+}
