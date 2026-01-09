@@ -23,7 +23,7 @@ const ChatWindow = ({
               </div>
               <div>
                 <h1 className="text-[#0A4F48] font-semibold">{client.name}</h1>
-                <p className=" text-sm">{client?.role?.join(", ")}</p>
+                <p className=" text-sm">{client?.role}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
