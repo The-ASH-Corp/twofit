@@ -62,7 +62,11 @@ const ActionCell = ({ row }) => {
   const navigate = useNavigate();
   return (
     <button
-      onClick={() => navigate("/admin/programs/create")}
+      onClick={() =>
+        navigate("/admin/programs/create", {
+          state: { programId: row.original._id },
+        })
+      }
       className="flex items-center gap-1.5 px-3 py-1.5 bg-[#EBF3F2] hover:bg-[#dceceb] text-[#0A4F48] text-[11px] font-bold rounded-lg transition-colors"
     >
       View Plan
