@@ -65,7 +65,7 @@ const ExpertLeftSide = ({ expert }) => {
   ];
 
   const specialization = [
-    { label: "Role", content: expert?.role?.[0] || "Dietitian" },
+    { label: "Role", content: expert?.role || "Dietitian" },
     {
       label: "Specialization",
       content:
@@ -108,7 +108,7 @@ const ExpertLeftSide = ({ expert }) => {
 
         <div className="flex gap-2 mb-6">
           <span className="px-3 py-1 bg-[#F8F9FA] rounded-full text-[10px] font-bold text-[#66706D] uppercase tracking-wider">
-            {expert?.role?.[0] || "Dietitian"}
+            {expert?.role || "Dietitian"}
           </span>
           <span className="px-3 py-1 bg-[#FAF3E0] rounded-full text-[10px] font-bold text-[#DAA520] flex items-center gap-1">
             <Star size={10} fill="currentColor" /> {expert?.rating || "0"}

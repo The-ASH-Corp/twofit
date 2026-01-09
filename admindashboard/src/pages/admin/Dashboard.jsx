@@ -190,19 +190,25 @@ const getDashboardDatas =async () => {
       },
     ],
   };
+  const trainers = dashboardData?.totalTrainers || 0;
+  const dietitians = dashboardData?.totalDietitians || 0;
+  const therapists = dashboardData?.totalTherapists || 0;
+  const hasExperts = trainers > 0 || dietitians > 0 || therapists > 0;
 
   const expertsSummaryData = {
-    labels: ["Trainers", "Dietitians", "Therapists", ],
+    labels:hasExperts ? ["Trainers", "Dietitians", "Therapists", ]: ["No Data"],
     datasets: [
       {
-        data: [dashboardData?.totalTrainers||0, dashboardData?.totalDietitians||0, dashboardData?.totalTherapists||0],
-        backgroundColor: ["#0A4F48", "#45C4A2", "#FFD7A8",],
+        data:  hasExperts ? [trainers, dietitians, therapists] : [1],
+        backgroundColor: hasExperts
+          ? ["#0A4F48", "#45C4A2", "#FFD7A8"]
+          : ["#E5E7EB"],
         borderWidth: 0,
         circumference: 180,
         rotation: 270,
         cutout: "80%",
-        hoverOffset: 15,
-        spacing: 1,
+        hoverOffset:  hasExperts ? 15 : 0,
+        spacing: hasExperts ? 1 : 0,
         borderRadius: 8,
       },
     ],
