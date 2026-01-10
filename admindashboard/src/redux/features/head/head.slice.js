@@ -3,6 +3,7 @@ import { createHead, getAllHeads, getHead } from "./head.thunk";
 
 const initialState = {
   allHeads: [],
+  createHead: null,
   head: null,
   status: "idle",
   error: null,
@@ -23,8 +24,10 @@ const headSlice = createSlice({
       .addCase(createHead.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(createHead.fulfilled, (state) => {
+      .addCase(createHead.fulfilled, (state, action) => {
         state.status = "succeeded";
+        state.createHead = action.payload;
+        state.error = null;
       })
       .addCase(createHead.rejected, (state, action) => {
         state.status = "failed";
@@ -49,7 +52,7 @@ const headSlice = createSlice({
       .addCase(getHead.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.head = action.payload;
-        state.error = null
+        state.error = null;
       })
       .addCase(getHead.rejected, (state, action) => {
         state.status = "failed";

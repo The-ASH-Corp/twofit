@@ -6,8 +6,17 @@ export const createProgram = async (data) => {
 
 export const getAllProgram = async (page,limit) => {
   const totalProgram = await programModel.countDocuments();
-  const program = await programModel.find().skip((page-1)*limit).limit(limit);
-  return {program,totalProgram};
+  const program = await programModel
+    .find()
+    .populate("category", "name -_id")
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .lean();
+    const formattedPrograms = program.map((program) => ({
+      ...program,
+      category: program.category?.name || null,
+    }));
+  return { program: formattedPrograms, totalProgram };
 };
 
 export const getSingleProgram = async (id) => {
