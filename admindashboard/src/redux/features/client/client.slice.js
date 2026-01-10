@@ -2,11 +2,12 @@ import { createSlice } from "@reduxjs/toolkit";
 import { getAllClients, getClient, getClientsBasedOnCoach } from "./client.thunk";
 
 const initialState = {
-  allClients:[],
-  selectedClient:null,
-  totalCount:0,
-  error:null,
-  status:"idle",
+  allClients: [],
+
+  selectedClient: null,
+  totalCount: 0,
+  error: null,
+  status: "idle",
 };
 
 const clientSlice = createSlice({
@@ -14,10 +15,10 @@ const clientSlice = createSlice({
   initialState,
   reducers: {
     clearClient(state) {
-      state.allClients=[];
-      state.selectedClient=null;
+      state.allClients = [];
+      state.selectedClient = null;
       state.error = null;
-      state.status="idle"
+      state.status = "idle"
     },
   },
   extraReducers: (builder) => {
@@ -59,6 +60,7 @@ const clientSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
+
   },
 });
 

@@ -10,6 +10,8 @@ import {
 import { getAllCategories } from "@/redux/features/category/category.thunk";
 import { CategoryListColumns } from "./CategoryListColumns";
 import BaseTable from "@/components/table/BaseTable";
+import { SyncLoader } from "react-spinners";
+
 
 export default function CategoryTable() {
   const dispatch = useDispatch(); 
@@ -45,7 +47,11 @@ export default function CategoryTable() {
     setCategories(filtered);
   };
 
-  if (status === "loading") return <p>Loading categories...</p>;
+  if (status === "loading") return (
+    <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+      <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+    </div>
+  );
   if (error) return <p>{error}</p>;
   return (
     <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">

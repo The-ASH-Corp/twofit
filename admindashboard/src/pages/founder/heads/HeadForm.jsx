@@ -6,18 +6,21 @@ import { useAppSelector } from '@/redux/store/hooks';
 import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const TherapyForm = () => {
   const dispatch = useDispatch(); 
    
   
     useEffect(() => {
-      dispatch(getAllCategories({ page : 1, limit :100 }));
-    }, []);
+      dispatch(getAllCategories({ page: 1, limit: 100 }));
+    }, [dispatch]);
 
     const data = useAppSelector(selectAllCategories);
     // const status = useAppSelector(selectCategoryStatus);
     // const error = useAppSelector(selectCategoryError);
+
+    
 
     const [ categories, setCategories] = useState([]);
     
@@ -150,11 +153,21 @@ const TherapyForm = () => {
   const navigate = useNavigate();
   
 
-    const handelSubmit = (value) => {
-      console.log(value);
-      dispatch(createHead(value));
-      navigate("/founder/heads")
-    };
+  const handelSubmit = async (value) => {
+    try {
+      const result = await dispatch(createHead(value)).unwrap();
+       console.log(result)
+      if (result.success) {
+        toast.success("Head created successfully");
+        navigate("/founder/heads");
+      } else {
+        toast.error("Failed to create head");
+      }
+    } catch (error) {
+      toast.error(error || "Failed to create head");
+    }
+  };
+
 
   return (
     <div>

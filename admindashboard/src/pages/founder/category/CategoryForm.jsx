@@ -3,6 +3,7 @@ import { createCategory } from "@/redux/features/category/category.thunk";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function CategoryForm() {
   const fields = [
@@ -22,11 +23,20 @@ export default function CategoryForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handelSubmit = (value) => {
-        console.log(value);
-        dispatch(createCategory(value))
+  const handelSubmit = async (value) => {
+    try {
+      console.log(value);
+      const category = await dispatch(createCategory(value)).unwrap();
+      if (category.success) {
+        toast.success("Category created successfully");
         navigate("/founder/category");
-      };
+      } else {
+        toast.error("Failed to create category");
+      } 
+    } catch (error) {
+      console.error("Category creation failed:", error);
+    }
+  };
 
   return (
     <div>

@@ -9,7 +9,7 @@ export const createPayroll = createAsyncThunk(
           "/payroll/update",
           payrollData
         );
-        return response.data
+        return response
     } catch (error) {
         return rejectWithValue(
           error.response?.data?.message || "Failed to add payroll"

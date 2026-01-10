@@ -1,10 +1,11 @@
 
 import { createSlice } from "@reduxjs/toolkit";
-import { createCoach, getAllCoaches, getSingleCoach } from "./coach.thunk";
+import { createCoach, getAllCoaches, getSingleCoach, getUsersAssignedToACoach } from "./coach.thunk";
 import { getAllCoachesByAdminId } from "../admins/admin.thunk";
 
 const initialState = {
   allCoaches: [],
+  assignedClients: [],
   selectedCoach: null,
   error: null,
   status: "idle",
@@ -15,9 +16,9 @@ const coachSlice = createSlice({
   initialState,
   reducers: {
     clearCoach(state) {
-      state.allCoaches =[];
-      state.selectedCoach=null;
-      state.status="idle"
+      state.allCoaches = [];
+      state.selectedCoach = null;
+      state.status = "idle"
       state.error = null;
     },
   },
@@ -66,7 +67,7 @@ const coachSlice = createSlice({
         state.error = null;
       })
       .addCase(createCoach.rejected, (state, action) => {
-        state.status = "failed"; 
+        state.status = "failed";
         state.error = action.payload;
       })
       // get all coaches by admin id
@@ -83,6 +84,21 @@ const coachSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
+
+
+      .addCase(getUsersAssignedToACoach.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getUsersAssignedToACoach.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.assignedClients = action.payload;
+      })
+      .addCase(getUsersAssignedToACoach.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      });
+
+
   },
 });
 

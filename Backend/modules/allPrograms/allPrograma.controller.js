@@ -15,7 +15,7 @@ export const createProgramController = async (req, res) => {
       req.body.duration = JSON.parse(req.body.duration);
     }
     const program = await createProgram(req.body);
-    res.status(200).json({ status: true, data: program });
+    res.status(200).json({ success: true, data: program });
   } catch (err) {
     console.log(err);
 

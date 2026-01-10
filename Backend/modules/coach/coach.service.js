@@ -2,7 +2,7 @@ import { generatePassword, hashPassword } from "../../utils/password.js";
 import { AdminModel } from "../admin/admin.model.js";
 import { CoachModel } from "./coach.model.js";
 
-export const createCoach = async (coach) => {  
+export const createCoach = async (coach) => {
   // Parse JSON stringified fields from FormData
   const fieldsToParseAsJSON = [
     "workingHours",
@@ -50,7 +50,7 @@ export const createCoach = async (coach) => {
 
   const coachCreated = await CoachModel.create({
     name: coach.fullname,
-    dob: coach.dob, 
+    dob: coach.dob,
     gender: coach.gender,
     password: await password(coach.password),
     ratingIncentive: coach.ratingIncentive,
@@ -126,13 +126,13 @@ export const AssignCoachToUser = async (coachId, userId) => {
 export const getUsersAssignedToACoach = async (coachId) => {
   return await CoachModel.findById(coachId)
     .select("assignedUsers")
-    .populate("assignedUsers", "name _id email");
+    .populate("assignedUsers", "-password");
 };
 
 
-export const getCoachesByAdmin = async ({adminIds}) => {
+export const getCoachesByAdmin = async ({ adminIds }) => {
   let coaches = adminIds.map((adminId) =>
-    CoachModel.findOne( {_id: adminId} )
+    CoachModel.findOne({ _id: adminId })
       .select("-password")
       .populate("assignedPrograms")
   );

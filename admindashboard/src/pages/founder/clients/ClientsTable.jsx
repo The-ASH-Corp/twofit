@@ -10,6 +10,8 @@ import {
 } from "@/redux/features/client/client.selectors";
 import { getAllClients } from "@/redux/features/client/client.thunk";
 import { useNavigate } from "react-router-dom";
+import { SyncLoader } from "react-spinners";
+
 
 export default function ClientsTable() {
 
@@ -51,7 +53,11 @@ export default function ClientsTable() {
     setClient(filtered);
   };
 
-  if (status === "loading") return <p>Loading clients...</p>;
+  if (status === "loading") return (
+        <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+          <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+        </div>
+      );
   if (error) return <p>{error}</p>;
 
   return (
