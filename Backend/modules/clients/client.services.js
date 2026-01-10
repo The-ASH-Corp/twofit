@@ -1,4 +1,5 @@
 import User from "../auth/auth.model.js";
+import { CoachModel } from "../coach/coach.model.js";
 
 export const getAllClient = async (page, limit) => {
   const skip = (page - 1) * limit;
@@ -59,7 +60,6 @@ export const getClientsBasedOnCoach = async (coachIds, page, limit) => {
 
   return { clients, totalCount };
 };
-
 
 export const updateWeightService = async (userId, currentWeight) => {
   if (!currentWeight) {
@@ -134,3 +134,9 @@ export const updateMeasurementsService = async (
   return user;
 };
 
+export const getAllFeedbacksService = async (userId) => {
+  const feedbacks = await CoachModel.find({ "feedback.userId": userId })
+    .select("name role feedback")
+    .populate("feedback.userId", "name email");
+  return feedbacks;
+};
