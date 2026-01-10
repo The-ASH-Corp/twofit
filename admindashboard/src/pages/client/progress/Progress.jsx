@@ -32,7 +32,7 @@ export default function Progress() {
 
   return (
     <>
-      <p className="text-[#0A4F48] font-bold text-[16px] mb-4">
+      <p className="text-[#0A4F48] font-bold text-[16px] mb-4 ">
         Overall Progress
       </p>
 
@@ -152,7 +152,7 @@ export default function Progress() {
       </div>
 
       {isOpen && (
-  <div className="fixed top-5 right-5 bottom-5 rounded-2xl w-[350px] bg-white shadow-xl p-4 z-50 flex flex-col">
+  <div className="fixed top-5 right-5 bottom-5 rounded-2xl w-[350px] bg-white shadow-xl p-4 z-50 flex flex-col backdrop-blur-sm">
     
     <div className="flex justify-between items-center mb-6">
       <h2 className="text-[#0A4F48] font-bold text-[16px]">

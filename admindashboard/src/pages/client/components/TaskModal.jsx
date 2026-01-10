@@ -1,45 +1,105 @@
 import React, { useState } from "react";
+import { X } from "lucide-react";
+import { assets } from "@/assets/asset";
 
 export default function TaskModal({ task, onClose }) {
   const [fileName, setFileName] = useState("Upload File");
 
   return (
-    <div className="absolute w-[350px] flex flex-col h-full bg-white rounded-2xl  right-0 top-5  p-4 space-y-4 shadow-md">
-      <h1 className="text-[#0A4F48] text-[14px] font-bold">{task.type}</h1>
-      <img src={task.image} />
-      <div className="flex gap-1">
-        <p className="text-[12px] font-400">{task.time}</p>
-        <p className="text-[12px] font-400">{task.desc}</p>
-      </div>
-      <div className="block space-y-2">
-        <label className="text-[11px] block">Comment</label>
-        <input
-          type="text"
-          placeholder="Add Comment"
-          className="border border-gray-200 focus:outline-none p-2 w-full rounded-xl"
-        />
+    <div className="fixed inset-0 z-50 flex justify-end">
+      {/* Overlay */}
+      <div
+        className="absolute inset-0 bg-black/5 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
-        <div className="block space-y-2">
-          <label className="text-[11px] block">Attachments</label>
-
-          <label className="w-full flex items-center gap-3 border border-gray-200 rounded-xl p-2 cursor-pointer">
-            <span className="bg-[#0A4F48] text-white px-4 py-2 rounded-2xl text-sm">
-              Upload File
-            </span>
-            <span className="text-sm text-gray-500">Upload image or video</span>
-
-            <input type="file" className="hidden" />
-          </label>
+      {/* Drawer */}
+      <div className="relative w-[400px] h-full bg-white shadow-2xl flex flex-col p-6 animate-in slide-in-from-right duration-300">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-[#0A4F48] text-[18px] font-bold">{task.type}</h1>
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X className="w-6 h-6 text-gray-400" />
+          </button>
         </div>
-      </div>
 
-      <div className="flex justify-between gap-2 mt-auto">
-        <button className="bg-[#EBF3F2] px-4 py-2 rounded-md w-full">
-          Skip
-        </button>
-        <button className="w-full bg-[#0A4F48] px-4 py-2 rounded-md">
-          Mark as Done
-        </button>
+        <div className="flex-1 overflow-y-auto space-y-6 pr-2 -mr-2 scrollbar-hide">
+          <div className="w-full aspect-video rounded-2xl overflow-hidden shadow-sm">
+            <img
+              src={task.image}
+              alt={task.type}
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-[13px] text-gray-800 leading-relaxed font-medium">
+              <span className="font-bold">{task.time}.</span> {task.desc}
+            </p>
+          </div>
+
+          {/* PDF Card */}
+          <div className="flex items-center justify-between bg-[#FDF8F3] p-4 rounded-[20px] border border-[#FBEAD9]/50">
+            <div className="flex items-center gap-4">
+              <div className="w-11 h-11 bg-[#FBEAD9] flex items-center justify-center rounded-xl shadow-sm">
+                <img src={assets.pdfVector} alt="pdf" className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-[14px] font-bold text-gray-800 leading-none mb-1.5">
+                  Breakfast-oats.pdf
+                </p>
+                <p className="text-[11px] text-gray-400 font-bold uppercase tracking-tight">
+                  PDF • 2.4 MB
+                </p>
+              </div>
+            </div>
+            <button className="bg-[#0A4F48] text-white text-[12px] font-bold px-4 py-2 rounded-xl shadow-sm hover:bg-[#083d38] transition-colors">
+              View
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold text-gray-700 block">
+                Comment
+              </label>
+              <input
+                type="text"
+                placeholder="Add Comment"
+                className="w-full border border-gray-100 bg-gray-50/30 focus:bg-white focus:border-[#0A4F48] focus:outline-none p-3 px-4 text-[13px] rounded-xl transition-all"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-[12px] font-bold text-gray-700 block">
+                Attachment
+              </label>
+              <label className="w-full flex items-center justify-between border border-gray-100 bg-gray-50/30 rounded-xl p-1.5 cursor-pointer hover:bg-white hover:border-gray-200 transition-all">
+                <span className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-[13px] font-bold">
+                  Upload File
+                </span>
+                <span className="text-[13px] text-gray-400 font-medium pr-4">
+                  Upload Photo or video
+                </span>
+                <input type="file" className="hidden" />
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-between gap-3 pt-6 mt-6 border-t border-gray-50">
+          <button
+            onClick={onClose}
+            className="flex-1 bg-gray-100 text-gray-600 px-6 py-3.5 rounded-xl text-[14px] font-bold hover:bg-gray-200 transition-colors"
+          >
+            Skip
+          </button>
+          <button className="flex-1 bg-[#0A4F48] text-white px-6 py-3.5 rounded-xl text-[14px] font-bold hover:bg-[#083d38] transition-colors shadow-lg shadow-emerald-900/10">
+            Mark as Done
+          </button>
+        </div>
       </div>
     </div>
   );
