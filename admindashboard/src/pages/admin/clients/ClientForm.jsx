@@ -148,24 +148,24 @@ export default function ClientForm() {
           label: "Dietician",
           type: "select",
           options: coachesOfAdmin
-            ?coachesOfAdmin?.filter((coach) => coach.role==="Dietician")
-            .map((coach) => ({ label: coach.name, value: coach._id })) :[],
+            ?coachesOfAdmin?.filter((coach) => coach?.role==="Dietician")
+            ?.map((coach) => ({ label: coach.name, value: coach._id })) :[],
         },
         {
           name: "trainer",
           label: "Trainer",
           type: "select",
           options: coachesOfAdmin
-            ?coachesOfAdmin.filter((coach) => coach.role ==="Trainer")
-            .map((coach) => ({ label: coach.name, value: coach._id })) :[],
+            ?coachesOfAdmin?.filter((coach) => coach?.role ==="Trainer")
+            ?.map((coach) => ({ label: coach.name, value: coach._id })) :[],
         },
         {
           name: "therapist",
           label: "Therapist",
           type: "select",
           options: coachesOfAdmin
-            ?coachesOfAdmin.filter((coach) => coach.role ==="Therapist")
-            .map((coach) => ({ label: coach.name, value: coach._id })) :[],
+            ?coachesOfAdmin?.filter((coach) => coach?.role ==="Therapist")
+            ?.map((coach) => ({ label: coach.name, value: coach._id })) :[],
         },
       ],
     },

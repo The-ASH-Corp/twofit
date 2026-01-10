@@ -8,10 +8,10 @@ export const createCoach = createAsyncThunk(
       const config =
         coachDetails instanceof FormData
           ? {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
           : {};
 
       const data = await axiosInstance.post(
@@ -35,9 +35,9 @@ export const getAllCoaches = createAsyncThunk(
       const data = await axiosInstance.get(
         `/coach/get-all-coaches/${page}/${limit}`
       );
-       console.log(data)
+      console.log(data)
       return data.data;
-     
+
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to get coaches"
@@ -75,3 +75,23 @@ export const getAllCoachesByAdmin = createAsyncThunk(
     }
   }
 );
+
+ 
+export const getUsersAssignedToACoach = createAsyncThunk(
+  "coach/getUsersAssignedToACoach",
+  async (coachId, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/coach/assigned-users/${coachId}`
+      );
+console.log(response.data)
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+        "Failed to get assigned users"
+      );
+    }
+  }
+);
+
