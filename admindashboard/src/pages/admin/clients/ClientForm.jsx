@@ -33,6 +33,7 @@ export default function ClientForm() {
   const fetchProgram = async () => {
     const program = await dispatch(getProgramById(user.program));
     const coachessOfAdmin = await dispatch(getAllCoachesByAdmin(user.experts));
+    console.log(coachessOfAdmin.payload);
     setProgram(program.payload);
     setCoachesOfAdmin(coachessOfAdmin.payload);
   };
@@ -147,24 +148,24 @@ export default function ClientForm() {
           label: "Dietician",
           type: "select",
           options: coachesOfAdmin
-            ?.filter((coach) => coach.role=="Dietician")
-            ?.map((coach) => ({ label: coach.name, value: coach._id })),
+            ?coachesOfAdmin?.filter((coach) => coach.role==="Dietician")
+            .map((coach) => ({ label: coach.name, value: coach._id })) :[],
         },
         {
           name: "trainer",
           label: "Trainer",
           type: "select",
           options: coachesOfAdmin
-            ?.filter((coach) => coach.role.includes("Trainer"))
-            ?.map((coach) => ({ label: coach.name, value: coach._id })),
+            ?coachesOfAdmin.filter((coach) => coach.role ==="Trainer")
+            .map((coach) => ({ label: coach.name, value: coach._id })) :[],
         },
         {
           name: "therapist",
           label: "Therapist",
           type: "select",
           options: coachesOfAdmin
-            ?.filter((coach) => coach.role.includes("Therapist"))
-            ?.map((coach) => ({ label: coach.name, value: coach._id })),
+            ?coachesOfAdmin.filter((coach) => coach.role ==="Therapist")
+            .map((coach) => ({ label: coach.name, value: coach._id })) :[],
         },
       ],
     },
