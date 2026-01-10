@@ -17,5 +17,6 @@ router.put("/update/:coachId", coachController.updateCoachById);
 router.delete("/delete/:coachId", coachController.deleteCoachById);
 router.get("/assigned-users/:coachId", coachController.getUsersAssignedToACoach);
 
+router.put("/feedback", coachController.createFeedback);
 
 export default router

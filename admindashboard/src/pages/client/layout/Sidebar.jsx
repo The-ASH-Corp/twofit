@@ -13,7 +13,7 @@ const menuItems = [
   { label: "Progress", icon: assets.experts, path: "/client/progress" },
   { label: "Messages", icon: assets.website, path: "/client/chats" },
   { label: "Feedback", icon: assets.website, path: "/client/feedback" },
-  { label: "support", icon: assets.finance, path: "/expert/finance" },
+  // { label: "support", icon: assets.finance, path: "/expert/finance" },
 ];
 
 export default function Sidebar() {
@@ -37,6 +37,7 @@ export default function Sidebar() {
           <NavLink
             to={item.path}
             key={item.label}
+            end={"/client"}
             className={({ isActive }) =>
               `flex items-center text-[#66706D] gap-3 w-full px-4 py-3 text-sm font-medium rounded-xl transition
     ${isActive ? "bg-[#0A4F48] text-white" : "text-gray-600 hover:bg-gray-100"}

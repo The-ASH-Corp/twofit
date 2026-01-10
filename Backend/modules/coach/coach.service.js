@@ -139,7 +139,10 @@ export const getCoachesByAdmin = async ({ adminIds }) => {
   return await Promise.all(coaches);
 }
 
-
-
-
-
+export const createFeedback = async (expertId, userId, rating, feedback) => {
+  return await CoachModel.findByIdAndUpdate(
+    expertId,
+    { $addToSet: { feedback: { userId, rating, feedback } } },
+    { new: true }
+  );
+};

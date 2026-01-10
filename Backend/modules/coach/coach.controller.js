@@ -189,6 +189,22 @@ export const getCoachesByAdmin = async (req, res) => {
     });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
+  }   
+};
+
+export const createFeedback = async (req, res)=> {
+  try {
+    const {expertId, userId, rating, feedback} = req.body;
+
+    const data = await coachService.createFeedback(expertId, userId, rating, feedback);
+
+    res.status(200).json({
+      success: true,
+      message: "Feedback created successfully",
+      data: data,
+    });
+  } catch (err) {
+     res.status(400).json({ success: false, message: err.message });
   }
 };
 

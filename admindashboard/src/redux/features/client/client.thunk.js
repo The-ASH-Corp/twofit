@@ -39,4 +39,14 @@ export const getClientsBasedOnCoach = createAsyncThunk(
   }
 );
 
-
+export const createFeedback = createAsyncThunk(
+  "client/createFeedback",
+  async (values, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.put(`/coach/feedback`, values);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to create feedback");
+    }
+  }
+);
