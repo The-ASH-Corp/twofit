@@ -1,11 +1,13 @@
 import React from "react";
 import { assets } from "@/assets/asset";
+import { BsChatLeftDots } from "react-icons/bs";
 
-export default function ExpertsList() {
+export default function ExpertsList({ expert }) {
+  console.log(expert);
   const experts = [
-    { role: "Trainer", name: "Rahul Mehta", icon: assets.profileVector },
-    { role: "Dietitian", name: "Anjali Sharma", icon: assets.profileVector },
-    { role: "Therapist", name: "Mira Kapoor", icon: assets.profileVector },
+    { role: "Trainer", name: expert?.filter((expert) => expert?.role === "Trainer").map((expert) => expert?.name), icon: assets.profileVector },
+    { role: "Dietitian", name: expert?.filter((expert) => expert?.role === "Dietician").map((expert) => expert?.name), icon: assets.profileVector },
+    { role: "Therapist", name: expert?.filter((expert) => expert?.role === "Therapist").map((expert) => expert?.name), icon: assets.profileVector },
   ];
 
   return (
@@ -38,12 +40,8 @@ export default function ExpertsList() {
                 </p>
               </div>
             </div>
-            <div className="w-7 h-7 flex items-center justify-center bg-gray-50 rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors shadow-sm">
-              <img
-                src={assets.chats}
-                alt="chat"
-                className="w-3.5 h-3.5 opacity-40"
-              />
+            <div className="w-7 h-7 flex items-center justify-center bg-[#EBF3F2] rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors shadow-sm">
+              <BsChatLeftDots className="w-3.5 h-3.5 font-bold " />
             </div>
           </div>
         ))}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { assets } from "@/assets/asset";
 import KpiCard from "@/components/cards/KpiCard";
 import HeroCard from "./components/HeroCard";
@@ -9,19 +9,39 @@ import DietPlanCard from "./components/DietPlanCard";
 import ExpertsList from "./components/ExpertsList";
 import Measeurement from "./components/Measeurement";
 import NotificationsList from "./components/NotificationsList";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { useDispatch } from "react-redux";
+import { getProgramById } from "@/redux/features/program/program.thunk";
+import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
 
 export default function Dashboard() {
+  const [program, setProgram] = useState(null);
+  const [coaches, setCoaches] = useState([]);
+  const user = useAppSelector(selectUser);
+  const dispatch = useDispatch();
+
+  const fetchDashboardData = async () => {
+    const program = await dispatch(getProgramById(user?.programType)).unwrap();
+    const coaches = await dispatch(getAllCoachesByAdmin([user?.trainer,user?.therapist,user?.dietition])).unwrap();
+    setProgram(program);
+    setCoaches(coaches);
+  };
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+  console.log("program",coaches);
   return (
     <div className="w-full grid grid-cols-[1fr_350px] gap-8 p-2">
       {/* Main Content Area */}
       <div className="space-y-8">
         {/* Top Section: Hero and KPI Cards */}
         <div className="grid grid-cols-[1.5fr_1fr] gap-6">
-          <HeroCard />
+          <HeroCard program={program} />
           <div className="grid grid-cols-2 gap-4">
             <KpiCard
               title="Program Days"
-              value="12 / 60"
+              value={`${program?.programDays || 0}/ ${user?.duration || 0}`}
               icon={assets.website}
               bg="#0A4F48"
               iconColor="white"
@@ -35,7 +55,7 @@ export default function Dashboard() {
             />
             <KpiCard
               title="Weight Progress"
-              value="75 kg"
+              value={user?.currentWeight || 0}
               icon={assets.website}
               bg="#F4DBC7"
             />
@@ -74,7 +94,7 @@ export default function Dashboard() {
       {/* Right Sidebar Area */}
       <div className="space-y-4">
         <DietPlanCard />
-        <ExpertsList />
+        <ExpertsList expert={coaches}/>
         <Measeurement />
         <NotificationsList />
       </div>
