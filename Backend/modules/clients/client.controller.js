@@ -99,3 +99,16 @@ export const updateMeasurements = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const getAllFeedbacks = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const feedbacks = await service.getAllFeedbacksService(userId);
+    res.status(200).json({
+      success: true,
+      data: feedbacks,
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}; 
