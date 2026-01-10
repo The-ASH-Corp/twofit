@@ -2,13 +2,12 @@ import { generatePassword, hashPassword } from "../../utils/password.js";
 import { AdminModel } from "../admin/admin.model.js";
 import { CoachModel } from "./coach.model.js";
 
-export const createCoach = async (coach) => {
+export const createCoach = async (coach) => {  
   // Parse JSON stringified fields from FormData
   const fieldsToParseAsJSON = [
     "workingHours",
     "breakSlots",
     "workingdays",
-    "role",
     "specialization",
     "languages",
   ];
@@ -51,7 +50,7 @@ export const createCoach = async (coach) => {
 
   const coachCreated = await CoachModel.create({
     name: coach.fullname,
-    dob: coach.dob,
+    dob: coach.dob, 
     gender: coach.gender,
     password: await password(coach.password),
     ratingIncentive: coach.ratingIncentive,
