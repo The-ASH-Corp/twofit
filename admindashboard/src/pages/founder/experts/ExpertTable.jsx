@@ -4,12 +4,12 @@ import { ExpertColumns } from './ExpertColumns'
 import { useDispatch } from 'react-redux';
 import { getAllCoaches } from '@/redux/features/coach/coach.thunk';
 import { useNavigate } from 'react-router-dom';
-import { selectAllCoaches, selectCoachError,  } from '@/redux/features/coach/coach.selector';
+import { selectAllCoaches, selectCoachStatus,  } from '@/redux/features/coach/coach.selector';
 import { useAppSelector } from '@/redux/store/hooks';
+import { SyncLoader } from "react-spinners";
+
 
 export default function ExpertTable() {
-
-  
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
@@ -24,15 +24,15 @@ export default function ExpertTable() {
   }, [dispatch, page, limit]);
 
   const data = useAppSelector(selectAllCoaches);
-  const status = useAppSelector(selectCoachError);
-  // const error = useAppSelector(selectCoachStatus);
+  // const error = useAppSelector(selectCoachError);
+  const status = useAppSelector(selectCoachStatus);
 
-  const [coaches, setCoaches] = useState([]);  
+  const [coaches, setCoaches] = useState([]);
 
-  useEffect(()=>{
-    setCoaches(data)
-    console.log(data)
-  },[data])
+  useEffect(() => {
+    setCoaches(data);
+    console.log(data);
+  }, [data]);
 
   const searchInputHandler = (e) => {
     const value = e.target.value.toLowerCase();
@@ -49,9 +49,14 @@ export default function ExpertTable() {
     setCoaches(filtered);
   };
 
-  if (status === "loading") return <p>Loading clients...</p>;
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+      </div>
+    );
   // if (error) return <p>{error}</p>;
-  
+
   return (
     <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
       <BaseTable

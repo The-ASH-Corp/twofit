@@ -14,8 +14,8 @@ export const createProgram = createAsyncThunk("program/createProgram", async (pr
             }
           : {};
 
-    const data = await axiosInstance.post(`/programs/create`, programDetails,config)
-    return data.data
+    const response = await axiosInstance.post(`/programs/create`, programDetails,config)
+    return response;
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || "Failed to Create Program");
   }
