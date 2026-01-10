@@ -91,29 +91,29 @@ const ExpertLeftSide = ({ expert }) => {
   // console.log(isFounderPage);
 
   return (
-    <div className="w-[280px] flex flex-col gap-6 overflow-y-auto no-scrollbar pb-6">
+    <div className="w-full flex flex-col gap-4 sm:gap-6 overflow-y-auto no-scrollbar pb-4 sm:pb-6">
       {/* Profile Card */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm relative flex flex-col items-center">
-        <button className="absolute top-4 right-4 text-gray-400">
-          <MoreHorizontal size={20} />
+      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm relative flex flex-col items-center">
+        <button className="absolute top-3 sm:top-4 right-3 sm:right-4 text-gray-400 hover:text-gray-600 transition-colors">
+          <MoreHorizontal size={18} className="sm:w-5 sm:h-5" />
         </button>
 
-        <div className="w-20 h-20 bg-gray-100 rounded-full mb-4 flex items-center justify-center text-[#0A4F48] font-bold text-2xl">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full mb-3 sm:mb-4 flex items-center justify-center text-[#0A4F48] font-bold text-xl sm:text-2xl">
           {expert?.name?.[0]}
         </div>
 
-        <h2 className="text-lg font-bold text-[#011412] mb-3">
+        <h2 className="text-base sm:text-lg font-bold text-[#011412] mb-2 sm:mb-3 text-center">
           {expert?.name || "Priya Menon"}
         </h2>
 
-        <div className="flex gap-2 mb-6">
-          <span className="px-3 py-1 bg-[#F8F9FA] rounded-full text-[10px] font-bold text-[#66706D] uppercase tracking-wider">
+        <div className="flex flex-wrap justify-center gap-2 mb-4 sm:mb-6">
+          <span className="px-2.5 sm:px-3 py-1 bg-[#F8F9FA] rounded-full text-[9px] sm:text-[10px] font-bold text-[#66706D] uppercase tracking-wider">
             {expert?.role || "Dietitian"}
           </span>
-          <span className="px-3 py-1 bg-[#FAF3E0] rounded-full text-[10px] font-bold text-[#DAA520] flex items-center gap-1">
+          <span className="px-2.5 sm:px-3 py-1 bg-[#FAF3E0] rounded-full text-[9px] sm:text-[10px] font-bold text-[#DAA520] flex items-center gap-1">
             <Star size={10} fill="currentColor" /> {expert?.rating || "0"}
           </span>
-          <span className="px-3 py-1 bg-[#E7F9F4] rounded-full text-[10px] font-bold text-[#00A389]">
+          <span className="px-2.5 sm:px-3 py-1 bg-[#E7F9F4] rounded-full text-[9px] sm:text-[10px] font-bold text-[#00A389]">
             {expert?.status || "Active"}
           </span>
         </div>
@@ -124,10 +124,10 @@ const ExpertLeftSide = ({ expert }) => {
               key={i}
               className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0"
             >
-              <span className="text-xs text-[#66706D] font-medium">
+              <span className="text-[11px] sm:text-xs text-[#66706D] font-medium">
                 {item.label}
               </span>
-              <span className="text-xs font-bold text-[#0A4F48]">
+              <span className="text-[11px] sm:text-xs font-bold text-[#0A4F48]">
                 {item.value}
               </span>
             </div>
@@ -137,11 +137,11 @@ const ExpertLeftSide = ({ expert }) => {
 
       {/* Chat Monitoring */}
       {(!isFounderPage && !isHeadPage) && (
-        <div className="bg-white rounded-2xl p-5 shadow-sm">
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm">
           <h3 className="text-sm font-bold text-[#0A4F48] mb-1">
             Chat Monitoring
           </h3>
-          <p className="text-[10px] text-[#66706D] mb-4">
+          <p className="text-[10px] text-[#66706D] mb-3 sm:mb-4">
             Monitor expert-client chats
           </p>
           <button className="w-full py-2.5 bg-[#0A4F48] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#083a35] transition-colors">
@@ -151,25 +151,25 @@ const ExpertLeftSide = ({ expert }) => {
       )}
 
       {/* Personal Info */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <div className="flex justify-between items-center mb-6">
+      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
           <h3 className="text-sm font-bold text-[#0A4F48]">Personal Info</h3>
-          <button className="text-gray-400">
-            <MoreHorizontal size={18} />
+          <button className="text-gray-400 hover:text-gray-600 transition-colors">
+            <MoreHorizontal size={16} className="sm:w-[18px] sm:h-[18px]" />
           </button>
         </div>
 
-        <div className="space-y-5">
+        <div className="space-y-4 sm:space-y-5">
           {personalInfo.map((item, i) => (
             <div key={i} className="flex gap-3">
               <div className="w-8 h-8 rounded-full bg-[#EBF3F2] flex items-center justify-center text-[#0A4F48] shrink-0">
                 {item.icon}
               </div>
-              <div className="flex flex-col">
+              <div className="flex flex-col min-w-0 flex-1">
                 <span className="text-[10px] text-[#66706D] font-medium">
                   {item.label}
                 </span>
-                <span className="text-[11px] font-bold text-[#011412] leading-tight mt-0.5">
+                <span className="text-[11px] font-bold text-[#011412] leading-tight mt-0.5 break-words">
                   {item.value}
                 </span>
               </div>
@@ -179,17 +179,17 @@ const ExpertLeftSide = ({ expert }) => {
       </div>
 
       {/* Role & Specialization */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <h3 className="text-sm font-bold text-[#0A4F48] mb-6">
+      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
+        <h3 className="text-sm font-bold text-[#0A4F48] mb-4 sm:mb-6">
           Role & Specialization
         </h3>
-        <div className="space-y-5">
+        <div className="space-y-4 sm:space-y-5">
           {specialization.map((item, i) => (
             <div key={i} className="flex flex-col gap-2">
               <span className="w-fit px-2 py-0.5 bg-[#F8F9FA] text-[10px] font-bold text-[#66706D] rounded">
                 {item.label}
               </span>
-              <p className="text-[11px] font-bold text-[#0A4F48] leading-relaxed">
+              <p className="text-[11px] font-bold text-[#0A4F48] leading-relaxed break-words">
                 {item.content}
               </p>
             </div>
