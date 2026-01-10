@@ -7,6 +7,7 @@ import {
   selectAllClients,
   selectClientStatus,
   selectClientError,
+  selectTotalClientCount,
 } from "@/redux/features/client/client.selectors";
 import { getAllClients } from "@/redux/features/client/client.thunk";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +32,7 @@ export default function ClientsTable() {
   const data = useAppSelector(selectAllClients);
   const status = useAppSelector(selectClientStatus);
   const error = useAppSelector(selectClientError);
+  const clientsLength = useAppSelector(selectTotalClientCount);
 
   const [clients, setClient] = useState([]);
 
@@ -72,6 +74,7 @@ export default function ClientsTable() {
         handleLimitChange={setLimit}
         page={page}
         limit={limit}
+        totalCount={clientsLength}
       />
     </div>
   );
