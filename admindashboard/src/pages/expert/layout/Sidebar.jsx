@@ -10,30 +10,30 @@ const menuItems = [
     path: "/expert",
   },
   { label: "Clients", icon: assets.clients, path: "/expert/clients" },
-  { label: "Experts", icon: assets.experts, path: "/expert/experts" },
-  {
-    label: "Programs",
-    icon: assets.programs,
-    path: "/expert/programs",
-    Children: [
-      {
-        label: "Program List",
-        icon: assets.programs,
-        path: "/expert/programs/list",
-      },
-      {
-        label: "Templates",
-        icon: assets.programs,
-        path: "/expert/programs/template",
-      },
-    ],
-  },
-  { label: "Therapy", icon: assets.website, path: "/expert/therapy" },
-  { label: "Category", icon: assets.website, path: "/expert/category" },
-  { label: "Finance", icon: assets.finance, path: "/expert/finance" },
+  // { label: "Experts", icon: assets.experts, path: "/expert/experts" },
+  // {
+  //   label: "Programs",
+  //   icon: assets.programs,
+  //   path: "/expert/programs",
+  //   Children: [
+  //     {
+  //       label: "Program List",
+  //       icon: assets.programs,
+  //       path: "/expert/programs/list",
+  //     },
+  //     {
+  //       label: "Templates",
+  //       icon: assets.programs,
+  //       path: "/expert/programs/template",
+  //     },
+  //   ],
+  // },
+  // { label: "Therapy", icon: assets.website, path: "/expert/therapy" },
+  // { label: "Category", icon: assets.website, path: "/expert/category" },
+  // { label: "Finance", icon: assets.finance, path: "/expert/finance" },
   { label: "Chats", icon: assets.chats, path: "/expert/chats" },
-  { label: "Analytics", icon: assets.analytics, path: "/expert/analytics" },
-  { label: "Website", icon: assets.website, path: "/expert/website" },
+  // { label: "Analytics", icon: assets.analytics, path: "/expert/analytics" },
+  // { label: "Website", icon: assets.website, path: "/expert/website" },
 ];
 
 export default function Sidebar() {
