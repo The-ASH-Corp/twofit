@@ -24,7 +24,7 @@ const adminSlice = createSlice({
       })
       .addCase(getAllAdmins.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.admins = action.payload.data;
+        state.admins = action.payload;
         state.error = null;
       })
       .addCase(getAllAdmins.rejected,(state,action)=>{

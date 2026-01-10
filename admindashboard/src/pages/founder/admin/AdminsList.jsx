@@ -14,6 +14,7 @@ import { SyncLoader } from "react-spinners";
 export default function AdminsList() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [totalCount,setTotalCount]=useState(0)
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -28,7 +29,9 @@ export default function AdminsList() {
   const [admins, setAdmins] = useState([]);
 
   useEffect(() => {
-    setAdmins(data);
+    console.log(data)
+    setAdmins(data.data);
+    setTotalCount(data.total);
   }, [data]);
 
   const searchInputHandler = (e) => {
@@ -70,6 +73,7 @@ export default function AdminsList() {
         handleLimitChange={setLimit}
         page={page}
         limit={limit}
+        totalCount={totalCount}
       />
     </div>
   );
