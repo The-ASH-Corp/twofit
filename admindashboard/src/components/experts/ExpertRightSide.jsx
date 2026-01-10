@@ -45,26 +45,26 @@ const ExpertRightSide = ({ expert }) => {
   ];
 
   return (
-    <div className="w-[300px] flex flex-col gap-6 overflow-y-auto no-scrollbar pb-6">
+    <div className="w-full flex flex-col gap-4 sm:gap-6 overflow-y-auto no-scrollbar pb-4 sm:pb-6">
       {/* Response Time Card */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-base font-bold text-[#0A4F48]">Response Time</h3>
-          <button className="text-gray-400">
-            <MoreHorizontal size={20} />
+      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
+          <h3 className="text-sm sm:text-base font-bold text-[#0A4F48]">Response Time</h3>
+          <button className="text-gray-400 hover:text-gray-600 transition-colors">
+            <MoreHorizontal size={18} className="sm:w-5 sm:h-5" />
           </button>
         </div>
         <div className="space-y-3">
           <div className="flex justify-between items-center p-3 bg-[#F8F9FA] rounded-xl">
-            <span className="text-xs text-[#66706D] font-medium">
+            <span className="text-[11px] sm:text-xs text-[#66706D] font-medium">
               Average Response Time
             </span>
-            <span className="text-sm font-bold text-[#011412] tracking-tight">
+            <span className="text-xs sm:text-sm font-bold text-[#011412] tracking-tight">
               {expert?.responseTime || "1h 12m"}
             </span>
           </div>
           <div className="flex justify-between items-center p-3 bg-[#F8F9FA] rounded-xl">
-            <span className="text-xs text-[#66706D] font-medium">
+            <span className="text-[11px] sm:text-xs text-[#66706D] font-medium">
               Fast Responses
             </span>
             <div className="flex items-center gap-2">
@@ -78,23 +78,23 @@ const ExpertRightSide = ({ expert }) => {
       </div>
 
       {/* Client Compliance Card */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-base font-bold text-[#0A4F48]">
+      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
+          <h3 className="text-sm sm:text-base font-bold text-[#0A4F48]">
             Client Compliance
           </h3>
-          <button className="text-gray-400">
-            <MoreHorizontal size={20} />
+          <button className="text-gray-400 hover:text-gray-600 transition-colors">
+            <MoreHorizontal size={18} className="sm:w-5 sm:h-5" />
           </button>
         </div>
 
-        <div className="relative h-44 mb-8">
+        <div className="relative h-40 sm:h-44 mb-6 sm:mb-8">
           <Doughnut data={complianceData} options={complianceOptions} />
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-[10px] text-[#66706D] font-medium">
               Avg Compliance
             </span>
-            <span className="text-2xl font-bold text-[#011412]">73%</span>
+            <span className="text-xl sm:text-2xl font-bold text-[#011412]">73%</span>
           </div>
         </div>
 
@@ -133,11 +133,11 @@ const ExpertRightSide = ({ expert }) => {
       </div>
 
       {/* Documents Card */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm flex-1">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-base font-bold text-[#0A4F48]">Documents</h3>
-          <button className="text-gray-400">
-            <MoreHorizontal size={20} />
+      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm flex-1">
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
+          <h3 className="text-sm sm:text-base font-bold text-[#0A4F48]">Documents</h3>
+          <button className="text-gray-400 hover:text-gray-600 transition-colors">
+            <MoreHorizontal size={18} className="sm:w-5 sm:h-5" />
           </button>
         </div>
         <div className="space-y-4">
@@ -145,11 +145,11 @@ const ExpertRightSide = ({ expert }) => {
             ? [{ name: expert.certifications, size: "2.4 MB" }]
             : documents
           ).map((doc, i) => (
-            <div key={i} className="flex items-center gap-4">
-              <div className="p-2.5 bg-[#FAF3E0] rounded-lg text-[#DAA520]">
-                <FileText size={20} />
+            <div key={i} className="flex items-center gap-3 sm:gap-4">
+              <div className="p-2 sm:p-2.5 bg-[#FAF3E0] rounded-lg text-[#DAA520] flex-shrink-0">
+                <FileText size={18} className="sm:w-5 sm:h-5" />
               </div>
-              <div className="flex flex-col min-w-0">
+              <div className="flex flex-col min-w-0 flex-1">
                 <span className="text-xs font-bold text-[#011412] truncate">
                   {doc.name}
                 </span>
