@@ -11,7 +11,7 @@ const coachSchema = new mongoose.Schema({
 
   phone: { type: String, required: true, unique: true },
 
-  password: { type: String, required: true},
+  password: { type: String, required: true },
 
   address: { type: String, required: true },
 
@@ -78,7 +78,34 @@ const coachSchema = new mongoose.Schema({
   autoSendGuide: { type: Boolean, default: false },
 
   automatedReminder: { type: Boolean, default: false },
-  status: { type: String, enum: ["Active", "Inactive"], default: "Active" }
+
+  status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
+
+  feedback: [
+    {
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      rating: {
+        type: Number,
+        min: 1,
+        max: 5
+      },
+      feedback: {
+        type: String,
+        trim: true
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now
+      },
+      updatedAt: {
+        type: Date,
+        default: Date.now
+      }
+    }
+  ]
 }, { timestamps: true });
 
 export const CoachModel = mongoose.model("Coach", coachSchema);

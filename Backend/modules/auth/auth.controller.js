@@ -10,16 +10,18 @@ export const createUserByAdmin = async (req, res) => {
       data: user,
     });
   } catch (err) {
+    console.log(err);
+
     res.status(400).json({ success: false, message: err.message });
   }
 };
 
 export const loginController = async (req, res) => {
   try {
-        console.log(req.body);
+    console.log(req.body);
 
     let data = await service.loginUser(req.body);
-    
+
 
     res.cookie("refreshToken", data.refreshToken, {
       httpOnly: true,
@@ -32,7 +34,7 @@ export const loginController = async (req, res) => {
     res.json({ success: true, message: "Login successful", data });
   } catch (err) {
     console.log(err);
-    
+
     res.status(400).json({ success: false, message: err.message });
   }
 };
