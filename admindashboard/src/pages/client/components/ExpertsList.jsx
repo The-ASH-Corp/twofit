@@ -5,9 +5,9 @@ import { BsChatLeftDots } from "react-icons/bs";
 export default function ExpertsList({ expert }) {
   console.log(expert);
   const experts = [
-    { role: "Trainer", name: expert?.filter((expert) => expert?.role === "Trainer").map((expert) => expert?.name), icon: assets.profileVector },
-    { role: "Dietitian", name: expert?.filter((expert) => expert?.role === "Dietician").map((expert) => expert?.name), icon: assets.profileVector },
-    { role: "Therapist", name: expert?.filter((expert) => expert?.role === "Therapist").map((expert) => expert?.name), icon: assets.profileVector },
+    { role: "Trainer", name: expert?.filter((expert) => expert?.role === "Trainer").map((expert) => expert?.name) || "N/A", icon: assets.profileVector },
+    { role: "Dietitian", name: expert?.filter((expert) => expert?.role === "Dietician").map((expert) => expert?.name) || "N/A", icon: assets.profileVector },
+    { role: "Therapist", name: expert?.filter((expert) => expert?.role === "Therapist").map((expert) => expert?.name) || "N/A", icon: assets.profileVector },
   ];
 
   return (
