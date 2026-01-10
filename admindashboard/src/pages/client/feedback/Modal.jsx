@@ -1,68 +1,92 @@
 import React from "react";
+import { X } from "lucide-react";
 
 export default function Modal({ expert, onClose }) {
   const [rating, setRating] = React.useState(0);
+
   return (
-    <div className="absolute right-0 h-full bg-white shadow-md rounded-2xl right-5 p-4 w-[300px] top-3 flex flex-col">
-      <div className="flex justify-between">
-        <h1 className="text-[#0A4F48] text-[16px] font-bold">
-          Rate Your Experience
-        </h1>
-        <h1 onClick={onClose} className="cursor-pointer">
-          close
-        </h1>
-      </div>
+    <div className="fixed inset-0 z-50 flex justify-end">
+      {/* Overlay */}
+      <div
+        className="absolute inset-0 bg-black/5 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
-      <div className="flex gap-3 items-center mt-10 ">
-        <img
-          src={expert.image}
-          alt={expert.name}
-          className="w-14 h-14 rounded-full object-cover"
-        />
+      {/* Drawer */}
+      <div className="relative w-[400px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+        <div className="flex justify-between items-center p-6 pb-4 border-b border-gray-100">
+          <h2 className="font-bold text-[18px] text-[#0A4F48]">
+            Rate Your Experience
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+          >
+            <X className="w-6 h-6 text-gray-400" />
+          </button>
+        </div>
 
-        <div className="flex-1 space-y-2">
-          <h3 className="font-semibold text-sm">{expert.name}</h3>
-          <div className="flex flex-row gap-2">
-            <p className="text-xs text-gray-500 px-3 py-1 rounded-full bg-gray-200 text-black">
-              {expert.role}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Expert Info */}
+          <div className="flex gap-4 items-center">
+            <img
+              src={expert.image}
+              alt={expert.name}
+              className="w-16 h-16 rounded-full object-cover"
+            />
+            <div className="flex-1 space-y-2">
+              <h3 className="font-semibold text-[15px] text-gray-800">
+                {expert.name}
+              </h3>
+              <div className="flex flex-row gap-2">
+                <p className="text-[11px] text-gray-600 px-3 py-1 rounded-full bg-gray-100 font-medium">
+                  {expert.role}
+                </p>
+                <p className="text-[11px] px-3 py-1 rounded-full bg-emerald-500 text-white font-medium">
+                  {expert.status}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Rating Section */}
+          <div className="space-y-3">
+            <p className="text-[13px] font-semibold text-gray-700">
+              Your Rating
             </p>
-            <p className="text-xs px-3 py-1 rounded-full bg-[#45C4A2] text-white">
-              {expert.status}
+            <div className="flex gap-2 bg-gray-50 p-3 rounded-xl">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setRating(star)}
+                  className={`text-3xl transition-colors ${
+                    star <= rating ? "text-yellow-400" : "text-gray-300"
+                  }`}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Feedback Section */}
+          <div className="space-y-3">
+            <p className="text-[13px] font-semibold text-gray-700">
+              Share Your Feedback
             </p>
+            <textarea
+              className="w-full border border-gray-200 bg-gray-50/30 focus:bg-white focus:border-[#0A4F48] focus:outline-none rounded-xl p-4 text-[13px] min-h-[140px] resize-none transition-all"
+              placeholder="Character Limit 300-500 chars ..."
+            />
           </div>
         </div>
-      </div>
-      <div className="mt-5 space-y-2">
-        <p className="text-[11px] font-medium">Your Rating</p>
-        <div className="flex gap-2  bg-[#F8F8F8] p-2 rounded-xl ">
-          {[1, 2, 3, 4, 5].map((star) => (
-            <button
-              key={star}
-              onClick={() => setRating(star)}
-              className={`text-2xl ${
-                star <= rating ? "text-yellow-400" : "text-gray-300"
-              }`}
-            >
-              ★
-            </button>
-          ))}
-        </div>
-      </div>
 
-      <div className="mt-5 space-y-2">
-        <p className="text-[11px] font-medium">Share Your Feedback:</p>
-        <div className="">
-          <textarea
-            className="w-full  border border-[#e0dbdb] focus:outline-none focus:ring-0 rounded-xl p-2 h-24"
-            placeholder="Character Limit 300-500 chars ..."
-          ></textarea>
+        {/* Submit Button */}
+        <div className="p-6 pt-4 border-t border-gray-100">
+          <button className="bg-[#0A4F48] w-full text-white px-6 py-3.5 rounded-xl text-[14px] font-bold hover:bg-[#083d38] transition-colors shadow-lg shadow-emerald-900/10">
+            Submit
+          </button>
         </div>
-      </div>
-
-      <div className="mt-auto">
-        <button className="bg-[#0A4F48] w-full bottom-0   text-white px-4 py-2 rounded-xl">
-          Submit
-        </button>
       </div>
     </div>
   );
