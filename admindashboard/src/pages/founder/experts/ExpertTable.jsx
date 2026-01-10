@@ -69,6 +69,7 @@ export default function ExpertTable() {
         handleLimitChange={setLimit}
         page={page}
         limit={limit}
+        totalCount={coaches.length}
       />
     </div>
   );
