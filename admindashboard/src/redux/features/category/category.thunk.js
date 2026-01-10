@@ -3,8 +3,8 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const createCategory = createAsyncThunk("category/create", async(categoryData, {rejectWithValue}) => {
     try {
-        const data = await axiosInstance.post("/category/create", categoryData);
-        return data.data;
+        const response = await axiosInstance.post("/category/create", categoryData);
+        return response;
     } catch (error) {
         return rejectWithValue(
           error.response?.data?.message || "creating category failed"

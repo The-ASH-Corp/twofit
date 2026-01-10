@@ -6,7 +6,7 @@ export const createHead = createAsyncThunk(
   async (headData, { rejectWithValue }) => {
     try {
         const response = await axiosInstance.post("heads/create", headData);
-        return response.data;
+        return response;
     } catch (error) {
         return rejectWithValue(
           error.response?.data?.message || "Failed to add head"

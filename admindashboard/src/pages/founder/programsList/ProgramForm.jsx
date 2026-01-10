@@ -6,6 +6,7 @@ import { useAppSelector } from "@/redux/store/hooks";
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function ProgramForm() {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ export default function ProgramForm() {
 
   useEffect(() => {
     dispatch(getAllCategories({ page: 1, limit: 100 }));
-  }, []);
+  }, [dispatch]);
 
   const data = useAppSelector(selectAllCategories);
 
@@ -89,7 +90,13 @@ export default function ProgramForm() {
       });
 
       const program = await dispatch(createProgram(formData)).unwrap();
-      navigate("/programs");
+
+      if (program.success) {
+        toast.success("Program created successfully");
+        navigate("/founder/programs");
+      } else {
+        toast.error("Failed to create program");
+      }
     } catch (error) {
       console.error("Program creation failed:", error);
     }
