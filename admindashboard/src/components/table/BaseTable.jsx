@@ -134,7 +134,7 @@ export default function BaseTable({
           </div>
         </div>
       </div>
-      {data.length > 0 ? (
+      {data?.length > 0 ? (
         <div className="overflow-x-auto overflow-y-auto flex-1 min-h-0 -mx-3 sm:-mx-4 md:mx-0">
           <div className="inline-block min-w-full align-middle px-3 sm:px-4 md:px-0">
             <table className="min-w-full text-sm border-collapse">
