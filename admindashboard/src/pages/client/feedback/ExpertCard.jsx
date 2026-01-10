@@ -26,9 +26,7 @@ export default function ExpertCard() {
   };
   useEffect(() => {
     fetchExperts();
-  }, []);
-  // console.log(experts);
-  
+  }, []);  
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full ">

@@ -1,8 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import { X } from "lucide-react";
+import { assets } from "@/assets/asset";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { useAppSelector } from "@/redux/store/hooks";
+import { useDispatch } from "react-redux";
+import { createFeedback } from "@/redux/features/client/client.thunk";
+import { toast } from "react-toastify";
 
 export default function Modal({ expert, onClose }) {
-  const [rating, setRating] = React.useState(0);
+  const dispatch = useDispatch();
+  const [rating, setRating] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const user = useAppSelector(selectUser);
+
+  const handleSubmit = async () => {
+    const values = { expertId: expert._id, rating, feedback, userId: user._id };
+    const response = await dispatch(createFeedback(values));
+    if (response?.payload?.success) {
+      onClose();
+      toast.success("Feedback submitted successfully");
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -30,7 +48,7 @@ export default function Modal({ expert, onClose }) {
           {/* Expert Info */}
           <div className="flex gap-4 items-center">
             <img
-              src={expert.image}
+              src={assets.profile}
               alt={expert.name}
               className="w-16 h-16 rounded-full object-cover"
             />
@@ -75,15 +93,21 @@ export default function Modal({ expert, onClose }) {
               Share Your Feedback
             </p>
             <textarea
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
               className="w-full border border-gray-200 bg-gray-50/30 focus:bg-white focus:border-[#0A4F48] focus:outline-none rounded-xl p-4 text-[13px] min-h-[140px] resize-none transition-all"
               placeholder="Character Limit 300-500 chars ..."
+              maxLength={500}
             />
           </div>
         </div>
 
         {/* Submit Button */}
         <div className="p-6 pt-4 border-t border-gray-100">
-          <button className="bg-[#0A4F48] w-full text-white px-6 py-3.5 rounded-xl text-[14px] font-bold hover:bg-[#083d38] transition-colors shadow-lg shadow-emerald-900/10">
+          <button
+            onClick={handleSubmit}
+            className="bg-[#0A4F48] w-full text-white px-6 py-3.5 rounded-xl text-[14px] font-bold hover:bg-[#083d38] transition-colors shadow-lg shadow-emerald-900/10"
+          >
             Submit
           </button>
         </div>
