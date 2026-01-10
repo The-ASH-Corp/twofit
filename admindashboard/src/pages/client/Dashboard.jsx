@@ -30,7 +30,7 @@ export default function Dashboard() {
   useEffect(() => {
     fetchDashboardData();
   }, []);
-  console.log("program",coaches);
+
   return (
     <div className="w-full grid grid-cols-[1fr_350px] gap-8 p-2">
       {/* Main Content Area */}
