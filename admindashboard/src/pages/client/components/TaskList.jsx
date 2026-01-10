@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import breakfast from "/src/assets/breakfast.svg";
 import TaskModal from "./TaskModal";
 
 export default function TaskList() {
@@ -8,49 +7,56 @@ export default function TaskList() {
   const list = [
     {
       type: "Breakfast",
-      time: "7:30 – 10:30 AM",
-      desc: "Eat a healthy breakfast with fruits & protein",
-      image: breakfast,
+      time: "7:30 – 10:00 AM",
+      desc: "Eat a balanced, healthy meal.",
+      image: "src/assets/breakfast.svg",
+      status: "pending",
+    },
+    {
+      type: "Lunch",
+      time: "1:00 – 2:30 PM",
+      desc: "Balanced meal, avoid heavy food.",
+      image: "src/assets/breakfast.svg",
+      status: "pending",
+    },
+    {
+      type: "Evening Snack",
+      time: "4:30 – 5:00 PM",
+      desc: "Light and healthy snack.",
+      image: "src/assets/breakfast.svg",
+      status: "pending",
+    },
+    {
+      type: "Dinner",
+      time: "7:00 – 9:00 PM",
+      desc: "Light, easy-to-digest meal.",
+      image: "src/assets/breakfast.svg",
       status: "pending",
     },
     {
       type: "Workout",
-      time: "6:00 – 7:00 AM",
-      desc: "Complete strength training workout",
-      image: breakfast,
-      status: "completed",
-    },
-    {
-      type: "Lunch",
-      time: "1:00 – 2:00 PM",
-      desc: "Balanced meal with carbs and vegetables",
-      image: breakfast,
+      time: "30-60 minutes.",
+      desc: "Morning or evening. Stay hydrated.",
+      image: "src/assets/breakfast.svg",
       status: "pending",
     },
     {
       type: "Therapy",
-      time: "5:00 – 5:30 PM",
-      desc: "Breathing and relaxation session",
-      image: breakfast,
-      status: "missed",
-    },
-    {
-      type: "Dinner",
-      time: "8:00 – 9:00 PM",
-      desc: "Light dinner with protein",
-      image: breakfast,
+      time: "After workout or evening.",
+      desc: "Stretching or recovery sessi...",
+      image: "src/assets/breakfast.svg",
       status: "pending",
     },
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 mt-4">
       {list.map((item, index) => (
         <div
           key={index}
-          className="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm"
+          className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-gray-50 hover:shadow-md transition-shadow"
         >
-          <div className="w-14 h-14 rounded-2xl   overflow-hidden">
+          <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
             <img
               src={item.image}
               alt={item.type}
@@ -58,28 +64,36 @@ export default function TaskList() {
             />
           </div>
 
-          <div className="flex-1 space-y-1">
-            <h3 className="font-bold text-[#0A4F48]">{item.type}</h3>
-            <div className="flex gap-4">
-              {" "}
-              <p className="text-xs  ">{item.time}</p>
-              <p className="text-xs">{item.desc}</p>
-            </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-bold text-[#0A4F48] text-[15px]">
+              {item.type}
+            </h3>
+            <p className="text-[12px] text-gray-500 font-medium truncate">
+              <span className="text-[#0A4F48] font-semibold">{item.time}</span>{" "}
+              {item.desc}
+            </p>
           </div>
 
-          <button className="bg-[#EBF3F2] px-8 py-2 rounded-lg text-sm">
-            Skip
-          </button>
-          <button
-            onClick={() => {setIsOpen(!isOpen);setSelectedTask(item)}}
-            className="bg-[#0A4F48] text-sm px-8 py-2 text-white rounded-lg"
-          >
-            View
-          </button>
+          <div className="flex gap-2">
+            <button className="bg-gray-50 px-6 py-2 rounded-lg text-[13px] font-bold text-gray-400 hover:bg-gray-100 transition-colors">
+              Skip
+            </button>
+            <button
+              onClick={() => {
+                setIsOpen(!isOpen);
+                setSelectedTask(item);
+              }}
+              className="bg-[#0A4F48] text-[13px] font-bold px-6 py-2 text-white rounded-lg hover:bg-[#083d38] transition-colors"
+            >
+              View
+            </button>
+          </div>
         </div>
       ))}
 
-      {isOpen && <TaskModal task={selectedTask} onClose={()=>setIsOpen(!isOpen)} />}
+      {isOpen && (
+        <TaskModal task={selectedTask} onClose={() => setIsOpen(!isOpen)} />
+      )}
     </div>
   );
 }
