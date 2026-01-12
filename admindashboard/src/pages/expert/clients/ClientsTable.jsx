@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import BaseTable from "../../../components/table/BaseTable";
 import { ClientColumns } from "./ClientColumns";
 import { useDispatch } from "react-redux";
@@ -9,43 +9,52 @@ import {
 } from "@/redux/features/client/client.selectors";
 import { useNavigate } from "react-router-dom";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { selectAssignedClients } from "@/redux/features/coach/coach.selector";
+import { selectAssignedClients, selectTotalClientsCount } from "@/redux/features/coach/coach.selector";
 import { getUsersAssignedToACoach } from "@/redux/features/coach/coach.thunk";
 
 export default function ClientsTable() {
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   const coachId = useAppSelector(selectUser);
-
-    useEffect(() => {
-    if (coachId) {
-      dispatch(getUsersAssignedToACoach(coachId._id));
+  useEffect(() => {
+    if (coachId?._id) {
+      dispatch(getUsersAssignedToACoach({ coachId: coachId._id, page, limit }));
     }
-  }, [dispatch, coachId]);
-  // const navigate = useNavigate();
-
-
+  }, [dispatch, coachId, page, limit]);
 
   const clients = useAppSelector(selectAssignedClients);
-
+  const clientTotalCount = useAppSelector(selectTotalClientsCount);
   const status = useAppSelector(selectClientStatus);
   const error = useAppSelector(selectClientError);
 
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
 
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+  };
 
   if (status === "loading") return <p>Loading clients...</p>;
   if (error) return <p>{error}</p>;
 
- const profilePath = (id) => {
+  const profilePath = (id) => {
     navigate(`/expert/clients/profile/${id}`);
   };
   return (
     <BaseTable
       columns={ClientColumns}
-      data={clients?.assignedUsers}
+      data={clients}
       pageLabel="My Clients"
       profilePath={profilePath}
+      handlePageChange={handlePageChange}
+      handleLimitChange={handleLimitChange}
+      page={page}
+      limit={limit}
+      totalCount={clientTotalCount}
     />
   );
 }

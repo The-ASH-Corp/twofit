@@ -4,12 +4,8 @@ import { getChats } from "@/redux/features/chat/chat.thunk";
 import { socket } from "@/utils/socket";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import ChatSidebar from "./ChatSidebar";
 import ChastList from "./ChastList";
 import ChatWindow from "./ChatWindow";
-import Templates from "./Templates";
-import CreateBroadcast from "./CreateBroadcast";
-import AutoReminders from "./AutoReminders";
 import { getAllCoachesByAdminId } from "@/redux/features/admins/admin.thunk";
 import { selectAllCoaches } from "@/redux/features/coach/coach.selector";
 
@@ -70,12 +66,6 @@ export default function Chats() {
     setChatClient(selectedClient);
   };
 
-  const handleBroadcastChat = () => {
-    socket.emit("broadcast", {
-      roomId: `broadcast_${user._id}`,
-    });
-  };
-
   useEffect(() => {
     if (!client) return;
 
@@ -132,30 +122,11 @@ export default function Chats() {
     setMessages([]);
   }, [client]);
 
-  const [sideTab, setSideTab] = useState("Chats");
-  const handleSideTabs = (tabName) => {
-    setSideTab(tabName);
-  };
 
   return (
     <div className="flex h-[calc(100vh-120px)]  gap-5">
-      {/* Left Sidebar */}
-      <ChatSidebar
-        clients={clients}
-        handleSideTabs={handleSideTabs}
-        sideTab={sideTab}
-      />
-
-      {/* Right - Content based on tab */}
-      {sideTab === "Templates" ? (
-        <Templates />
-      ) : sideTab === "Create Broadcast" ? (
-        <CreateBroadcast onCancel={() => handleSideTabs("Chats")} />
-      ) : sideTab === "Auto Reminders" ? (
-        <AutoReminders />
-      ) : (
         <>
-          {/* Center - Chat List */}
+          {/* Middle - Chat List */}
           <ChastList
             clients={clients}
             chatClient={chatClient}
@@ -174,7 +145,7 @@ export default function Chats() {
             onlineUsers={onlineUsers}
           />
         </>
-      )}
+      
     </div>
   );
 }

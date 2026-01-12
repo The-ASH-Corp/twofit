@@ -79,13 +79,10 @@ export const getAllCoachesByAdmin = createAsyncThunk(
  
 export const getUsersAssignedToACoach = createAsyncThunk(
   "coach/getUsersAssignedToACoach",
-  async (coachId, { rejectWithValue }) => {
+  async ({ coachId, page, limit }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(
-        `/coach/assigned-users/${coachId}`
-      );
-console.log(response.data)
-      return response.data;
+      const response = await axiosInstance.get(`/coach/assigned-users/${coachId}/${page}/${limit}`);      
+      return response;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message ||
