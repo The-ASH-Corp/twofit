@@ -33,6 +33,7 @@ const TherapyTable = () => {
   // ];
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [totalCount,setTotalCount]=useState(0)
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -49,9 +50,11 @@ const TherapyTable = () => {
   // const error = useSelector(selectHeadError);
 
   const [heads, setHeads] = useState([]);
+  console.log(data)
 
   useEffect(() => {
-    setHeads(data);
+    setHeads(data.data.head);
+    setTotalCount(data.data.totalCount);
   }, [data]);
 
   const searchInputHandler = (e) => {
@@ -93,6 +96,7 @@ const TherapyTable = () => {
         handleLimitChange={setLimit}
         page={page}
         limit={limit}
+        totalCount={totalCount}
       />
     </div>
   );

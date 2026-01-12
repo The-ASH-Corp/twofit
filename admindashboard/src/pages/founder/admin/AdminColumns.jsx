@@ -46,7 +46,7 @@ export const AdminColumns = [
    },
      { accessorKey: "specialization", header: "Specialisation" },
 
-  { accessorKey: "clients", header: "Clients" },
+  // { accessorKey: "clients", header: "Clients" },
  
 //   {
 //     accessorKey: "experts",
@@ -69,9 +69,9 @@ export const AdminColumns = [
 //       </div>
 //     ),
 //   },
-  { accessorKey: "maxClient", header: "Maximum Limit" },
-  { accessorKey: "rating", header: "Rating" },
-  { accessorKey: "responseTime", header: "Response Time" },
+  // { accessorKey: "maxClient", header: "Maximum Limit" },
+  // { accessorKey: "rating", header: "Rating" },
+  // { accessorKey: "responseTime", header: "Response Time" },
 
   {
     accessorKey: "status",

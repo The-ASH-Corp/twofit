@@ -20,7 +20,7 @@ export const getAllHeads = createAsyncThunk(
     async ({page, limit}, {rejectWithValue}) => {
         try {
             const response = await axiosInstance.get(`heads/get-all-heads/${page}/${limit}`);
-            return response.data
+            return response;
         } catch (error) {
              return rejectWithValue(
                error.response?.data?.message || "Failed to get heads"

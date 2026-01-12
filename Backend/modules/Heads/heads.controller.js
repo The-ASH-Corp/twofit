@@ -2,11 +2,11 @@ import * as headService from "./heads.service.js";
 
 export const createHead = async (req, res) => {
   try {
-    const head = await headService.createHead(req.body);
+    const { head, totalCount } = await headService.createHead(req.body);
     res.status(201).json({
       success: true,
-      message: "Head created successfully",
       data: head,
+      total: totalCount,
     });
   } catch (error) {
     console.log(error);

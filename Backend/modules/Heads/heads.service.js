@@ -36,7 +36,12 @@ export const createHead = async (head) => {
 export const getAllHeads = async (page, limit) => {
   const skip = (page - 1) * limit;
 
-  return await HeadsModel.find().skip(skip).limit(limit);
+  const totalCount = await HeadsModel.countDocuments();
+  const head =  await HeadsModel.find().skip(skip).limit(limit);
+  return{
+    head,
+    totalCount
+  }
 };
 
 export const getHeadById = async (id) => {
