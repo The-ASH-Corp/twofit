@@ -50,3 +50,16 @@ export const createFeedback = createAsyncThunk(
     }
   }
 );
+
+export const getAllFeedbacks = createAsyncThunk(
+  "client/getAllFeedbacks",
+  async ( id , { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(`/clients/get-all-feedbacks/${id}`);
+      
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to get feedbacks");
+    }
+  }
+);

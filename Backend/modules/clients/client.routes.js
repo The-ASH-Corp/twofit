@@ -1,5 +1,5 @@
 import express from "express";
-import { deleteClient, getAllClients, getClientsBasedOnCoach, getSingleClient, updateClient, updateMeasurements, updateWeight } from "./client.controller.js";
+import { deleteClient, getAllClients, getAllFeedbacks, getClientsBasedOnCoach, getSingleClient, updateClient, updateMeasurements, updateWeight } from "./client.controller.js";
 
 
 const router = express.Router()
@@ -13,8 +13,7 @@ router.post("/get-all-users-based-on-coach-for-admin", getClientsBasedOnCoach)
 
 router.put("/:userId/weight", updateWeight);
 router.put("/:userId/measurements", updateMeasurements);
-
-
+router.get("/get-all-feedbacks/:userId", getAllFeedbacks)
 
 
 export default router;
