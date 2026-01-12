@@ -30,7 +30,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-[225px] bg-white   py-6 px-5 flex flex-col h-screen">
+    <aside className="w-[225px] bg-white py-6 px-5 flex flex-col h-screen fixed left-0 top-0 z-40">
       <h1 className="text-2xl  m-auto my-4 mb-8">
         <img src={assets.logo} className="text-[#66706D]" />
       </h1>

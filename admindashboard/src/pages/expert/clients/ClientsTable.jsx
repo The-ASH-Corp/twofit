@@ -13,7 +13,7 @@ import { selectAssignedClients } from "@/redux/features/coach/coach.selector";
 import { getUsersAssignedToACoach } from "@/redux/features/coach/coach.thunk";
 
 export default function ClientsTable() {
-
+const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const coachId = useAppSelector(selectUser);
@@ -37,13 +37,15 @@ export default function ClientsTable() {
   if (status === "loading") return <p>Loading clients...</p>;
   if (error) return <p>{error}</p>;
 
-  console.log("clients", clients?.assignedUsers);
-
+ const profilePath = (id) => {
+    navigate(`/expert/clients/profile/${id}`);
+  };
   return (
     <BaseTable
       columns={ClientColumns}
       data={clients?.assignedUsers}
       pageLabel="My Clients"
+      profilePath={profilePath}
     />
   );
 }
