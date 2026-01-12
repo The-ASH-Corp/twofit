@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ChastList from "./ChastList";
 import ChatWindow from "./ChatWindow";
-import { getAllCoachesByAdminId } from "@/redux/features/admins/admin.thunk";
-import { selectAllCoaches } from "@/redux/features/coach/coach.selector";
+import { getUsersAssignedToACoach } from "@/redux/features/coach/coach.thunk";
+import { selectAssignedClients } from "@/redux/features/coach/coach.selector";
 
 export default function Chats() {
   const user = useSelector(selectUser);
@@ -42,10 +42,10 @@ export default function Chats() {
   const [messages, setMessages] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
 
-  const clients = useSelector(selectAllCoaches);
+  const clients = useSelector(selectAssignedClients);
 
   const fetchAllExperts=()=>{
-    dispatch(getAllCoachesByAdminId({adminId:user._id,page:1,limit:100}))
+    dispatch(getUsersAssignedToACoach({coachId:user._id,page:1,limit:100}))
   }
 
   const chats = useSelector(getChat);
