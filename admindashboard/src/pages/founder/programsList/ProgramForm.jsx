@@ -19,6 +19,8 @@ export default function ProgramForm() {
 
   const data = useAppSelector(selectAllCategories);
 
+
+
   const fields = [
     {
       section: "Program Information",
@@ -35,7 +37,7 @@ export default function ProgramForm() {
           name: "category",
           label: "Choose Your Category",
           type: "select",
-          options: data.map((items) => ({
+          options:data.data.map((items) => ({
             label: items.name,
             value: items._id,
           })),

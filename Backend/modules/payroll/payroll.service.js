@@ -1,9 +1,10 @@
 import { PayrollModel } from "./payroll.model.js";
 
-export const createPayroll = async (payroll) => {
-    return await PayrollModel.findByIdAndUpdate(
-      "6960c69c6b7d7ca635decb87",
-      {
+export const updatePayroll = async (payroll) => {
+  return await PayrollModel.findOneAndUpdate(
+    { id: "6960c69c6b7d7ca635decb87" },
+    {
+      $set: {
         rating1: payroll.rating1,
         rating2: payroll.rating2,
         rating3: payroll.rating3,
@@ -13,10 +14,15 @@ export const createPayroll = async (payroll) => {
         extendProgram90days: payroll.extendProgram90days,
         targetAchieved: payroll.targetAchieved,
       },
-      { new: true }
-    );
-}
+    },
+    {
+      new: true, 
+      upsert: true,
+    }
+  );
+};
+
 
 export const getPayroll = async ()=> {
-  return await PayrollModel.findById("6960c69c6b7d7ca635decb87");
+  return await PayrollModel.findOne({id: "6960c69c6b7d7ca635decb87"});
 }
