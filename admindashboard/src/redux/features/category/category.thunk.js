@@ -15,8 +15,8 @@ export const createCategory = createAsyncThunk("category/create", async(category
 export const getAllCategories=createAsyncThunk('category/getAllCategories',async({page,limit},{rejectWithValue})=>{
     try{
         const data = await axiosInstance.get(`/category/list/${page}/${limit}`);
-        console.log(data.data)
-         return data.data; 
+        // console.log(data.data)
+         return data; 
         
     }
     catch(error){

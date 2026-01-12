@@ -33,7 +33,7 @@ export const ProgramListColumns = [
   { accessorKey: "title", header: "Program Name" },
   { accessorKey: "duration", header: "Duration" },
   { accessorKey: "category", header: "category"},
-  { accessorKey: "linkedTemplate", header: "Linked Template" },
+  // { accessorKey: "linkedTemplate", header: "Linked Template" },
 
   {
     accessorKey: "status",

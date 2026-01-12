@@ -16,8 +16,8 @@ import { SyncLoader } from "react-spinners";
 export default function CategoryTable() {
   const dispatch = useDispatch(); 
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
-
+  const [limit, setLimit] = useState(10)
+  const [totalCount, setTotalCount] = useState(0);
   useEffect(() => {
     dispatch(getAllCategories({ page, limit }));
   }, [dispatch, page, limit]);
@@ -27,9 +27,11 @@ export default function CategoryTable() {
     const error = useAppSelector(selectCategoryError);
 
     const [ categories, setCategories] = useState([]);
+    console.log(data)
 
     useEffect(()=>{
-      setCategories(data)
+      setCategories(data.data)
+      setTotalCount(data.total);
     },[data])
 
   const searchInputHandler = (e) => {
@@ -66,6 +68,7 @@ export default function CategoryTable() {
         handleLimitChange={setLimit}
         page={page}
         limit={limit}
+        totalCount={totalCount}
       />
     </div>
   );
