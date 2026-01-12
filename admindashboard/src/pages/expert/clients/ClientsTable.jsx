@@ -37,12 +37,12 @@ export default function ClientsTable() {
   if (status === "loading") return <p>Loading clients...</p>;
   if (error) return <p>{error}</p>;
 
-  console.log("clients", clients.assignedUsers);
+  console.log("clients", clients?.assignedUsers);
 
   return (
     <BaseTable
       columns={ClientColumns}
-      data={clients.assignedUsers}
+      data={clients?.assignedUsers}
       pageLabel="My Clients"
     />
   );
