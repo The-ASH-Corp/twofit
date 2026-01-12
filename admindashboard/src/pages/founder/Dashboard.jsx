@@ -1,4 +1,4 @@
-import React  from "react";
+import React, { useEffect, useState } from "react";
 import {
   Users,
   UserCheck,
@@ -28,6 +28,13 @@ import {
   Filler,
 } from "chart.js";
 import { Bar, Line, Doughnut } from "react-chartjs-2";
+import { useDispatch } from "react-redux";
+import { founderDashboardData } from "@/redux/features/founder/founder.thunk";
+import { useAppSelector } from "@/redux/store/hooks";
+import {
+  selectFounderDashBoard,
+  selectFounderStatus,
+} from "@/redux/features/founder/founder.selector";
 
 ChartJS.register(
   CategoryScale,
@@ -92,7 +99,6 @@ const Dashboard = () => {
         data: [30, 35, 70, 68, 72, 75, 74, 76, 78, 80, 79, 82],
         backgroundColor: "#0A4F48",
         borderRadius: 4,
-
       },
       {
         label: "Workout",
@@ -282,6 +288,23 @@ const Dashboard = () => {
     },
   ];
 
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(founderDashboardData());
+  }, [dispatch]);
+
+  const data = useAppSelector(selectFounderDashBoard);
+  // const error = useAppSelector(selectFounderError);
+  const status = useAppSelector(selectFounderStatus);
+
+  const [founder, setFounder] = useState();
+
+  useEffect(() => {
+      setFounder(data);
+      console.log(data);
+    }, [data]);
+
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA] h-[calc(100vh-120px)] overflow-auto  no-scrollbar">
       {/* Summary Cards */}
@@ -289,25 +312,25 @@ const Dashboard = () => {
         {[
           {
             label: "Total Clients",
-            value: "1,245",
+            value: founder?.data?.totalClient,
             icon: <Users size={20} className="text-[#0A4F48]" />,
             bg: "bg-[#EBF3F2]",
           },
           {
             label: "Headers",
-            value: "86",
+            value: founder?.data?.totalHeads,
             icon: <UserCheck size={20} className="text-[#DAA520]" />,
             bg: "bg-[#FAF3E0]",
           },
           {
             label: "Sub Admins",
-            value: "34",
+            value: founder?.data?.totalAdmins,
             icon: <FileText size={20} className="text-[#0A4F48]" />,
             bg: "bg-[#EBF3F2]",
           },
           {
             label: "Total Programs",
-            value: "86",
+            value: founder?.data?.totalPrograms,
             icon: <Layout size={20} className="text-[#DAA520]" />,
             bg: "bg-[#FAF3E0]",
           },
@@ -535,7 +558,9 @@ const Dashboard = () => {
                 <span className="text-[10px] text-[#66706D] font-medium">
                   Total Experts
                 </span>
-                <span className="text-3xl font-bold text-[#0A4F48]">54</span>
+                <span className="text-3xl font-bold text-[#0A4F48]">
+                  {founder?.data?.totalExperts}
+                </span>
               </div>
             </div>
             <div className="flex flex-col gap-3 mt-4">

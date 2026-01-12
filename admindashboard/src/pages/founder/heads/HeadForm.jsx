@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-const TherapyForm = () => {
+const HeadForm = () => {
   const dispatch = useDispatch(); 
    
   
@@ -25,7 +25,7 @@ const TherapyForm = () => {
     const [ categories, setCategories] = useState([]);
     
         useEffect(()=>{
-          setCategories(data)
+          setCategories(data.data)
         },[data])
 
         console.log(categories)
@@ -88,12 +88,15 @@ const TherapyForm = () => {
             options: [
               { label: "pcod", value: "pcod" },
               { label: "thyroid", value: "thyroid" },
-              {label:"astma",value:"astma"},
-              {label:"diabetes",value:"diabetes"},
-              {label:"hypertension",value:"hypertension"},
-              {label:"obesity",value:"obesity"},
-              {label:"osteoporosis",value:"osteoporosis"},
-              {label:"polycystic ovarian syndrome",value:"polycystic ovarian syndrome"},
+              { label: "astma", value: "astma" },
+              { label: "diabetes", value: "diabetes" },
+              { label: "hypertension", value: "hypertension" },
+              { label: "obesity", value: "obesity" },
+              { label: "osteoporosis", value: "osteoporosis" },
+              {
+                label: "polycystic ovarian syndrome",
+                value: "polycystic ovarian syndrome",
+              },
             ],
           },
           {
@@ -116,10 +119,10 @@ const TherapyForm = () => {
             name: "programCategory",
             label: "Program Category",
             type: "select",
-            options: categories.map((items)=> ({
-              label: items.name,
-              value: items._id
-            }))
+            options: categories.map((items) => ({
+              label: items?.name,
+              value: items?._id,
+            })),
           },
         ],
       },
@@ -181,4 +184,4 @@ const TherapyForm = () => {
   );
 }
 
-export default TherapyForm
+export default HeadForm;

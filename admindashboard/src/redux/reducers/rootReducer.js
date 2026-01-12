@@ -12,6 +12,7 @@ import therapyReducer from "../features/therapy/therapy.slice"
 import headReducer from "../features/head/head.slice"
 import workoutReducer from "../features/workout/workout.slice"
 import payrollReducer from "../features/payroll/payroll.slice"
+import founderReducer from "../features/founder/founder.slice"
 
 export default combineReducers({
   auth: authReducer,
@@ -24,5 +25,6 @@ export default combineReducers({
   therapy: therapyReducer,
   head: headReducer,
   workout: workoutReducer,
-  payroll: payrollReducer
+  payroll: payrollReducer,
+  founder: founderReducer,
 });
