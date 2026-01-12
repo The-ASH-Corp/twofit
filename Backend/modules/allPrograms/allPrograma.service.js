@@ -1,3 +1,4 @@
+import { CoachModel } from "../coach/coach.model.js";
 import programModel from "./allPrograma.model.js";
 
 export const createProgram = async (data) => {
@@ -33,4 +34,19 @@ export const deleteProgram = async (id) => {
 
 export const getAllProgramByCategory =async(category)=>{
     return await programModel.find({category})
+}
+
+export const getAllProgramsByExpert = async (expertId, page, limit) => {
+  const coach = await CoachModel.findById(expertId).select("assignedPrograms").lean().populate("assignedPrograms");
+  
+  if (!coach) {
+    return { program: [], totalProgram: 0 };
+  }
+  
+  const totalProgram = coach.assignedPrograms?.length || 0;
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  
+  const paginatedPrograms = coach.assignedPrograms?.slice(startIndex, endIndex) || [];
+  return { program: paginatedPrograms, totalProgram };
 }

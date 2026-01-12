@@ -2,6 +2,7 @@ import express from "express";
 import {
   createProgramController,
   deleteProgramController,
+  getAllProgramByExpert,
   getAllProgramController,
   getSingleProgramController,
   updateSingleProgramController,
@@ -16,5 +17,6 @@ router.put("/update/:id", updateSingleProgramController);
 router.delete("/delete/:id", deleteProgramController);
 
 router.get("/get-all-programs-by-category/:category", getAllProgramController)
+router.get("/get-all-programs-by-expert/:expertId/:page/:limit", getAllProgramByExpert)
 
 export default router;
