@@ -10,30 +10,13 @@ const menuItems = [
     path: "/expert",
   },
   { label: "Clients", icon: assets.clients, path: "/expert/clients" },
-  // { label: "Experts", icon: assets.experts, path: "/expert/experts" },
-  // {
-  //   label: "Programs",
-  //   icon: assets.programs,
-  //   path: "/expert/programs",
-  //   Children: [
-  //     {
-  //       label: "Program List",
-  //       icon: assets.programs,
-  //       path: "/expert/programs/list",
-  //     },
-  //     {
-  //       label: "Templates",
-  //       icon: assets.programs,
-  //       path: "/expert/programs/template",
-  //     },
-  //   ],
-  // },
-  // { label: "Therapy", icon: assets.website, path: "/expert/therapy" },
-  // { label: "Category", icon: assets.website, path: "/expert/category" },
-  // { label: "Finance", icon: assets.finance, path: "/expert/finance" },
+  {
+    label: "Programs",
+    icon: assets.programs,
+    path: "/expert/programs",
+  },
+  { label: "Finance", icon: assets.finance, path: "/expert/finance" },
   { label: "Chats", icon: assets.chats, path: "/expert/chats" },
-  // { label: "Analytics", icon: assets.analytics, path: "/expert/analytics" },
-  // { label: "Website", icon: assets.website, path: "/expert/website" },
 ];
 
 export default function Sidebar() {
@@ -47,7 +30,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-[225px] bg-white   py-6 px-5 flex flex-col h-screen">
+    <aside className="w-[225px] bg-white py-6 px-5 flex flex-col h-screen fixed left-0 top-0 z-40">
       <h1 className="text-2xl  m-auto my-4 mb-8">
         <img src={assets.logo} className="text-[#66706D]" />
       </h1>
@@ -57,6 +40,7 @@ export default function Sidebar() {
           <NavLink
             to={item.path}
             key={item.label}
+            end={item.path == "/expert"}
             className={({ isActive }) =>
               `flex items-center text-[#66706D] gap-3 w-full px-4 py-3 text-sm font-medium rounded-xl transition
     ${isActive ? "bg-[#0A4F48] text-white" : "text-gray-600 hover:bg-gray-100"}

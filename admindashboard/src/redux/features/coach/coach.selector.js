@@ -4,3 +4,4 @@ export const selectCoachError = (state) => state.coach.error;
 export const selectCoachStatus = (state) => state.coach.status;
 
 export const selectAssignedClients = (state) => state.coach.assignedClients;
+export const selectTotalClientsCount = (state) => state.coach.totalClientsCount;

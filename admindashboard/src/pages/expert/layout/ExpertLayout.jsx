@@ -12,7 +12,7 @@ export default function AppLayout() {
     <div className="flex min-h-screen bg-gray-50">
       <Sidebar />
 
-      <div className="flex-1 p-6  ">
+      <div className="flex-1 p-6 ml-[225px]">
         <TopBar />
 
          <div className="mt-6">
