@@ -63,7 +63,7 @@ const ActionCell = ({ row }) => {
   return (
     <button
       onClick={() =>
-        navigate("/admin/programs/create", {
+        navigate("/expert/programs/viewPlan", {
           state: { programId: row.original._id },
         })
       }

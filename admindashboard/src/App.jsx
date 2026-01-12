@@ -65,6 +65,8 @@ import ExpertDashboard from "./pages/expert/Dashboard";
 import ExpertClientsTable from "./pages/expert/clients/ClientsTable";
 import ExpertChats from "./pages/expert/chats/Chats";
 import ExpertPrograms from "./pages/expert/programsList/ProgramTable";
+import ExpertPlanDetails from "./pages/expert/programsList/PlanDetails"
+import ExpertFinance from "./pages/expert/finance/FinanceTable"
 // Client Pages Import
 import ClientLayout from './pages/client/layout/ClientLayout'
 import ClientDashboard from './pages/client/Dashboard'
@@ -193,6 +195,8 @@ function App() {
           <Route path="clients" element={<ExpertClientsTable />} />
           <Route path="chats" element={<ExpertChats />} />
           <Route path="programs" element={<ExpertPrograms />} />
+          <Route path ="programs/viewPlan" element={<ExpertPlanDetails />} />
+          <Route path ="finance" element={<ExpertFinance />} />
         </Route>
 
         {/* CLIENT */}

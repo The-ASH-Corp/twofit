@@ -15,6 +15,7 @@ const menuItems = [
     icon: assets.programs,
     path: "/expert/programs",
   },
+  { label: "Finance", icon: assets.finance, path: "/expert/finance" },
   { label: "Chats", icon: assets.chats, path: "/expert/chats" },
 ];
 
