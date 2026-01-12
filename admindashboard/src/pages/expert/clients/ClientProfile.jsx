@@ -14,18 +14,17 @@ import { SyncLoader } from "react-spinners";
 
 const ClientProfile = () => {
   const dispatch = useDispatch();
-  const { clientId } = useParams();
+  const { id } = useParams();
 
   const client = useSelector(selectSelectedClient);
   const status = useSelector(selectClientStatus);
   const error = useSelector(selectClientError);
 
   useEffect(() => {
-    if (clientId) {
-      dispatch(getClient({ id: clientId }));
-      // console.log(client)
+    if (id) {
+      dispatch(getClient({ id }));
     }
-  }, [clientId, dispatch]);
+  }, [id, dispatch]);
 
   if (status === "loading")
     return (
