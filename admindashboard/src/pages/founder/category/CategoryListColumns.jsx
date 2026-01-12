@@ -14,7 +14,7 @@ export const CategoryListColumns = [
         type="checkbox"
         checked={table.getIsAllRowsSelected()}
         onChange={table.getToggleAllRowsSelectedHandler()}
-        className="w-[12px] h-[12px] cursor-pointer"
+        className="w-3 h-3 cursor-pointer"
       />
     ),
     cell: ({ row }) => (
@@ -22,14 +22,14 @@ export const CategoryListColumns = [
         type="checkbox"
         checked={row.getIsSelected()}
         onChange={row.getToggleSelectedHandler()}
-        className="w-[12px] h-[12px] cursor-pointer"
+        className="w-3 h-3 cursor-pointer"
       />
     ),
   },
   { accessorKey: "name", header: "Category Name" },
   { accessorKey: "programLimit", header: "Programs" },
-  { accessorKey: "name", header: "Sub Admins" },
-  { accessorKey: "name", header: "Experts" },
-  { accessorKey: "name", header: "Clients" },
+  // { accessorKey: "name", header: "Sub Admins" },
+  // { accessorKey: "name", header: "Experts" },
+  // { accessorKey: "name", header: "Clients" },
   { id: "actions", header: "Action", cell: () => "⋯" },
 ];

@@ -39,4 +39,5 @@ const programSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("ProgramsList", programSchema);
+const ProgramModel = mongoose.model("ProgramsList", programSchema);
+export default ProgramModel;

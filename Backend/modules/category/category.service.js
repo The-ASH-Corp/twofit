@@ -1,4 +1,4 @@
-import categoryModel from "./category.model.js"
+import { categoryModel } from "./category.model.js"
 
 export const createCategory= async (data)=>{
     try {
@@ -22,7 +22,12 @@ export const createCategory= async (data)=>{
 export const getAllCategory = async (page, limit) => {
   try {
     const skip = (page - 1) * limit;
-    return await categoryModel.find().skip(skip).limit(limit)
+    const totalCount = await categoryModel.countDocuments()
+    const category =  await categoryModel.find().skip(skip).limit(limit)
+     return {
+      category,
+      totalCount
+     }
   } catch (error) {
     throw error;
   }

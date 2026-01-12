@@ -46,7 +46,7 @@ export const ExpertColumns = [
    },
      { accessorKey: "specialization", header: "Specialisation" },
 
-  { accessorKey: "clients", header: "Clients" },
+  // { accessorKey: "clients", header: "Clients" },
  
 //   {
 //     accessorKey: "experts",
@@ -70,8 +70,8 @@ export const ExpertColumns = [
 //     ),
 //   },
   { accessorKey: "maxClient", header: "Maximum Limit" },
-  { accessorKey: "rating", header: "Rating" },
-  { accessorKey: "responseTime", header: "Response Time" },
+  // { accessorKey: "rating", header: "Rating" },
+  // { accessorKey: "responseTime", header: "Response Time" },
 
   {
     accessorKey: "status",
