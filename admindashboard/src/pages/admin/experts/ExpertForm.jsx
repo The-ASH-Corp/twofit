@@ -102,7 +102,7 @@ export default function ExpertForm() {
         {
           name: "chooseProgram",
           label: "Choose Program",
-          type: "select",
+          type: "multiple",
           options: program
             ? [{ label: program.name || program.title, value: program._id }]
             : [],
