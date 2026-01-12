@@ -96,22 +96,32 @@ export default function BaseTable({
     <div className="bg-white p-3 sm:p-4 md:p-6 rounded-xl flex flex-col overflow-hidden h-full">
       {/* Header Section - Responsive */}
       <div className="mb-4 sm:mb-6 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
-        <h2 className="text-[#0A4F48] font-bold text-[18px] sm:text-[20px] md:text-[22px]">{pageLabel}</h2>
-        
+        <h2 className="text-[#0A4F48] font-bold text-[18px] sm:text-[20px] md:text-[22px]">
+          {pageLabel}
+        </h2>
+
         {/* Controls Section */}
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           {/* Search Bar - Full width on mobile */}
           <div className="flex items-center bg-[#F8F8F8] px-3 rounded-lg flex-1 sm:flex-initial min-w-0">
-            <img src={assets.search} className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" alt="search" />
+            <img
+              src={assets.search}
+              className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
+              alt="search"
+            />
             <input
               type="text"
               placeholder="Search anything"
               className="w-full sm:w-40 md:w-56 lg:w-72 px-2.5 py-2 sm:py-3 border-none rounded-xl focus:outline-none bg-transparent text-sm"
               onChange={(e) => onSearchInputChange(e)}
             />
-            <img src={assets.filter} className="w-4 h-4 flex-shrink-0" alt="filter" />
+            <img
+              src={assets.filter}
+              className="w-4 h-4 flex-shrink-0"
+              alt="filter"
+            />
           </div>
-          
+
           {/* Action Buttons - Horizontal scroll on mobile if needed */}
           <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1 sm:pb-0">
             <button className="bg-[#EBF3F2] rounded-md text-[11px] sm:text-[12px] font-semibold px-2 sm:px-3 py-2 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
@@ -167,14 +177,21 @@ export default function BaseTable({
                       <td
                         key={cell.id}
                         className="py-2 md:py-5 px-2 lg:px-4 text-[11px] sm:text-[12px] lg:text-[13px] font-medium text-black flex md:table-cell"
-                        data-label={table.getHeaderGroups()[0]?.headers[index]?.column?.columnDef?.header}
+                        data-label={
+                          table.getHeaderGroups()[0]?.headers[index]?.column
+                            ?.columnDef?.header
+                        }
                       >
                         {/* Mobile Label */}
                         <span className="md:hidden font-semibold text-gray-600 mr-2 min-w-[120px]">
                           {flexRender(
-                            table.getHeaderGroups()[0]?.headers[index]?.column?.columnDef?.header,
-                            table.getHeaderGroups()[0]?.headers[index]?.getContext()
-                          )}:
+                            table.getHeaderGroups()[0]?.headers[index]?.column
+                              ?.columnDef?.header,
+                            table
+                              .getHeaderGroups()[0]
+                              ?.headers[index]?.getContext()
+                          )}
+                          :
                         </span>
                         {/* Cell Content */}
                         <span className="flex-1">
@@ -193,8 +210,14 @@ export default function BaseTable({
         </div>
       ) : (
         <div className="flex items-center justify-center h-full flex-col gap-2 py-12">
-          <BsDatabaseAdd className="text-gray-400" size={50} />
-          <p className="text-center text-gray-500 text-sm sm:text-base">Please add some data</p>
+          <BsDatabaseAdd
+            onClick={() => navigate(actionPath)}
+            className="text-gray-400"
+            size={50}
+          />
+          <p className="text-center text-gray-500 text-sm sm:text-base">
+            Please add some data
+          </p>
         </div>
       )}
 
@@ -240,7 +263,10 @@ export default function BaseTable({
             {paginationRange.map((pageNumber, idx) => {
               if (pageNumber === "...") {
                 return (
-                  <span key={idx} className="px-1 text-gray-400 font-bold text-xs sm:text-sm">
+                  <span
+                    key={idx}
+                    className="px-1 text-gray-400 font-bold text-xs sm:text-sm"
+                  >
                     ...
                   </span>
                 );

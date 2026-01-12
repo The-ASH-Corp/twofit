@@ -1,6 +1,7 @@
 import { AdminModel } from "../admin/admin.model.js";
 import allProgramModel from "../allPrograms/allPrograma.model.js";
 import User from "../auth/auth.model.js";
+import { CoachModel } from "../coach/coach.model.js";
 import { HeadsModel } from "../Heads/heads.modal.js";
 
 
@@ -9,11 +10,13 @@ export const getDashboardData = async() => {
     const totalHeads = await HeadsModel.countDocuments();
     const totalAdmins = await AdminModel.countDocuments();
     const totalPrograms = await allProgramModel.countDocuments();
+    const totalExperts = await CoachModel.countDocuments();
 
-    return{
-        totalClient,
-        totalHeads,
-        totalAdmins,
-        totalPrograms,
-    }
+    return {
+      totalClient,
+      totalHeads,
+      totalAdmins,
+      totalPrograms,
+      totalExperts,
+    };
 } 
