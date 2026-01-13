@@ -50,6 +50,22 @@ ChartJS.register(
 );
 
 const Dashboard = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(founderDashboardData());
+  }, [dispatch]);
+
+  const data = useAppSelector(selectFounderDashBoard);
+  // const error = useAppSelector(selectFounderError);
+  const status = useAppSelector(selectFounderStatus);
+
+  const [founder, setFounder] = useState();
+
+  useEffect(() => {
+    setFounder(data);
+    console.log(data);
+  }, [data]);
   // Mock Data for Charts
   const growthData = {
     labels: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
@@ -175,7 +191,11 @@ const Dashboard = () => {
     labels: ["Trainers", "Dietitians", "Therapists"],
     datasets: [
       {
-        data: [22, 18, 14],
+        data: [
+          founder?.data?.Trainers,
+          founder?.data?.Dietitians,
+          founder?.data?.Therapists,
+        ],
         backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
         borderWidth: 0,
         circumference: 180,
@@ -288,22 +308,7 @@ const Dashboard = () => {
     },
   ];
 
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(founderDashboardData());
-  }, [dispatch]);
-
-  const data = useAppSelector(selectFounderDashBoard);
-  // const error = useAppSelector(selectFounderError);
-  const status = useAppSelector(selectFounderStatus);
-
-  const [founder, setFounder] = useState();
-
-  useEffect(() => {
-      setFounder(data);
-      console.log(data);
-    }, [data]);
+  
 
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA] h-[calc(100vh-120px)] overflow-auto  no-scrollbar">
@@ -371,8 +376,8 @@ const Dashboard = () => {
             <DashboardCard title="Client Compliance" subTitle="Last Year">
               <div className="flex items-center gap-4 mb-4">
                 <LegendItem color="#0A4F48" label="Diet" />
-                <LegendItem color="#FFD7A8" label="Workout" />
-                <LegendItem color="#45C4A2" label="Therapy" />
+                <LegendItem color="#F4DBC7" label="Workout" />
+                <LegendItem color="#EBF3F2" label="Therapy" />
               </div>
               <div className="h-64">
                 <Bar
@@ -565,9 +570,21 @@ const Dashboard = () => {
             </div>
             <div className="flex flex-col gap-3 mt-4">
               {[
-                { label: "Trainers", count: 22, color: "bg-[#0A4F48]" },
-                { label: "Dietitians", count: 18, color: "bg-[#45C4A2]" },
-                { label: "Therapists", count: 14, color: "bg-[#FFD7A8]" },
+                {
+                  label: "Trainers",
+                  count: founder?.data?.Trainers,
+                  color: "bg-[#0A4F48]",
+                },
+                {
+                  label: "Dietitians",
+                  count: founder?.data?.Dietitians,
+                  color: "bg-[#EBF3F2]",
+                },
+                {
+                  label: "Therapists",
+                  count: founder?.data?.Therapists,
+                  color: "bg-[#FFD7A8]",
+                },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">

@@ -3,8 +3,14 @@ import KpiCard from "@/components/cards/KpiCard";
 import React, { useState } from "react";
 import PayrollMenu from "./PayrollMenu";
 
-export default function FinanceKpi() {
+export default function FinanceKpi({data}) {
+  console.log(data)
   const [payrollOpen, setPayrollOpen] = useState(false);
+  const totalSalary = data?.reduce(
+    (sum, coach) => sum + (coach.salary || 0),
+    0
+  );
+
   return (
     <div className="relative flex flex-col items-center gap-4 w-full bg-white p-5 rounded-xl mb-4 h-[calc()]">
       <div className="flex items-center justify-between w-full">
@@ -26,25 +32,25 @@ export default function FinanceKpi() {
       <div className="flex gap-4 justify-between  w-full">
         <KpiCard
           title="Total Experts"
-          value="150"
+          value={data?.length}
           icon={assets.website}
           iconClass="bg-[#0A4F48]"
         />
         <KpiCard
           title="Total Monthly Salary"
-          value="12,300,000"
+          value={`₹ ${totalSalary.toLocaleString("en-IN")}`}
           icon={assets.website}
           iconClass="bg-[#F4DBC7]"
         />
         <KpiCard
           title="Total Incentives"
-          value="1,200,300"
+          value="₹ 1,200,300"
           icon={assets.chats}
           iconClass="bg-[#0A4F48]"
         />
         <KpiCard
           title="Average Expert Rating"
-          value="$250,000"
+          value="250,000"
           icon={assets.filter}
           iconClass="bg-[#F4DBC7]"
         />
