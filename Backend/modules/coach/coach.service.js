@@ -123,10 +123,32 @@ export const AssignCoachToUser = async (coachId, userId) => {
   );
 };
 
-export const getUsersAssignedToACoach = async (coachId) => {
-  return await CoachModel.findById(coachId)
+export const getUsersAssignedToACoach = async (coachId, page, limit) => {
+  const skip = (page - 1) * limit;
+  
+  const coach = await CoachModel.findById(coachId).select("assignedUsers");
+  
+  if (!coach) {
+    return { users: [], total: 0 };
+  }
+  
+  const total = coach.assignedUsers.length;
+  
+  const paginatedCoach = await CoachModel.findById(coachId)
     .select("assignedUsers")
-    .populate("assignedUsers", "-password");
+    .populate({
+      path: "assignedUsers",
+      select: "-password",
+      options: {
+        skip: skip,
+        limit: limit
+      }
+    });
+  
+  return {
+    users: paginatedCoach.assignedUsers,
+    total: total 
+   };
 };
 
 

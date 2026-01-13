@@ -50,3 +50,13 @@ export const getAllProgramsByCategory=createAsyncThunk('program/getAllProgramsBy
         return rejectWithValue(error.response?.data?.message || "Failed to get programs by category");
     }
 })
+
+export const getAllProgramsByExpertId=createAsyncThunk('program/getAllProgramsByExpertId',async({expertId, page, limit},{rejectWithValue})=>{
+    try{
+        const data=await axiosInstance.get(`/programs/get-all-programs-by-expert/${expertId}/${page}/${limit}`)
+            return data;
+    }
+    catch(error){
+        return rejectWithValue(error.response?.data?.message || "Failed to get programs by expert id");
+    }
+})

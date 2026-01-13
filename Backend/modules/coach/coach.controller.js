@@ -166,7 +166,7 @@ export const AssignCoachToUser = async (req, res) => {
 }
 
 export const getUsersAssignedToACoach = async (req, res) => {
-  const { coachId } = req.params;
+  const { coachId, page, limit } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(coachId)) {
     return res.status(400).json({
@@ -175,10 +175,11 @@ export const getUsersAssignedToACoach = async (req, res) => {
     });
   }
 
-  const assignedUsers = await coachService.getUsersAssignedToACoach(coachId);
+  const { users, total } = await coachService.getUsersAssignedToACoach(coachId, parseInt(page), parseInt(limit));
   res.status(200).json({
     success: true,
-    data: assignedUsers
+    data: users,
+    total: total
   })
 
 }

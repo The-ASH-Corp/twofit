@@ -15,7 +15,7 @@ router.put("/assign", coachController.AssignCoachToUser);
 router.get("/get-coach/:coachId", coachController.getCoachById);
 router.put("/update/:coachId", coachController.updateCoachById);
 router.delete("/delete/:coachId", coachController.deleteCoachById);
-router.get("/assigned-users/:coachId", coachController.getUsersAssignedToACoach);
+router.get("/assigned-users/:coachId/:page/:limit", coachController.getUsersAssignedToACoach);
 
 router.put("/feedback", coachController.createFeedback);
 

@@ -6,6 +6,7 @@ import { getAllCoachesByAdminId } from "../admins/admin.thunk";
 const initialState = {
   allCoaches: [],
   assignedClients: [],
+  totalClientsCount: 0,
   selectedCoach: null,
   error: null,
   status: "idle",
@@ -91,7 +92,9 @@ const coachSlice = createSlice({
       })
       .addCase(getUsersAssignedToACoach.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.assignedClients = action.payload;
+        state.assignedClients = action.payload.data;
+        state.totalClientsCount = action.payload.total;
+        state.error = null;
       })
       .addCase(getUsersAssignedToACoach.rejected, (state, action) => {
         state.status = "failed";
