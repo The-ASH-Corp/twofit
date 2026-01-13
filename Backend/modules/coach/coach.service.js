@@ -168,3 +168,21 @@ export const createFeedback = async (expertId, userId, rating, feedback) => {
     { new: true }
   );
 };
+
+
+export const getCoachDashboardStats =async(coachId) => {
+  const coach = await CoachModel.findById(coachId).select("assignedUsers assignedPrograms feedback");
+  if (!coach) {
+    throw new Error("Coach not found");
+  }
+  const totalClients = coach.assignedUsers.length;
+  const totalPrograms = coach.assignedPrograms.length;
+  const avarageRating = coach.feedback.length > 0 ? 
+    (coach.feedback.reduce((sum, fb) => sum + fb.rating, 0) / coach.feedback.length).toFixed(2) 
+    : 0;
+  return {
+    totalClients,
+    totalPrograms,
+    avarageRating: parseFloat(avarageRating)
+  };
+} 
