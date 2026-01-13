@@ -3,7 +3,9 @@ const statusColors = {
   Inactive: "bg-[#66706D] text-white",
   Suspended: "bg-[#FB5858] text-white",
 };
-
+import { getPlanByProgramId } from "@/redux/features/plans/plan.thunk";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 export const ProgramListColumns = [
@@ -35,7 +37,6 @@ export const ProgramListColumns = [
       <span className=" capitalize">{row.original.category?.name || "—"}</span>
     ),
   },
-  { accessorKey: "linkedTemplate", header: "Linked Template" },
 
   {
     accessorKey: "status",
@@ -58,15 +59,23 @@ export const ProgramListColumns = [
   },
 ];
 
-const ActionCell = ({ row }) => {
+const ActionCell = ({ row }) => {  //fix here
+  // const dispatch = useDispatch();
+  // const [planData, setPlanData] = useState(null);
   const navigate = useNavigate();
+
+  const fetchPlanById = async () => {
+    // const data = await dispatch(getPlanByProgramId(row.original._id));
+    // setPlanData(data.payload.data);
+    // console.log(data);
+    navigate("/admin/programs/create", {
+      state: { programId: row.original._id, title: row.original.title },
+    });
+  };
+
   return (
     <button
-      onClick={() =>
-        navigate("/admin/programs/create", {
-          state: { programId: row.original._id },
-        })
-      }
+      onClick={() => fetchPlanById()}
       className="flex items-center gap-1.5 px-3 py-1.5 bg-[#EBF3F2] hover:bg-[#dceceb] text-[#0A4F48] text-[11px] font-bold rounded-lg transition-colors"
     >
       View Plan

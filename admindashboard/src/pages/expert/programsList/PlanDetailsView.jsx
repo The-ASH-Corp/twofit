@@ -6,7 +6,7 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 export default function PlanDetailsView() {
     const user =useAppSelector(selectUser);
-    console.log("User in PlanDetailsView:", user.role);
+    console.log("User in PlanDetailsView:", user?.role);
   const location = useLocation();
   const planData = location.state?.planData;
 

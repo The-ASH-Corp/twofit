@@ -18,3 +18,13 @@ export const getPlanById = createAsyncThunk("plans/getPlanById",async(planId,{re
         return rejectWithValue(error.response?.data?.message || "Failed to fetch plan");
     }
 })
+
+export const getPlanByProgramId = createAsyncThunk("plans/getPlanByProgramId",async(programId,{rejectWithValue}) => {
+    try {
+        const data =await axiosInstance.get(`/plans/get-plan-by-programId/${programId}`,{rejectWithValue})
+        return data.data
+    }
+        catch (error) {
+        return rejectWithValue(error.response?.data?.message || "Failed to fetch plan");
+    }
+})
