@@ -4,6 +4,8 @@ const statusColors = {
   Suspended: "bg-[#FB5858] text-white",
 };
 
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { useAppSelector } from "@/redux/store/hooks";
 import { useNavigate } from "react-router-dom";
 
 export const ProgramListColumns = [
@@ -60,6 +62,14 @@ export const ProgramListColumns = [
 
 const ActionCell = ({ row }) => {
   const navigate = useNavigate();
+  const user = useAppSelector(selectUser);
+  const localRole = localStorage.getItem("role");
+  
+  // Don't render button if local role is expert and user role is dietician
+  if (localRole === "expert" && user?.role === "Dietician") {
+    return null;
+  }
+  
   return (
     <button
       onClick={() =>
