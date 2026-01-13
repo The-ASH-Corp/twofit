@@ -11,6 +11,10 @@ export const getDashboardData = async() => {
     const totalAdmins = await AdminModel.countDocuments();
     const totalPrograms = await allProgramModel.countDocuments();
     const totalExperts = await CoachModel.countDocuments();
+    const Trainers = await CoachModel.countDocuments({ role: "Trainer" });
+    const Dietitians = await CoachModel.countDocuments({ role: "Dietician" });
+    const Therapists = await CoachModel.countDocuments({ role: "Therapist" });
+
 
     return {
       totalClient,
@@ -18,5 +22,8 @@ export const getDashboardData = async() => {
       totalAdmins,
       totalPrograms,
       totalExperts,
+      Trainers,
+      Dietitians,
+      Therapists,
     };
 } 

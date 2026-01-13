@@ -42,6 +42,7 @@ export const adminValidationSchema = z.object({
     required_error: "Base Salary is Required",
     invalid_type_error: "Base Salary must be number",
   }),
+  headId: z.string().optional(),
   autoSendWelcome: z.boolean().optional(),
   autoSendGuide: z.boolean().optional(),
   automatedReminder: z.boolean().optional(),

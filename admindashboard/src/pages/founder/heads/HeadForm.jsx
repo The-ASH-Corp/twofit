@@ -119,7 +119,7 @@ const HeadForm = () => {
             name: "programCategory",
             label: "Program Category",
             type: "select",
-            options: categories.map((items) => ({
+            options: categories?.map((items) => ({
               label: items?.name,
               value: items?._id,
             })),
