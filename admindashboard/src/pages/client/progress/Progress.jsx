@@ -1,15 +1,20 @@
 import { assets } from "@/assets/asset";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ProgressChart from "../components/ProgressChart";
 import WeightChart from "../components/Measeurement";
 import WeightUpdate from "./WeightUpdate";
 import MeasurementUpdate from "./MeasurementUpdate";
 import { Download, X } from "lucide-react";
 import { Bar } from "react-chartjs-2";
+ import { selectSelectedClient } from "@/redux/features/client/client.selectors";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 export default function Progress() {
   const [isOpen, setIsOpen] = useState(false);
   const [panelType, setPanelType] = useState(null);
+
+
 
   const kpiData = [
     {
