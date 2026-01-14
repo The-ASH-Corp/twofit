@@ -16,9 +16,9 @@ export default function AdminForm() {
 
   const fetchPrograms = async () => { 
     const response = await dispatch(
-      getAllProgramsByCategory(user.programCategory)
+      getAllProgramsByCategory({category: user.programCategory, page: 1, limit: 1000})
     ).unwrap();
-    setPrograms(response);
+    setPrograms(response.data);
   };
   useEffect(() => {
     fetchPrograms();
@@ -85,7 +85,7 @@ export default function AdminForm() {
           name: "chooseProgram",
           label: "Choose Program",
           type: "multiple",
-          options:programs.map((program) => ({
+          options:programs?.map((program) => ({
             key: program._id,
             label: program.title,
             value: program.title,

@@ -65,8 +65,8 @@ export const deleteProgramController = async (req, res) => {
 
 export const getAllProgramControllerByCategory = async (req, res) => {
   try {
-    const { category } = req.params
-    const { program, totalProgram } = await getAllProgramByCategory(category);
+    const { category, page, limit } = req.params
+    const { program, totalProgram } = await getAllProgramByCategory(category, page, limit);
     res.status(200).json({ status: true, data: program, totalProgram });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });

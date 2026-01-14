@@ -32,9 +32,15 @@ export const deleteProgram = async (id) => {
   return await programModel.findByIdAndDelete(id);
 };
 
-export const getAllProgramByCategory =async(category)=>{
-    return await programModel.find({category})
-}
+export const getAllProgramByCategory = async (category, page, limit) => {
+  const totalProgram = await programModel.countDocuments({ category });
+  const data = await programModel
+    .find({ category }).populate("category", "name")
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .lean();
+  return { program: data, totalProgram };
+};
 
 export const getAllProgramsByExpert = async (expertId, page, limit) => {
   const coach = await CoachModel.findById(expertId).select("assignedPrograms").lean().populate("assignedPrograms");
