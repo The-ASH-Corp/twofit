@@ -12,9 +12,7 @@ export const getPlanById = async (planId) => {
 }
 
 
-export const getPlanByProgramId = async (programId) => {
-    console.log(programId);
-    
+export const getPlanByProgramId = async (programId) => {    
     const plan = await Plan.findOne({ program: programId });
     return plan;
 }
