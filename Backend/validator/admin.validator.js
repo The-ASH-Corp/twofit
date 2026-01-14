@@ -42,6 +42,14 @@ export const adminValidationSchema = z.object({
     required_error: "Base Salary is Required",
     invalid_type_error: "Base Salary must be number",
   }),
+  experience: z.string({
+    required_error: "Experience is Required",
+    invalid_type_error: "Experience must be string",
+  }),
+  qualification: z.string({
+    required_error: "Qualification is Required",
+    invalid_type_error: "Qualification must be string",
+  }),
   headId: z.string().optional(),
   autoSendWelcome: z.boolean().optional(),
   autoSendGuide: z.boolean().optional(),
