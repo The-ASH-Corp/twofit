@@ -4,6 +4,7 @@ import {
   deleteProgramController,
   getAllProgramByExpert,
   getAllProgramController,
+  getAllProgramControllerByAdmin,
   getAllProgramControllerByCategory,
   getSingleProgramController,
   updateSingleProgramController,
@@ -18,6 +19,7 @@ router.put("/update/:id", updateSingleProgramController);
 router.delete("/delete/:id", deleteProgramController);
 
 router.get("/get-all-programs-by-category/:category/:page/:limit", getAllProgramControllerByCategory)
+router.get("/get-all-programs-by-admin/:adminId/:page/:limit", getAllProgramControllerByAdmin)
 router.get("/get-all-programs-by-expert/:expertId/:page/:limit", getAllProgramByExpert)
 
 export default router;

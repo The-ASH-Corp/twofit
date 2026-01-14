@@ -34,7 +34,7 @@ export const adminValidationSchema = z.object({
     required_error: "Specialisation is Required",
     invalid_type_error: "Specialisation must be string",
   }),
-  chooseProgram: z.string({
+  chooseProgram:z.array(z.string(), {
     required_error: "Program is Required",
     invalid_type_error: "Program must be string",
   }),

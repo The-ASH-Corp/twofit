@@ -6,6 +6,7 @@ import {
   updateProgram,
   getAllProgramByCategory,
   getAllProgramsByExpert,
+  getAllProgramsByAdmin,
 } from "./allPrograma.service.js";
 
 export const createProgramController = async (req, res) => {
@@ -82,4 +83,15 @@ export const getAllProgramByExpert = async (req, res) => {
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
+};
+
+export const getAllProgramControllerByAdmin = async (req, res) => {
+  try {
+    const { adminId, page, limit } = req.params
+    const { program, totalProgram } = await getAllProgramsByAdmin(adminId, page, limit);
+    res.status(200).json({ status: true, data: program, totalProgram });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ success: false, message: err.message });
+  } 
 };

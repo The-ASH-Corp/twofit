@@ -135,21 +135,20 @@ export default function AdminForm() {
   };
 
   const handleAdminCreation = async (values) => {
-    const selectedProgram = programs.find(
-      (program) => program.title == values.chooseProgram
-    );
-
+    const selectedProgramIds = values.chooseProgram.map(title => 
+      programs.find(program => program.title === title)?._id
+    ).filter(Boolean);
     try {
       await dispatch(
         createAdmin({
           ...values,
-          chooseProgram: selectedProgram._id,
+          chooseProgram: selectedProgramIds,
           headId: user._id,
         })
       ).unwrap();
       toast("Admin created successfully", { type: "success" });
       navigate("/head/admins");
-    } catch (error) {
+    } catch (error) {      
       toast("Failed to create admin", { type: "error" });
     }
   };
