@@ -31,28 +31,32 @@ export default function FinanceKpi({data}) {
       </div>
       <div className="flex gap-4 justify-between  w-full">
         <KpiCard
-          title="Total Experts"
+          title="Total Employees"
           value={data?.length}
-          icon={assets.website}
+          icon={assets.totalEmploy}
           iconClass="bg-[#0A4F48]"
+          bg="#0A4F48"
         />
         <KpiCard
-          title="Total Monthly Salary"
+          title="Total Payroll"
           value={`₹ ${totalSalary.toLocaleString("en-IN")}`}
-          icon={assets.website}
+          icon={assets.totalPayroll}
           iconClass="bg-[#F4DBC7]"
+          bg="#F4DBC7"
         />
         <KpiCard
-          title="Total Incentives"
+          title="Pending Payroll"
           value="₹ 1,200,300"
-          icon={assets.chats}
+          icon={assets.pendingPayroll}
           iconClass="bg-[#0A4F48]"
+          bg="#0A4F48"
         />
         <KpiCard
-          title="Average Expert Rating"
+          title="Completed Payroll"
           value="250,000"
-          icon={assets.filter}
+          icon={assets.totalPayroll}
           iconClass="bg-[#F4DBC7]"
+          bg="#F4DBC7"
         />
       </div>
       {/* payroll menu */}
