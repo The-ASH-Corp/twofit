@@ -134,8 +134,6 @@ export default function AdminForm() {
     automatedReminder: false,
   };
 
-  
-
   const handleAdminCreation = async (values) => {
     const selectedProgram = programs.find(
       (program) => program.title == values.chooseProgram
@@ -143,7 +141,11 @@ export default function AdminForm() {
 
     try {
       await dispatch(
-        createAdmin({ ...values, chooseProgram: selectedProgram._id })
+        createAdmin({
+          ...values,
+          chooseProgram: selectedProgram._id,
+          headId: user._id,
+        })
       ).unwrap();
       toast("Admin created successfully", { type: "success" });
       navigate("/head/admins");

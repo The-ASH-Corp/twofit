@@ -69,8 +69,51 @@ const PayrollMenu = ({ setPayrollOpen, payrollOpen }) => {
   }, [data?.id, data]);
 
   const handleToggle = (key) => {
-    setToggles((prev) => ({ ...prev, [key]: !prev[key] }));
+    setToggles((prev) => {
+      const nextValue = !prev[key];
+
+      // If turning OFF → reset related fields
+      if (!nextValue) {
+        setPayrollData((prevData) => {
+          switch (key) {
+            case "rating":
+              return {
+                ...prevData,
+                rating1: 0,
+                rating2: 0,
+                rating3: 0,
+              };
+
+            case "extraClient":
+              return {
+                ...prevData,
+                extraClient: 0,
+              };
+
+            case "extendProgram":
+              return {
+                ...prevData,
+                extendProgram30days: 0,
+                extendProgram60days: 0,
+                extendProgram90days: 0,
+              };
+
+            case "target":
+              return {
+                ...prevData,
+                targetAchieved: 0,
+              };
+
+            default:
+              return prevData;
+          }
+        });
+      }
+
+      return { ...prev, [key]: nextValue };
+    });
   };
+
 
   const handleChange = (key, value) => {
     setPayrollData((prev) => ({
