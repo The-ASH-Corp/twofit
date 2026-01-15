@@ -56,7 +56,7 @@ export default function FinanceTable() {
     );
   return (
     <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
-      <FinanceKpi data={employees} />
+      <FinanceKpi />
       <BaseTable
         columns={FinanceColumns}
         data={employees}

@@ -4,6 +4,7 @@ import { getAllEmployees } from "./finance.thunk";
 const initialState = {
   allEmployees: [],
   employeeCount: null,
+  totalSalary: null,
   error: null,
   status: "idle",
 };
@@ -26,6 +27,7 @@ const employeeSlice = createSlice({
         state.status = "succeeded";
         state.allEmployees = action.payload.data.employees;
         state.employeeCount = action.payload.data.employeeCount;
+        state.totalSalary = action.payload.data.totalSalary;
         state.error = null;
       })
       .addCase(getAllEmployees.rejected, (state, action) => {

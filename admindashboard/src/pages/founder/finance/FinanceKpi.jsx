@@ -2,14 +2,17 @@ import { assets } from "@/assets/asset";
 import KpiCard from "@/components/cards/KpiCard";
 import React, { useState } from "react";
 import PayrollMenu from "./PayrollMenu";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectEmployeeCount, selectTotalSalary } from "@/redux/features/finance/finance.selector";
 
-export default function FinanceKpi({data}) {
-  console.log(data)
+export default function FinanceKpi() {
+  // console.log(data)
   const [payrollOpen, setPayrollOpen] = useState(false);
-  const totalSalary = data?.reduce(
-    (sum, emp) => sum + Number(emp.salary || 0),
-    0
-  );
+  const count = useAppSelector(selectEmployeeCount);
+  const totalPayroll = useAppSelector(selectTotalSalary);
+  const pendingPayroll = useAppSelector(selectTotalSalary);
+  const CompletedPayroll = (totalPayroll - pendingPayroll)
+
 
   return (
     <div className="relative flex flex-col items-center gap-4 w-full bg-white p-5 rounded-xl mb-4 h-[calc()]">
@@ -32,28 +35,28 @@ export default function FinanceKpi({data}) {
       <div className="flex gap-4 justify-between  w-full">
         <KpiCard
           title="Total Employees"
-          value={data?.length}
+          value={count}
           icon={assets.totalEmploy}
           iconClass="bg-[#0A4F48]"
           bg="#0A4F48"
         />
         <KpiCard
           title="Total Payroll"
-          value={`₹ ${totalSalary.toLocaleString("en-IN")}`}
+          value={`₹ ${totalPayroll.toLocaleString("en-IN")}`}
           icon={assets.totalPayroll}
           iconClass="bg-[#F4DBC7]"
           bg="#F4DBC7"
         />
         <KpiCard
           title="Pending Payroll"
-          value="₹ 1,200,300"
+          value={`₹ ${pendingPayroll.toLocaleString("en-IN")}`}
           icon={assets.pendingPayroll}
           iconClass="bg-[#0A4F48]"
           bg="#0A4F48"
         />
         <KpiCard
           title="Completed Payroll"
-          value="250,000"
+          value={`₹ ${CompletedPayroll.toLocaleString("en-IN")}`}
           icon={assets.totalPayroll}
           iconClass="bg-[#F4DBC7]"
           bg="#F4DBC7"
