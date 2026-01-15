@@ -105,7 +105,8 @@ const coachSchema = new mongoose.Schema({
         default: Date.now
       }
     }
-  ]
+  ],
+  incentives: {type: Number, default: 0}
 }, { timestamps: true });
 
 export const CoachModel = mongoose.model("Coach", coachSchema);
