@@ -7,7 +7,7 @@ export default function FinanceKpi({data}) {
   console.log(data)
   const [payrollOpen, setPayrollOpen] = useState(false);
   const totalSalary = data?.reduce(
-    (sum, coach) => sum + (coach.salary || 0),
+    (sum, emp) => sum + Number(emp.salary || 0),
     0
   );
 

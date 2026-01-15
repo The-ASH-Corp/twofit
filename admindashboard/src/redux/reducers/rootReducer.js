@@ -13,18 +13,20 @@ import headReducer from "../features/head/head.slice"
 import workoutReducer from "../features/workout/workout.slice"
 import payrollReducer from "../features/payroll/payroll.slice"
 import founderReducer from "../features/founder/founder.slice"
+import financeReducer from "../features/finance/finance.slice"
 
 export default combineReducers({
   auth: authReducer,
   client: clientReducer,
   coach: coachReducer,
-  program:programReducer,
-  category:categoryReducer,
+  program: programReducer,
+  category: categoryReducer,
   chat: chatReducer,
-  admin:adminReducer,
+  admin: adminReducer,
   therapy: therapyReducer,
   head: headReducer,
   workout: workoutReducer,
   payroll: payrollReducer,
   founder: founderReducer,
+  finance: financeReducer,
 });
