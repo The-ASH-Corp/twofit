@@ -1,23 +1,30 @@
 import { ErrorMessage, Field } from "formik";
 import React from "react";
 
-const FormSelect = ({ label, name, options }) => {
+const FormSelect = ({ label, name, options, onChange }) => {
   return (
     <div className="flex flex-col w-full">
       <label className="font-medium">{label}</label>
 
-      <Field
-        as="select"
-        name={name}
-        className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#0A4F48]"
-      >
-        <option value="">Select {label}</option>
+      <Field name={name}>
+        {({ field, form }) => (
+          <select
+            {...field}
+            className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#0A4F48]"
+            onChange={(e) => {
+              field.onChange(e);
+              if (onChange) onChange(e, form);
+            }}
+          >
+            <option value="">Select {label}</option>
 
-        {options?.map((opt) => (
-          <option key={opt.value??opt._id} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
+            {options?.map((opt) => (
+              <option key={opt.value ?? opt._id} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        )}
       </Field>
 
       <ErrorMessage

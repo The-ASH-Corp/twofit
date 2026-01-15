@@ -56,7 +56,16 @@ export const deleteHead = async (id) => {
   return await HeadsModel.findByIdAndDelete(id);
 };
 
-export const getDashboardData = async () => {
+export const getDashboardData = async (id) => {
+//   const head = await HeadsModel.findById(id);
+//   const totalAdmins = await AdminModel.countDocuments({ headId: id });
+//   const totalExperts =await CoachModel.
+// console.log(totalAdmins);
+
+
+
+
+
   const totalClients = await User.countDocuments({ role: "user" });
   const totalPrograms = await allProgramaModel.countDocuments();
   const totalAdmins = await AdminModel.countDocuments();

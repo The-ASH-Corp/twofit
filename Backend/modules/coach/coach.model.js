@@ -105,7 +105,8 @@ const coachSchema = new mongoose.Schema({
         default: Date.now
       }
     }
-  ]
+  ],
+  adminId: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
 }, { timestamps: true });
 
 export const CoachModel = mongoose.model("Coach", coachSchema);

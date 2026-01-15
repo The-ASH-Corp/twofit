@@ -2,9 +2,10 @@ import BaseForm from "@/components/form/BaseForm";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { createCoach } from "@/redux/features/coach/coach.thunk";
 import { refreshProfile } from "@/redux/features/auth/auth.thunk";
-import { selectProgramById } from "@/redux/features/program/program.selector";
-import { getProgramById } from "@/redux/features/program/program.thunk";
-import React, { useEffect } from "react";
+import {
+  getAllProgramsByAdmin,
+} from "@/redux/features/program/program.thunk";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -12,14 +13,16 @@ import { toast } from "react-toastify";
 export default function ExpertForm() {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
-  const program = useSelector(selectProgramById);
+  const [program, setProgram] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user?.program) {
-      dispatch(getProgramById(user.program));
-    }
-  }, [user?.program, dispatch]);
+    dispatch(
+      getAllProgramsByAdmin({ adminId: user._id, page: 1, limit: 120 })
+    ).then((res) => {
+      setProgram(res.payload.data);
+    });
+  }, [dispatch]);
 
   const fields = [
     {
@@ -103,10 +106,11 @@ export default function ExpertForm() {
           name: "chooseProgram",
           label: "Choose Program",
           type: "multiple",
-          options: program
-            ? [{ label: program.name || program.title, value: program._id }]
-            : [],
-        },
+          options: program?.map((prog) => ({
+            label: prog.title,
+            value: prog._id,
+          }))
+        }
       ],
     },
     {

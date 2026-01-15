@@ -45,9 +45,9 @@ export const getHead = createAsyncThunk(
 
 export const getDashboardData = createAsyncThunk(
     "head/get-dashboard-data",
-    async (_, {rejectWithValue}) => {
+    async (headId, {rejectWithValue}) => {
         try {
-            const response = await axiosInstance.get(`heads/dashboard-data`);            
+            const response = await axiosInstance.get(`heads/dashboard-data/${headId}`);            
             return response.data
         } catch (error) {
              return rejectWithValue(

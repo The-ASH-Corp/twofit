@@ -9,6 +9,7 @@ export const createCoach = async (coach) => {
     "breakSlots",
     "workingdays",
     "specialization",
+    "chooseProgram",
     "languages",
   ];
   const booleanFields = [
@@ -63,6 +64,7 @@ export const createCoach = async (coach) => {
     phone: coach.phone,
     address: coach.address,
     role: coach.role,
+    adminId: coach.adminId,
     specialization: coach.specialization,
     experience: coach.experience,
     qualification: coach.qualification,
