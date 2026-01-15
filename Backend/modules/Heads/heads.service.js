@@ -1,5 +1,6 @@
 import { generatePassword, hashPassword } from "../../utils/password.js";
 import { AdminModel } from "../admin/admin.model.js";
+import ProgramModel from "../allPrograms/allPrograma.model.js";
 import allProgramaModel from "../allPrograms/allPrograma.model.js";
 import User from "../auth/auth.model.js";
 import { CoachModel } from "../coach/coach.model.js";
@@ -24,7 +25,7 @@ export const createHead = async (head) => {
     phone: head.phone,
     password: hashedPassword,
     address: head.address,
-    status:"Active",
+    status: "Active",
     specialization: head.specialization,
     experience: head.experience,
     qualification: head.qualification,
@@ -37,11 +38,11 @@ export const getAllHeads = async (page, limit) => {
   const skip = (page - 1) * limit;
 
   const totalCount = await HeadsModel.countDocuments();
-  const head =  await HeadsModel.find().skip(skip).limit(limit);
-  return{
+  const head = await HeadsModel.find().skip(skip).limit(limit);
+  return {
     head,
-    totalCount
-  }
+    totalCount,
+  };
 };
 
 export const getHeadById = async (id) => {
@@ -57,28 +58,35 @@ export const deleteHead = async (id) => {
 };
 
 export const getDashboardData = async (id) => {
-//   const head = await HeadsModel.findById(id);
-//   const totalAdmins = await AdminModel.countDocuments({ headId: id });
-//   const totalExperts =await CoachModel.
-// console.log(totalAdmins);
+  
+  const head = await HeadsModel.find({_id: id}).populate("programCategory")
+  const totalAdmins = await AdminModel.find({ headId: id });
+  const totalExperts = await Promise.all(totalAdmins.map(async (admin) => {
+    return await CoachModel.find({ adminId: admin._id });
+  }));
 
+  const totalClients =  await Promise.all(totalAdmins.map(async (admin) => {
+    return (await CoachModel.find({ adminId: admin._id }).select("assignedUsers")).reduce((acc, coach) => acc + coach.assignedUsers.length, 0)  ;
+  }));
+  const totalPrograms = await ProgramModel.countDocuments({category: head[0].programCategory._id});
 
+  const totalTrainers = await totalExperts.filter(expertArray => 
+    expertArray.some(expert => expert.role == "Trainer")
+  ).reduce((acc, expertArray) => acc + expertArray.filter(expert => expert.role == "Trainer").length, 0);
 
+  const totalDietitians = await totalExperts.filter(expertArray => 
+    expertArray.some(expert => expert.role == "Dietician")
+  ).reduce((acc, expertArray) => acc + expertArray.filter(expert => expert.role == "Dietician").length, 0);
 
-
-  const totalClients = await User.countDocuments({ role: "user" });
-  const totalPrograms = await allProgramaModel.countDocuments();
-  const totalAdmins = await AdminModel.countDocuments();
-  const totalExperts = await CoachModel.countDocuments();
-  const totalTrainers = await CoachModel.countDocuments({ role: "Trainer" });
-  const totalDietitians = await CoachModel.countDocuments({ role: "Dietician" });
-  const totalTherapists = await CoachModel.countDocuments({ role: "Therapist" });
+  const totalTherapists = await totalExperts.filter(expertArray => 
+    expertArray.some(expert => expert.role == "Therapist")
+  ).reduce((acc, expertArray) => acc + expertArray.filter(expert => expert.role == "Therapist").length, 0);
 
   return {
     totalClients,
     totalPrograms,
-    totalAdmins,
-    totalExperts,
+    totalAdmins:  totalAdmins.length,
+    totalExperts: totalExperts.length,
     totalTrainers,
     totalDietitians,
     totalTherapists,
