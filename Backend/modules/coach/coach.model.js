@@ -106,6 +106,7 @@ const coachSchema = new mongoose.Schema({
       }
     }
   ],
+  incentives: {type: Number, default: 0},
   adminId: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
 }, { timestamps: true });
 

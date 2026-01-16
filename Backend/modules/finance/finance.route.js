@@ -3,6 +3,6 @@ import * as financeController from "./finance.controller.js"
 
 const router = express.Router();
 
-router.get("/employees", financeController.employees)
+router.get("/employees/:page/:limit", financeController.employees);
 
 export default router

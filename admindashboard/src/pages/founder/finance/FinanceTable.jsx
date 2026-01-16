@@ -5,67 +5,68 @@ import { FinanceColumns } from './FinanceColumns'
 import KpiCard from '@/components/cards/KpiCard'
 import FinanceKpi from './FinanceKpi'
 import { useDispatch } from 'react-redux'
-import { getAllCoaches } from '@/redux/features/coach/coach.thunk'
 import { useAppSelector } from '@/redux/store/hooks'
-import { selectAllCoaches, selectCoachStatus } from '@/redux/features/coach/coach.selector'
 import { SyncLoader } from "react-spinners";
+import { getAllEmployees } from '@/redux/features/finance/finance.thunk'
+import { selectAllEmployees, selectEmployeeCount, selectEmployeeStatus } from '@/redux/features/finance/finance.selector'
 
 
 export default function FinanceTable() {
-   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   //  const navigate = useNavigate();
-   const [page, setPage] = useState(1);
-   const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
-   useEffect(() => {
-     dispatch(getAllCoaches({ page, limit }));
-   }, [dispatch, page, limit]);
+  useEffect(() => {
+    dispatch(getAllEmployees({ page, limit }));
+  }, [dispatch, page, limit]);
 
-   const data = useAppSelector(selectAllCoaches);
-   // const error = useAppSelector(selectCoachError);
-   const status = useAppSelector(selectCoachStatus);
+  const data = useAppSelector(selectAllEmployees);
+  const count = useAppSelector(selectEmployeeCount);
+  // const error = useAppSelector(selectEmployeeError);
+  const status = useAppSelector(selectEmployeeStatus);
 
-   const [coaches, setCoaches] = useState([]);
+  const [employees, setEmployees] = useState([]);
 
-   useEffect(() => {
-     setCoaches(data);
+  useEffect(() => {
+    setEmployees(data);
     //  console.log(data);
-   }, [data]);
+  }, [data]);
 
-   const searchInputHandler = (e) => {
-     const value = e.target.value.toLowerCase();
+  const searchInputHandler = (e) => {
+    const value = e.target.value.toLowerCase();
 
-     if (!value) {
-       setCoaches(data);
-       return;
-     }
+    if (!value) {
+      setEmployees(data);
+      return;
+    }
 
-     const filtered = data.filter((coach) =>
-       coach.name?.toLowerCase().includes(value)
-     );
+    const filtered = data.filter((coach) =>
+      coach.name?.toLowerCase().includes(value)
+    );
 
-     setCoaches(filtered);
-   };
+    setEmployees(filtered);
+  };
 
-   if (status === "loading")
-     return (
-       <div className="flex justify-center items-center h-[calc(100vh-120px)]">
-         <SyncLoader color="#0A4F48" loading margin={2} size={20} />
-       </div>
-     );
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+      </div>
+    );
   return (
     <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
-      <FinanceKpi data={coaches}/>
+      <FinanceKpi />
       <BaseTable
         columns={FinanceColumns}
-        data={coaches}
+        data={employees}
         pageLabel={"Finance List"}
         onSearchInputChange={searchInputHandler}
         handlePageChange={setPage}
         handleLimitChange={setLimit}
         page={page}
         limit={limit}
-        totalCount={coaches.length}
+        totalCount={count}
       />
     </div>
   );
