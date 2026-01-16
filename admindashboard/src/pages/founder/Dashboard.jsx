@@ -187,22 +187,24 @@ const Dashboard = () => {
     ],
   };
 
+  const trainers = founder?.data?.Trainers || 0;
+  const dietitians = founder?.data?.Dietitians || 0;
+  const therapists = founder?.data?.Therapists || 0;
+  const hasExperts = trainers > 0 || dietitians > 0 || therapists > 0;
   const expertsSummaryData = {
-    labels: ["Trainers", "Dietitians", "Therapists"],
+    labels: hasExperts ? ["Trainers", "Dietitians", "Therapists"] : ["No Data"],
     datasets: [
       {
-        data: [
-          founder?.data?.Trainers,
-          founder?.data?.Dietitians,
-          founder?.data?.Therapists,
-        ],
-        backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
+        data: hasExperts ? [trainers, dietitians, therapists] : [1],
+        backgroundColor: hasExperts
+          ? ["#0A4F48", "#EBF3F2", "#F4DBC7"]
+          : ["#E5E7EB"],
         borderWidth: 0,
         circumference: 180,
         rotation: 270,
         cutout: "80%",
-        hoverOffset: 1,
-        spacing: 3,
+        hoverOffset: hasExperts ? 1 : 0,
+        spacing: hasExperts ? 3 : 0,
         borderRadius: 6,
       },
     ],
