@@ -29,6 +29,8 @@ import {
 import { Bar, Line, Doughnut } from "react-chartjs-2";
 import { getDashboardData } from "@/redux/features/head/head.thunk";
 import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 ChartJS.register(
   CategoryScale,
@@ -45,8 +47,9 @@ ChartJS.register(
 export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState({});
   const dispatch = useDispatch();
+  const user = useAppSelector(selectUser);
   useEffect(() => {
-    dispatch(getDashboardData()).then((res) => {
+    dispatch(getDashboardData(user._id)).then((res) => {
       setDashboardData(res.payload);
     });
   }, []);

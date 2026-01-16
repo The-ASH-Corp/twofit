@@ -2,24 +2,32 @@ import React, { useState } from 'react'
 import BaseTable from '../../../components/table/BaseTable'
 import { ProgramListColumns } from './ProgramListColumns'
 import { useDispatch } from 'react-redux'
-import { getAllPrograms } from '@/redux/features/program/program.thunk'
+import { getAllProgramsByCategory } from '@/redux/features/program/program.thunk'
 import { useAppSelector } from '@/redux/store/hooks'
 import { useEffect } from 'react'
-import { selectAllPrograms, selectProgramError, selectProgramStatus, selectTotalProgramCount } from '@/redux/features/program/program.selector'
+import { selectProgramError, selectProgramStatus } from '@/redux/features/program/program.selector'
 import { SyncLoader } from 'react-spinners'
+import { selectUser } from '@/redux/features/auth/auth.selectores'
 
 export default function ProgramTable() {
 
+  const user =useAppSelector(selectUser)
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [ totalProgramCount, setTotalProgramCount ] = useState(0);
+  const [data, setData ] =useState([]);
 
+  const fetchPrograms =() =>{
+    dispatch(getAllProgramsByCategory({category: user?.programCategory, page, limit})).unwrap().then((response) => {
+      setData(response.data);
+      setTotalProgramCount(response.totalProgram);
+    });
+  }
   useEffect(() => {
-    dispatch(getAllPrograms({ page, limit }));
+   fetchPrograms();
   }, [dispatch, page, limit]);
 
-  const totalProgramCount = useAppSelector(selectTotalProgramCount);
-  const data = useAppSelector(selectAllPrograms);
   const status = useAppSelector(selectProgramStatus);
   const error = useAppSelector(selectProgramError);
 

@@ -16,9 +16,9 @@ export default function AdminForm() {
 
   const fetchPrograms = async () => { 
     const response = await dispatch(
-      getAllProgramsByCategory(user.programCategory)
+      getAllProgramsByCategory({category: user.programCategory, page: 1, limit: 1000})
     ).unwrap();
-    setPrograms(response);
+    setPrograms(response.data);
   };
   useEffect(() => {
     fetchPrograms();
@@ -85,7 +85,7 @@ export default function AdminForm() {
           name: "chooseProgram",
           label: "Choose Program",
           type: "multiple",
-          options:programs.map((program) => ({
+          options:programs?.map((program) => ({
             key: program._id,
             label: program.title,
             value: program.title,
@@ -135,21 +135,20 @@ export default function AdminForm() {
   };
 
   const handleAdminCreation = async (values) => {
-    const selectedProgram = programs.find(
-      (program) => program.title == values.chooseProgram
-    );
-
+    const selectedProgramIds = values.chooseProgram.map(title => 
+      programs.find(program => program.title === title)?._id
+    ).filter(Boolean);
     try {
       await dispatch(
         createAdmin({
           ...values,
-          chooseProgram: selectedProgram._id,
+          chooseProgram: selectedProgramIds,
           headId: user._id,
         })
       ).unwrap();
       toast("Admin created successfully", { type: "success" });
       navigate("/head/admins");
-    } catch (error) {
+    } catch (error) {      
       toast("Failed to create admin", { type: "error" });
     }
   };

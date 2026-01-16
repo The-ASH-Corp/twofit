@@ -53,8 +53,8 @@ const TherapyTable = () => {
   console.log(data)
 
   useEffect(() => {
-    setHeads(data.data.head);
-    setTotalCount(data.data.totalCount);
+    setHeads(data?.data?.head);
+    setTotalCount(data?.data?.totalCount);
   }, [data]);
 
   const searchInputHandler = (e) => {

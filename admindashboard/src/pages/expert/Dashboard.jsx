@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Users, FileText, TrendingUp, Activity } from "lucide-react";
 import { Bar, Doughnut } from "react-chartjs-2";
 import {
@@ -12,6 +12,10 @@ import {
   ArcElement,
 } from "chart.js";
 import ReviewDrawer from "./components/ReviewDrawer";
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { getCoachDashboardStats } from "@/redux/features/coach/coach.thunk";
 
 ChartJS.register(
   CategoryScale,
@@ -28,7 +32,20 @@ export default function Dashboard() {
 
   // Compliance Chart Data
   const complianceData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    labels: [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ],
     datasets: [
       {
         label: "High",
@@ -68,15 +85,15 @@ export default function Dashboard() {
           padding: 20,
           font: { size: 12, weight: "500" },
           color: "#374151",
-          generateLabels: function(chart) {
+          generateLabels: function (chart) {
             const datasets = chart.data.datasets;
             const totals = Array(chart.data.labels.length).fill(0);
-            datasets.forEach(dataset => {
+            datasets.forEach((dataset) => {
               dataset.data.forEach((value, index) => {
                 totals[index] += value;
               });
             });
-            
+
             return datasets.map((dataset, i) => {
               return {
                 text: `${dataset.label}`,
@@ -99,11 +116,17 @@ export default function Dashboard() {
         bodyFont: { size: 12 },
         titleFont: { size: 13, weight: "600" },
         callbacks: {
-          title: function(context) {
+          title: function (context) {
             return context[0].label + " 2025";
           },
           label: function (context) {
-            return " " + context.dataset.label + "          " + context.parsed.y + "%";
+            return (
+              " " +
+              context.dataset.label +
+              "          " +
+              context.parsed.y +
+              "%"
+            );
           },
         },
       },
@@ -160,7 +183,7 @@ export default function Dashboard() {
         bodyFont: { size: 12 },
         titleFont: { size: 13, weight: "600" },
         callbacks: {
-          title: function(context) {
+          title: function (context) {
             return context[0].label + " 2025";
           },
           label: function (context) {
@@ -183,7 +206,7 @@ export default function Dashboard() {
           color: "#9CA3AF",
           font: { size: 11 },
         },
-        grid: { 
+        grid: {
           color: "#F3F4F6",
           drawBorder: false,
         },
@@ -194,7 +217,7 @@ export default function Dashboard() {
 
   // Performance Doughnut Data
   const performanceData = {
-   datasets: [
+    datasets: [
       {
         data: [22, 18, 14],
         backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
@@ -322,7 +345,19 @@ export default function Dashboard() {
     };
     return statusMap[status] || "bg-gray-50 text-gray-700";
   };
-
+  const dispatch = useDispatch();
+  const user = useAppSelector(selectUser);
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const fetchData = async () => {
+    const response = await dispatch(
+      getCoachDashboardStats( user._id )
+    );
+    setDashboardStats(response.payload);
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
+  console.log("dashboardStats", dashboardStats);
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA] h-[calc(100vh-120px)] overflow-auto no-scrollbar">
       {/* Top Metrics */}
@@ -332,8 +367,10 @@ export default function Dashboard() {
             <Users size={20} className="text-[#0A4F48]" />
           </div>
           <div>
-            <p className="text-[13px] text-gray-500 font-medium">Total Clients</p>
-            <p className="text-[24px] font-bold text-gray-900">1,245</p>
+            <p className="text-[13px] text-gray-500 font-medium">
+              Total Clients
+            </p>
+            <p className="text-[24px] font-bold text-gray-900">{dashboardStats?.totalClients || 0}</p>
           </div>
         </div>
 
@@ -342,8 +379,10 @@ export default function Dashboard() {
             <FileText size={20} className="text-[#D4A5A0]" />
           </div>
           <div>
-            <p className="text-[13px] text-gray-500 font-medium">Pending Reviews</p>
-            <p className="text-[24px] font-bold text-gray-900">7</p>
+            <p className="text-[13px] text-gray-500 font-medium">
+              Pending Reviews
+            </p>
+            <p className="text-[24px] font-bold text-gray-900">{dashboardStats?.pendingReviews || 0}</p>
           </div>
         </div>
 
@@ -352,7 +391,9 @@ export default function Dashboard() {
             <TrendingUp size={20} className="text-[#45C4A2]" />
           </div>
           <div>
-            <p className="text-[13px] text-gray-500 font-medium">Client Compliance</p>
+            <p className="text-[13px] text-gray-500 font-medium">
+              Client Compliance
+            </p>
             <p className="text-[24px] font-bold text-gray-900">73%</p>
           </div>
         </div>
@@ -363,7 +404,7 @@ export default function Dashboard() {
           </div>
           <div>
             <p className="text-[13px] text-gray-500 font-medium">Programs</p>
-            <p className="text-[24px] font-bold text-gray-900">2</p>
+            <p className="text-[24px] font-bold text-gray-900">{dashboardStats?.totalPrograms || 0}</p>
           </div>
         </div>
       </div>
@@ -377,7 +418,9 @@ export default function Dashboard() {
             {/* Client Compliance Chart */}
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-[16px] font-bold text-gray-900">Client Compliance</h2>
+                <h2 className="text-[16px] font-bold text-gray-900">
+                  Client Compliance
+                </h2>
                 <select className="text-[13px] text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A4F48]">
                   <option>Last Year</option>
                   <option>Last 6 Months</option>
@@ -392,7 +435,9 @@ export default function Dashboard() {
             {/* Rating Score Chart */}
             <div className="bg-white rounded-2xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-[16px] font-bold text-gray-900">Rating Score</h2>
+                <h2 className="text-[16px] font-bold text-gray-900">
+                  Rating Score
+                </h2>
                 <select className="text-[13px] text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A4F48]">
                   <option>Last 8 Months</option>
                   <option>Last 6 Months</option>
@@ -407,7 +452,9 @@ export default function Dashboard() {
 
           {/* Pending Reviews Table */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h2 className="text-[16px] font-bold text-gray-900 mb-4">Pending Reviews</h2>
+            <h2 className="text-[16px] font-bold text-gray-900 mb-4">
+              Pending Reviews
+            </h2>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -434,13 +481,22 @@ export default function Dashboard() {
                 </thead>
                 <tbody>
                   {pendingReviews.map((review) => (
-                    <tr key={review.id} className="border-b border-gray-50 hover:bg-gray-50/50">
+                    <tr
+                      key={review.id}
+                      className="border-b border-gray-50 hover:bg-gray-50/50"
+                    >
                       <td className="py-4 text-[13px] text-gray-900 font-medium">
                         {review.clientName}
                       </td>
-                      <td className="py-4 text-[13px] text-gray-600">{review.program}</td>
-                      <td className="py-4 text-[13px] text-gray-600">{review.mealType}</td>
-                      <td className="py-4 text-[13px] text-gray-600">{review.dateTime}</td>
+                      <td className="py-4 text-[13px] text-gray-600">
+                        {review.program}
+                      </td>
+                      <td className="py-4 text-[13px] text-gray-600">
+                        {review.mealType}
+                      </td>
+                      <td className="py-4 text-[13px] text-gray-600">
+                        {review.dateTime}
+                      </td>
                       <td className="py-4">
                         <span
                           className={`text-[12px] font-semibold px-3 py-1 rounded-full ${getStatusColor(
@@ -470,21 +526,26 @@ export default function Dashboard() {
         <div className="space-y-6">
           {/* My Performance Card */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h2 className="text-[16px] font-bold text-gray-900 mb-6">My Performance</h2>
-            
+            <h2 className="text-[16px] font-bold text-gray-900 mb-6">
+              My Performance
+            </h2>
+
             {/* Circular Progress Chart */}
             <div className="flex justify-center items-center mb-6 pt-4">
               <div className="relative w-48 h-28">
                 {/* <Doughnut data={performanceData} options={performanceOptions} /> */}
-                 <Doughnut
-                                data={performanceData}
-                                options={{
-                                  plugins: { legend: { display: false } },
-                                  maintainAspectRatio: false,
-                                  cutout: "80%",
-                                }}
-                              />
-                <div className="absolute inset-0 flex items-center justify-center" style={{ top: '10px' }}>
+                <Doughnut
+                  data={performanceData}
+                  options={{
+                    plugins: { legend: { display: false } },
+                    maintainAspectRatio: false,
+                    cutout: "80%",
+                  }}
+                />
+                <div
+                  className="absolute inset-0 flex items-center justify-center"
+                  style={{ top: "10px" }}
+                >
                   <div className="text-center">
                     <p className="text-[32px] font-bold text-gray-900">50%</p>
                   </div>
@@ -497,7 +558,9 @@ export default function Dashboard() {
               <div className="flex justify-between items-center pb-4 border-b border-gray-100">
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 rounded-full bg-[#0A4F48]"></div>
-                  <span className="text-[13px] text-gray-600">Task Completion</span>
+                  <span className="text-[13px] text-gray-600">
+                    Task Completion
+                  </span>
                 </div>
                 <span className="text-[15px] font-bold text-gray-900">50%</span>
               </div>
@@ -507,7 +570,7 @@ export default function Dashboard() {
                   <div className="w-3 h-3 rounded-full bg-[#F4DBC7]"></div>
                   <span className="text-[13px] text-gray-600">Rating</span>
                 </div>
-                <span className="text-[15px] font-bold text-gray-900">4.6</span>
+                <span className="text-[15px] font-bold text-gray-900">{dashboardStats?.avarageRating || 0}</span>
               </div>
 
               <div className="flex justify-between items-center">
@@ -522,18 +585,24 @@ export default function Dashboard() {
 
           {/* Daily Activity Log */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h2 className="text-[16px] font-bold text-gray-900 mb-4">Daily Activity Log</h2>
+            <h2 className="text-[16px] font-bold text-gray-900 mb-4">
+              Daily Activity Log
+            </h2>
             <div className="space-y-4">
               {activityLog.map((activity, index) => (
                 <div key={index} className="flex gap-3">
-                  <div className={`w-8 h-8 rounded-full ${activity.bg} flex items-center justify-center flex-shrink-0`}>
+                  <div
+                    className={`w-8 h-8 rounded-full ${activity.bg} flex items-center justify-center flex-shrink-0`}
+                  >
                     {activity.icon}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[13px] text-gray-900 font-medium leading-tight">
                       {activity.text}
                     </p>
-                    <p className="text-[12px] text-gray-500 mt-1">{activity.time}</p>
+                    <p className="text-[12px] text-gray-500 mt-1">
+                      {activity.time}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -543,7 +612,10 @@ export default function Dashboard() {
       </div>
 
       {/* Review Drawer */}
-      <ReviewDrawer review={selectedReview} onClose={() => setSelectedReview(null)} />
+      <ReviewDrawer
+        review={selectedReview}
+        onClose={() => setSelectedReview(null)}
+      />
     </div>
   );
 }

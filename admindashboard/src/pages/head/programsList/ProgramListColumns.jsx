@@ -39,7 +39,6 @@ export const ProgramListColumns = [
     </span>
    )
 },
-  { accessorKey: "linkedTemplate", header: "Linked Template" },
 
   {
     accessorKey: "status",
