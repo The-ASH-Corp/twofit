@@ -1,8 +1,6 @@
 import { generatePassword, hashPassword } from "../../utils/password.js";
 import { AdminModel } from "../admin/admin.model.js";
 import ProgramModel from "../allPrograms/allPrograma.model.js";
-import allProgramaModel from "../allPrograms/allPrograma.model.js";
-import User from "../auth/auth.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import { HeadsModel } from "./heads.modal.js";
 
@@ -83,7 +81,7 @@ export const getDashboardData = async (id) => {
   ).reduce((acc, expertArray) => acc + expertArray.filter(expert => expert.role == "Therapist").length, 0);
 
   return {
-    totalClients,
+    totalClients: totalClients.reduce((acc, client) => acc + client, 0), 
     totalPrograms,
     totalAdmins:  totalAdmins.length,
     totalExperts: totalExperts.length,

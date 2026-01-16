@@ -113,3 +113,13 @@ export const getDashboardData = async (adminId) => {
     totalTherapists,
   }
 };
+
+export const getAdminByHead = async ({headId,page,limit}) => {
+  const skip = (page - 1) * limit;
+  const totalCount = await AdminModel.countDocuments({ headId });
+  const admin = await AdminModel.find({ headId }).select("-password").skip(skip).limit(limit);
+  return {
+    admin,
+    totalCount,
+  };
+};
