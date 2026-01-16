@@ -65,7 +65,7 @@ import ExpertDashboard from "./pages/expert/Dashboard";
 import ExpertClientsTable from "./pages/expert/clients/ClientsTable";
 import ExpertChats from "./pages/expert/chats/Chats";
 import ExpertPrograms from "./pages/expert/programsList/ProgramTable";
-import ExpertPlanDetails from "./pages/expert/programsList/PlanDetails"
+import ExpertPlanDetails from "./pages/expert/programsList/PlanDetailsView"
 import ExpertFinance from "./pages/expert/finance/FinanceTable"
 import ExpertClientProfile from "./pages/expert/clients/ClientProfile"
 // Client Pages Import

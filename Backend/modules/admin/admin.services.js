@@ -49,8 +49,9 @@ export const addNewAdmin = async (adminData) => {
     autoSendGuide: adminData.autoSendGuide,
     automatedReminder: adminData.automatedReminder,
     headId: adminData.headId,
+    experience: adminData.experience,
+    qualification: adminData.qualification,
   });
-  console.log(adminData.headId)
   return newAdmin;
 };
 

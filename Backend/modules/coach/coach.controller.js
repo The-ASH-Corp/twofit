@@ -231,3 +231,17 @@ export const getClientsForExpert = async (req, res) => {
     });
   }
 };
+
+export const getCoachDashboardStats = async(req, res) => {
+  try {
+    const { coachId } = req.params;
+    const stats = await coachService.getCoachDashboardStats(coachId);
+
+    res.status(200).json({
+      success: true,
+      data: stats,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   ChevronDown,
   ChevronUp,
@@ -16,8 +16,12 @@ import { createNewPlan } from "@/redux/features/plans/plan.thunk";
 import { toast } from "react-toastify";
 
 export default function PlanForm() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
+  
   const [programDetails, setProgramDetails] = useState({
-    name: "Weight Loss",
+    name: location.state?.title || "", // Initialize with program name from location
     duration: "30 Days",
   });
 
@@ -185,8 +189,6 @@ export default function PlanForm() {
       })
     );
   };
-  const dispatch = useDispatch();
-  const location = useLocation();
 
   const handleSave = async () => {
     const cleanedWeeks = weeks.map((week) => ({
@@ -201,18 +203,22 @@ export default function PlanForm() {
     }));
 
     const payload = {
-      ...programDetails,
+      name: programDetails.name, // This will now include the correct program name
+      duration: programDetails.duration,
       program: location.state?.programId,
       weeks: cleanedWeeks,
     };
+    
     const data = await dispatch(createNewPlan(payload));
+    
     if (data.payload.success) {
       toast.success(data.payload.message);
+      navigate(-1); // Navigate back to the previous page
     } else {
       toast.error(data.payload.message);
     }
   };
-
+  console.log(location.state)
   return (
     <div className="flex flex-col lg:flex-row gap-6 p-6 min-h-screen bg-[#F8F9FA]">
       {/* Left Content - Form Area */}
@@ -224,7 +230,7 @@ export default function PlanForm() {
               Program Name
             </label>
             <span className="text-sm font-bold text-[#0A4F48]">
-              Weight Loss
+             {location.state?.title}
             </span>
           </div>
           <hr className="border-gray-50" />

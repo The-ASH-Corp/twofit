@@ -1,3 +1,4 @@
+import { AdminModel } from "../admin/admin.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import programModel from "./allPrograma.model.js";
 
@@ -32,9 +33,15 @@ export const deleteProgram = async (id) => {
   return await programModel.findByIdAndDelete(id);
 };
 
-export const getAllProgramByCategory =async(category)=>{
-    return await programModel.find({category})
-}
+export const getAllProgramByCategory = async (category, page, limit) => {
+  const totalProgram = await programModel.countDocuments({ category });
+  const data = await programModel
+    .find({ category }).populate("category", "name")
+    .skip((page - 1) * limit)
+    .limit(limit)
+    .lean();
+  return { program: data, totalProgram };
+};
 
 export const getAllProgramsByExpert = async (expertId, page, limit) => {
   const coach = await CoachModel.findById(expertId).select("assignedPrograms").lean().populate("assignedPrograms");
@@ -48,5 +55,29 @@ export const getAllProgramsByExpert = async (expertId, page, limit) => {
   const endIndex = startIndex + limit;
   
   const paginatedPrograms = coach.assignedPrograms?.slice(startIndex, endIndex) || [];
+  return { program: paginatedPrograms, totalProgram };
+}
+
+export const getAllProgramsByAdmin = async (adminId, page, limit) => {
+  const admin = await AdminModel.findById(adminId)
+    .populate({
+      path: "program",
+      select: "title category duration status",
+      populate: {
+        path: "category",
+        select: "name"
+      }
+    })
+    .lean();
+
+  if (!admin) {
+    return { program: [], totalProgram: 0 };
+  }
+  
+  const totalProgram = admin.program?.length || 0;
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  
+  const paginatedPrograms = admin.program?.slice(startIndex, endIndex) || [];
   return { program: paginatedPrograms, totalProgram };
 }

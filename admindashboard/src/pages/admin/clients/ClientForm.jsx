@@ -3,7 +3,9 @@ import BaseForm from "../../../components/form/BaseForm";
 import { createClient } from "../../../redux/features/auth/auth.thunk";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { getProgramById } from "@/redux/features/program/program.thunk";
+import {
+  getAllProgramsByAdmin,
+} from "@/redux/features/program/program.thunk";
 import { useEffect, useState } from "react";
 import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
 import { toast } from "react-toastify";
@@ -12,7 +14,26 @@ import { useNavigate } from "react-router-dom";
 const initialValues = {
   fullname: "",
   dob: "",
-  gender: "", //need to add
+  gender: "",
+  email: "",
+  phone: "",
+  address: "",
+  medicalconditions: [],
+  allergy: [],
+  foodPreference: "",
+  fitnessGoal: "",
+  currentWeight: "",
+  targetWeight: "",
+  programType: "",
+  duration: "",
+  startDate: "",
+  endDate: "",
+  dietician: "",
+  trainer: "",
+  therapist: "",
+  autoSendWelcome: false,
+  autoSendGuide: false,
+  automatedReminder: false,
 };
 
 const schema = Yup.object({
@@ -22,25 +43,63 @@ const schema = Yup.object({
 });
 
 export default function ClientForm() {
-
   const navigate = useNavigate();
   const [program, setProgram] = useState(null);
   const [coachesOfAdmin, setCoachesOfAdmin] = useState([]);
+  const [selectedProgram, setSelectedProgram] = useState(null);
   const dispatch = useDispatch();
 
   const user = useSelector(selectUser);
 
   const fetchProgram = async () => {
-    const program = await dispatch(getProgramById(user.program));
+    await dispatch(
+      getAllProgramsByAdmin({ adminId: user._id, page: 1, limit: 120 })
+    ).then((res) => {
+      setProgram(res.payload.data);
+    });
     const coachessOfAdmin = await dispatch(getAllCoachesByAdmin(user.experts));
-    console.log(coachessOfAdmin.payload);
-    setProgram(program.payload);
     setCoachesOfAdmin(coachessOfAdmin.payload);
   };
 
   useEffect(() => {
     fetchProgram();
   }, []);
+
+  const setProgramId = (programId) => {
+    const selectedProgram = program?.find((p) => p._id === programId);
+    setSelectedProgram(selectedProgram);
+  };
+
+  const calculateEndDate = (start, durationValue, setFieldValue) => {
+    if (start && durationValue) {
+      const date = new Date(start);
+      if (isNaN(date.getTime())) return;
+
+      const durationString = String(durationValue).toLowerCase();
+      // Match number, optionally followed by unit. Default unit to 'days' if missing.
+      const match = durationString.match(/(\d+)(?:\s*([a-z]+))?/);
+
+      if (match) {
+        const number = parseInt(match[1], 10);
+        const unit = match[2] || "days"; // Default to days
+
+        let endDate = new Date(date);
+
+        if (unit.includes("day")) {
+          endDate.setUTCDate(date.getUTCDate() + number);
+        } else if (unit.includes("week")) {
+          endDate.setUTCDate(date.getUTCDate() + number * 7);
+        } else if (unit.includes("month")) {
+          endDate.setUTCMonth(date.getUTCMonth() + number);
+        } else if (unit.includes("year")) {
+          endDate.setUTCFullYear(date.getUTCFullYear() + number);
+        }
+
+        const formattedDate = endDate.toISOString().split("T")[0];
+        setFieldValue("endDate", formattedDate);
+      }
+    }
+  };
 
   const fields = [
     {
@@ -88,10 +147,15 @@ export default function ClientForm() {
             { label: "None", value: "none" },
           ],
         },
-        { name: "allergy", label: "Allergies", type: "multiple", options: [
-          { label: "Peanuts", value: "peanuts" },
-          { label: "Seafood", value: "seafood" },
-        ] },
+        {
+          name: "allergy",
+          label: "Allergies",
+          type: "multiple",
+          options: [
+            { label: "Peanuts", value: "peanuts" },
+            { label: "Seafood", value: "seafood" },
+          ],
+        },
         {
           name: "foodPreference",
           label: "Food Preference",
@@ -123,20 +187,41 @@ export default function ClientForm() {
           name: "programType",
           label: "Program Type",
           type: "select",
-          options: program
-            ? [{ label: program.title, value: program._id }]
-            : [],
+          options: program?.map((prog) => ({
+            label: prog.title,
+            value: prog._id,
+          })),
+          onChange: (e) => setProgramId(e.target.value),
         },
         {
           name: "duration",
           label: "Duration",
           type: "select",
-          options: program
-            ? program.duration.map((d) => ({ label: d, value: d }))
-            : [],
+          options: selectedProgram?.duration?.map((d) => ({
+            label: d,
+            value: d,
+          })),
+          onChange: (e, form) => {
+            calculateEndDate(
+              form.values.startDate,
+              e.target.value,
+              form.setFieldValue
+            );
+          },
         },
-        { name: "startDate", label: "Start Date", type: "date" },
-        { name: "endDate", label: "End Date", type: "date" },
+        {
+          name: "startDate",
+          label: "Start Date",
+          type: "date",
+          onChange: (e, form) => {
+            calculateEndDate(
+              e.target.value,
+              form.values.duration,
+              form.setFieldValue
+            );
+          },
+        },
+        { name: "endDate", label: "End Date", type: "date", readOnly: true },
       ],
     },
     {
@@ -148,24 +233,30 @@ export default function ClientForm() {
           label: "Dietician",
           type: "select",
           options: coachesOfAdmin
-            ?coachesOfAdmin?.filter((coach) => coach?.role==="Dietician")
-            ?.map((coach) => ({ label: coach.name, value: coach._id })) :[],
+            ? coachesOfAdmin
+                ?.filter((coach) => coach?.role === "Dietician")
+                ?.map((coach) => ({ label: coach.name, value: coach._id }))
+            : [],
         },
         {
           name: "trainer",
           label: "Trainer",
           type: "select",
           options: coachesOfAdmin
-            ?coachesOfAdmin?.filter((coach) => coach?.role ==="Trainer")
-            ?.map((coach) => ({ label: coach.name, value: coach._id })) :[],
+            ? coachesOfAdmin
+                ?.filter((coach) => coach?.role === "Trainer")
+                ?.map((coach) => ({ label: coach.name, value: coach._id }))
+            : [],
         },
         {
           name: "therapist",
           label: "Therapist",
           type: "select",
           options: coachesOfAdmin
-            ?coachesOfAdmin?.filter((coach) => coach?.role ==="Therapist")
-            ?.map((coach) => ({ label: coach.name, value: coach._id })) :[],
+            ? coachesOfAdmin
+                ?.filter((coach) => coach?.role === "Therapist")
+                ?.map((coach) => ({ label: coach.name, value: coach._id }))
+            : [],
         },
       ],
     },
@@ -194,13 +285,13 @@ export default function ClientForm() {
 
   const handleUserCreation = async (values) => {
     const updatedValues = { ...values, adminId: user._id };
-   const client = await dispatch(createClient(updatedValues));
-   if(client.payload.success){
-    toast.success("Client created successfully");
-    navigate(-1);
-   }else{
-    toast.error("Failed to create client");
-   }
+    const client = await dispatch(createClient(updatedValues));
+    if (client.payload.success) {
+      toast.success("Client created successfully");
+      navigate(-1);
+    } else {
+      toast.error("Failed to create client");
+    }
   };
 
   return (

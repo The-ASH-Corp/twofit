@@ -272,7 +272,6 @@ const getDashboardDatas =async () => {
       time: "3 Days Ago",
     },
   ];
-  console.log(dashboardData);
   
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA]">
