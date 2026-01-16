@@ -82,8 +82,8 @@ export const getAllCoachesByAdmin = async ({ adminId, page, limit }) => {
 
 export const getDashboardData = async (adminId) => {
 
-  const totalPrograms = await allProgramaModel.countDocuments();
-  const totalExperts = await AdminModel.find({_id:adminId}).select("experts").populate("experts");
+  const totalExperts = await AdminModel.find({_id:adminId}).select("experts program").populate("experts program");
+  const totalPrograms = totalExperts[0].program?.length;
 
   const query = {
     $or: [

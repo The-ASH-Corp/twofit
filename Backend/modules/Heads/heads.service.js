@@ -56,35 +56,42 @@ export const deleteHead = async (id) => {
 };
 
 export const getDashboardData = async (id) => {
-  
-  const head = await HeadsModel.find({_id: id}).populate("programCategory")
+
+  const head = await HeadsModel.find({ _id: id }).populate("programCategory")
   const totalAdmins = await AdminModel.find({ headId: id });
+
   const totalExperts = await Promise.all(totalAdmins.map(async (admin) => {
     return await CoachModel.find({ adminId: admin._id });
   }));
 
-  const totalClients =  await Promise.all(totalAdmins.map(async (admin) => {
-    return (await CoachModel.find({ adminId: admin._id }).select("assignedUsers")).reduce((acc, coach) => acc + coach.assignedUsers.length, 0)  ;
-  }));
-  const totalPrograms = await ProgramModel.countDocuments({category: head[0].programCategory._id});
+  const uniqueClients = new Set();
+  totalExperts.flat().forEach(expert => {
+    if (expert.assignedUsers && expert.assignedUsers.length > 0) {
+      expert.assignedUsers.forEach(userId => uniqueClients.add(userId.toString()));
+    }
+  });
 
-  const totalTrainers = await totalExperts.filter(expertArray => 
+  const totalClients = uniqueClients.size;
+
+  const totalPrograms = await ProgramModel.countDocuments({ category: head[0].programCategory._id });
+
+  const totalTrainers = await totalExperts.filter(expertArray =>
     expertArray.some(expert => expert.role == "Trainer")
   ).reduce((acc, expertArray) => acc + expertArray.filter(expert => expert.role == "Trainer").length, 0);
 
-  const totalDietitians = await totalExperts.filter(expertArray => 
+  const totalDietitians = await totalExperts.filter(expertArray =>
     expertArray.some(expert => expert.role == "Dietician")
   ).reduce((acc, expertArray) => acc + expertArray.filter(expert => expert.role == "Dietician").length, 0);
 
-  const totalTherapists = await totalExperts.filter(expertArray => 
+  const totalTherapists = await totalExperts.filter(expertArray =>
     expertArray.some(expert => expert.role == "Therapist")
   ).reduce((acc, expertArray) => acc + expertArray.filter(expert => expert.role == "Therapist").length, 0);
 
   return {
-    totalClients: totalClients.reduce((acc, client) => acc + client, 0), 
+    totalClients,
     totalPrograms,
-    totalAdmins:  totalAdmins.length,
-    totalExperts: totalExperts.length,
+    totalAdmins: totalAdmins.length,
+    totalExperts: totalExperts.reduce((acc, expert) => acc + expert.length, 0),
     totalTrainers,
     totalDietitians,
     totalTherapists,
