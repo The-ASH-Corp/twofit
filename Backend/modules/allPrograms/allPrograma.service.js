@@ -1,5 +1,6 @@
 import { AdminModel } from "../admin/admin.model.js";
 import { CoachModel } from "../coach/coach.model.js";
+import planModel from "../plan/plan.model.js";
 import programModel from "./allPrograma.model.js";
 
 export const createProgram = async (data) => {
@@ -72,12 +73,17 @@ export const getAllProgramsByAdmin = async (adminId, page, limit) => {
 
   if (!admin) {
     return { program: [], totalProgram: 0 };
-  }
-  
+  }  
+
+  const programsWithPlans = await Promise.all(admin.program.map(async (program) => {
+    const plans = await planModel.find({ program: program._id }).lean();
+    return { ...program, plans };
+  }));
+
   const totalProgram = admin.program?.length || 0;
   const startIndex = (page - 1) * limit;
   const endIndex = startIndex + limit;
   
-  const paginatedPrograms = admin.program?.slice(startIndex, endIndex) || [];
+  const paginatedPrograms = programsWithPlans?.slice(startIndex, endIndex) || [];
   return { program: paginatedPrograms, totalProgram };
 }
