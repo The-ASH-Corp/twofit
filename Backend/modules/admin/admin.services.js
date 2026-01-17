@@ -49,8 +49,9 @@ export const addNewAdmin = async (adminData) => {
     autoSendGuide: adminData.autoSendGuide,
     automatedReminder: adminData.automatedReminder,
     headId: adminData.headId,
+    experience: adminData.experience,
+    qualification: adminData.qualification,
   });
-  console.log(adminData.headId)
   return newAdmin;
 };
 
@@ -81,8 +82,8 @@ export const getAllCoachesByAdmin = async ({ adminId, page, limit }) => {
 
 export const getDashboardData = async (adminId) => {
 
-  const totalPrograms = await allProgramaModel.countDocuments();
-  const totalExperts = await AdminModel.find({_id:adminId}).select("experts").populate("experts");
+  const totalExperts = await AdminModel.find({_id:adminId}).select("experts program").populate("experts program");
+  const totalPrograms = totalExperts[0].program?.length;
 
   const query = {
     $or: [
@@ -111,4 +112,14 @@ export const getDashboardData = async (adminId) => {
     totalDietitians,
     totalTherapists,
   }
+};
+
+export const getAdminByHead = async ({headId,page,limit}) => {
+  const skip = (page - 1) * limit;
+  const totalCount = await AdminModel.countDocuments({ headId });
+  const admin = await AdminModel.find({ headId }).select("-password").skip(skip).limit(limit);
+  return {
+    admin,
+    totalCount,
+  };
 };

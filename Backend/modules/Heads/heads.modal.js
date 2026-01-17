@@ -10,8 +10,8 @@ const headsSchema = new mongoose.Schema({
   specialization: { type: Array, required: true },
   experience: { type: String, required: true },
   qualification: { type: String, required: true },
-  programCategory: { type: mongoose.Schema.Types.ObjectId, ref: "ProgramsList", required: true },
-  salary: { type: String, required: true },
+  programCategory: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
+  salary: { type: Number, required: true },
   password: { type: String, required: true },
   role:{type:String,enum:["head"],default:"head"},
   status:{type:String,enum:["Active","Inactive"],default:"Active"}

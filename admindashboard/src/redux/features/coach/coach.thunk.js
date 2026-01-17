@@ -35,7 +35,7 @@ export const getAllCoaches = createAsyncThunk(
       const data = await axiosInstance.get(
         `/coach/get-all-coaches/${page}/${limit}`
       );
-      console.log(data)
+      // console.log(data)
       return data.data;
 
     } catch (error) {
@@ -92,3 +92,19 @@ export const getUsersAssignedToACoach = createAsyncThunk(
   }
 );
 
+
+export const getCoachDashboardStats = createAsyncThunk(
+  "coach/getCoachDashboardStats",
+  async (coachId, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/coach/dashboard-stats/${coachId}`);      
+      return response.data
+    }
+    catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+        "Failed to get coach dashboard stats"
+      );
+    }
+  }
+);

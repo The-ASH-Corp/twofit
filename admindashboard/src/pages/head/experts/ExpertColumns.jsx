@@ -46,31 +46,23 @@ export const ExpertColumns = [
    },
      { accessorKey: "specialization", header: "Specialisation" },
 
-  { accessorKey: "clients", header: "Clients" },
- 
-//   {
-//     accessorKey: "experts",
-//     header: "Experts",
-//     cell: ({ row }) => (
-//       <div className="flex gap-2 flex-wrap">
-//         {row.original.experts.map((exp) => {
-//           const colorClass =
-//             expertColors[exp] || "bg-gray-100 text-gray-700 border";
-
-//           return (
-//             <span
-//               key={exp}
-//               className={`px-2 py-1 text-[11px] rounded-sm ${colorClass}`}
-//             >
-//               {exp}
-//             </span>
-//           );
-//         })}
-//       </div>
-//     ),
-//   },
+  { accessorKey: "clients", header: "Clients" ,
+    cell:({row})=>{
+      const clients=row.original.assignedUsers.length
+      return clients
+    }
+  },
   { accessorKey: "maxClient", header: "Maximum Limit" },
-  { accessorKey: "rating", header: "Rating" },
+  {
+    accessorKey: "feedback",
+    header: "Rating",
+    cell: ({ row }) => {
+      const feedback = row.original.feedback;
+      return feedback && feedback.length > 0
+        ? (feedback.reduce((acc, f) => acc + f.rating, 0) / feedback.length).toFixed(1)
+        : 0;
+    },
+  },
   { accessorKey: "responseTime", header: "Response Time" },
 
   {

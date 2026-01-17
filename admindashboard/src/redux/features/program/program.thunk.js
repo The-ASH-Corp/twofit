@@ -1,11 +1,11 @@
 import axiosInstance from "@/utils/axiosInstance";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-
-
-export const createProgram = createAsyncThunk("program/createProgram", async (programDetails, { rejectWithValue }) => {
-  try {
-     const config =
+export const createProgram = createAsyncThunk(
+  "program/createProgram",
+  async (programDetails, { rejectWithValue }) => {
+    try {
+      const config =
         programDetails instanceof FormData
           ? {
               headers: {
@@ -14,49 +14,91 @@ export const createProgram = createAsyncThunk("program/createProgram", async (pr
             }
           : {};
 
-    const response = await axiosInstance.post(`/programs/create`, programDetails,config)
-    return response;
-  } catch (error) {
-    return rejectWithValue(error.response?.data?.message || "Failed to Create Program");
+      const response = await axiosInstance.post(
+        `/programs/create`,
+        programDetails,
+        config
+      );
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to Create Program"
+      );
+    }
   }
-})
+);
 
-export const getAllPrograms=createAsyncThunk('program/getAllPrograms',async({page,limit},{rejectWithValue})=>{
-    try{
-        const data=await axiosInstance.get(`/programs/list/${page}/${limit}`)
-         return data; 
-        
+export const getAllPrograms = createAsyncThunk(
+  "program/getAllPrograms",
+  async ({ page, limit }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(`/programs/list/${page}/${limit}`);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get programs"
+      );
     }
-    catch(error){
-        return rejectWithValue(error.response?.data?.message || "Failed to get programs");
+  }
+);
+export const getProgramById = createAsyncThunk(
+  "program/getProgramById",
+  async (programId, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(`/programs/get/${programId}`);
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get program by id"
+      );
     }
-})
-export const getProgramById=createAsyncThunk('program/getProgramById',async(programId,{rejectWithValue})=>{
-    try{
-        const data=await axiosInstance.get(`/programs/get/${programId}`)
-         return data.data; 
-    }
-    catch(error){
-        return rejectWithValue(error.response?.data?.message || "Failed to get program by id");
-    }
-})
+  }
+);
 
-export const getAllProgramsByCategory=createAsyncThunk('program/getAllProgramsByCategory',async(category,{rejectWithValue})=>{
-    try{
-        const data=await axiosInstance.get(`/programs/get-all-programs-by-category/${category}`)
-         return data.data; 
+export const getAllProgramsByCategory = createAsyncThunk(
+  "program/getAllProgramsByCategory",
+  async ({ category, page, limit }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(
+        `/programs/get-all-programs-by-category/${category}/${page}/${limit}`
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get programs by category"
+      );
     }
-    catch(error){
-        return rejectWithValue(error.response?.data?.message || "Failed to get programs by category");
-    }
-})
+  }
+);
 
-export const getAllProgramsByExpertId=createAsyncThunk('program/getAllProgramsByExpertId',async({expertId, page, limit},{rejectWithValue})=>{
-    try{
-        const data=await axiosInstance.get(`/programs/get-all-programs-by-expert/${expertId}/${page}/${limit}`)
-            return data;
+export const getAllProgramsByExpertId = createAsyncThunk(
+  "program/getAllProgramsByExpertId",
+  async ({ expertId, page, limit }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(
+        `/programs/get-all-programs-by-expert/${expertId}/${page}/${limit}`
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get programs by expert id"
+      );
     }
-    catch(error){
-        return rejectWithValue(error.response?.data?.message || "Failed to get programs by expert id");
+  }
+);
+
+export const getAllProgramsByAdmin = createAsyncThunk(
+  "program/getAllProgramsByAdmin",
+  async ({ adminId, page, limit }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(
+        `/programs/get-all-programs-by-admin/${adminId}/${page}/${limit}`
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get programs by admin id"
+      );
     }
-})
+  }
+);

@@ -57,6 +57,7 @@ export default function BaseForm({
                               label={field.label ?? "just text"}
                               name={field.name}
                               options={field.options}
+                              onChange={field.onChange}
                             />
                           </div>
                         );
@@ -86,6 +87,8 @@ export default function BaseForm({
                           label={field.label}
                           name={field.name}
                           type={field.type || "text"}
+                          onChange={field.onChange}
+                          readOnly={field.readOnly}
                         />
                       );
                     })}
@@ -151,6 +154,7 @@ export default function BaseForm({
                               label={field.label ?? "just text"}
                               name={field.name}
                               options={field.options}
+                              onChange={field.onChange}
                             />
                           </div>
                         );
@@ -171,6 +175,8 @@ export default function BaseForm({
                           label={field.label}
                           name={field.name}
                           type={field.type || "text"}
+                          onChange={field.onChange}
+                          readOnly={field.readOnly}
                         />
                       );
                     })}

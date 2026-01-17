@@ -1,16 +1,16 @@
-const expertColors = {
-  Dietitian: "bg-[#FFF5ED] text-black",
-  Therapist: "bg-[#E7F9F4] text-black",
-  Trainer: "bg-[#EBF2FE] text-black",
-};
+// const expertColors = {
+//   Dietitian: "bg-[#FFF5ED] text-black",
+//   Therapist: "bg-[#E7F9F4] text-black",
+//   Trainer: "bg-[#EBF2FE] text-black",
+// };
 // const formatINR = (amount) =>
 //   `₹${amount.toLocaleString("en-IN")}`;
 
-const statusColors = {
-  Active: "bg-[#45C4A2] text-white",
-  Inactive: "bg-[#66706D] text-white",
-  Suspended: "bg-[#FB5858] text-white",
-};
+// const statusColors = {
+//   Active: "bg-[#45C4A2] text-white",
+//   Inactive: "bg-[#66706D] text-white",
+//   Suspended: "bg-[#FB5858] text-white",
+// };
 
 export const FinanceColumns = [
   {
@@ -32,34 +32,49 @@ export const FinanceColumns = [
       />
     ),
   },
-  { accessorKey: "name", header: "Expert Name" },
+  { accessorKey: "name", header: "Employees Name" },
   {
     accessorKey: "role",
     header: "Role",
-    cell: ({ row }) => {
-      const role = row.original.role;
-      const expertColor = expertColors[role] || "bg-gray-200 text-gray-700";
+    // cell: ({ row }) => {
+    //   const role = row.original.role;
+    //   const expertColor = expertColors[role] || "bg-gray-200 text-gray-700";
 
-      return (
-        <span className={`px-2 py-1 text-[11px] rounded-xl ${expertColor}`}>
-          {role}
-        </span>
-      );
-    },
+    //   return (
+    //     <span className={`px-2 py-1 text-[11px] rounded-xl ${expertColor}`}>
+    //       {role}
+    //     </span>
+    //   );
+    // },
+  },
+  {
+    accessorKey: "months",
+    header: "Months",
+    // cell: ({ row }) => formatINR(row.original.baseSalary),
   },
   {
     accessorKey: "salary",
     header: "Base Salary",
     // cell: ({ row }) => formatINR(row.original.baseSalary),
   },
+  // {
+  //   accessorKey: "leave",
+  //   header: "Leave",
+  //   // cell: ({ row }) => formatINR(row.original.baseSalary),
+  // },
   {
-    accessorKey: "incentive",
+    accessorKey: "incentives",
     header: "Incentives",
     // cell: ({ row }) => formatINR(row.original.incentive),
   },
+  // {
+  //   accessorKey: "deductions",
+  //   header: "Deductions",
+  //   // cell: ({ row }) => formatINR(row.original.incentive),
+  // },
   {
-    accessorKey: "totalPayout",
-    header: "Total Payout",
+    accessorKey: "netSalary",
+    header: "Net Salary",
     // cell: ({ row }) => (
     //   <span className="font-semibold">
     //     {formatINR(row.original.totalPayout)}
@@ -88,22 +103,10 @@ export const FinanceColumns = [
   //       </div>
   //     ),
   //   },
-  { accessorKey: "rating", header: "Rating" },
-  { accessorKey: "responseTime", header: "Response Time" },
 
   {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => {
-      const status = row.original.status;
-      const colorClass = statusColors[status] || "bg-gray-200 text-gray-700";
-
-      return (
-        <span className={`px-2 py-1 text-[11px] rounded-xl ${colorClass}`}>
-          {status}
-        </span>
-      );
-    },
+    accessorKey: "date",
+    header: "Date",
   },
   { id: "actions", header: "Action", cell: () => "⋯" },
 ];

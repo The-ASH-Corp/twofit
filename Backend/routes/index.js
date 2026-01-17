@@ -11,6 +11,7 @@ import categoryRouts from "../modules/category/category.routes.js"
 import payrollRouts from "../modules/payroll/payroll.route.js"
 import planRoutes from "../modules/plan/plan.route.js"
 import founderRoutes from "../modules/founder/founder.routes.js"
+import financeRoutes from "../modules/finance/finance.route.js"
 
 const router = express.Router();
 
@@ -26,6 +27,8 @@ router.use("/category", categoryRouts);
 router.use("/payroll", payrollRouts);
 router.use("/plans",planRoutes)
 router.use("/founder", founderRoutes)
+router.use("/finance", financeRoutes)
+
 
 
 

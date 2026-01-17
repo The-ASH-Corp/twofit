@@ -45,13 +45,27 @@ export const getHead = createAsyncThunk(
 
 export const getDashboardData = createAsyncThunk(
     "head/get-dashboard-data",
-    async (_, {rejectWithValue}) => {
+    async (headId, {rejectWithValue}) => {
         try {
-            const response = await axiosInstance.get(`heads/dashboard-data`);            
+            const response = await axiosInstance.get(`heads/dashboard-data/${headId}`);            
             return response.data
         } catch (error) {
              return rejectWithValue(
                error.response?.data?.message || "Failed to get heads"
+             );
+        }
+    }
+)
+
+export const getAllCoachesByHead = createAsyncThunk(
+    "head/get-all-coaches-by-head",
+    async ({headId,page,limit}, {rejectWithValue}) => {
+        try {
+            const response = await axiosInstance.get(`heads/get-all-coaches-by-head/${headId}/${page}/${limit}`);
+            return response;
+        } catch (error) {
+             return rejectWithValue(
+               error.response?.data?.message || "Failed to get coaches by head"
              );
         }
     }

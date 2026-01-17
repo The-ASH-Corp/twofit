@@ -13,11 +13,11 @@ const adminSchema = new mongoose.Schema(
       type: Array,
       required: true,
     },
-    program: {
+    program:[ {
       type: mongoose.Schema.Types.ObjectId,
       ref: "ProgramsList",
       required: true,
-    },
+    }],
     salary: { type: Number, default: 0 },
     role: { type: String, default: "admin" },
     experts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Coach" }],
@@ -26,6 +26,8 @@ const adminSchema = new mongoose.Schema(
     automatedReminder: { type: Boolean, default: false },
     status: { type: String, default: "Active" },
     headId: { type: mongoose.Schema.Types.ObjectId, ref: "Heads" },
+    experience: { type: String, required: true },
+    qualification: { type: String, required: true },
   },
   { timestamps: true }
 );

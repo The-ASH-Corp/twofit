@@ -11,4 +11,5 @@ router.get("/admin-profile/:id",adminController.getAdminProfile)
 router.get("/get-all-coaches-by-admin/:adminId/:page/:limit", adminController.getAllCoachesByAdmin);
 
 router.get("/dashboard-data/:adminId",adminController.getDashboardData)
+router.get("/get-admin-by-head/:headId/:page/:limit",adminController.getAdminByHead)
 export default router;

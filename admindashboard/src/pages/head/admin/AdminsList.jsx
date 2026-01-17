@@ -3,10 +3,13 @@ import BaseTable from '../../../components/table/BaseTable'
 import { AdminColumns } from './AdminColumns'
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { getAllAdmins } from '@/redux/features/admins/admin.thunk';
+import { getAdminsByHeadId } from '@/redux/features/admins/admin.thunk';
+import { useAppSelector } from '@/redux/store/hooks';
+import { selectUser } from '@/redux/features/auth/auth.selectores';
 
 export default function AdminsList() {
 
+  const user =useAppSelector(selectUser)
   const [admins,setAdmins]=useState([])
   const [totalCount,setTotalCount]=useState(0)
   const [page, setPage] = useState(1);
@@ -14,7 +17,7 @@ export default function AdminsList() {
 
   const dispatch = useDispatch();
   const fetchAdminData=async()=>{
-    const admin =await dispatch(getAllAdmins({page,limit})).unwrap()
+    const admin =await dispatch(getAdminsByHeadId({page,limit,headId:user._id})).unwrap()
     setAdmins(admin.data)
     setTotalCount(admin.total)
   }

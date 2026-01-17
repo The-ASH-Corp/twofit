@@ -30,6 +30,9 @@ import bellVector from "./bellVector.svg";
 import greenBellVector from "./greenBellVector.svg";
 import star from "./Star.svg"
 import pdfVector from "./pdfVector.svg"
+import totalEmploy from "./totalExpert.svg"
+import totalPayroll from "./totalPayroll.svg"
+import pendingPayroll from "./pendingPayroll.svg"
 
 export const assets = {
   menu,
@@ -64,5 +67,8 @@ export const assets = {
   greenBellVector,
   star,
   pdfVector,
+  totalEmploy,
+  totalPayroll,
+  pendingPayroll,
 };
 

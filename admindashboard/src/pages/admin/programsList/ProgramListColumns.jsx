@@ -3,7 +3,6 @@ const statusColors = {
   Inactive: "bg-[#66706D] text-white",
   Suspended: "bg-[#FB5858] text-white",
 };
-
 import { useNavigate } from "react-router-dom";
 
 export const ProgramListColumns = [
@@ -35,7 +34,6 @@ export const ProgramListColumns = [
       <span className=" capitalize">{row.original.category?.name || "—"}</span>
     ),
   },
-  { accessorKey: "linkedTemplate", header: "Linked Template" },
 
   {
     accessorKey: "status",
@@ -58,15 +56,13 @@ export const ProgramListColumns = [
   },
 ];
 
-const ActionCell = ({ row }) => {
+const ActionCell = ({ row }) => { 
   const navigate = useNavigate();
   return (
     <button
-      onClick={() =>
-        navigate("/admin/programs/create", {
-          state: { programId: row.original._id },
-        })
-      }
+      onClick={() =>  navigate("/admin/programs/create", {
+      state: { programId: row.original._id, title: row.original.title },
+    })}
       className="flex items-center gap-1.5 px-3 py-1.5 bg-[#EBF3F2] hover:bg-[#dceceb] text-[#0A4F48] text-[11px] font-bold rounded-lg transition-colors"
     >
       View Plan

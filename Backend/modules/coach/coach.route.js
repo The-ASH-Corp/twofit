@@ -18,5 +18,6 @@ router.delete("/delete/:coachId", coachController.deleteCoachById);
 router.get("/assigned-users/:coachId/:page/:limit", coachController.getUsersAssignedToACoach);
 
 router.put("/feedback", coachController.createFeedback);
+router.get("/dashboard-stats/:coachId", coachController.getCoachDashboardStats);
 
 export default router

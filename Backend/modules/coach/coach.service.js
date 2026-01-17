@@ -1,5 +1,6 @@
 import { generatePassword, hashPassword } from "../../utils/password.js";
 import { AdminModel } from "../admin/admin.model.js";
+import { PayrollModel } from "../payroll/payroll.model.js";
 import { CoachModel } from "./coach.model.js";
 
 export const createCoach = async (coach) => {
@@ -9,6 +10,7 @@ export const createCoach = async (coach) => {
     "breakSlots",
     "workingdays",
     "specialization",
+    "chooseProgram",
     "languages",
   ];
   const booleanFields = [
@@ -63,6 +65,7 @@ export const createCoach = async (coach) => {
     phone: coach.phone,
     address: coach.address,
     role: coach.role,
+    adminId: coach.adminId,
     specialization: coach.specialization,
     experience: coach.experience,
     qualification: coach.qualification,
@@ -161,10 +164,67 @@ export const getCoachesByAdmin = async ({ adminIds }) => {
   return await Promise.all(coaches);
 }
 
+const calculateAvgRating = (feedback = []) => {
+  if (!feedback.length) return 0;
+  const total = feedback.reduce((sum, f) => sum + f.rating, 0);
+  return Number((total / feedback.length).toFixed(2));
+};
+
+const getRatingIncentive = async (avgRating) => {
+  const payroll = await PayrollModel.findOne({
+    id: "6960c69c6b7d7ca635decb87",
+  }).lean();
+
+  if (!payroll) return 0;
+
+  if (avgRating >= 4.0 && avgRating <= 4.4) return payroll.rating1;
+  if (avgRating >= 4.5 && avgRating <= 4.7) return payroll.rating2;
+  if (avgRating >= 4.8 && avgRating <= 5.0) return payroll.rating3;
+
+  return 0;
+};
+
 export const createFeedback = async (expertId, userId, rating, feedback) => {
-  return await CoachModel.findByIdAndUpdate(
+  // 1️⃣ Push feedback
+  const coach = await CoachModel.findByIdAndUpdate(
     expertId,
-    { $addToSet: { feedback: { userId, rating, feedback } } },
+    { $push: { feedback: { userId, rating, feedback } } },
     { new: true }
   );
+
+  if (!coach) throw new Error("Coach not found");
+
+  
+  const avgRating = calculateAvgRating(coach.feedback);
+
+  // 3️⃣ Calculate incentive from payroll
+  let incentives = await getRatingIncentive(avgRating);;
+  
+
+  // 4️⃣ Update coach with avgRating + incentive
+  await CoachModel.findByIdAndUpdate(expertId, {
+    avgRating,
+    incentives,
+  });
+
+  return coach;
 };
+
+
+
+export const getCoachDashboardStats =async(coachId) => {
+  const coach = await CoachModel.findById(coachId).select("assignedUsers assignedPrograms feedback");
+  if (!coach) {
+    throw new Error("Coach not found");
+  }
+  const totalClients = coach.assignedUsers.length;
+  const totalPrograms = coach.assignedPrograms.length;
+  const avarageRating = coach.feedback.length > 0 ? 
+    (coach.feedback.reduce((sum, fb) => sum + fb.rating, 0) / coach.feedback.length).toFixed(2) 
+    : 0;
+  return {
+    totalClients,
+    totalPrograms,
+    avarageRating: parseFloat(avarageRating)
+  };
+} 

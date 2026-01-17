@@ -2,52 +2,57 @@ import React, { useState } from 'react'
 import BaseTable from '../../../components/table/BaseTable'
 import { ProgramListColumns } from './ProgramListColumns'
 import { useDispatch } from 'react-redux'
-import { getAllPrograms } from '@/redux/features/program/program.thunk'
+import {  getAllProgramsByAdmin } from '@/redux/features/program/program.thunk'
 import { useAppSelector } from '@/redux/store/hooks'
 import { useEffect } from 'react'
-import { selectAllPrograms, selectProgramError, selectProgramStatus } from '@/redux/features/program/program.selector'
+import { selectProgramError, selectProgramStatus } from '@/redux/features/program/program.selector'
+import { selectUser } from '@/redux/features/auth/auth.selectores'
 
 export default function ProgramTable() {
 
+  const user =useAppSelector(selectUser)
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [userPrograms, setUserPrograms] = useState([])
+  const [totalPrograms, setTotalPrograms] = useState(0);
 
+  const fetchUserPrograms = async () => {
+    const response = await dispatch(
+      getAllProgramsByAdmin({adminId: user._id, page, limit})
+    ).unwrap();
+    setUserPrograms(response.data);
+    setTotalPrograms(response.totalProgram);
+  }
   useEffect(() => {
-    dispatch(getAllPrograms({ page, limit }));
-  }, [dispatch, page, limit]);
+    fetchUserPrograms();
+  }, [dispatch, page, limit, user._id]);
 
-  const data = useAppSelector(selectAllPrograms);
   const status = useAppSelector(selectProgramStatus);
   const error = useAppSelector(selectProgramError);
-
-  const [ programs, setProgram ] = useState([]);
-
-  useEffect(()=>{
-    setProgram(data)
-  },[data])
 
     const searchInputHandler = (e) => {
       const value = e.target.value.toLowerCase();
 
       if (!value) {
-        setProgram(data);
+        fetchUserPrograms()
         return;
       }
 
-      const filtered = data.filter((programs) =>
+      const filtered = userPrograms.filter((programs) =>
         programs.title?.toLowerCase().includes(value)
       );
 
-      setProgram(filtered);
+      setUserPrograms(filtered);
     };
+    
   if (status === "loading") return <p>Loading programs...</p>;
   if (error) return <p>{error}</p>;
   return (
     <div>
       <BaseTable
         columns={ProgramListColumns}
-        data={programs}
+        data={userPrograms}
         pageLabel={"Program List"}
         actionLabel="Add Program"
         onSearchInputChange={searchInputHandler}
@@ -55,6 +60,7 @@ export default function ProgramTable() {
         handleLimitChange={setLimit}
         page={page}
         limit={limit}
+        totalCount={totalPrograms}
       />
     </div>
   );
