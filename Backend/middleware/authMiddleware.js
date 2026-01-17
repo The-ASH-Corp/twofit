@@ -10,7 +10,9 @@ export const authMiddleware = async (req, res, next) => {
   try {
     const auth = req.headers.authorization;
 
-    if (!auth) return res.status(401).json({ message: "No token provided" });
+    if (!auth) {
+      console.log("no token issue")
+      return res.status(401).json({ message: "No token provided" });}
 
     const token = auth.split(" ")[1];
 
@@ -23,7 +25,10 @@ export const authMiddleware = async (req, res, next) => {
           (await FounderModel.findById(decoded.id).select("-password")) ||
           await CoachModel.findById(decoded.id).select("-password")));
 
-    if (!user) return res.status(401).json({ message: "User not found" });
+    if (!user) {
+      console.log("no user found issue")
+      return res.status(401).json({ message: "User not found" });
+    }
 
     req.user = user;
     next();

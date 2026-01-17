@@ -99,14 +99,46 @@ export const getDashboardData = async (id) => {
 };
 
 
-export const getAllCoachesByHead =async(headId,page,limit)=>{
+export const getAllCoachesByHead = async (headId, page, limit) => {
   const skip = (page - 1) * limit;
 
   const totalAdmins = await AdminModel.find({ headId })
   const totalCount = (await Promise.all(totalAdmins.map(admin => CoachModel.countDocuments({ adminId: admin._id })))).reduce((acc, count) => acc + count, 0);
   const coaches = await Promise.all(totalAdmins.map(admin => CoachModel.find({ adminId: admin._id }).skip(skip).limit(limit).populate("assignedUsers")));
   return {
-    coaches:coaches.flat(),
-    totalCount:totalCount, 
+    coaches: coaches.flat(),
+    totalCount: totalCount,
+  };
+}
+
+export const getAllUsersByHead = async (headId, page, limit) => {
+
+
+  const totalAdmins = await AdminModel.find({ headId })
+
+  // Fetch all coaches to get all potential users
+  const coaches = await Promise.all(totalAdmins.map(admin => CoachModel.find({ adminId: admin._id }).populate("assignedUsers")));
+
+  const allUsers = coaches.flat().flatMap(coach => coach.assignedUsers);
+
+  const uniqueUsersMap = new Map();
+  allUsers.forEach(user => {
+    if (user && user._id) {
+      uniqueUsersMap.set(user._id.toString(), user);
+    }
+  });
+
+  const uniqueUsersList = Array.from(uniqueUsersMap.values());
+
+  const totalCount = uniqueUsersList.length;
+
+  // Apply pagination
+  const startIndex = (page - 1) * limit;
+  const endIndex = startIndex + limit;
+  const paginatedUsers = uniqueUsersList.slice(startIndex, endIndex);
+
+  return {
+    users: paginatedUsers,
+    totalCount: totalCount,
   };
 }

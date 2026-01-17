@@ -91,7 +91,6 @@ export const loginUser = async ({ email, password }) => {
 
 
   const match = await bcrypt.compare(password, user.password);
-  console.log(match);
 
   if (!match) throw new Error("Invalid credentials");
 

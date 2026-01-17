@@ -26,7 +26,7 @@ export default function ProgramTable() {
   }
   useEffect(() => {
     fetchUserPrograms();
-  }, [dispatch, page, limit, user._id]);
+  }, [dispatch, page, limit, user?._id]);
 
   const status = useAppSelector(selectProgramStatus);
   const error = useAppSelector(selectProgramError);

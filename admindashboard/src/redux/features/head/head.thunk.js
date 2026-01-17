@@ -70,3 +70,17 @@ export const getAllCoachesByHead = createAsyncThunk(
         }
     }
 )
+
+export const getAllUsersByHead = createAsyncThunk(
+    "head/get-all-users-by-head",
+    async ({headId,page,limit}, {rejectWithValue}) => {
+        try {
+            const response = await axiosInstance.get(`heads/get-all-users-by-head/${headId}/${page}/${limit}`);
+            return response;
+        } catch (error) {
+             return rejectWithValue(
+               error.response?.data?.message || "Failed to get users by head"
+             );
+        }
+    }
+)

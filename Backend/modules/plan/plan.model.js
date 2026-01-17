@@ -14,6 +14,7 @@ const daySchema = new mongoose.Schema({
 
 const weekSchema = new mongoose.Schema({
     name: { type: String, required: true },
+    title: { type: String },
     days: [daySchema],
 });
 
@@ -30,7 +31,7 @@ const planSchema = new mongoose.Schema(
         },
         program: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "ProgramsList", 
+            ref: "ProgramsList",
             required: true,
         },
         weeks: [weekSchema],
