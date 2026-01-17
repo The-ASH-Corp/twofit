@@ -66,23 +66,33 @@ export const updateWeightService = async (userId, currentWeight) => {
     throw new Error("Current weight is required");
   }
 
-  const user = await User.findByIdAndUpdate(
-    userId,
-    {
-      $set: { currentWeight },
-      $push: {
-        weightHistory: {
-          weight: currentWeight,
-          date: new Date(),
-        },
-      },
-    },
-    { new: true }
-  );
+  const user = await User.findById(userId);
 
   if (!user) {
     throw new Error("User not found");
   }
+
+   if (!user.weightHistory || user.weightHistory.length === 0) {
+    user.weightHistory = [
+      {
+        weight: currentWeight,
+        date: new Date(),
+        isInitial: true, 
+      },
+    ];
+  } else {
+    // Push subsequent weights
+    user.weightHistory.push({
+      weight: currentWeight,
+      date: new Date(),
+      isInitial: false,
+    });
+  }
+
+  // Update current weight
+  user.currentWeight = currentWeight;
+
+  await user.save();
 
   return user;
 };
