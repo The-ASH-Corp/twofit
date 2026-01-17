@@ -90,63 +90,61 @@ const Login = () => {
         </div>
         {/* form */}
         <div className="flex flex-col items-center w-full gap-6">
-          <div className="w-full flex flex-col items-start">
-            <form onSubmit={handleLogin} className="flex flex-col w-full gap-6">
-              <div className="flex flex-col items-start gap-2">
-                <label htmlFor="" className="text-[11px]">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  className="border w-full rounded-md h-10 p-4 text-[12px]"
-                  placeholder="yourname@example.com"
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                />
-              </div>
-              <div className="relative flex flex-col items-start gap-2">
-                <label htmlFor="" className="text-[11px]">
-                  Password
-                </label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  className="border w-full rounded-md h-10 p-4 text-[12px]"
-                  placeholder="Enter your password"
-                  onChange={(e) =>
-                    setFormData({ ...formData, password: e.target.value })
-                  }
-                />
-                <button
-                  type="button"
-                  className="absolute bottom-3.5 right-3"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  <img src={assets.HiddenIcon} alt="" />
-                </button>
-              </div>
-            </form>
-          </div>
-          <div className="w-full flex justify-between items-center">
-            <div className="flex items-center justify-center gap-1">
+          <form onSubmit={handleLogin} className="flex flex-col w-full gap-6">
+            <div className="flex flex-col items-start gap-2">
+              <label htmlFor="" className="text-[11px]">
+                Email Address
+              </label>
               <input
-                type="checkbox"
-                class="h-4 w-4 appearance-none rounded-[4px] border border-[#DBDEDD] bg-[#F0F0F0]"
+                type="email"
+                className="border w-full rounded-md h-10 p-4 text-[12px]"
+                placeholder="yourname@example.com"
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
               />
-              <span className="text-[12px] ">Remember me</span>
             </div>
-            <button className="text-[12px] font-semibold ">
-              Forgot Password?
-            </button>
-          </div>
-          <div className="w-full">
-            <button
-              className="bg-[#0A4F48] w-full py-3.5 rounded-lg text-white font-semibold text-[16px]"
-              onClick={handleLogin}
-            >
-              Login
-            </button>
-          </div>
+            <div className="relative flex flex-col items-start gap-2">
+              <label htmlFor="" className="text-[11px]">
+                Password
+              </label>
+              <input
+                type={showPassword ? "text" : "password"}
+                className="border w-full rounded-md h-10 p-4 text-[12px]"
+                placeholder="Enter your password"
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+              />
+              <button
+                type="button"
+                className="absolute bottom-3.5 right-3"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                <img src={assets.HiddenIcon} alt="" />
+              </button>
+            </div>
+            <div className="w-full flex justify-between items-center">
+              <div className="flex items-center justify-center gap-1">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 appearance-none rounded-[4px] border border-[#DBDEDD] bg-[#F0F0F0]"
+                />
+                <span className="text-[12px] ">Remember me</span>
+              </div>
+              <button type="button" className="text-[12px] font-semibold ">
+                Forgot Password?
+              </button>
+            </div>
+            <div className="w-full">
+              <button
+                type="submit"
+                className="bg-[#0A4F48] w-full py-3.5 rounded-lg text-white font-semibold text-[16px]"
+              >
+                Login
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
