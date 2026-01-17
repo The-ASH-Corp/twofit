@@ -70,3 +70,17 @@ export const getDashboardData = createAsyncThunk(
     }
   }
 );
+
+export const getAdminsByHeadId = createAsyncThunk(
+  "admins/getAdminsByHeadId",
+  async ({headId,page,limit}, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(`/admin/get-admin-by-head/${headId}/${page}/${limit}`);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get admins by head id"
+      );
+    }
+  }
+);

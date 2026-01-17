@@ -169,7 +169,7 @@ export default function Dashboard() {
             {[
               {
                 label: "Total Clients",
-                value: dashboardData?.totalClients,
+                value: dashboardData?.totalClients || 0,
                 icon: <GraduationCap size={22} className="text-white" />,
                 bg: "bg-[#0A4F48]",
               },

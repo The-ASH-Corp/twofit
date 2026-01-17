@@ -4,18 +4,21 @@ import { ExpertColumns } from './ExpertColumns'
 import { useDispatch } from 'react-redux';
 import { getAllCoaches } from '@/redux/features/coach/coach.thunk';
 import { useNavigate } from 'react-router-dom';
+import { getAllCoachesByHead } from '@/redux/features/head/head.thunk';
+import { useAppSelector } from '@/redux/store/hooks';
+import { selectUser } from '@/redux/features/auth/auth.selectores';
 
 export default function ExpertTable() {
 
+  const user =useAppSelector(selectUser)
   const [coaches,setCoaches]=useState([])
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
   
   const dispatch = useDispatch();
   const fetchCoachData=async()=>{
-    const coache =await dispatch(getAllCoaches({page,limit})).unwrap()
-    const clients =coache[0].assignedUsers.length
-    setCoaches(coache)
+    const coache =await dispatch(getAllCoachesByHead({page,limit,headId:user._id})).unwrap()
+    setCoaches(coache.data)
   }
 
   const handlePageChange = (newPage) => {

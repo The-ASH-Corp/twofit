@@ -67,3 +67,17 @@ export const getDashboardData = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 };
+
+export const getAdminByHead =async(req,res)=>{
+  try {
+    const {headId,page,limit} = req.params;
+    const {admin,totalCount} = await service.getAdminByHead({headId,page,limit});
+    res.status(200).json({
+      success: true,
+      data: admin,
+      total: totalCount,
+    });
+  } catch (error) {
+    res.status(400).json({success:false,message:error.message})   
+  }
+}
