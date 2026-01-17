@@ -56,16 +56,31 @@ export const ProgramListColumns = [
   },
 ];
 
-const ActionCell = ({ row }) => { 
+const ActionCell = ({ row }) => {
   const navigate = useNavigate();
+  const { _id, title, plans = [] } = row.original;
+  const hasPlans = plans.length > 0;
+
+  const handleNavigation = () => {
+    if (hasPlans) {
+      navigate("/admin/programs/plans", {
+        state: { programId: _id, title },
+      });
+    } else {
+      navigate("/admin/programs/create", {
+        state: { programId: _id, title },
+      });
+    }
+  };
+
   return (
     <button
-      onClick={() =>  navigate("/admin/programs/create", {
-      state: { programId: row.original._id, title: row.original.title },
-    })}
-      className="flex items-center gap-1.5 px-3 py-1.5 bg-[#EBF3F2] hover:bg-[#dceceb] text-[#0A4F48] text-[11px] font-bold rounded-lg transition-colors"
+      onClick={handleNavigation}
+      className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-lg ${
+        hasPlans ? "bg-[#EBF3F2] text-[#0A4F48]" : "bg-[#0A4F48] text-white"
+      } transition-colors`}
     >
-      View Plan
+      {hasPlans ? "View Plan" : "Add Plan"}
     </button>
   );
 };

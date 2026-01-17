@@ -89,3 +89,17 @@ export const getAllCoachesByHead =async(req,res)=>{
     res.status(400).json({success:false,message:error.message})
   }
 }
+
+export const getAllUsersByHead =async(req,res)=>{
+  try {
+    const {headId,page,limit} = req.params;
+    const {users,totalCount} = await headService.getAllUsersByHead(headId,page,limit);
+    res.status(200).json({
+      success: true,
+      data: users,
+      total: totalCount,
+    });
+  } catch (error) {
+    res.status(400).json({success:false,message:error.message})
+  }
+}

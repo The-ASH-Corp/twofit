@@ -19,7 +19,7 @@ export default function PlanForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  
+
   const [programDetails, setProgramDetails] = useState({
     name: location.state?.title || "", // Initialize with program name from location
     duration: "30 Days",
@@ -29,6 +29,7 @@ export default function PlanForm() {
     {
       id: 1,
       name: "Week 1",
+      title: "Foundation Phase",
       expanded: true,
       days: [
         {
@@ -55,6 +56,14 @@ export default function PlanForm() {
     );
   };
 
+  const updateWeekTitle = (weekId, newTitle) => {
+    setWeeks(
+      weeks.map((week) =>
+        week.id === weekId ? { ...week, title: newTitle } : week
+      )
+    );
+  };
+
   const toggleDay = (weekId, dayId) => {
     setWeeks(
       weeks.map((week) => {
@@ -75,6 +84,7 @@ export default function PlanForm() {
     const newWeek = {
       id: weeks.length + 1,
       name: `Week ${weeks.length + 1}`,
+      title: "",
       expanded: true,
       days: [],
     };
@@ -193,6 +203,7 @@ export default function PlanForm() {
   const handleSave = async () => {
     const cleanedWeeks = weeks.map((week) => ({
       name: week.name,
+      title: week.title,
       days: week.days.map((day) => ({
         name: day.name,
         exercises: (day.exercises || []).map((ex) => {
@@ -208,9 +219,9 @@ export default function PlanForm() {
       program: location.state?.programId,
       weeks: cleanedWeeks,
     };
-    
+
     const data = await dispatch(createNewPlan(payload));
-    
+
     if (data.payload.success) {
       toast.success(data.payload.message);
       navigate(-1); // Navigate back to the previous page
@@ -218,7 +229,6 @@ export default function PlanForm() {
       toast.error(data.payload.message);
     }
   };
-  console.log(location.state)
   return (
     <div className="flex flex-col lg:flex-row gap-6 p-6 min-h-screen bg-[#F8F9FA]">
       {/* Left Content - Form Area */}
@@ -230,7 +240,7 @@ export default function PlanForm() {
               Program Name
             </label>
             <span className="text-sm font-bold text-[#0A4F48]">
-             {location.state?.title}
+              {location.state?.title}
             </span>
           </div>
           <hr className="border-gray-50" />
@@ -305,7 +315,8 @@ export default function PlanForm() {
                     </label>
                     <input
                       type="text"
-                      defaultValue="Foundation Phase"
+                      value={week.title}
+                      onChange={(e) => updateWeekTitle(week.id, e.target.value)}
                       className="w-full p-3 bg-white border border-gray-200 rounded-xl text-sm outline-none focus:border-[#0A4F48] transition-colors"
                       placeholder="Enter week title"
                     />

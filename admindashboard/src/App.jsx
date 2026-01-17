@@ -59,6 +59,7 @@ import AdminClientProfile from "./pages/admin/clients/ClientProfile";
 import AdminAddClient from "./pages/admin/clients/ClientForm";
 import AdminProgramTable from "./pages/admin/programsList/ProgramTable";
 import PlanForm from "./pages/admin/programsList/PlanForm";
+import AdminPlanView from "./pages/admin/programsList/PlanDetailsView"
 //Expert Pages Imports
 import ExpertLayout from "./pages/expert/layout/ExpertLayout";
 import ExpertDashboard from "./pages/expert/Dashboard";
@@ -181,6 +182,7 @@ function App() {
           <Route path="clients/addclient" element={<AdminAddClient />} />
           <Route path="programs" element={<AdminProgramTable />} />
           <Route path="programs/create" element={<PlanForm />} />
+          <Route path="programs/plans" element={<AdminPlanView />} />
         </Route>
 
         {/* EXPERT */}

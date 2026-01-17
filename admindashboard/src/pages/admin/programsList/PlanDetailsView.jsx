@@ -17,6 +17,7 @@ export default function PlanDetailsView() {
 
   const fetchPlanById = async () => {
     const data = await dispatch(getPlanByProgramId(planData?.programId));
+    console.log(data.payload);
     if (data.payload) {
       setProgramDetails({
         name: data.payload.name,

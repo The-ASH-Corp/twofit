@@ -18,8 +18,6 @@ export const createUserByAdmin = async (req, res) => {
 
 export const loginController = async (req, res) => {
   try {
-    console.log(req.body);
-
     let data = await service.loginUser(req.body);
 
 
