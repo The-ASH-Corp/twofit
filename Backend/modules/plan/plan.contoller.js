@@ -50,3 +50,19 @@ export const getPlanByProgramId = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const uploadMedia = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
+    const fileUrl = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+    res.status(200).json({
+      success: true,
+      message: "File uploaded successfully",
+      url: fileUrl,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
