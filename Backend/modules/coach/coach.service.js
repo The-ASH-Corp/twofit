@@ -167,7 +167,7 @@ export const getCoachesByAdmin = async ({ adminIds }) => {
 const calculateAvgRating = (feedback = []) => {
   if (!feedback.length) return 0;
   const total = feedback.reduce((sum, f) => sum + f.rating, 0);
-  return Number((total / feedback.length).toFixed(2));
+  return Number((total / feedback.length).toFixed(1));
 };
 
 
