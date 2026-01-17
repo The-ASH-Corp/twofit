@@ -62,7 +62,9 @@ export const getAllProgramsByCategory = createAsyncThunk(
       const data = await axiosInstance.get(
         `/programs/get-all-programs-by-category/${category}/${page}/${limit}`
       );
+      console.log(data);
       return data;
+      
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to get programs by category"
