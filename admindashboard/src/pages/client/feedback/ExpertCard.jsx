@@ -43,7 +43,7 @@ export default function ExpertCard() {
             <div className="flex-1">
               <h3 className="font-semibold text-sm">{expert?.name}</h3>
               <div className="flex flex-row gap-2">
-                <p className="text-xs text-gray-500 px-3 py-1 rounded-full bg-gray-200 text-black">
+                <p className="text-xs text-gray-500 px-3 py-1 rounded-full bg-gray-200 ">
                   {expert?.role}
                 </p>
                 <p className="text-xs px-3 py-1 rounded-full bg-[#45C4A2] text-white">
