@@ -48,15 +48,15 @@ export const adminCreateUser = async (userData) => {
     duration: userData.duration,
     programEndDate: userData.endDate,
     programStartDate: userData.startDate,
-    dietition: userData.dietician || null,
-    trainer: userData.trainer || null,
-    therapist: userData.therapist || null,
+    dietition: userData.dietician,
+    trainer: userData.trainer,
+    therapist: userData.therapist,
     autoSendGuide: userData.autoSendGuide || false,
     automatedReminder: userData.automatedReminder || false,
     autoSendWelcome: userData.autoSendWelcome || false,
   });
-  const coaches = [userData.dietician, userData.trainer, userData.therapist].filter(Boolean);
-  
+  const coaches = [userData.dietician, userData.trainer, userData.therapist];
+
   await CoachModel.updateMany(
     { _id: { $in: coaches } },
     { $addToSet: { assignedUsers: user._id } },
