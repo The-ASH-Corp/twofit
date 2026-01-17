@@ -42,21 +42,21 @@ export default function FinanceKpi() {
         />
         <KpiCard
           title="Total Payroll"
-          value={`₹ ${totalPayroll.toLocaleString("en-IN")}`}
+          value={`₹ ${totalPayroll?.toLocaleString("en-IN")}`}
           icon={assets.totalPayroll}
           iconClass="bg-[#F4DBC7]"
           bg="#F4DBC7"
         />
         <KpiCard
           title="Pending Payroll"
-          value={`₹ ${pendingPayroll.toLocaleString("en-IN")}`}
+          value={`₹ ${pendingPayroll?.toLocaleString("en-IN")}`}
           icon={assets.pendingPayroll}
           iconClass="bg-[#0A4F48]"
           bg="#0A4F48"
         />
         <KpiCard
           title="Completed Payroll"
-          value={`₹ ${CompletedPayroll.toLocaleString("en-IN")}`}
+          value={`₹ ${CompletedPayroll?.toLocaleString("en-IN")}`}
           icon={assets.totalPayroll}
           iconClass="bg-[#F4DBC7]"
           bg="#F4DBC7"

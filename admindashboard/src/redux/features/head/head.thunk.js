@@ -56,3 +56,17 @@ export const getDashboardData = createAsyncThunk(
         }
     }
 )
+
+export const getAllCoachesByHead = createAsyncThunk(
+    "head/get-all-coaches-by-head",
+    async ({headId,page,limit}, {rejectWithValue}) => {
+        try {
+            const response = await axiosInstance.get(`heads/get-all-coaches-by-head/${headId}/${page}/${limit}`);
+            return response;
+        } catch (error) {
+             return rejectWithValue(
+               error.response?.data?.message || "Failed to get coaches by head"
+             );
+        }
+    }
+)

@@ -3,7 +3,6 @@ import { getAllClients, getClient, getClientsBasedOnCoach } from "./client.thunk
 
 const initialState = {
   allClients: [],
-
   selectedClient: null,
   totalCount: 0,
   error: null,

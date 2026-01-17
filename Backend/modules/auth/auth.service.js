@@ -17,6 +17,8 @@ export const adminCreateUser = async (userData) => {
   console.log("Generated Password for User:", password);
   const hashed = await bcrypt.hash(password, 10);
 
+
+  const initialWeight = userData.currentWeight
   const user = await User.create({
     name: userData.fullname,
     email: userData.email,
@@ -27,8 +29,17 @@ export const adminCreateUser = async (userData) => {
     gender: userData.gender,
     phone: userData.phone,
     address: userData.address,
-    currentWeight: userData.currentWeight,
+    currentWeight: initialWeight,
     targetWeight: userData.targetWeight,
+    weightHistory: initialWeight
+      ? [
+        {
+          weight: initialWeight,
+          date: new Date(),
+          isInitial: true,
+        },
+      ]
+      : [],
     medicalConditions: userData.medicalconditions,
     allergies: userData.allergy,
     goals: userData.fitnessGoal,

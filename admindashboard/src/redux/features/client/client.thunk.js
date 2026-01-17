@@ -63,3 +63,15 @@ export const getAllFeedbacks = createAsyncThunk(
     }
   }
 );
+
+
+export const updateWeightOfClient=createAsyncThunk("client/updateWeight", async({id,weight},{rejectWithValue})=>{
+  try{
+    const data=await axiosInstance.put(`clients/${id}/weight`,{weight})
+    return data.data
+
+  }
+  catch(error){
+    return rejectWithValue(error.response?.data?.message || "Failed to update weight")
+  }
+})

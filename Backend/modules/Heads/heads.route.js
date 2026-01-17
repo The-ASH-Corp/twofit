@@ -10,5 +10,6 @@ router.put("/update/:id", headsController.updateHead);
 router.delete("/delete/:id", headsController.deleteHead);
 
 router.get("/dashboard-data/:id", headsController.getDashboardData)
+router.get("/get-all-coaches-by-head/:headId/:page/:limit",headsController.getAllCoachesByHead)
 
 export default router;
