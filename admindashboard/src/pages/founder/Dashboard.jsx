@@ -310,8 +310,6 @@ const Dashboard = () => {
     },
   ];
 
-  
-
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA] h-[calc(100vh-120px)] overflow-auto  no-scrollbar">
       {/* Summary Cards */}
