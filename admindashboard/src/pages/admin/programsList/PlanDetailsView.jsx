@@ -17,13 +17,66 @@ export default function PlanDetailsView() {
 
   const fetchPlanById = async () => {
     const data = await dispatch(getPlanByProgramId(planData?.programId));
-    console.log(data.payload);
     if (data.payload) {
+      // Aggregate all media from weeks -> days -> exercises
+      const allMedia = [];
+      const addedMedia = new Set(); // To track unique media items
+
+      data.payload.weeks?.forEach((week) => {
+        week.days?.forEach((day) => {
+          day.exercises?.forEach((ex) => {
+            const hasMediaName = !!ex.mediaName;
+            const hasUrl = !!ex.url;
+
+            // Decode URL to ensure matching works if filenames have spaces/special chars
+            let decodedUrl = "";
+            if (hasUrl) {
+              try {
+                decodedUrl = decodeURIComponent(ex.url);
+              } catch (e) {
+                decodedUrl = ex.url;
+              }
+            }
+
+            const isSameResource =
+              hasMediaName && hasUrl && decodedUrl.includes(ex.mediaName);
+
+            if (isSameResource) {
+              if (!addedMedia.has(ex.mediaName)) {
+                allMedia.push({
+                  name: ex.mediaName,
+                  type: "file",
+                  size: "N/A",
+                });
+                addedMedia.add(ex.mediaName);
+              }
+            } else {
+              if (hasMediaName && !addedMedia.has(ex.mediaName)) {
+                allMedia.push({
+                  name: ex.mediaName,
+                  type: "file",
+                  size: "N/A",
+                });
+                addedMedia.add(ex.mediaName);
+              }
+              if (hasUrl && !addedMedia.has(ex.url)) {
+                allMedia.push({
+                  name: ex.url,
+                  type: "link",
+                  size: null,
+                });
+                addedMedia.add(ex.url);
+              }
+            }
+          });
+        });
+      });
+
       setProgramDetails({
         name: data.payload.name,
         duration: data.payload.duration,
         clients: planData?.clients || 0,
-        planMedia: planData?.planMedia || [],
+        planMedia: allMedia,
       });
 
       const formattedWeeks = data.payload.weeks.map((week, index) => ({
@@ -56,8 +109,8 @@ export default function PlanDetailsView() {
   const toggleWeek = (id) => {
     setWeeks(
       weeks.map((week) =>
-        week.id === id ? { ...week, expanded: !week.expanded } : week
-      )
+        week.id === id ? { ...week, expanded: !week.expanded } : week,
+      ),
     );
   };
 
@@ -68,12 +121,12 @@ export default function PlanDetailsView() {
           return {
             ...week,
             days: week.days.map((day) =>
-              day.id === dayId ? { ...day, expanded: !day.expanded } : day
+              day.id === dayId ? { ...day, expanded: !day.expanded } : day,
             ),
           };
         }
         return week;
-      })
+      }),
     );
   };
 
@@ -211,7 +264,9 @@ export default function PlanDetailsView() {
       {/* Right Sidebar */}
       <div className="lg:w-80 flex flex-col gap-4">
         {/* Plan Media */}
-        <div className={`bg-white p-5 rounded-2xl border border-gray-100 shadow-sm ${programDetails?.planMedia?.length > 0 ? "" : "min-h-[25vh]"}`}>
+        <div
+          className={`bg-white p-5 rounded-2xl border border-gray-100 shadow-sm ${programDetails?.planMedia?.length > 0 ? "" : "min-h-[25vh]"}`}
+        >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-bold text-[#011412]">Plan Media</h3>
             <button className="p-1 text-gray-400 hover:text-gray-600">
@@ -229,7 +284,6 @@ export default function PlanDetailsView() {
             ))}
           </div>
         </div>
-
       </div>
     </div>
   );
@@ -386,7 +440,7 @@ const ChangeLogItem = ({ action, user, time }) => {
     <div className="flex items-start gap-3">
       <div
         className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${getColor(
-          user
+          user,
         )} text-sm font-bold`}
       >
         {getInitial(user)}

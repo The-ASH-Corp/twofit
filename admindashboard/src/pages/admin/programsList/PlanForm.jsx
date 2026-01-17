@@ -455,7 +455,6 @@ const PlanSection = ({
   const fileInputRef = useRef(null);
 
   const handleFileChange = async (e) => {
-    console.log("hihihihihihi");
     const file = e.target.files[0];
     if (file) {
       setUploading(true);
