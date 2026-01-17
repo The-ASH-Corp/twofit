@@ -44,7 +44,10 @@ export const getAllHeads = async (page, limit) => {
 };
 
 export const getHeadById = async (id) => {
-  return await HeadsModel.findById(id);
+  return await HeadsModel.findById(id).populate({
+    path: "programCategory",
+    select: "name",
+  });
 };
 
 export const updateHead = async (id, updatedData) => {
