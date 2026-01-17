@@ -8,6 +8,7 @@ import { AdminModel } from "../../modules/admin/admin.model.js";
 import { HeadsModel } from "../Heads/heads.modal.js";
 import { CoachModel } from "../coach/coach.model.js";
 import { FounderModel } from "../../seeds/createAdmin.js";
+import { calculateExtraClientIncentive } from "../payroll/payroll.service.js";
 
 export const adminCreateUser = async (userData) => {
   const exists = await User.findOne({ email: userData.email });
@@ -16,6 +17,8 @@ export const adminCreateUser = async (userData) => {
   console.log("Generated Password for User:", password);
   const hashed = await bcrypt.hash(password, 10);
 
+
+  const initialWeight = userData.currentWeight
   const user = await User.create({
     name: userData.fullname,
     email: userData.email,
@@ -26,8 +29,17 @@ export const adminCreateUser = async (userData) => {
     gender: userData.gender,
     phone: userData.phone,
     address: userData.address,
-    currentWeight: userData.currentWeight,
+    currentWeight: initialWeight,
     targetWeight: userData.targetWeight,
+    weightHistory: initialWeight
+      ? [
+        {
+          weight: initialWeight,
+          date: new Date(),
+          isInitial: true,
+        },
+      ]
+      : [],
     medicalConditions: userData.medicalconditions,
     allergies: userData.allergy,
     goals: userData.fitnessGoal,
@@ -46,11 +58,16 @@ export const adminCreateUser = async (userData) => {
   });
   const coaches = [userData.dietician, userData.trainer, userData.therapist].filter(Boolean);
   
-  await CoachModel.updateMany(
-    { _id: { $in: coaches } },
-    { $addToSet: { assignedUsers: user._id } },
-    { new: true }
-  );
+  for (const coachId of coaches) {
+    await CoachModel.findByIdAndUpdate(
+      coachId,
+      { $addToSet: { assignedUsers: user._id } },
+      { new: true }
+    );
+
+    // Recalculate extra client incentive
+    await calculateExtraClientIncentive(coachId);
+  }
 
   return user;
 };

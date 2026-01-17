@@ -16,11 +16,13 @@ export const allEmployees = async (page, limit) => {
       ...h,
       role: "head",
       netSalary: h.salary,
+      incentives: "N/A",
     })),
     ...admins.map((a) => ({
       ...a,
       role: "admin",
       netSalary: a.salary,
+      incentives: "N/A",
     })),
     ...experts.map((c) => ({
       ...c,
