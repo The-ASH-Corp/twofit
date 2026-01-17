@@ -1,110 +1,56 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { useDispatch } from "react-redux";
+import { getPlanByProgramId } from "@/redux/features/plans/plan.thunk";
 
 export default function PlanDetailsView() {
-    const user =useAppSelector(selectUser);
-    console.log("User in PlanDetailsView:", user?.role);
   const location = useLocation();
-  const planData = location.state?.planData;
+  const planData = location.state;
+
+  const dispatch = useDispatch();
+
+  const [weeks, setWeeks] = useState([]);
+  const [programDetails, setProgramDetails] = useState(null);
+
+  const fetchPlanById = async () => {
+    const data = await dispatch(getPlanByProgramId(planData?.programId));
+    if (data.payload) {
+      setProgramDetails({
+        name: data.payload.name,
+        duration: data.payload.duration,
+        clients: planData?.clients || 0,
+        planMedia: planData?.planMedia || [],
+      });
+
+      const formattedWeeks = data.payload.weeks.map((week, index) => ({
+        ...week,
+        id: week._id,
+        expanded: index === 0,
+        days: week.days.map((day, dIndex) => ({
+          ...day,
+          id: day._id,
+          expanded: dIndex === 0,
+          workoutPlan: day.exercises.map((ex) => ({
+            exercise: ex.name || "N/A",
+            notes: ex.notes || "N/A",
+            url: ex.url || "N/A",
+            media: ex.mediaName || "N/A",
+          })),
+        })),
+      }));
+      setWeeks(formattedWeeks);
+    }
+  };
+
+  useEffect(() => {
+    fetchPlanById();
+  }, []);
+  const user = useAppSelector(selectUser);
 
   // Sample data structure - replace with actual data from API
-  const [programDetails] = useState({
-    name: planData?.name || "Weight Loss",
-    duration: planData?.duration || "30 Days",
-    clients: planData?.clients || 42,
-    planMedia: planData?.planMedia || [
-      { name: "Breakfast-oats.jpg", size: "2.6 MB", type: "image" },
-      { name: "Healthy-snack-almond", size: "", type: "image" },
-      { name: "Healthy-snack-almond.pdf", size: "2.2 MB", type: "pdf" },
-      { name: "Healthy-snack-almond.pdf", size: "2.2 MB", type: "pdf" },
-    ],
-    changeLogs: planData?.changeLogs || [
-      {
-        action: "Updated Week 2 Lunch Items",
-        user: "Dietitian",
-        time: "16:04 PM",
-      },
-      {
-        action: "Added HIT video",
-        user: "Trainer",
-        time: "10:22 PM",
-      },
-      {
-        action: "Updated Therapy media file",
-        user: "Therapist",
-        time: "11:40 PM",
-      },
-    ],
-  });
-
-  const [weeks, setWeeks] = useState(
-    planData?.weeks || [
-      {
-        id: 1,
-        name: "Week 1",
-        title: "Foundation Phase",
-        expanded: true,
-        days: [
-          {
-            id: 1,
-            name: "Day 1",
-            expanded: true,
-            workoutPlan: [
-              {
-                exercise: "Warmup",
-                notes:
-                  "Practice 10 minutes of wind-down breathing before bed.",
-                url: "https://www.youtube.com/watch?v=",
-                media: "Cognitive Behavioral Therapy.mp4",
-              },
-              {
-                exercise: "Bodyweight Squats",
-                notes:
-                  "Practice 10 minutes of wind-down breathing before bed.",
-                url: "https://www.youtube.com/watch?v=",
-                media: "Cognitive Behavioral Therapy.mp4",
-              },
-            ],
-          },
-          {
-            id: 2,
-            name: "Day 2",
-            expanded: false,
-            workoutPlan: [],
-          },
-          {
-            id: 3,
-            name: "Day 3",
-            expanded: false,
-            workoutPlan: [],
-          },
-          {
-            id: 4,
-            name: "Day 4",
-            expanded: false,
-            workoutPlan: [],
-          },
-        ],
-      },
-      {
-        id: 2,
-        name: "Week 2",
-        title: "",
-        expanded: false,
-        days: [],
-      },
-      {
-        id: 3,
-        name: "Week 3",
-        title: "",
-        expanded: false,
-        days: [],
-      },
-    ]
-  );
 
   const toggleWeek = (id) => {
     setWeeks(
@@ -141,7 +87,7 @@ export default function PlanDetailsView() {
               Program Name
             </label>
             <span className="text-sm font-bold text-[#0A4F48]">
-              {programDetails.name}
+              {programDetails?.name}
             </span>
           </div>
           <hr className="border-gray-100" />
@@ -155,7 +101,7 @@ export default function PlanDetailsView() {
                   key={i}
                   disabled
                   className={`px-4 py-1.5 rounded-full text-xs font-medium border ${
-                    programDetails.duration === dur
+                    programDetails?.duration === dur
                       ? "bg-[#EBF3F2] text-[#0A4F48] border-transparent"
                       : "bg-white text-[#66706D] border-gray-200"
                   }`}
@@ -171,7 +117,7 @@ export default function PlanDetailsView() {
               Clients
             </label>
             <span className="text-sm font-bold text-[#0A4F48]">
-              {programDetails.clients} Clients
+              {programDetails?.clients} Clients
             </span>
           </div>
         </div>
@@ -248,9 +194,7 @@ export default function PlanDetailsView() {
                         {/* Day Content */}
                         {day.expanded && day.workoutPlan.length > 0 && (
                           <div className="p-4 bg-white">
-                            <WorkoutPlanSection
-                              workoutPlan={day.workoutPlan}
-                            />
+                            <WorkoutPlanSection workoutPlan={day.workoutPlan} />
                           </div>
                         )}
                       </div>
@@ -266,7 +210,7 @@ export default function PlanDetailsView() {
       {/* Right Sidebar */}
       <div className="lg:w-80 flex flex-col gap-4">
         {/* Plan Media */}
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <div className={`bg-white p-5 rounded-2xl border border-gray-100 shadow-sm ${programDetails?.planMedia?.length > 0 ? "" : "min-h-[25vh]"}`}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-bold text-[#011412]">Plan Media</h3>
             <button className="p-1 text-gray-400 hover:text-gray-600">
@@ -274,7 +218,7 @@ export default function PlanDetailsView() {
             </button>
           </div>
           <div className="flex flex-col gap-2.5">
-            {programDetails.planMedia.map((media, index) => (
+            {programDetails?.planMedia?.map((media, index) => (
               <MediaItem
                 key={index}
                 name={media.name}
@@ -285,25 +229,6 @@ export default function PlanDetailsView() {
           </div>
         </div>
 
-        {/* Change Logs */}
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-[#011412]">Change Logs</h3>
-            <button className="p-1 text-gray-400 hover:text-gray-600">
-              <MoreHorizontal size={18} />
-            </button>
-          </div>
-          <div className="flex flex-col gap-3">
-            {programDetails.changeLogs.map((log, index) => (
-              <ChangeLogItem
-                key={index}
-                action={log.action}
-                user={log.user}
-                time={log.time}
-              />
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   );

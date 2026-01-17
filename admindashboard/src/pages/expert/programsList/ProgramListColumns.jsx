@@ -37,8 +37,6 @@ export const ProgramListColumns = [
       <span className=" capitalize">{row.original.category?.name || "—"}</span>
     ),
   },
-  { accessorKey: "linkedTemplate", header: "Linked Template" },
-
   {
     accessorKey: "status",
     header: "Status",
@@ -69,7 +67,10 @@ const ActionCell = ({ row }) => {
   if (localRole === "expert" && user?.role === "Dietician") {
     return null;
   }
-  
+  const hasPlans = row.original.plans?.length > 0;
+
+  if (!hasPlans) return null;
+
   return (
     <button
       onClick={() =>
