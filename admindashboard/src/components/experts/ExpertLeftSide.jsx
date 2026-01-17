@@ -69,7 +69,7 @@ const ExpertLeftSide = ({ expert }) => {
     {
       label: "Specialization",
       content:
-        expert?.specialization ||
+        expert?.specialization.join(", ") ||
         "PCOD Diet Plans, Therapeutic Diets, Weight-loss Programs, Thyroid",
     },
     { label: "Experience", content: expert?.experience || "7 Years" },
@@ -111,7 +111,7 @@ const ExpertLeftSide = ({ expert }) => {
             {expert?.role || "Dietitian"}
           </span>
           <span className="px-2.5 sm:px-3 py-1 bg-[#FAF3E0] rounded-full text-[9px] sm:text-[10px] font-bold text-[#DAA520] flex items-center gap-1">
-            <Star size={10} fill="currentColor" /> {expert?.rating || "0"}
+            <Star size={10} fill="currentColor" /> {expert?.avgRating || "0"}
           </span>
           <span className="px-2.5 sm:px-3 py-1 bg-[#E7F9F4] rounded-full text-[9px] sm:text-[10px] font-bold text-[#00A389]">
             {expert?.status || "Active"}
@@ -136,7 +136,7 @@ const ExpertLeftSide = ({ expert }) => {
       </div>
 
       {/* Chat Monitoring */}
-      {(!isFounderPage && !isHeadPage) && (
+      {!isFounderPage && !isHeadPage && (
         <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm">
           <h3 className="text-sm font-bold text-[#0A4F48] mb-1">
             Chat Monitoring
