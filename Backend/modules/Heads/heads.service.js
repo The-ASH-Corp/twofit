@@ -97,3 +97,16 @@ export const getDashboardData = async (id) => {
     totalTherapists,
   };
 };
+
+
+export const getAllCoachesByHead =async(headId,page,limit)=>{
+  const skip = (page - 1) * limit;
+
+  const totalAdmins = await AdminModel.find({ headId })
+  const totalCount = (await Promise.all(totalAdmins.map(admin => CoachModel.countDocuments({ adminId: admin._id })))).reduce((acc, count) => acc + count, 0);
+  const coaches = await Promise.all(totalAdmins.map(admin => CoachModel.find({ adminId: admin._id }).skip(skip).limit(limit).populate("assignedUsers")));
+  return {
+    coaches:coaches.flat(),
+    totalCount:totalCount, 
+  };
+}

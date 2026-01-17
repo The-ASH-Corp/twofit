@@ -45,7 +45,11 @@ export const AdminColumns = [
     }
    },
      { accessorKey: "specialization", header: "Specialisation" },
-     { accessorKey: "experts", header: "Experts" },
+       {
+    accessorKey: "experts",
+    header: "Experts",
+    cell: ({ row }) => row.original.experts?.length || 0,
+  },
   {
     accessorKey: "status",
     header: "Status",
