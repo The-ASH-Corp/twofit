@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import { assets } from "../assets/asset";
 import { login } from "@/redux/features/auth/auth.thunk";
 import { useDispatch } from "react-redux";
-// import { useAppSelector } from "@/redux/store/hooks";
-// import { selectToken, selectUser } from "@/redux/features/auth/auth.selectores";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -26,68 +24,40 @@ const Login = () => {
     user: "/client",
   };
 
- 
-  // const handleLogin = async () => {
-  //   try {
-  //     const result = await dispatch(login(formData)).unwrap();
-  //     console.log("LOGIN RESPONSE:", result);
-  //     console.log("USER DETAILS:", result.user);
-
-  //     const role = result.user.role;
-
-  //     localStorage.setItem("token", result.accessToken);
-  //     localStorage.setItem("role", role);
-
-  //     const redirectPath = ROLE_REDIRECT[role];
-
-  //     if (!redirectPath) {
-  //       throw new Error("Unknown role");
-  //     }
-
-  //     navigate(redirectPath, { replace: true });
-  //   } catch (error) {
-  //     console.error("Login failed:", error);
-  //     alert(error?.message || "Invalid email or password");
-  //   }
-  // };
-
   const resolveRole = (role) => {
-  if (!role) return null;
+    if (!role) return null;
 
-  const normalizedRole = role.toLowerCase();
+    const normalizedRole = role.toLowerCase();
 
-  if (["therapist", "dietician", "trainer"].includes(normalizedRole)) {
-    return "expert";
-  }
-
-  return normalizedRole;
-};
-
-  const handleLogin = async () => {
-  try {
-    const result = await dispatch(login(formData)).unwrap();
-
-    const finalRole = resolveRole(result.user.role);
-
-    localStorage.setItem("token", result.accessToken);
-    localStorage.setItem("role", finalRole);
-
-    const redirectPath = ROLE_REDIRECT[finalRole];
-
-    if (!redirectPath) {
-      throw new Error("Unknown role");
+    if (["therapist", "dietician", "trainer"].includes(normalizedRole)) {
+      return "expert";
     }
 
-    navigate(redirectPath, { replace: true });
-  } catch (error) {
-    console.error("Login failed:", error);
-    alert(error?.message || "Invalid email or password");
-  }
-};
+    return normalizedRole;
+  };
 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const result = await dispatch(login(formData)).unwrap();
 
+      const finalRole = resolveRole(result.user.role);
 
-  
+      localStorage.setItem("token", result.accessToken);
+      localStorage.setItem("role", finalRole);
+
+      const redirectPath = ROLE_REDIRECT[finalRole];
+
+      if (!redirectPath) {
+        throw new Error("Unknown role");
+      }
+
+      navigate(redirectPath, { replace: true });
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert(error?.message || "Invalid email or password");
+    }
+  };
 
   return (
     <div className="h-screen w-full flex items-center justify-between ">
@@ -121,7 +91,7 @@ const Login = () => {
         {/* form */}
         <div className="flex flex-col items-center w-full gap-6">
           <div className="w-full flex flex-col items-start">
-            <form action="" className="flex flex-col w-full gap-6">
+            <form onSubmit={handleLogin} className="flex flex-col w-full gap-6">
               <div className="flex flex-col items-start gap-2">
                 <label htmlFor="" className="text-[11px]">
                   Email Address
@@ -148,6 +118,7 @@ const Login = () => {
                   }
                 />
                 <button
+                  type="button"
                   className="absolute bottom-3.5 right-3"
                   onClick={() => setShowPassword(!showPassword)}
                 >
