@@ -1,14 +1,14 @@
 import { assets } from "@/assets/asset";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ProgressChart from "../components/ProgressChart";
 import WeightChart from "../components/Measeurement";
 import WeightUpdate from "./WeightUpdate";
 import MeasurementUpdate from "./MeasurementUpdate";
+import HoldPlan from "./HoldPlan";
+import ExtendPlan from "./ExtendPlan";
 import { Download, X } from "lucide-react";
 import { Bar } from "react-chartjs-2";
-import { selectSelectedClient } from "@/redux/features/client/client.selectors";
-import { useAppSelector } from "@/redux/store/hooks";
-import { selectUser } from "@/redux/features/auth/auth.selectores";
+import MobileBottomNav from "../components/MobileBottomNav";
 
 export default function Progress() {
   const [isOpen, setIsOpen] = useState(false);
@@ -187,18 +187,31 @@ export default function Progress() {
       },
     },
   };
+
   return (
     <>
-      {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      {/* Header - Desktop */}
+      <div className="hidden lg:flex justify-between items-center mb-6">
         <h1 className="text-[#0A4F48] font-bold text-[20px]">
           Overall Progress
         </h1>
         <div className="flex gap-3">
-          <button className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-gray-50 transition-colors">
+          <button
+            onClick={() => {
+              setIsOpen(true);
+              setPanelType("hold");
+            }}
+            className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-gray-50 transition-colors"
+          >
             Hold Plan
           </button>
-          <button className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-[#083d38] transition-colors">
+          <button
+            onClick={() => {
+              setIsOpen(true);
+              setPanelType("extend");
+            }}
+            className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-[#083d38] transition-colors"
+          >
             Extend Plan
           </button>
           <button className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-[#083d38] transition-colors flex items-center gap-2">
@@ -208,7 +221,21 @@ export default function Progress() {
         </div>
       </div>
 
-      <div className="grid grid-cols-[1fr_350px] gap-6">
+      {/* Mobile Header */}
+      <div className="lg:hidden mb-4">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-[#0A4F48] font-semibold text-[16px]">
+            Overall Progress
+          </h1>
+          <button className="bg-[#0A4F48] text-white px-3 py-2 rounded-lg text-[12px] font-medium flex items-center gap-2">
+            <span>PDF</span>
+            <Download className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop Layout */}
+      <div className="hidden lg:grid lg:grid-cols-[1fr_350px] gap-6">
         {/* Main Content */}
         <div className="space-y-6">
           {/* KPI Cards */}
@@ -350,22 +377,176 @@ export default function Progress() {
         </div>
       </div>
 
-      {/* Update Drawer */}
+      {/* Mobile Layout */}
+      <div className="lg:hidden space-y-4 pb-20">
+        {/* KPI Grid */}
+        <div className="grid grid-cols-2 gap-3">
+          {kpiData.map((kpi, index) => (
+            <div key={index} className="bg-white rounded-xl p-4 shadow-sm">
+              <div className="flex items-start justify-between mb-2">
+                <p className="text-[11px] text-gray-600 font-medium leading-tight">
+                  {kpi.title}
+                </p>
+                <div
+                  className="w-10 h-10 flex items-center justify-center rounded-full flex-shrink-0"
+                  style={{ backgroundColor: kpi.bg }}
+                >
+                  <img
+                    src={kpi.icon}
+                    alt={kpi.title}
+                    className="w-4 h-4"
+                    style={{
+                      filter: kpi.iconColor
+                        ? "brightness(0) invert(1)"
+                        : "none",
+                    }}
+                  />
+                </div>
+              </div>
+              <h2 className="text-[20px] font-bold text-[#0A4F48]">
+                {kpi.value}
+              </h2>
+            </div>
+          ))}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3">
+          <button
+            onClick={() => {
+              setIsOpen(true);
+              setPanelType("hold");
+            }}
+            className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg text-[13px] font-medium"
+          >
+            Hold Plan
+          </button>
+          <button
+            onClick={() => {
+              setIsOpen(true);
+              setPanelType("extend");
+            }}
+            className="flex-1 bg-[#0A4F48] text-white py-3 rounded-lg text-[13px] font-medium"
+          >
+            Extend Plan
+          </button>
+        </div>
+
+        {/* Weight Progress Card */}
+        <div className="bg-white rounded-xl p-4 shadow-sm">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-[#0A4F48] font-semibold text-[14px]">
+              Weight Progress
+            </h3>
+            <button
+              onClick={() => {
+                setIsOpen(true);
+                setPanelType("weight");
+              }}
+              className="bg-[#0A4F48] text-white px-3 py-1.5 rounded-lg text-[12px] font-medium"
+            >
+              Update
+            </button>
+          </div>
+          <ProgressChart />
+        </div>
+
+        {/* Measurements Card */}
+        <div className="bg-white rounded-xl p-4 shadow-sm">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-[#0A4F48] font-semibold text-[14px]">
+              Measurements
+            </h3>
+            <button
+              onClick={() => {
+                setIsOpen(true);
+                setPanelType("measurement");
+              }}
+              className="bg-[#0A4F48] text-white px-3 py-1.5 rounded-lg text-[12px] font-medium"
+            >
+              Update
+            </button>
+          </div>
+          <div className="h-[220px] w-full">
+            <Bar data={measurementsData} options={chartOptions} />
+          </div>
+        </div>
+
+        {/* Streaks Card */}
+        <div className="bg-white rounded-xl p-4 shadow-sm">
+          <h3 className="text-[#0A4F48] font-semibold text-[14px] mb-3">
+            Streaks
+          </h3>
+          <div className="space-y-2">
+            <div className="bg-gray-50 rounded-lg p-3 flex justify-between items-center">
+              <p className="text-[12px] font-medium text-gray-700">
+                Active Streak
+              </p>
+              <p className="text-[#0A4F48] font-bold text-[14px]">12 Days</p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3 flex justify-between items-center">
+              <p className="text-[12px] font-medium text-gray-700">
+                Longest Streak
+              </p>
+              <p className="font-bold text-[14px] text-gray-800">16 Days</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Compliance Card */}
+        <div className="bg-white rounded-xl p-4 shadow-sm">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-[#0A4F48] font-semibold text-[14px]">
+              Compliance
+            </h3>
+            <span className="text-[16px] font-bold text-gray-800">78%</span>
+          </div>
+          <div className="space-y-2">
+            {compliance.map((item, i) => (
+              <div
+                key={i}
+                className="relative bg-gray-50 rounded-lg p-3 pl-4"
+              >
+                <div
+                  className="absolute left-0 top-0 w-1 h-full rounded-l-lg"
+                  style={{ background: item.color }}
+                />
+                <div className="flex items-center justify-between">
+                  <p className="text-[12px] font-medium text-gray-700">
+                    {item.title}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-gray-400 font-medium">
+                      {item.missed}
+                    </span>
+                    <span className="text-[12px] font-bold text-[#0A4F48]">
+                      {item.percentage}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Update Drawer/Modal */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex justify-end">
           {/* Overlay */}
           <div
-            className="absolute inset-0 bg-black/5 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/20 backdrop-blur-sm"
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Drawer */}
-          <div className="relative w-[400px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+          {/* Drawer - Full screen on mobile, sidebar on desktop */}
+          <div className="relative w-full lg:w-[400px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
             <div className="flex justify-between items-center p-6 pb-4 border-b border-gray-100">
               <h2 className="font-bold text-[18px] text-[#0A4F48]">
-                {panelType === "weight"
-                  ? "Update Weight"
-                  : "Update Measurements"}
+                {panelType === "weight" && "Update Weight"}
+                {panelType === "measurement" && "Update Measurements"}
+                {panelType === "hold" && "Hold Plan"}
+                {panelType === "extend" && "Extend Plan"}
               </h2>
               <button
                 onClick={() => setIsOpen(false)}
@@ -376,12 +557,23 @@ export default function Progress() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-6">
-              {panelType === "weight" && <WeightUpdate />}
-              {panelType === "measurement" && <MeasurementUpdate />}
+              {panelType === "weight" && (
+                <WeightUpdate onClose={() => setIsOpen(false)} />
+              )}
+              {panelType === "measurement" && (
+                <MeasurementUpdate onClose={() => setIsOpen(false)} />
+              )}
+              {panelType === "hold" && (
+                <HoldPlan onClose={() => setIsOpen(false)} />
+              )}
+              {panelType === "extend" && (
+                <ExtendPlan onClose={() => setIsOpen(false)} />
+              )}
             </div>
           </div>
         </div>
       )}
+      <MobileBottomNav />
     </>
   );
 }
