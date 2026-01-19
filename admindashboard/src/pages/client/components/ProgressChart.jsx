@@ -8,9 +8,6 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
- import { weightProgress } from "@/assets/weeklyCompliance";
-import { useAppSelector } from "@/redux/store/hooks";
-import { selectCurrentWeight, selectWeightHistory } from "@/redux/features/client/client.selectors";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
 import { fetchClientWeightHistory } from "@/redux/features/client/client.thunk";
@@ -20,23 +17,12 @@ export default function ProgressChart() {
 
   const customTicks = [0, 30, 60, 90, 120];
 
-//   const weightHistory = useAppSelector(selectWeightHistory);
-//   const currentWeight = useAppSelector(selectCurrentWeight);
-//   const clientState = useAppSelector(state => state.client);
-// console.log("CLIENT STATE:", clientState);
-
-// console.log("Redux weightHistory:", weightHistory);
-
-//   useEffect(() => {
-//     dispatch(fetchClientWeightHistory());
-//   }, [dispatch]);
  const [weight, setWeight] = useState([]);
 
 useEffect(() => {
   dispatch(fetchClientWeightHistory())
     .unwrap()
     .then((data) => {
-      console.log("UNWRAPPED DATA:", data);  
       setWeight(data.weightHistory);
     })
     .catch((err) => {
@@ -48,8 +34,6 @@ const currentWeight =
   weight.length > 0 ? weight[weight.length - 1].weight : 0;
 const weightChange = currentWeight - startWeight;
 
-
-console.log("WEIGHT HISTORY:", weight);
   return (
     <div className="h-[250px] w-full mt-4">
       <ResponsiveContainer width="100%" height="100%">

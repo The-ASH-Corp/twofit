@@ -69,7 +69,6 @@ const clientSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchClientWeightHistory.fulfilled, (state, action) => {
-         console.log("FULFILLED PAYLOAD:", action.payload);
         state.status = "succeeded";
         state.weightHistory = action.payload?.weightHistory ?? [];
         state.currentWeight = action.payload?.currentWeight ?? null;

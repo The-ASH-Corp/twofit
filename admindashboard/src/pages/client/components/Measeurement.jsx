@@ -23,7 +23,6 @@ const dispatch = useDispatch();
       </div>
     );
   }
-  console.log("History:", history);
 
   const start = history[0];
   const current = history[history.length - 1];
