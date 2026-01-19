@@ -91,50 +91,50 @@ const ExpertCenterSide = ({ expert }) => {
     },
   ];
 
-  const assignedClients = [
-    {
-      name: "Aarav Kumar",
-      program: "Weight Loss",
-      compliance: "78%",
-      status: "Active",
-    },
-    {
-      name: "Manoj S",
-      program: "Thyroid",
-      compliance: "82%",
-      status: "Inactive",
-    },
-    {
-      name: "Lydia Thomas",
-      program: "PCOD",
-      compliance: "63%",
-      status: "Active",
-    },
-    {
-      name: "George Philip",
-      program: "Weight Gain",
-      compliance: "71%",
-      status: "Active",
-    },
-    {
-      name: "Neha Sugathan",
-      program: "Postpartum",
-      compliance: "59%",
-      status: "Inactive",
-    },
-    {
-      name: "Aarav Kumar",
-      program: "Weight Loss",
-      compliance: "78%",
-      status: "Active",
-    },
-    {
-      name: "Aarav Kumar",
-      program: "Weight Loss",
-      compliance: "78%",
-      status: "Active",
-    },
-  ];
+  // const assignedClients = [
+  //   {
+  //     name: "Aarav Kumar",
+  //     program: "Weight Loss",
+  //     compliance: "78%",
+  //     status: "Active",
+  //   },
+  //   {
+  //     name: "Manoj S",
+  //     program: "Thyroid",
+  //     compliance: "82%",
+  //     status: "Inactive",
+  //   },
+  //   {
+  //     name: "Lydia Thomas",
+  //     program: "PCOD",
+  //     compliance: "63%",
+  //     status: "Active",
+  //   },
+  //   {
+  //     name: "George Philip",
+  //     program: "Weight Gain",
+  //     compliance: "71%",
+  //     status: "Active",
+  //   },
+  //   {
+  //     name: "Neha Sugathan",
+  //     program: "Postpartum",
+  //     compliance: "59%",
+  //     status: "Inactive",
+  //   },
+  //   {
+  //     name: "Aarav Kumar",
+  //     program: "Weight Loss",
+  //     compliance: "78%",
+  //     status: "Active",
+  //   },
+  //   {
+  //     name: "Aarav Kumar",
+  //     program: "Weight Loss",
+  //     compliance: "78%",
+  //     status: "Active",
+  //   },
+  // ];
 
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -164,7 +164,7 @@ const ExpertCenterSide = ({ expert }) => {
   };
 
   return (
-    <div className="w-full flex flex-col gap-4 sm:gap-6 overflow-y-auto no-scrollbar pb-4 sm:pb-6 px-0 sm:px-1">
+    <div className="w-full flex flex-col gap-4 sm:gap-6  pb-4 sm:pb-6 px-0 sm:px-1">
       {/* Rating Score Card */}
       <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
@@ -390,7 +390,7 @@ const ExpertCenterSide = ({ expert }) => {
               {[...Array(totalPages)].map((_, i) => (
                 <button
                   key={i + 1}
-                  className={`w-7 h-7 sm:w-8 sm:h-8 rounded-md text-xs font-bold transition-colors flex-shrink-0 ${
+                  className={`w-7 h-7 sm:w-8 sm:h-8 rounded-md text-xs font-bold transition-colors shrink-0 ${
                     currentPage === i + 1
                       ? "bg-[#0A4F48] text-white"
                       : "text-[#66706D] hover:bg-gray-50"

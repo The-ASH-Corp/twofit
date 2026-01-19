@@ -16,11 +16,11 @@ export default function FinanceKpi() {
 
   return (
     <div className="relative flex flex-col items-center gap-4 w-full bg-white p-5 rounded-xl mb-4 h-[calc()]">
-      <div className="flex items-center justify-between w-full">
+      <div className="flex flex-col md:flex-row gap-3 md:gap-0 items-start md:items-center md:justify-between w-full">
         <h2 className="text-[#0A4F48] font-bold text-[16px]">
           Salary & Incentives Overview
         </h2>
-        <div className="flex items-center gap-2.5">
+        <div className="flex justify-end items-center gap-2.5 w-full">
           <button className="text-[12px] font-semibold px-3.5 py-2.5 bg-[#EBF3F2] rounded-md">
             Incentives
           </button>
@@ -32,7 +32,7 @@ export default function FinanceKpi() {
           </button>
         </div>
       </div>
-      <div className="flex gap-4 justify-between  w-full">
+      <div className="flex flex-col lg:flex-row gap-4 justify-between  w-full">
         <KpiCard
           title="Total Employees"
           value={count}
