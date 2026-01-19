@@ -1,9 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TaskModal from "./TaskModal";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { getProgramById } from "@/redux/features/program/program.thunk";
+import { useDispatch } from "react-redux";
 
 export default function TaskList() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const user =useAppSelector(selectUser)
+  const dispatch = useDispatch();
+  const [plans, setPlans] = useState([])
+
+  const fetchProgramData = async () => {
+    const data = await  dispatch(getProgramById(user?.programType)).unwrap();
+    setPlans(data.plan);
+  }
+  useEffect(() => {
+    fetchProgramData();
+  }, []);
+  console.log(plans,"plams");
   const list = [
     {
       type: "Breakfast",

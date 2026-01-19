@@ -13,9 +13,8 @@ const menuItems = [
   },
   { label: "Daily Plan", icon: assets.clients, path: "/client/daily-plan" },
   { label: "Progress", icon: assets.experts, path: "/client/progress" },
-  { label: "Messages", icon: assets.website, path: "/client/chats" },
+  { label: "Messages", icon: assets.chats, path: "/client/chats" },
   { label: "Feedback", icon: assets.website, path: "/client/feedback" },
-  // { label: "support", icon: assets.finance, path: "/expert/finance" },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
@@ -65,7 +64,7 @@ export default function Sidebar({ isOpen, onClose }) {
             <NavLink
               to={item.path}
               key={item.label}
-              end={item.path === "/admin"}
+              end={item.path === "/client"}
               onClick={() => {
                 if (window.innerWidth < 1024) onClose();
               }}

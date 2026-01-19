@@ -21,19 +21,17 @@ const programSchema = new mongoose.Schema(
       required: true,
     },
 
-    // template: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Template",
-    //   required: true,
-    // },
+    plan: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Plan",
+    },
+    
     status:{
       type:String,
       enum:["draft","published"],
       default:"draft"
     }
   },
-  
-
   {
     timestamps: true,
   }
