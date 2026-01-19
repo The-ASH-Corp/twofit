@@ -20,7 +20,7 @@ export default function MobileBottomNav() {
     {
       name: "Message",
       icon: MessageCircle,
-      path: "/client/messages",
+      path: "/client/chats",
     },
     {
       name: "Progress",

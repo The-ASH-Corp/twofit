@@ -5,7 +5,7 @@ import { assets } from "@/assets/asset";
 export default function TaskModal({ task, onClose }) {
   const [fileName, setFileName] = useState("Upload File");
   const [showVideoModal, setShowVideoModal] = useState(false);
-console.log(task)
+
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       {/* Overlay */}
@@ -15,7 +15,7 @@ console.log(task)
       />
 
       {/* Drawer */}
-      <div className="relative w-[400px] h-full bg-white shadow-2xl flex flex-col p-6 animate-in slide-in-from-right duration-300">
+      <div className="relative w-full max-w-[400px] h-full bg-white shadow-2xl flex flex-col p-6 pb-24 lg:pb-6 animate-in slide-in-from-right duration-300">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-[#0A4F48] text-[18px] font-bold">{task.type|| task.name}</h1>
           <button
@@ -26,7 +26,7 @@ console.log(task)
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto space-y-6 pr-2 -mr-2 scrollbar-hide">
+        <div className="flex-1 overflow-y-auto space-y-6 pr-2 -mr-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="w-full aspect-video rounded-2xl overflow-hidden shadow-sm">
             <img
               src={"src/assets/Workout.png"}
@@ -92,7 +92,7 @@ console.log(task)
           </div>
         </div>
 
-        <div className="flex justify-between gap-3 pt-6 mt-6 border-t border-gray-50">
+        <div className="flex justify-between gap-3 pt-6 mt-6 border-t border-gray-50 bg-white">
           <button
             onClick={onClose}
             className="flex-1 bg-gray-100 text-gray-600 px-6 py-3.5 rounded-xl text-[14px] font-bold hover:bg-gray-200 transition-colors"

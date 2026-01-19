@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import DailyTaskDrawer from "./DailyTaskDrawer";
+import MobileBottomNav from "../components/MobileBottomNav";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -129,18 +130,18 @@ export default function DailyPlan() {
   };
 
   return (
-    <div className="bg-white rounded-2xl p-8 shadow-sm">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="font-bold text-[20px] text-[#0A4F48]">
+    <div className="bg-white lg:rounded-2xl lg:p-8 p-4 lg:shadow-sm">
+      <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 lg:gap-0 mb-6 lg:mb-8">
+        <h2 className="font-bold text-[18px] lg:text-[20px] text-[#0A4F48]">
           {monthNames[currentMonth]} {currentYear}
         </h2>
 
-        <div className="flex gap-4 items-center">
-          <div className="relative">
+        <div className="flex gap-3 lg:gap-4 items-center">
+          <div className="relative flex-1 lg:flex-initial">
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="appearance-none bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 pr-10 text-[13px] font-medium text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0A4F48]/20"
+              className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-lg px-3 lg:px-4 py-2 pr-10 text-[12px] lg:text-[13px] font-medium text-gray-700 cursor-pointer hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-[#0A4F48]/20"
             >
               <option>All Status</option>
               <option>Skipped</option>
@@ -180,13 +181,14 @@ export default function DailyPlan() {
         </div>
       </div>
 
-      <div className="grid grid-cols-7 mb-4">
-        {days.map((d) => (
+      <div className="grid grid-cols-7 mb-3 lg:mb-4">
+        {days.map((d, idx) => (
           <div
             key={d}
-            className="text-center text-[13px] font-medium text-gray-500 py-3"
+            className="text-center text-[11px] lg:text-[13px] font-medium text-gray-500 py-2 lg:py-3"
           >
-            {d}
+            <span className="hidden lg:inline">{d}</span>
+            <span className="lg:hidden">{d.charAt(0)}</span>
           </div>
         ))}
       </div>
@@ -210,14 +212,14 @@ export default function DailyPlan() {
             <div
               key={index}
               onClick={() => handleDateClick(fullDate)}
-              className={`min-h-[120px] border-r border-b border-gray-200 p-3 relative cursor-pointer hover:bg-gray-50/50 transition-colors ${
+              className={`min-h-[80px] lg:min-h-[120px] border-r border-b border-gray-200 p-2 lg:p-3 relative cursor-pointer hover:bg-gray-50/50 transition-colors ${
                 !isCurrentMonth ? "bg-gray-50/30" : ""
               }`}
             >
               {isCurrentMonth && (
                 <>
                   <span
-                    className={`text-[13px] font-medium ${
+                    className={`text-[11px] lg:text-[13px] font-medium ${
                       !isCurrentMonth ? "text-gray-400" : "text-gray-700"
                     }`}
                   >
@@ -226,24 +228,24 @@ export default function DailyPlan() {
 
                   {/* TODAY Badge */}
                   {fullDate === today && (
-                    <div className="absolute bottom-3 left-3 right-3 bg-[#0A4F48] text-white text-[11px] font-bold py-1.5 rounded-lg text-center">
+                    <div className="absolute bottom-2 lg:bottom-3 left-2 lg:left-3 right-2 lg:right-3 bg-[#0A4F48] text-white text-[9px] lg:text-[11px] font-bold py-1 lg:py-1.5 rounded-lg text-center">
                       Today
                     </div>
                   )}
 
                   {/* TASKS */}
-                  <div className="mt-2 space-y-1.5">
+                  <div className="mt-1.5 lg:mt-2 space-y-1">
                     {filteredTasks?.map((task, i) => (
                       <div
                         key={i}
-                        className={`text-[11px] font-medium px-2 py-1 rounded border ${
+                        className={`text-[9px] lg:text-[11px] font-medium px-1.5 lg:px-2 py-0.5 lg:py-1 rounded border truncate ${
                           task.type === "skipped"
                             ? "bg-[#FFFBF0] border-[#FFE4A3] text-[#B8860B]"
                             : "bg-[#FFF5F5] border-[#FFC9C9] text-[#C53030]"
                         }`}
                       >
-                        {task.count} Task -{" "}
-                        {task.type.charAt(0).toUpperCase() + task.type.slice(1)}
+                        <span className="hidden lg:inline">{task.count} Task - {task.type.charAt(0).toUpperCase() + task.type.slice(1)}</span>
+                        <span className="lg:hidden">{task.type.charAt(0).toUpperCase() + task.type.slice(1).substring(0, 5)}...</span>
                       </div>
                     ))}
                   </div>
@@ -259,6 +261,7 @@ export default function DailyPlan() {
         tasks={selectedDate ? calendarData[selectedDate]?.tasks : null}
         onClose={() => setSelectedDate(null)}
       />
+      <MobileBottomNav />
     </div>
   );
 }
