@@ -25,7 +25,7 @@ const HeadLeftSide = ({ Head }) => {
   ];
 
   return (
-    <div className="w-[38%] flex flex-col gap-4 h-">
+    <div className=" flex flex-col gap-4 h-">
       <div className="bg-white rounded-2xl p-8 flex flex-col gap-8 shadow-sm ">
         {/* Header with Name and Badges */}
         <div className="flex items-center gap-4">

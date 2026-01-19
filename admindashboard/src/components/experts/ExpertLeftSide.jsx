@@ -72,7 +72,10 @@ const ExpertLeftSide = ({ expert }) => {
         expert?.specialization.join(", ") ||
         "PCOD Diet Plans, Therapeutic Diets, Weight-loss Programs, Thyroid",
     },
-    { label: "Experience", content: expert?.experience || "7 Years" },
+    {
+      label: "Experience",
+      content: expert?.experience ? `${expert.experience} Years` : "7 Years",
+    },
     {
       label: "Certifications",
       content: expert?.qualification || "M.Sc. Clinical Nutrition",
@@ -86,12 +89,12 @@ const ExpertLeftSide = ({ expert }) => {
     },
   ];
 
-  const isFounderPage = useMatch("/founder/experts/profile/:id") 
-  const isHeadPage = useMatch("/head/experts/profile/:id")
+  const isFounderPage = useMatch("/founder/experts/profile/:id");
+  const isHeadPage = useMatch("/head/experts/profile/:id");
   // console.log(isFounderPage);
 
   return (
-    <div className="w-full flex flex-col gap-4 sm:gap-6 overflow-y-auto no-scrollbar pb-4 sm:pb-6">
+    <div className="w-full flex flex-col gap-4 sm:gap-6  pb-4 sm:pb-6">
       {/* Profile Card */}
       <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm relative flex flex-col items-center">
         <button className="absolute top-3 sm:top-4 right-3 sm:right-4 text-gray-400 hover:text-gray-600 transition-colors">
@@ -122,12 +125,12 @@ const ExpertLeftSide = ({ expert }) => {
           {profileDetails.map((item, i) => (
             <div
               key={i}
-              className="flex justify-between items-center py-2 border-b border-gray-50 last:border-0"
+              className="flex justify-between items-center bg-[#F8F8F8] p-3 rounded-xl"
             >
               <span className="text-[11px] sm:text-xs text-[#66706D] font-medium">
                 {item.label}
               </span>
-              <span className="text-[11px] sm:text-xs font-bold text-[#0A4F48]">
+              <span className="text-[11px] sm:text-xs font-medium text-black wrap-break-word">
                 {item.value}
               </span>
             </div>
@@ -169,7 +172,7 @@ const ExpertLeftSide = ({ expert }) => {
                 <span className="text-[10px] text-[#66706D] font-medium">
                   {item.label}
                 </span>
-                <span className="text-[11px] font-bold text-[#011412] leading-tight mt-0.5 break-words">
+                <span className="text-[11px] font-bold text-[#011412] leading-tight mt-0.5 wrap-break-word">
                   {item.value}
                 </span>
               </div>
@@ -185,11 +188,14 @@ const ExpertLeftSide = ({ expert }) => {
         </h3>
         <div className="space-y-4 sm:space-y-5">
           {specialization.map((item, i) => (
-            <div key={i} className="flex flex-col gap-2">
-              <span className="w-fit px-2 py-0.5 bg-[#F8F9FA] text-[10px] font-bold text-[#66706D] rounded">
+            <div
+              key={i}
+              className="flex flex-col gap-2 p-3.5 bg-[#F8F8F8] rounded-2xl"
+            >
+              <span className="w-fit px-2 py-0.5 bg-[#F0F0F0] text-[10px] font-bold text-[#66706D] rounded">
                 {item.label}
               </span>
-              <p className="text-[11px] font-bold text-[#0A4F48] leading-relaxed break-words">
+              <p className="text-[11px] font-bold text-[#0A4F48] leading-relaxed wrap-break-word">
                 {item.content}
               </p>
             </div>

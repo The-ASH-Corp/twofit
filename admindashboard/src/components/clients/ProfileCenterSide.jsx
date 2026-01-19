@@ -96,7 +96,7 @@ const assignedExperts = [
   ];
 
   return (
-    <div className="w-[50%] flex flex-col items-center gap-4 overflow-y-auto  no-scrollbar">
+    <div className=" flex flex-col items-center gap-4 pb-4">
       {/* Health Details */}
       <div className="p-4 flex flex-col items-center gap-4 w-full bg-white rounded-lg">
         <div className="w-full flex justify-between items-center">
@@ -137,7 +137,9 @@ const assignedExperts = [
         <div className="p-4 bg-white rounded-2xl w-[50%]">
           <div className="flex flex-col items-start gap-1 ">
             <span className="text-[11px] text-[#66706D]">Program Type</span>
-            <span className="font-bold text-[12px]">{client?.programType?.title}</span>
+            <span className="font-bold text-[12px]">
+              {client?.programType?.title}
+            </span>
           </div>
         </div>
         <div className="p-4 bg-white rounded-2xl w-[50%]">
@@ -181,7 +183,10 @@ const assignedExperts = [
           {assignedExperts.map((items, i) => {
             const styles = statusStyles[items.status] || statusStyles.Pending;
             return (
-              <div key={i} className="flex items-center justify-between w-full py-4 border-b border-b-[#DBDEDD]">
+              <div
+                key={i}
+                className="flex items-center justify-between w-full py-4 border-b border-b-[#DBDEDD]"
+              >
                 <div className="flex items-start gap-4">
                   <div
                     className="p-3 rounded-full "
