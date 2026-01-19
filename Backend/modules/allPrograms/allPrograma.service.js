@@ -23,7 +23,7 @@ export const getAllProgram = async (page,limit) => {
 };
 
 export const getSingleProgram = async (id) => {
-  return await programModel.findById(id);
+  return await programModel.findById(id).populate("plan");
 };
 
 export const updateProgram = async (id, data) => {

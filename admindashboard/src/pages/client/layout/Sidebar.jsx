@@ -64,7 +64,7 @@ export default function Sidebar({ isOpen, onClose }) {
             <NavLink
               to={item.path}
               key={item.label}
-              end={item.path === "/admin"}
+              end={item.path === "/client"}
               onClick={() => {
                 if (window.innerWidth < 1024) onClose();
               }}

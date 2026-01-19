@@ -1,9 +1,10 @@
 import React from "react";
 import { assets } from "@/assets/asset";
 import { BsChatLeftDots } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 
 export default function ExpertsList({ expert }) {
-  console.log(expert);
+const navigate = useNavigate();
   const experts = [
     { role: "Trainer", name: expert?.filter((expert) => expert?.role === "Trainer").map((expert) => expert?.name) || "N/A", icon: assets.profileVector },
     { role: "Dietitian", name: expert?.filter((expert) => expert?.role === "Dietician").map((expert) => expert?.name) || "N/A", icon: assets.profileVector },
@@ -41,7 +42,7 @@ export default function ExpertsList({ expert }) {
               </div>
             </div>
             <div className="w-7 h-7 flex items-center justify-center bg-[#EBF3F2] rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors shadow-sm">
-              <BsChatLeftDots className="w-3.5 h-3.5 font-bold " />
+              <BsChatLeftDots className="w-3.5 h-3.5 font-bold " onClick={()=>navigate("/client/chats")}/>
             </div>
           </div>
         ))}
