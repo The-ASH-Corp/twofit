@@ -1,6 +1,6 @@
 import { generatePassword, hashPassword } from "../../utils/password.js";
 import { AdminModel } from "../admin/admin.model.js";
-import { PayrollModel } from "../payroll/payroll.model.js";
+import { calculateRatingIncentive } from "../payroll/payroll.service.js";
 import { CoachModel } from "./coach.model.js";
 
 export const createCoach = async (coach) => {
@@ -14,9 +14,9 @@ export const createCoach = async (coach) => {
     "languages",
   ];
   const booleanFields = [
-    "ratingIncentive",
-    "responseTimeIncentive",
-    "complianceIncentive",
+    // "ratingIncentive",
+    // "responseTimeIncentive",
+    // "complianceIncentive",
     "autoSendWelcome",
     "autoSendGuide",
     "automatedReminder",
@@ -55,9 +55,9 @@ export const createCoach = async (coach) => {
     dob: coach.dob,
     gender: coach.gender,
     password: await password(coach.password),
-    ratingIncentive: coach.ratingIncentive,
-    responseTimeIncentive: coach.responseTimeIncentive,
-    complianceIncentive: coach.complianceIncentive,
+    // ratingIncentive: coach.ratingIncentive,
+    // responseTimeIncentive: coach.responseTimeIncentive,
+    // complianceIncentive: coach.complianceIncentive,
     autoSendWelcome: coach.autoSendWelcome,
     autoSendGuide: coach.autoSendGuide,
     automatedReminder: coach.automatedReminder,
@@ -167,22 +167,10 @@ export const getCoachesByAdmin = async ({ adminIds }) => {
 const calculateAvgRating = (feedback = []) => {
   if (!feedback.length) return 0;
   const total = feedback.reduce((sum, f) => sum + f.rating, 0);
-  return Number((total / feedback.length).toFixed(2));
+  return Number((total / feedback.length).toFixed(1));
 };
 
-const getRatingIncentive = async (avgRating) => {
-  const payroll = await PayrollModel.findOne({
-    id: "6960c69c6b7d7ca635decb87",
-  }).lean();
 
-  if (!payroll) return 0;
-
-  if (avgRating >= 4.0 && avgRating <= 4.4) return payroll.rating1;
-  if (avgRating >= 4.5 && avgRating <= 4.7) return payroll.rating2;
-  if (avgRating >= 4.8 && avgRating <= 5.0) return payroll.rating3;
-
-  return 0;
-};
 
 export const createFeedback = async (expertId, userId, rating, feedback) => {
   // 1️⃣ Push feedback
@@ -197,15 +185,9 @@ export const createFeedback = async (expertId, userId, rating, feedback) => {
   
   const avgRating = calculateAvgRating(coach.feedback);
 
-  // 3️⃣ Calculate incentive from payroll
-  let incentives = await getRatingIncentive(avgRating);;
-  
+  await CoachModel.findByIdAndUpdate(expertId, { avgRating });
 
-  // 4️⃣ Update coach with avgRating + incentive
-  await CoachModel.findByIdAndUpdate(expertId, {
-    avgRating,
-    incentives,
-  });
+  await calculateRatingIncentive(expertId);
 
   return coach;
 };
@@ -227,4 +209,6 @@ export const getCoachDashboardStats =async(coachId) => {
     totalPrograms,
     avarageRating: parseFloat(avarageRating)
   };
-} 
+}
+
+  

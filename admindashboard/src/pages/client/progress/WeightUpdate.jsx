@@ -28,7 +28,7 @@ export default function WeightUpdate() {
       const res = await dispatch(
         updateWeightOfClient({
           id: user._id,
-          currentWeight,
+        currentWeight:Number(weight),
         })
       ).unwrap();
       console.log("Updated client:", res);

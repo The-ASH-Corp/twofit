@@ -12,22 +12,25 @@ import {
 import { getAllClients } from "@/redux/features/client/client.thunk";
 import { useNavigate } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
+import { getAllUsersByHead } from "@/redux/features/head/head.thunk";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 export default function ClientsTable() {
+  const user =useAppSelector(selectUser)
   const navigate = useNavigate();
   const status = useAppSelector(selectClientStatus);
   const error = useAppSelector(selectClientError);
   const [clients, setClients] = useState([]);
-
+  const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
   const fetchClientData = async () => {
-    const client = await dispatch(getAllClients({ page, limit })).unwrap();
+    const client = await dispatch(getAllUsersByHead({ headId:user._id,page, limit })).unwrap();
     setClients(client.data);
+    setTotalCount(client.total);
   };
 
-  const clientsLength = useAppSelector(selectTotalClientCount);
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -77,7 +80,7 @@ export default function ClientsTable() {
         handleLimitChange={handleLimitChange}
         page={page}
         limit={limit}
-        totalCount={clientsLength}
+        totalCount={totalCount}
       />
     </div>
   );

@@ -154,23 +154,23 @@ export default function ExpertForm() {
       position: "right",
       fields: [{ name: "baseSalary", label: "Base Salary", type: "text" }],
     },
-    {
-      section: "Enable Incentives",
-      position: "right",
-      fields: [
-        { name: "ratingIncentive", label: "Rating Incentives", type: "toggle" },
-        {
-          name: "responseTimeIncentive",
-          label: "Response Time Incentives",
-          type: "toggle",
-        },
-        {
-          name: "complianceIncentive",
-          label: "Compliance Incentives",
-          type: "toggle",
-        },
-      ],
-    },
+    // {
+    //   section: "Enable Incentives",
+    //   position: "right",
+    //   fields: [
+    //     { name: "ratingIncentive", label: "Rating Incentives", type: "toggle" },
+    //     {
+    //       name: "responseTimeIncentive",
+    //       label: "Response Time Incentives",
+    //       type: "toggle",
+    //     },
+    //     {
+    //       name: "complianceIncentive",
+    //       label: "Compliance Incentives",
+    //       type: "toggle",
+    //     },
+    //   ],
+    // },
     {
       section: "Account Setup",
       position: "right",

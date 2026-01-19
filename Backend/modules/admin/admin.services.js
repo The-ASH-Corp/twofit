@@ -84,12 +84,12 @@ export const getDashboardData = async (adminId) => {
 
   const totalExperts = await AdminModel.find({_id:adminId}).select("experts program").populate("experts program");
   const totalPrograms = totalExperts[0].program?.length;
-
+  
   const query = {
     $or: [
-      { trainer: { $in: totalExperts?.experts } },
-      { dietition: { $in: totalExperts?.experts } },
-      { therapist: { $in: totalExperts?.experts } },
+      { trainer: { $in: totalExperts[0]?.experts } },
+      { dietition: { $in: totalExperts[0]?.experts } },
+      { therapist: { $in: totalExperts[0]?.experts } },
     ],
     role: "user",
   };
@@ -98,7 +98,7 @@ export const getDashboardData = async (adminId) => {
 
   const totalClients = clients?.length;
   const totalCoaches = totalExperts[0].experts?.length;
-
+  
   const totalTrainers =await totalExperts[0].experts?.filter((expert) => expert.role.includes("Trainer"))?.length;
   const totalDietitians =await totalExperts[0].experts?.filter((expert) => expert.role.includes("Dietician"))?.length;
   const totalTherapists =await totalExperts[0].experts?.filter((expert) => expert.role.includes("Therapist"))?.length;

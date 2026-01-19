@@ -6,15 +6,13 @@ import WeightUpdate from "./WeightUpdate";
 import MeasurementUpdate from "./MeasurementUpdate";
 import { Download, X } from "lucide-react";
 import { Bar } from "react-chartjs-2";
- import { selectSelectedClient } from "@/redux/features/client/client.selectors";
+import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 export default function Progress() {
   const [isOpen, setIsOpen] = useState(false);
   const [panelType, setPanelType] = useState(null);
-
-
 
   const kpiData = [
     {
@@ -81,7 +79,7 @@ export default function Progress() {
           bottomLeft: 0,
           bottomRight: 0,
         },
-        barThickness:18,
+        barThickness: 18,
       },
       {
         label: "Waist",

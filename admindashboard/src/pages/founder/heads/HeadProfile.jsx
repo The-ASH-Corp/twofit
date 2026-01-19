@@ -1,9 +1,6 @@
-import AdminCenterSide from "@/components/admin/AdminCenterSide";
-import AdminLeftSide from "@/components/admin/AdminLeftSide";
-import AdminRightSide from "@/components/admin/AdminRightSide";
-import ExpertCenterSide from "@/components/experts/ExpertCenterSide";
-import ExpertLeftSide from "@/components/experts/ExpertLeftSide";
-import ExpertRightSide from "@/components/experts/ExpertRightSide";
+import HeadCenterSide from "@/components/head/HeadCenterSide";
+import HeadLeftSide from "@/components/head/HeadLeftSide";
+import HeadRightSide from "@/components/head/HeadRightSide";
 import {
   selectHead,
   selectHeadError,
@@ -15,12 +12,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
 
-const ExpertProfile = () => {
+const HeadProfile = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
   console.log(id);
 
-  const expert = useSelector(selectHead);
+  const head = useSelector(selectHead);
   const status = useSelector(selectHeadStatus);
   const error = useSelector(selectHeadError);
 
@@ -52,14 +49,14 @@ const ExpertProfile = () => {
 
       <div className="flex flex-1 justify-between w-full gap-4 overflow-auto no-scrollbar pb-6">
         {/* left */}
-        <AdminLeftSide admin={expert} />
+        <HeadLeftSide Head={head} />
         {/* center */}
-        <AdminCenterSide admin={expert} />
+        <HeadCenterSide Head={head} />
         {/* right */}
-        <AdminRightSide admin={expert} />
+        <HeadRightSide Head={head} />
       </div>
     </div>
   );
 };
 
-export default ExpertProfile;
+export default HeadProfile;

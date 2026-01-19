@@ -53,10 +53,10 @@ export const createFeedback = createAsyncThunk(
 
 export const getAllFeedbacks = createAsyncThunk(
   "client/getAllFeedbacks",
-  async ( id , { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
       const data = await axiosInstance.get(`/clients/get-all-feedbacks/${id}`);
-      
+
       return data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to get feedbacks");
@@ -65,13 +65,62 @@ export const getAllFeedbacks = createAsyncThunk(
 );
 
 
-export const updateWeightOfClient=createAsyncThunk("client/updateWeight", async({id,weight},{rejectWithValue})=>{
-  try{
-    const data=await axiosInstance.put(`clients/${id}/weight`,{weight})
+export const updateWeightOfClient = createAsyncThunk("client/updateWeight", async ({ id, currentWeight }, { rejectWithValue }) => {
+  try {
+    const data = await axiosInstance.put(`clients/${id}/weight`, { currentWeight })
     return data.data
 
   }
-  catch(error){
+  catch (error) {
     return rejectWithValue(error.response?.data?.message || "Failed to update weight")
   }
 })
+
+export const updateMeasurementOfClient = createAsyncThunk("client/updateMeasurement", async ({ id, chest, waist, hip }, { rejectWithValue }) => {
+  try {
+    const data = await axiosInstance.put(`clients/${id}/measurements`, { chest, waist, hip })
+    return data.data
+  }
+  catch (error) {
+    return rejectWithValue(error.response?.data?.message || "Failed to update measurement")
+  }
+})
+
+
+export const fetchClientWeightHistory = createAsyncThunk(
+  "client/fetchClientWeightHistory",
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get("/clients/weight-history");
+
+      console.log("WEIGHT HISTORY API:", data); 
+
+
+      return data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch weight history"
+      );
+    }
+  }
+);
+
+
+
+export const fetchClientMeasurementHistory = createAsyncThunk(
+  "client/fetchClientMeasurementHistory",
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get("/clients/measurement-history");
+
+      console.log("MEASUREMENT HISTORY API:", data); 
+
+
+      return data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch measurement history"
+      );
+    }
+  }
+);  

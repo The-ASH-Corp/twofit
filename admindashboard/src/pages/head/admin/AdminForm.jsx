@@ -19,10 +19,13 @@ export default function AdminForm() {
       getAllProgramsByCategory({category: user.programCategory, page: 1, limit: 1000})
     ).unwrap();
     setPrograms(response.data);
+    console.log(response)
   };
+  
   useEffect(() => {
     fetchPrograms();
   }, []);
+  console.log(programs);
 
   const fields = [
     {

@@ -19,8 +19,10 @@ export const generateRefreshToken = (user) => {
 export const refreshAccessToken = async (req, res, next) => {
   const refreshToken = req.cookies.refreshToken;
 
-  if (!refreshToken)
+  if (!refreshToken){
+    console.log("no refresh token")
     return res.status(401).json({ message: "Refresh token missing" });
+  }
 
   try {
     const decoded = jwt.verify(

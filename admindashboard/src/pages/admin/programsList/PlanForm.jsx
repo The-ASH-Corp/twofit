@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   ChevronDown,
@@ -12,14 +12,17 @@ import {
   X,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
-import { createNewPlan } from "@/redux/features/plans/plan.thunk";
+import {
+  createNewPlan,
+  uploadPlanMedia,
+} from "@/redux/features/plans/plan.thunk";
 import { toast } from "react-toastify";
 
 export default function PlanForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-  
+
   const [programDetails, setProgramDetails] = useState({
     name: location.state?.title || "", // Initialize with program name from location
     duration: "30 Days",
@@ -29,6 +32,7 @@ export default function PlanForm() {
     {
       id: 1,
       name: "Week 1",
+      title: "Foundation Phase",
       expanded: true,
       days: [
         {
@@ -50,8 +54,16 @@ export default function PlanForm() {
   const toggleWeek = (id) => {
     setWeeks(
       weeks.map((week) =>
-        week.id === id ? { ...week, expanded: !week.expanded } : week
-      )
+        week.id === id ? { ...week, expanded: !week.expanded } : week,
+      ),
+    );
+  };
+
+  const updateWeekTitle = (weekId, newTitle) => {
+    setWeeks(
+      weeks.map((week) =>
+        week.id === weekId ? { ...week, title: newTitle } : week,
+      ),
     );
   };
 
@@ -62,12 +74,12 @@ export default function PlanForm() {
           return {
             ...week,
             days: week.days.map((day) =>
-              day.id === dayId ? { ...day, expanded: !day.expanded } : day
+              day.id === dayId ? { ...day, expanded: !day.expanded } : day,
             ),
           };
         }
         return week;
-      })
+      }),
     );
   };
 
@@ -75,6 +87,7 @@ export default function PlanForm() {
     const newWeek = {
       id: weeks.length + 1,
       name: `Week ${weeks.length + 1}`,
+      title: "",
       expanded: true,
       days: [],
     };
@@ -95,7 +108,7 @@ export default function PlanForm() {
           return { ...week, days: [...week.days, newDay] };
         }
         return week;
-      })
+      }),
     );
   };
 
@@ -113,7 +126,7 @@ export default function PlanForm() {
           };
         }
         return week;
-      })
+      }),
     );
   };
 
@@ -138,7 +151,7 @@ export default function PlanForm() {
           };
         }
         return week;
-      })
+      }),
     );
   };
 
@@ -153,7 +166,7 @@ export default function PlanForm() {
                 return {
                   ...day,
                   exercises: (day.exercises || []).map((ex) =>
-                    ex.id === exercise.id ? { ...ex, ...exercise } : ex
+                    ex.id === exercise.id ? { ...ex, ...exercise } : ex,
                   ),
                 };
               }
@@ -162,7 +175,7 @@ export default function PlanForm() {
           };
         }
         return week;
-      })
+      }),
     );
   };
 
@@ -177,7 +190,7 @@ export default function PlanForm() {
                 return {
                   ...day,
                   exercises: (day.exercises || []).filter(
-                    (ex) => ex.id !== exerciseId
+                    (ex) => ex.id !== exerciseId,
                   ),
                 };
               }
@@ -186,13 +199,14 @@ export default function PlanForm() {
           };
         }
         return week;
-      })
+      }),
     );
   };
 
   const handleSave = async () => {
     const cleanedWeeks = weeks.map((week) => ({
       name: week.name,
+      title: week.title,
       days: week.days.map((day) => ({
         name: day.name,
         exercises: (day.exercises || []).map((ex) => {
@@ -203,14 +217,14 @@ export default function PlanForm() {
     }));
 
     const payload = {
-      name: programDetails.name, // This will now include the correct program name
+      name: programDetails.name,
       duration: programDetails.duration,
       program: location.state?.programId,
       weeks: cleanedWeeks,
     };
-    
+
     const data = await dispatch(createNewPlan(payload));
-    
+
     if (data.payload.success) {
       toast.success(data.payload.message);
       navigate(-1); // Navigate back to the previous page
@@ -218,9 +232,8 @@ export default function PlanForm() {
       toast.error(data.payload.message);
     }
   };
-  console.log(location.state)
   return (
-    <div className="flex flex-col lg:flex-row gap-6 p-6 min-h-screen bg-[#F8F9FA]">
+    <div className="flex flex-col lg:flex-row gap-6 p-6 h-[calc(95vh-120px)] overflow-y-auto bg-[#F8F9FA]">
       {/* Left Content - Form Area */}
       <div className="flex-1 flex flex-col gap-6">
         {/* Header Section */}
@@ -230,7 +243,7 @@ export default function PlanForm() {
               Program Name
             </label>
             <span className="text-sm font-bold text-[#0A4F48]">
-             {location.state?.title}
+              {location.state?.title}
             </span>
           </div>
           <hr className="border-gray-50" />
@@ -305,7 +318,8 @@ export default function PlanForm() {
                     </label>
                     <input
                       type="text"
-                      defaultValue="Foundation Phase"
+                      value={week.title}
+                      onChange={(e) => updateWeekTitle(week.id, e.target.value)}
                       className="w-full p-3 bg-white border border-gray-200 rounded-xl text-sm outline-none focus:border-[#0A4F48] transition-colors"
                       placeholder="Enter week title"
                     />
@@ -425,6 +439,7 @@ const PlanSection = ({
 }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [editingId, setEditingId] = useState(null);
+  const dispatch = useDispatch();
 
   // Local state for the form
   const [formState, setFormState] = useState({
@@ -433,6 +448,65 @@ const PlanSection = ({
     url: "",
     mediaName: "",
   });
+
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const fileInputRef = useRef(null);
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setUploading(true);
+      setUploadProgress(0);
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const resultAction = await dispatch(
+          uploadPlanMedia({
+            formData,
+            onUploadProgress: (progressEvent) => {
+              const percentCompleted = Math.round(
+                (progressEvent.loaded * 100) / progressEvent.total,
+              );
+              setUploadProgress(percentCompleted);
+            },
+          }),
+        );
+
+        if (uploadPlanMedia.fulfilled.match(resultAction)) {
+          const response = resultAction.payload;
+          // If successful, response is the data object from axiosInstance (which is response.data from axios)
+          if (response.success) {
+            setFormState((prev) => ({
+              ...prev,
+              mediaName: file.name,
+              url: response.url,
+            }));
+            toast.success("File uploaded successfully");
+          } else {
+            toast.error(response.message || "File upload failed");
+          }
+        } else {
+          if (resultAction.payload) {
+            toast.error(resultAction.payload);
+          } else {
+            toast.error("File upload failed");
+          }
+        }
+      } catch (error) {
+        console.error("Upload failed", error);
+        toast.error("File upload failed");
+      } finally {
+        setUploading(false);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      }
+    }
+  };
 
   const handleAddOrUpdate = () => {
     if (!formState.name) return; // Simple validation
@@ -549,7 +623,10 @@ const PlanSection = ({
                   Media Attachment
                 </label>
                 <div className="flex border border-gray-200 rounded-xl overflow-hidden bg-white">
-                  <button className="flex items-center gap-2 px-4 py-2.5 bg-[#EBF3F2] text-[#011412] text-xs font-bold whitespace-nowrap hover:bg-[#dceceb] transition-colors">
+                  <button
+                    onClick={() => fileInputRef.current.click()}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-[#EBF3F2] text-[#011412] text-xs font-bold whitespace-nowrap hover:bg-[#dceceb] transition-colors cursor-pointer"
+                  >
                     <Upload size={14} />
                     Upload File
                   </button>
@@ -560,11 +637,30 @@ const PlanSection = ({
                         ? "Upload Exercise Video"
                         : "Upload Video, Audio and Photos"
                     }
-                    className="w-full px-4 py-2.5 text-xs outline-none text-gray-500 placeholder:text-gray-400 bg-white"
+                    className="w-full px-4 py-2.5 text-xs outline-none text-gray-500 placeholder:text-gray-400 bg-white cursor-pointer"
                     readOnly
                     value={formState.mediaName}
+                    onClick={() => fileInputRef.current.click()}
+                  />
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleFileChange}
+                    accept="video/*,image/*,audio/*"
                   />
                 </div>
+                {uploading && (
+                  <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                    <div
+                      className="bg-[#0A4F48] h-1.5 rounded-full transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                    <p className="text-[10px] text-gray-500 mt-0.5 text-right">
+                      {uploadProgress}%
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 

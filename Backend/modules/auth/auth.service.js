@@ -8,6 +8,7 @@ import { AdminModel } from "../../modules/admin/admin.model.js";
 import { HeadsModel } from "../Heads/heads.modal.js";
 import { CoachModel } from "../coach/coach.model.js";
 import { FounderModel } from "../../seeds/createAdmin.js";
+import { calculateExtraClientIncentive } from "../payroll/payroll.service.js";
 
 export const adminCreateUser = async (userData) => {
   const exists = await User.findOne({ email: userData.email });
@@ -55,13 +56,18 @@ export const adminCreateUser = async (userData) => {
     automatedReminder: userData.automatedReminder || false,
     autoSendWelcome: userData.autoSendWelcome || false,
   });
-  const coaches = [userData.dietician, userData.trainer, userData.therapist];
+  const coaches = [userData.dietician, userData.trainer, userData.therapist].filter(Boolean);
+  
+  for (const coachId of coaches) {
+    await CoachModel.findByIdAndUpdate(
+      coachId,
+      { $addToSet: { assignedUsers: user._id } },
+      { new: true }
+    );
 
-  await CoachModel.updateMany(
-    { _id: { $in: coaches } },
-    { $addToSet: { assignedUsers: user._id } },
-    { new: true }
-  );
+    // Recalculate extra client incentive
+    await calculateExtraClientIncentive(coachId);
+  }
 
   return user;
 };
@@ -85,7 +91,6 @@ export const loginUser = async ({ email, password }) => {
 
 
   const match = await bcrypt.compare(password, user.password);
-  console.log(match);
 
   if (!match) throw new Error("Invalid credentials");
 

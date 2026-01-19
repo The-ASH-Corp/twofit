@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   LineChart,
   Line,
@@ -8,15 +8,52 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
-import { weightProgress } from "@/assets/weeklyCompliance";
-
-export default function ProgressChart() {
-  const customTicks = [0, 30, 60, 90, 120];
+ import { weightProgress } from "@/assets/weeklyCompliance";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectCurrentWeight, selectWeightHistory } from "@/redux/features/client/client.selectors";
+import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { fetchClientWeightHistory } from "@/redux/features/client/client.thunk";
   
+export default function ProgressChart() {
+  const dispatch = useDispatch();
+
+  const customTicks = [0, 30, 60, 90, 120];
+
+//   const weightHistory = useAppSelector(selectWeightHistory);
+//   const currentWeight = useAppSelector(selectCurrentWeight);
+//   const clientState = useAppSelector(state => state.client);
+// console.log("CLIENT STATE:", clientState);
+
+// console.log("Redux weightHistory:", weightHistory);
+
+//   useEffect(() => {
+//     dispatch(fetchClientWeightHistory());
+//   }, [dispatch]);
+ const [weight, setWeight] = useState([]);
+
+useEffect(() => {
+  dispatch(fetchClientWeightHistory())
+    .unwrap()
+    .then((data) => {
+      console.log("UNWRAPPED DATA:", data);  
+      setWeight(data.weightHistory);
+    })
+    .catch((err) => {
+      console.error("Failed to load weight history", err);
+    });
+}, [dispatch]);
+const startWeight = weight.length > 0 ? weight[0].weight : 0;
+const currentWeight =
+  weight.length > 0 ? weight[weight.length - 1].weight : 0;
+const weightChange = currentWeight - startWeight;
+
+
+console.log("WEIGHT HISTORY:", weight);
   return (
     <div className="h-[250px] w-full mt-4">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={weightProgress} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+        <LineChart data={weight} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <CartesianGrid horizontal={true} vertical={false} stroke="#F1F5F9" />
 
           <XAxis 
@@ -42,15 +79,15 @@ export default function ProgressChart() {
                   <div className="bg-white p-4 shadow-2xl rounded-2xl border border-gray-50 flex flex-col gap-1.5">
                     <div className="flex justify-between gap-8 text-[11px] font-bold">
                        <span className="text-gray-400">Current</span>
-                       <span className="text-gray-800">78 kg</span>
+                       <span className="text-gray-800">{currentWeight}</span>
                     </div>
                     <div className="flex justify-between gap-8 text-[11px] font-bold">
                        <span className="text-gray-400">Start</span>
-                       <span className="text-gray-800">80 kg</span>
+                       <span className="text-gray-800">{startWeight}</span>
                     </div>
                     <div className="flex justify-between gap-8 text-[11px] font-bold">
                        <span className="text-gray-400">Change</span>
-                       <span className="text-[#0A4F48]">-2 kg</span>
+                       <span className="text-[#0A4F48]">{weightChange}</span>
                     </div>
                   </div>
                 );
