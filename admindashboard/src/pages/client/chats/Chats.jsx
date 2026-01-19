@@ -8,9 +8,12 @@ import ChastList from "./ChastList";
 import ChatWindow from "./ChatWindow";
 import { selectAllCoaches } from "@/redux/features/coach/coach.selector";
 import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
+import MobileBottomNav from "../components/MobileBottomNav";
 
 export default function Chats() {
   const user = useSelector(selectUser);
+  const [showChatWindow, setShowChatWindow] = useState(false);
+
   useEffect(() => {
     fetchAllExperts();
     socket.auth = {
@@ -43,19 +46,20 @@ export default function Chats() {
 
   const [clients, setClients] = useState([]);
 
-  const fetchAllExperts=async()=>{
-    const coaches = [user?.trainer, user?.therapist, user?.dietition].filter(Boolean);
+  const fetchAllExperts = async () => {
+    const coaches = [user?.trainer, user?.therapist, user?.dietition].filter(
+      Boolean
+    );
     if (coaches.length > 0) {
-    const data = await dispatch(getAllCoachesByAdmin(coaches));
-    setClients(data.payload);
+      const data = await dispatch(getAllCoachesByAdmin(coaches));
+      setClients(data.payload);
     }
-  }
+  };
 
   const chats = useSelector(getChat);
   const dispatch = useDispatch();
 
   const getPrivateRoomId = (u1, u2) => `private:${[u1, u2].sort().join("_")}`;
-
 
   const chatClient = (selectedClient) => {
     if (client) {
@@ -67,6 +71,11 @@ export default function Chats() {
 
     socket.emit("join_room", { roomId });
     setChatClient(selectedClient);
+    setShowChatWindow(true); // Show chat window on mobile
+  };
+
+  const handleBackToList = () => {
+    setShowChatWindow(false);
   };
 
   useEffect(() => {
@@ -125,20 +134,30 @@ export default function Chats() {
     setMessages([]);
   }, [client]);
 
-
   return (
-    <div className="flex h-[calc(100vh-120px)]  gap-5">
-     
-        <>
-          {/* Center - Chat List */}
+    <div className="flex h-[calc(100vh-120px)] gap-5">
+      {/* Desktop View - Always visible on desktop */}
+      <>
+        {/* Center - Chat List */}
+        <div
+          className={`${
+            showChatWindow ? "hidden lg:block" : "block"
+          } w-full lg:w-80`}
+        >
           <ChastList
             clients={clients}
             chatClient={chatClient}
             client={client}
             onlineUsers={onlineUsers}
           />
+        </div>
 
-          {/* Right - Chat Window */}
+        {/* Right - Chat Window */}
+        <div
+          className={`${
+            showChatWindow ? "block" : "hidden lg:block"
+          } w-full lg:flex-1`}
+        >
           <ChatWindow
             client={client}
             messages={messages}
@@ -147,8 +166,11 @@ export default function Chats() {
             messageHandlers={messageHandlers}
             user={user}
             onlineUsers={onlineUsers}
+            onBack={handleBackToList}
           />
-        </>
+        </div>
+      </>
+     <MobileBottomNav />
     </div>
   );
 }

@@ -93,9 +93,6 @@ export const fetchClientWeightHistory = createAsyncThunk(
     try {
       const data = await axiosInstance.get("/clients/weight-history");
 
-      console.log("WEIGHT HISTORY API:", data); 
-
-
       return data;
     } catch (err) {
       return rejectWithValue(
@@ -112,9 +109,6 @@ export const fetchClientMeasurementHistory = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const data = await axiosInstance.get("/clients/measurement-history");
-
-      console.log("MEASUREMENT HISTORY API:", data); 
-
 
       return data;
     } catch (err) {

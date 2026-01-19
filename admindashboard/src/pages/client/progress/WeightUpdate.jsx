@@ -1,17 +1,14 @@
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { updateWeightOfClient } from "@/redux/features/client/client.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { useDispatch } from "react-redux";
 
-export default function WeightUpdate() {
+export default function WeightUpdate({ onClose }) {
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
   const [weight, setWeight] = useState("");
 
-  useEffect(() => {
-    console.log("Selected Client:", user);
-  }, [user]);
 
   const handleSubmit = async () => {
     if (!weight) {
@@ -28,32 +25,47 @@ export default function WeightUpdate() {
       const res = await dispatch(
         updateWeightOfClient({
           id: user._id,
-        currentWeight:Number(weight),
+          currentWeight: Number(weight),
         })
       ).unwrap();
       console.log("Updated client:", res);
-      alert("Weight updated successfully ");
+      alert("Weight updated successfully");
+      if (onClose) onClose();
     } catch (err) {
       console.log(err);
       alert("Failed to update weight");
     }
   };
+
   return (
-    <div className="space-y-4  flex flex-col h-full">
-      <label>Current Weight</label>
-      <input
-        value={weight}
-        onChange={(e) => setWeight(e.target.value)}
-        type="number"
-        placeholder="Enter Weight (kg)"
-        className="w-full border border-gray-200 rounded-xl focus:outline-none  p-2"
-      />
-      <div className="mt-auto">
+    <div className="space-y-4 flex flex-col h-full">
+      <div className="space-y-2">
+        <label className="text-[14px] font-medium text-gray-700">
+          Current Weight
+        </label>
+        <input
+          value={weight}
+          onChange={(e) => setWeight(e.target.value)}
+          type="number"
+          placeholder="Add weight (kg)"
+          className="w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0A4F48]/20 p-3"
+        />
+      </div>
+
+      <div className="space-y-3 mt-auto">
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+        )}
         <button
           onClick={handleSubmit}
-          className="bg-[#0A4F48] w-full bottom-0   text-white px-4 py-2 rounded-xl"
+          className="w-full bg-[#0A4F48] text-white py-3 rounded-xl font-medium hover:bg-[#083d38] transition-colors"
         >
-          Submit
+          Save & Update
         </button>
       </div>
     </div>

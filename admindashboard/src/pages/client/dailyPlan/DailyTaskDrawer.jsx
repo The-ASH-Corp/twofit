@@ -22,17 +22,20 @@ export default function DailyTaskDrawer({ selectedDate, tasks, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
+    <div className="fixed inset-0 z-50 flex lg:justify-end items-end lg:items-stretch">
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/5 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/20 lg:bg-black/5 backdrop-blur-sm"
         onClick={onClose}
       />
 
       {/* Drawer */}
-      <div className="relative w-[320px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-        <div className="flex justify-between items-center p-6 pb-4 border-b border-gray-100">
-          <h2 className="font-bold text-[16px] text-gray-800">
+      <div className="relative w-full lg:w-[320px] lg:h-full max-h-[70vh] lg:max-h-none bg-white shadow-2xl flex flex-col rounded-t-3xl lg:rounded-none animate-in slide-in-from-bottom lg:slide-in-from-right duration-300 pb-24 lg:pb-0">
+        <div className="flex justify-between items-center p-5 lg:p-6 pb-4 border-b border-gray-100">
+          {/* Mobile handle bar */}
+          <div className="lg:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-gray-300 rounded-full"></div>
+          
+          <h2 className="font-bold text-[15px] lg:text-[16px] text-gray-800">
             {formatDate(selectedDate)}
           </h2>
           <button
@@ -43,18 +46,18 @@ export default function DailyTaskDrawer({ selectedDate, tasks, onClose }) {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-3">
+        <div className="flex-1 overflow-y-auto p-5 lg:p-6 space-y-2.5 lg:space-y-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {tasks && tasks.length > 0 ? (
             tasks.map((task, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between py-3 px-4 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-between py-3.5 lg:py-3 px-4 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-colors"
               >
-                <span className="text-[15px] font-medium text-gray-800">
+                <span className="text-[14px] lg:text-[15px] font-medium text-gray-800">
                   {task.name}
                 </span>
                 <span
-                  className={`text-[12px] font-semibold px-3 py-1 rounded-full border ${
+                  className={`text-[11px] lg:text-[12px] font-semibold px-2.5 lg:px-3 py-1 rounded-full border ${
                     statusColors[task.status.toLowerCase()] ||
                     statusColors.pending
                   }`}
