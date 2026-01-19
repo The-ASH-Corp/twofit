@@ -4,6 +4,7 @@ import { assets } from "@/assets/asset";
 
 export default function TaskModal({ task, onClose }) {
   const [fileName, setFileName] = useState("Upload File");
+  const [showVideoModal, setShowVideoModal] = useState(false);
 console.log(task)
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
@@ -55,7 +56,9 @@ console.log(task)
                 </p> */}
               </div>
             </div>
-            <button className="bg-[#0A4F48] text-white text-[12px] font-bold px-4 py-2 rounded-xl shadow-sm hover:bg-[#083d38] transition-colors">
+            <button 
+              onClick={() => setShowVideoModal(true)}
+              className="bg-[#0A4F48] text-white text-[12px] font-bold px-4 py-2 rounded-xl shadow-sm hover:bg-[#083d38] transition-colors">
               View
             </button>
           </div>
@@ -101,6 +104,37 @@ console.log(task)
           </button>
         </div>
       </div>
+
+      {/* Video Modal */}
+      {showVideoModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setShowVideoModal(false)}
+          />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-gray-100">
+              <h2 className="text-[#0A4F48] text-lg font-bold">Exercise Video</h2>
+              <button
+                onClick={() => setShowVideoModal(false)}
+                className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-400" />
+              </button>
+            </div>
+            <div className="p-4">
+              <video
+                controls
+                autoPlay
+                className="w-full rounded-xl"
+                src={task.url}
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
