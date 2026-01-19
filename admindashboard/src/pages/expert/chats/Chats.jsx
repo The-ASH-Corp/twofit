@@ -12,6 +12,11 @@ import { selectAssignedClients } from "@/redux/features/coach/coach.selector";
 export default function Chats() {
   const user = useSelector(selectUser);
 
+  const [client, setChatClient] = useState(null);
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
   useEffect(() => {
     fetchAllExperts();
     socket.auth = {
@@ -36,11 +41,6 @@ export default function Chats() {
       socket.disconnect();
     };
   }, [user?._id]);
-
-  const [client, setChatClient] = useState(null);
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [onlineUsers, setOnlineUsers] = useState([]);
 
   const clients = useSelector(selectAssignedClients);
 
@@ -76,7 +76,7 @@ export default function Chats() {
         chatId: getPrivateRoomId(user._id, client._id),
       })
     );
-  }, [client, user._id, dispatch]);
+  }, [client, user?._id, dispatch]);
 
   useEffect(() => {
     if (chats?.messages) {
@@ -88,7 +88,7 @@ export default function Chats() {
     const onNewMessage = (msg) => {
       if (!client) return;
 
-      const currentRoom = getPrivateRoomId(user._id, client._id);
+      const currentRoom = getPrivateRoomId(user?._id, client._id);
       if (msg.roomId !== currentRoom) return;
 
       setMessages((prev) => [...prev, msg]);

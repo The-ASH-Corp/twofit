@@ -20,7 +20,6 @@ export default function Dashboard() {
   const [coaches, setCoaches] = useState([]);
   const user = useAppSelector(selectUser);
   const dispatch = useDispatch();
-
   const fetchDashboardData = async () => {
     const program = await dispatch(getProgramById(user?.programType)).unwrap();
     const coaches = await dispatch(getAllCoachesByAdmin([user?.trainer,user?.therapist,user?.dietition])).unwrap();
@@ -41,7 +40,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-2 gap-4">
             <KpiCard
               title="Program Days"
-              value={`${program?.programDays || 0}/ ${user?.duration || 0}`}
+              value={`${program?.programDays || 0}/ ${program?.plan.duration || 0}`}
               icon={assets.website}
               bg="#0A4F48"
               iconColor="white"

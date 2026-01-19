@@ -1,8 +1,11 @@
+import ProgramModel from "../allPrograms/allPrograma.model.js";
 import Plan from "./plan.model.js";
 
 export const createPlan = async (planData) => {
     const newPlan = await Plan.create(planData);
-    return  { success: true, message: "Plan created successfully", data: newPlan };
+
+   await ProgramModel.findByIdAndUpdate(planData.program, { plan: newPlan._id });
+    return  newPlan;
 }
 
 

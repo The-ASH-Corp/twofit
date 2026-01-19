@@ -25,7 +25,7 @@ export const updateOneClient = async (userData, id) => {
   const client = await User.findByIdAndUpdate(
     id,
     { $set: userData },
-    { new: true }
+    { new: true },
   ).select("-password");
   return client;
 };
@@ -72,12 +72,12 @@ export const updateWeightService = async (userId, currentWeight) => {
     throw new Error("User not found");
   }
 
-   if (!user.weightHistory || user.weightHistory.length === 0) {
+  if (!user.weightHistory || user.weightHistory.length === 0) {
     user.weightHistory = [
       {
         weight: currentWeight,
         date: new Date(),
-        isInitial: true, 
+        isInitial: true,
       },
     ];
   } else {
@@ -99,7 +99,7 @@ export const updateWeightService = async (userId, currentWeight) => {
 
 export const updateMeasurementsService = async (
   userId,
-  { chest, waist, hip }
+  { chest, waist, hip },
 ) => {
   const updateFields = {};
   const historyEntry = {};
@@ -134,7 +134,7 @@ export const updateMeasurementsService = async (
         },
       },
     },
-    { new: true }
+    { new: true },
   );
 
   if (!user) {
@@ -149,4 +149,53 @@ export const getAllFeedbacksService = async (userId) => {
     .select("name role feedback")
     .populate("feedback.userId", "name email");
   return feedbacks;
+};
+
+export const fetchWeightHistoryService = async (userId) => {
+  const user = await User.findById(userId).select(
+    "weightHistory currentWeight",
+  );
+
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+
+  const sortedHistory = user.weightHistory
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .map((item) => ({
+      date: item.date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+      }),
+      weight: item.weight,
+    }));
+
+  return {
+    currentWeight: user.currentWeight,
+    weightHistory: sortedHistory,
+  };
+};
+
+export const fetchMeasurementHistory = async (userId) => {
+  const user = await User.findById(userId).select("measurementHistory");
+
+  if (!user) {
+    throw new Error("USER_NOT_FOUND");
+  }
+
+  const sortedHistory = user.measurementHistory
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .map((item) => ({
+      date: item.date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+      }),
+      chest: item.chest,
+      waist: item.waist,
+      hip: item.hip,
+    }));
+
+  return {
+    measurementHistory: sortedHistory,
+  };
 };

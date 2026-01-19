@@ -1,7 +1,6 @@
 import React from "react";
 
 export default function HeroCard({program}) {
-  console.log(program,"program");
   
   return (
     <div className="relative w-full h-[320px] rounded-[32px] overflow-hidden shadow-sm">
