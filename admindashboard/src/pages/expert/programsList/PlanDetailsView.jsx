@@ -18,28 +18,63 @@ export default function PlanDetailsView() {
   const fetchPlanById = async () => {
     const data = await dispatch(getPlanByProgramId(planData?.programId));
     if (data.payload) {
+      // Collect all unique media from exercises
+      const allMedia = new Map();
+      
+      data.payload.weeks.forEach((week) => {
+        week.days.forEach((day) => {
+          day.exercises.forEach((ex) => {
+            if (ex.mediaName && ex.mediaName !== "N/A" && ex.url && ex.url !== "N/A") {
+              // Use URL as unique key to avoid duplicates
+              if (!allMedia.has(ex.url)) {
+                allMedia.set(ex.url, {
+                  name: ex.mediaName,
+                  url: ex.url,
+                  type: ex.url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
+                  size: '' // Size not available in data
+                });
+              }
+            }
+          });
+        });
+      });
+
       setProgramDetails({
         name: data.payload.name,
         duration: data.payload.duration,
         clients: planData?.clients || 0,
-        planMedia: planData?.planMedia || [],
+        planMedia: Array.from(allMedia.values()),
       });
 
       const formattedWeeks = data.payload.weeks.map((week, index) => ({
         ...week,
         id: week._id,
         expanded: index === 0,
-        days: week.days.map((day, dIndex) => ({
-          ...day,
-          id: day._id,
-          expanded: dIndex === 0,
-          workoutPlan: day.exercises.map((ex) => ({
-            exercise: ex.name || "N/A",
-            notes: ex.notes || "N/A",
-            url: ex.url || "N/A",
-            media: ex.mediaName || "N/A",
-          })),
-        })),
+        days: week.days.map((day, dIndex) => {
+          // Remove duplicate exercises within the same day
+          const uniqueExercises = [];
+          const seen = new Set();
+          
+          day.exercises.forEach((ex) => {
+            const key = `${ex.name}-${ex.url}-${ex.mediaName}`;
+            if (!seen.has(key)) {
+              seen.add(key);
+              uniqueExercises.push({
+                exercise: ex.name || "N/A",
+                notes: ex.notes || "N/A",
+                url: ex.url || "N/A",
+                media: ex.mediaName || "N/A",
+              });
+            }
+          });
+
+          return {
+            ...day,
+            id: day._id,
+            expanded: dIndex === 0,
+            workoutPlan: uniqueExercises,
+          };
+        }),
       }));
       setWeeks(formattedWeeks);
     }
@@ -224,6 +259,7 @@ export default function PlanDetailsView() {
                 name={media.name}
                 size={media.size}
                 type={media.type}
+                url={media.url}
               />
             ))}
           </div>
@@ -294,7 +330,7 @@ const DetailField = ({ label, value, isLink = false }) => (
   </div>
 );
 
-const MediaItem = ({ name, size, type }) => {
+const MediaItem = ({ name, size, type, url }) => {
   const getIcon = () => {
     if (type === "pdf") {
       return (
@@ -356,48 +392,25 @@ const MediaItem = ({ name, size, type }) => {
   };
 
   return (
-    <div className="flex items-center gap-3 p-3 bg-[#F8F9FA] rounded-lg border border-gray-50 hover:border-gray-200 transition-colors">
+    <a 
+      href={url} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="flex items-center gap-3 p-3 bg-[#F8F9FA] rounded-lg border border-gray-50 hover:border-gray-200 transition-colors cursor-pointer"
+    >
       {getIcon()}
       <div className="flex-1 min-w-0">
         <p className="text-xs font-medium text-[#011412] truncate">{name}</p>
-        {size && (
+        {size ? (
           <p className="text-[10px] text-[#66706D] mt-0.5">
             {type.toUpperCase()} • {size}
           </p>
+        ) : (
+          <p className="text-[10px] text-[#66706D] mt-0.5">
+            {type.toUpperCase()}
+          </p>
         )}
       </div>
-    </div>
-  );
-};
-
-const ChangeLogItem = ({ action, user, time }) => {
-  const getInitial = (name) => name.charAt(0).toUpperCase();
-  const getColor = (name) => {
-    const colors = {
-      Dietitian: "bg-[#0A4F48] text-white",
-      Trainer: "bg-[#FFF4E6] text-[#FF9500]",
-      Therapist: "bg-[#0A4F48] text-white",
-    };
-    return colors[name] || "bg-gray-200 text-gray-600";
-  };
-
-  return (
-    <div className="flex items-start gap-3">
-      <div
-        className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${getColor(
-          user
-        )} text-sm font-bold`}
-      >
-        {getInitial(user)}
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium text-[#011412] leading-relaxed">
-          {action}
-        </p>
-        <p className="text-[10px] text-[#66706D] mt-1">
-          {user} • {time}
-        </p>
-      </div>
-    </div>
+    </a>
   );
 };
