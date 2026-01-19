@@ -106,7 +106,7 @@ export default function BaseTable({
           <div className="flex items-center bg-[#F8F8F8] px-3 rounded-lg flex-1 sm:flex-initial min-w-0">
             <img
               src={assets.search}
-              className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0"
+              className="w-4 h-4 sm:w-5 sm:h-5 shrink-0"
               alt="search"
             />
             <input
@@ -117,7 +117,7 @@ export default function BaseTable({
             />
             <img
               src={assets.filter}
-              className="w-4 h-4 flex-shrink-0"
+              className="w-4 h-4 shrink-0"
               alt="filter"
             />
           </div>
@@ -126,18 +126,18 @@ export default function BaseTable({
           <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1 sm:pb-0">
             <button className="bg-[#EBF3F2] rounded-md text-[11px] sm:text-[12px] font-semibold px-2 sm:px-3 py-2 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
               All Status
-              <MdOutlineKeyboardArrowDown className="w-4 h-4 flex-shrink-0" />
+              <MdOutlineKeyboardArrowDown className="w-4 h-4 shrink-0" />
             </button>
             <button className="bg-[#EBF3F2] rounded-md text-[11px] sm:text-[12px] font-semibold px-2 sm:px-3 py-2 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
               Bulk Actions
-              <MdOutlineKeyboardArrowDown className="w-4 h-4 flex-shrink-0" />
+              <MdOutlineKeyboardArrowDown className="w-4 h-4 shrink-0" />
             </button>
             {actionPath ? (
               <button
                 onClick={() => navigate(actionPath)}
                 className="bg-[#0A4F48] text-white rounded-md text-[11px] sm:text-[12px] font-semibold px-2 sm:px-3 py-2 flex items-center gap-1 sm:gap-2 whitespace-nowrap"
               >
-                <BiPlus className="w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0" />
+                <BiPlus className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
                 {actionLabel}
               </button>
             ) : null}
@@ -158,7 +158,7 @@ export default function BaseTable({
                       >
                         {flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                       </th>
                     ))}
@@ -189,7 +189,7 @@ export default function BaseTable({
                               ?.columnDef?.header,
                             table
                               .getHeaderGroups()[0]
-                              ?.headers[index]?.getContext()
+                              ?.headers[index]?.getContext(),
                           )}
                           :
                         </span>
@@ -197,7 +197,7 @@ export default function BaseTable({
                         <span className="flex-1">
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </span>
                       </td>
@@ -222,7 +222,7 @@ export default function BaseTable({
       )}
 
       {/* Pagination - Responsive */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 py-4 mt-auto border-t border-gray-100">
+      <div className="flex flex-col sm:flex-row sm:items-start items-center justify-between gap-4 py-4 mt-auto border-t border-gray-100">
         {/* Results Per Page */}
         <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-[#66706D] font-medium">
           <span className="whitespace-nowrap">Show</span>
@@ -248,7 +248,7 @@ export default function BaseTable({
           <button
             onClick={() => handlePageChange(Math.max(1, page - 1))}
             disabled={page === 1}
-            className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg flex-shrink-0 ${
+            className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg shrink-0 ${
               page === 1
                 ? "bg-gray-100 text-gray-300 cursor-not-allowed"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
@@ -276,7 +276,7 @@ export default function BaseTable({
                 <button
                   key={idx}
                   onClick={() => handlePageChange(pageNumber)}
-                  className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs sm:text-sm font-bold transition-colors flex-shrink-0 ${
+                  className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs sm:text-sm font-bold transition-colors shrink-0 ${
                     page === pageNumber
                       ? "bg-[#0A4F48] text-white shadow-md"
                       : "bg-gray-100 text-gray-600 hover:bg-gray-200"
@@ -294,7 +294,7 @@ export default function BaseTable({
           <button
             onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
             disabled={page === totalPages}
-            className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg flex-shrink-0 ${
+            className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg shrink-0 ${
               page === totalPages
                 ? "bg-gray-100 text-gray-300 cursor-not-allowed"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"

@@ -17,7 +17,7 @@ const AdminRightSide = ({ admin }) => {
   ];
 
   return (
-    <div className="w-[24%] flex flex-col gap-4">
+    <div className=" flex flex-col gap-4">
       <div className="bg-white rounded-2xl p-6 flex flex-col shadow-sm ">
         {/* Header */}
         <div className="flex items-center justify-between">

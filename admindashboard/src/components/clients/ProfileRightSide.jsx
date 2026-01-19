@@ -61,14 +61,14 @@ const ProfileRightSide = ({ client }) => {
   const [date, setDate] = useState(new Date(2025, 5, 12));
   const [taskOpen, setTaskOpen] = useState(false);
   return (
-    <div className="w-[25%] flex flex-col items-center gap-4 overflow-auto  no-scrollbar">
+    <div className=" flex flex-col items-center gap-4 pb-4">
       {/* calender */}
       <div className="flex flex-col items-center w-full bg-white rounded-lg">
         <Calendar
           mode="single"
           selected={date}
           onSelect={setDate}
-          className="rounded-lg px-2 py-4 bg-[#EBF3F2] [--cell-size:37px] w-full "
+          className="rounded-lg px-2 py-4 bg-[#EBF3F2] [--cell-size:37px] w-[320px] lg:w-full "
           buttonVariant="ghost"
         />
         <div className="w-full flex flex-col items-center gap-4 p-4">

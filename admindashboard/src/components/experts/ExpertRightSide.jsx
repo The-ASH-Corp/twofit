@@ -45,7 +45,7 @@ const ExpertRightSide = ({ expert }) => {
   ];
 
   return (
-    <div className="w-full flex flex-col gap-4 sm:gap-6 overflow-y-auto no-scrollbar pb-4 sm:pb-6">
+    <div className="w-full flex flex-col gap-4 sm:gap-6  pb-4 sm:pb-6">
       {/* Response Time Card */}
       <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
         <div className="flex justify-between items-center mb-4 sm:mb-6">
@@ -146,7 +146,7 @@ const ExpertRightSide = ({ expert }) => {
             : documents
           ).map((doc, i) => (
             <div key={i} className="flex items-center gap-3 sm:gap-4">
-              <div className="p-2 sm:p-2.5 bg-[#FAF3E0] rounded-lg text-[#DAA520] flex-shrink-0">
+              <div className="p-2 sm:p-2.5 bg-[#FAF3E0] rounded-lg text-[#DAA520] shrink-0">
                 <FileText size={18} className="sm:w-5 sm:h-5" />
               </div>
               <div className="flex flex-col min-w-0 flex-1">

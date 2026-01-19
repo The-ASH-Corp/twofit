@@ -47,13 +47,19 @@ const HeadProfile = () => {
         </button>
       </div>
 
-      <div className="flex flex-1 justify-between w-full gap-4 overflow-auto no-scrollbar pb-6">
+      <div className="flex flex-col lg:flex-row flex-1 justify-between w-full gap-4 h-[calc(100vh-110px)] overflow-auto no-scrollbar pb-6">
         {/* left */}
-        <HeadLeftSide Head={head} />
+        <div className="w-full lg:w-[38%]">
+          <HeadLeftSide Head={head} />
+        </div>
         {/* center */}
-        <HeadCenterSide Head={head} />
+        <div className="w-full lg:w-[38%]">
+          <HeadCenterSide Head={head} />
+        </div>
         {/* right */}
-        <HeadRightSide Head={head} />
+        <div className="w-full lg:w-[24%]">
+          <HeadRightSide Head={head} />
+        </div>
       </div>
     </div>
   );

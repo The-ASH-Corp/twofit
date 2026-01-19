@@ -173,7 +173,7 @@ const calculateAvgRating = (feedback = []) => {
 
 
 export const createFeedback = async (expertId, userId, rating, feedback) => {
-  // 1️⃣ Push feedback
+  // Push feedback
   const coach = await CoachModel.findByIdAndUpdate(
     expertId,
     { $push: { feedback: { userId, rating, feedback } } },
@@ -195,19 +195,19 @@ export const createFeedback = async (expertId, userId, rating, feedback) => {
 
 
 export const getCoachDashboardStats =async(coachId) => {
-  const coach = await CoachModel.findById(coachId).select("assignedUsers assignedPrograms feedback");
+  const coach = await CoachModel.findById(coachId).select(
+    "assignedUsers assignedPrograms avgRating",
+  );
   if (!coach) {
     throw new Error("Coach not found");
   }
   const totalClients = coach.assignedUsers.length;
   const totalPrograms = coach.assignedPrograms.length;
-  const avarageRating = coach.feedback.length > 0 ? 
-    (coach.feedback.reduce((sum, fb) => sum + fb.rating, 0) / coach.feedback.length).toFixed(2) 
-    : 0;
+  const avarageRating = coach.avgRating;
   return {
     totalClients,
     totalPrograms,
-    avarageRating: parseFloat(avarageRating)
+    avarageRating,
   };
 }
 
