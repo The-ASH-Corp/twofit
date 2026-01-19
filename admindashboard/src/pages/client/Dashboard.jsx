@@ -86,7 +86,7 @@ export default function Dashboard() {
         {/* Bottom Section: My Tasks */}
         <div>
           <h2 className="text-[#0A4F48] font-bold text-lg">My Tasks</h2>
-          <TaskList />
+          <TaskList plans={program?.plan} />
         </div>
       </div>
 

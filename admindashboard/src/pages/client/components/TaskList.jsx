@@ -1,25 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, {useState } from "react";
 import TaskModal from "./TaskModal";
-import { useAppSelector } from "@/redux/store/hooks";
-import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { getProgramById } from "@/redux/features/program/program.thunk";
-import { useDispatch } from "react-redux";
 
-export default function TaskList() {
+
+
+export default function TaskList({ plans }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-  const user = useAppSelector(selectUser);
-  const dispatch = useDispatch();
-  const [plans, setPlans] = useState([]);
-  const [currentDay, setCurrentDay] = useState(1); 
-
-  const fetchProgramData = async () => {
-    const data = await dispatch(getProgramById(user?.programType)).unwrap();
-    setPlans(data.plan);
-  };
-  useEffect(() => {
-    fetchProgramData();
-  }, []);
+  const [currentDay, setCurrentDay] = useState(1);
 
   const days =
     plans?.weeks?.flatMap((week, weekIndex) =>
@@ -35,7 +22,6 @@ export default function TaskList() {
   const currentDayData = days[currentDay - 1]; 
   const todayExercises = currentDayData?.exercises || [];
 
-console.log(todayExercises)
   return (
     <div className="space-y-3 mt-4">
       {todayExercises?.map((item, index) => (
