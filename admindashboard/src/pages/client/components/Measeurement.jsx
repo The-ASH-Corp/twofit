@@ -1,28 +1,51 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { assets } from "@/assets/asset";
+import { useDispatch } from "react-redux";
+import { fetchClientMeasurementHistory } from "@/redux/features/client/client.thunk";
 
 export default function Measeurement() {
+const dispatch = useDispatch();
+  const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+    dispatch(fetchClientMeasurementHistory())
+      .unwrap()
+      .then((data) => {
+        setHistory(data.measurementHistory || []);
+      })
+      .catch(console.error);
+  }, [dispatch]);
+
+  if (!history.length) {
+    return (
+      <div className="bg-white p-5 rounded-2xl shadow-sm mt-4 text-gray-400 text-sm">
+        No measurement data available
+      </div>
+    );
+  }
+  console.log("History:", history);
+
+  const start = history[0];
+  const current = history[history.length - 1];
+
   const measurements = [
     {
       label: "Chest",
-      before: "93 cm",
-      current: "96 cm",
+      before: `${start.chest} cm`,
+      current: `${current.chest} cm`,
       color: "bg-[#0A4F48]",
-      active: true,
     },
     {
       label: "Waist",
-      before: "92 cm",
-      current: "89 cm",
+      before: `${start.waist} cm`,
+      current: `${current.waist} cm`,
       color: "bg-[#F4DBC7]",
-      active: false,
     },
     {
       label: "Hips",
-      before: "101 cm",
-      current: "99 cm",
+      before: `${start.hip} cm`,
+      current: `${current.hip} cm`,
       color: "bg-[#EBF3F2]",
-      active: false,
     },
   ];
 
