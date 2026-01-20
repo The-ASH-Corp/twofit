@@ -108,3 +108,91 @@ export const deleteAllCategory=async( )=>{
     throw error;
   }
 }
+
+export const founderCategoryList = async (page, limit) => {
+  try {
+    page = Number(page);
+    limit = Number(limit);
+
+    const skip = (page - 1) * limit;
+
+    const totalCount = await categoryModel.countDocuments();
+
+    const data = await categoryModel.aggregate([
+      { $skip: skip },
+      { $limit: limit },
+
+      // ===== Programs under category =====
+      {
+        $lookup: {
+          from: "programslists",
+          localField: "_id",
+          foreignField: "category",
+          as: "programs",
+        },
+      },
+
+      // ===== Heads under category =====
+      {
+        $lookup: {
+          from: "heads",
+          localField: "_id",
+          foreignField: "programCategory",
+          as: "heads",
+        },
+      },
+
+      // ===== Admins under heads =====
+      {
+        $lookup: {
+          from: "admins",
+          localField: "heads._id",
+          foreignField: "headId",
+          as: "admins",
+        },
+      },
+
+      // ===== Coaches under programs =====
+      {
+        $lookup: {
+          from: "coaches",
+          localField: "programs._id",
+          foreignField: "assignedPrograms",
+          as: "coaches",
+        },
+      },
+
+      // ===== Users under programs =====
+      {
+        $lookup: {
+          from: "users",
+          localField: "programs._id",
+          foreignField: "programType",
+          as: "users",
+        },
+      },
+
+      // ===== Final Shape =====
+      {
+        $project: {
+          _id: 0,
+          categoryId: "$_id",
+          categoryName: "$name",
+
+          programsCount: { $size: "$programs" },
+          // headsCount: { $size: "$heads" },
+          adminsCount: { $size: "$admins" },
+          expertCount: { $size: "$coaches" },
+          clientCount: { $size: "$users" },
+        },
+      },
+    ]);
+
+    return {
+      data,
+      totalCount,
+    };
+  } catch (error) {
+    throw error;
+  }
+};

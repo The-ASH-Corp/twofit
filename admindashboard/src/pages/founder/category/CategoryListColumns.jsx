@@ -26,10 +26,10 @@ export const CategoryListColumns = [
       />
     ),
   },
-  { accessorKey: "name", header: "Category Name" },
-  { accessorKey: "programLimit", header: "Programs" },
-  // { accessorKey: "name", header: "Sub Admins" },
-  // { accessorKey: "name", header: "Experts" },
-  // { accessorKey: "name", header: "Clients" },
+  { accessorKey: "categoryName", header: "Category Name" },
+  { accessorKey: "programsCount", header: "Programs" },
+  { accessorKey: "adminsCount", header: "Sub Admins" },
+  { accessorKey: "expertCount", header: "Experts" },
+  { accessorKey: "clientCount", header: "Clients" },
   { id: "actions", header: "Action", cell: () => "⋯" },
 ];
