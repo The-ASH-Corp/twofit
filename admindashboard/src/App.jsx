@@ -76,6 +76,8 @@ import ClientFeedback from "./pages/client/feedback/Feedback";
 import ClientProgress from "./pages/client/progress/Progress";
 import DailyPlan from "./pages/client/dailyPlan/DailyPlan";
 import ClientChat from "./pages/client/chats/Chats"
+import TherapyList from "./pages/admin/therapy/TherapyTable";
+import TherapyForm from "./pages/admin/therapy/TherapyForm";
 
 function App() {
   return (
@@ -183,6 +185,9 @@ function App() {
           <Route path="programs" element={<AdminProgramTable />} />
           <Route path="programs/create" element={<PlanForm />} />
           <Route path="programs/plans" element={<AdminPlanView />} />
+          <Route path="therapy" element={<TherapyList/>}/>
+          <Route path="therapy/create" element={<TherapyForm/>}/>
+          <Route path="therapy/plans" element={<TherapyDetails/>}/>
         </Route>
 
         {/* EXPERT */}
