@@ -2,10 +2,10 @@ import React, { useState } from 'react'
 import BaseTable from '../../../components/table/BaseTable'
 import { ProgramListColumns } from './ProgramListColumns'
 import { useDispatch } from 'react-redux'
-import { getAllPrograms } from '@/redux/features/program/program.thunk'
+import {  getFounderPrograms } from '@/redux/features/program/program.thunk'
 import { useAppSelector } from '@/redux/store/hooks'
 import { useEffect } from 'react'
-import { selectAllPrograms, selectProgramError, selectProgramStatus, selectTotalProgramCount } from '@/redux/features/program/program.selector'
+import {  selectFounderPrograms, selectProgramError, selectProgramStatus, selectTotalProgramCount } from '@/redux/features/program/program.selector'
 import { SyncLoader } from "react-spinners";
 
 export default function ProgramTable() {
@@ -15,21 +15,23 @@ export default function ProgramTable() {
   const [limit, setLimit] = useState(10);
 
   useEffect(() => {
-    dispatch(getAllPrograms({ page, limit }));
+    dispatch(getFounderPrograms({ page, limit }));
   }, [dispatch, page, limit]);
 
-  const data = useAppSelector(selectAllPrograms);
+  const data = useAppSelector(selectFounderPrograms);
+  const totalCount = useAppSelector(selectTotalProgramCount);
+  console.log(`data`);
   const status = useAppSelector(selectProgramStatus);
   const error = useAppSelector(selectProgramError);
-  const totalProgramCount = useAppSelector(selectTotalProgramCount);
 
   const [ programs, setProgram ] = useState([]);
 
   useEffect(()=>{
     setProgram(data)
+    console.log(`data`);
   },[data])
 
-  console.log(programs)
+  // console.log(programs)
 
     const searchInputHandler = (e) => {
       const value = e.target.value.toLowerCase();
@@ -64,7 +66,7 @@ export default function ProgramTable() {
         handleLimitChange={setLimit}
         page={page}
         limit={limit}
-        totalCount={totalProgramCount}
+        totalCount={totalCount}
       />
     </div>
   );

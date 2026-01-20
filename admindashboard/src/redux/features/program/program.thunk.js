@@ -104,3 +104,20 @@ export const getAllProgramsByAdmin = createAsyncThunk(
     }
   }
 );
+
+export const getFounderPrograms = createAsyncThunk(
+  "/programs/founder/list",
+  async ({ page, limit }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(
+        `/programs/founder/list/${page}/${limit}`,
+      );
+      console.log(`data`)
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get programs",
+      );
+    }
+  },
+);

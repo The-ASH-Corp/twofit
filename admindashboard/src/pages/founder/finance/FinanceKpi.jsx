@@ -15,20 +15,17 @@ export default function FinanceKpi() {
 
 
   return (
-    <div className="relative flex flex-col items-center gap-4 w-full bg-white p-5 rounded-xl mb-4 h-[calc()]">
-      <div className="flex flex-col md:flex-row gap-3 md:gap-0 items-start md:items-center md:justify-between w-full">
+    <div className="relative flex flex-col items-center gap-8 md:gap-4 w-full bg-white p-5 rounded-xl mb-4 h-[calc()]">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-0 items-start md:items-center md:justify-between w-full">
         <h2 className="text-[#0A4F48] font-bold text-[16px]">
           Salary & Incentives Overview
         </h2>
-        <div className="flex justify-end items-center gap-2.5 w-full">
-          <button className="text-[12px] font-semibold px-3.5 py-2.5 bg-[#EBF3F2] rounded-md">
-            Incentives
-          </button>
+        <div className="flex md:justify-end items-center gap-2.5 w-full md:w-fit">
           <button
             className="text-[12px] font-semibold px-3.5 py-2.5 bg-[#0A4F48] rounded-md text-white"
             onClick={() => setPayrollOpen(!payrollOpen)}
           >
-            Create Payroll
+           Add Incentives
           </button>
         </div>
       </div>

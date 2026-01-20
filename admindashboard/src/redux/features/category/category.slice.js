@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
- import { getAllCategories } from "./category.thunk";
+ import { getAllCategories, getFounderCategories } from "./category.thunk";
 
 const initialState = {
   allCategories: [],
+  founderCategory: [],
+  totalCategory:0,
   selectedCategory: null,
   error: null,
   status: "idle",
@@ -33,6 +35,20 @@ const categorySlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
+      .addCase(getFounderCategories.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(getFounderCategories.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.founderCategory = action.payload.data.data;
+        state.totalCategory = action.payload.data.data.totalCount;
+        state.error = null;
+      })
+      .addCase(getFounderCategories.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      });
 
        
 

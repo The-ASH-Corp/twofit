@@ -1,4 +1,12 @@
-import { createCategory ,getAllCategory,getSingleCategory,updateCategory,deleteSingleCategory,deleteAllCategory} from "./category.service.js";
+import {
+  createCategory,
+  getAllCategory,
+  getSingleCategory,
+  updateCategory,
+  deleteSingleCategory,
+  deleteAllCategory,
+  founderCategoryList,
+} from "./category.service.js";
  
 export const createCategoryController = async (req, res) => {
   try {
@@ -100,3 +108,20 @@ export const deleteAllCategoriesController = async (req, res) => {
     });
   }
 };
+
+export const gatFounderCategoryList= async (req,res)=> {
+  try {
+    const page = Number(req.params.page);
+    const limit = Number(req.params.limit);
+    const list = await founderCategoryList(page, limit);
+    return res.status(200).json({
+      success: true,
+      data: list,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}
