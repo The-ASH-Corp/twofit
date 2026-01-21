@@ -187,7 +187,7 @@ function App() {
           <Route path="programs/plans" element={<AdminPlanView />} />
           <Route path="therapy" element={<TherapyList/>}/>
           <Route path="therapy/create" element={<TherapyForm/>}/>
-          <Route path="therapy/plans" element={<TherapyDetails/>}/>
+          {/* <Route path="therapy/plans" element={<TherapyDetails/>}/> */}
         </Route>
 
         {/* EXPERT */}

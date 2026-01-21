@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllHeads } from "@/redux/features/head/head.thunk";
 import {
   selectAllHeads,
+  selectHeadCount,
   selectHeadStatus,
 } from "@/redux/features/head/head.selectors";
 import { useNavigate } from "react-router-dom";
@@ -33,7 +34,7 @@ const TherapyTable = () => {
   // ];
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [totalCount,setTotalCount]=useState(0)
+  // const [totalCount, setTotalCount] = useState(0);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -46,15 +47,17 @@ const TherapyTable = () => {
   }, [dispatch, page, limit]);
 
   const data = useSelector(selectAllHeads);
+  const totalCount = useSelector(selectHeadCount);
   const status = useSelector(selectHeadStatus);
   // const error = useSelector(selectHeadError);
 
   const [heads, setHeads] = useState([]);
-  console.log(data)
+  // console.log(data)
+  // console.log(totalCount)
 
   useEffect(() => {
-    setHeads(data?.data?.head);
-    setTotalCount(data?.data?.totalCount);
+    setHeads(data);
+    // console.log(data);
   }, [data]);
 
   const searchInputHandler = (e) => {
