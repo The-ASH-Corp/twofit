@@ -1,12 +1,48 @@
-import React, {useState } from "react";
+import React, { useState } from "react";
 import TaskModal from "./TaskModal";
-
-
+import { useDispatch } from "react-redux";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { getUserTaskStatus } from "@/redux/features/tasks/task.thunk";
+import { useEffect } from "react";
+import { socket } from "@/utils/socket";
+import { selectToken } from "@/redux/features/auth/auth.selectores";
 
 export default function TaskList({ plans }) {
+  const dispatch = useDispatch();
+  const user = useAppSelector(selectUser);
+  const token = useAppSelector(selectToken);
+  const { tasks } = useAppSelector((state) => state.tasks);
+
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [currentDay, setCurrentDay] = useState(1);
+
+  const currentGlobalDay = user?.currentGlobalDay || 1;
+
+  useEffect(() => {
+    dispatch(getUserTaskStatus());
+
+    if (user?._id && token) {
+      // Socket.IO Setup
+      socket.auth = { userId: user._id, token: token };
+      socket.connect();
+
+      socket.on("connect", () => {
+        console.log("Client task socket connected");
+      });
+
+      socket.on("task_status_updated", (data) => {
+        console.log("Task status updated via socket:", data);
+        dispatch(getUserTaskStatus()); // Refresh list
+      });
+
+      return () => {
+        socket.off("connect");
+        socket.off("task_status_updated");
+        socket.disconnect();
+      };
+    }
+  }, [dispatch, user?._id, token]);
 
   const days =
     plans?.weeks?.flatMap((week, weekIndex) =>
@@ -16,11 +52,27 @@ export default function TaskList({ plans }) {
         dayIndex: dayIndex + 1,
         globalIndex: weekIndex * 7 + dayIndex + 1,
         exercises: day.exercises,
-      }))
+      })),
     ) || [];
 
-  const currentDayData = days[currentDay - 1]; 
-  const todayExercises = currentDayData?.exercises || [];
+  const currentDayData = days[currentGlobalDay - 1];
+  const todayExercises =
+    currentDayData?.exercises?.map((ex, index) => {
+      const submission = tasks?.find(
+        (t) =>
+          t.globalDayIndex === currentGlobalDay && t.exerciseIndex === index,
+      );
+      return {
+        ...ex,
+        programId: plans.program,
+        weekIndex: currentDayData.weekIndex,
+        dayIndex: currentDayData.dayIndex,
+        globalDayIndex: currentGlobalDay,
+        exerciseIndex: index,
+        status: submission?.status || "todo",
+        submission,
+      };
+    }) || [];
 
   return (
     <div className="space-y-3 mt-4">
@@ -39,11 +91,27 @@ export default function TaskList({ plans }) {
 
           <div className="flex-1 min-w-0">
             <h3 className="font-bold text-[#0A4F48] text-[15px]">
-              {item.name ||"Workout"}
+              {item.name || "Workout"}
             </h3>
             <p className="text-[12px] text-gray-500 font-medium truncate">
               {item.notes}
             </p>
+          </div>
+
+          <div className="flex flex-col items-end gap-2">
+            {item.submission && (
+              <span
+                className={`text-[10px] font-bold px-2 py-1 rounded-full ${
+                  item.submission.status === "verified"
+                    ? "bg-green-100 text-green-700"
+                    : item.submission.status === "rejected"
+                      ? "bg-red-100 text-red-700"
+                      : "bg-yellow-100 text-yellow-700"
+                }`}
+              >
+                {item.submission.status.toUpperCase()}
+              </span>
+            )}
           </div>
 
           <div className="flex gap-2">
@@ -64,7 +132,11 @@ export default function TaskList({ plans }) {
       ))}
 
       {isOpen && (
-        <TaskModal task={selectedTask} onClose={() => setIsOpen(!isOpen)} />
+        <TaskModal
+          task={selectedTask}
+          onClose={() => setIsOpen(!isOpen)}
+          onSuccess={() => dispatch(getUserTaskStatus())}
+        />
       )}
     </div>
   );

@@ -93,6 +93,8 @@ const userSchema = new mongoose.Schema(
 
     automatedReminder: { type: Boolean, default: false },
 
+    currentGlobalDay: { type: Number, default: 1 },
+
   },
   { timestamps: true }
 );

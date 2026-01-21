@@ -1,15 +1,25 @@
 import React, { useState } from "react";
-import { X, ChevronDown, ChevronUp, Play, Link as LinkIcon, FileText } from "lucide-react";
+import {
+  X,
+  ChevronDown,
+  ChevronUp,
+  Play,
+  Link as LinkIcon,
+  FileText,
+} from "lucide-react";
+import { useDispatch } from "react-redux";
+import { verifyTask, rejectTask } from "@/redux/features/tasks/task.thunk";
 
 export default function ReviewDrawer({ review, onClose }) {
   if (!review) return null;
+  const dispatch = useDispatch();
 
   const [expandedSections, setExpandedSections] = useState({
-    warmup: true,
-    exercise1: false,
-    exercise2: false,
+    details: true,
+    file: true,
   });
-  const [reviewText, setReviewText] = useState("");
+  const [comment, setComment] = useState("");
+  const [processing, setProcessing] = useState(false);
 
   const toggleSection = (section) => {
     setExpandedSections((prev) => ({
@@ -18,13 +28,21 @@ export default function ReviewDrawer({ review, onClose }) {
     }));
   };
 
-  const handleApprove = () => {
-    console.log("Approved");
+  const handleApprove = async () => {
+    setProcessing(true);
+    await dispatch(verifyTask(review._id));
+    setProcessing(false);
     onClose();
   };
 
-  const handleImprove = () => {
-    console.log("Needs Improvement");
+  const handleImprove = async () => {
+    if (!comment) {
+      alert("Please provide a comment for improvement");
+      return;
+    }
+    setProcessing(true);
+    await dispatch(rejectTask({ id: review._id, comment }));
+    setProcessing(false);
     onClose();
   };
 
@@ -41,9 +59,11 @@ export default function ReviewDrawer({ review, onClose }) {
         {/* Header */}
         <div className="flex justify-between items-center p-5 pb-4 bg-white border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <h2 className="font-semibold text-[16px] text-gray-900">Detail View</h2>
-            <span className="px-3 py-1 bg-purple-50 text-purple-700 text-[12px] font-semibold rounded-full">
-              In Review
+            <h2 className="font-semibold text-[16px] text-gray-900">
+              Task Review
+            </h2>
+            <span className="px-3 py-1 bg-yellow-50 text-yellow-700 text-[12px] font-semibold rounded-full uppercase">
+              {review.status}
             </span>
           </div>
           <button
@@ -58,137 +78,114 @@ export default function ReviewDrawer({ review, onClose }) {
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
           {/* Client Details */}
           <div className="bg-white rounded-xl p-4 space-y-3">
-            <h3 className="text-[13px] font-semibold text-gray-500">Client Details</h3>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-[13px] text-gray-500">Client Name</span>
-                <span className="text-[13px] text-gray-900 font-medium">{review.clientName}</span>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-[13px] text-gray-500">Program</span>
-                <span className="text-[13px] text-gray-900 font-medium">{review.program}</span>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-[13px] text-gray-500">Date & Time</span>
-                <span className="text-[13px] text-gray-900 font-medium">{review.dateTime}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Warm-up Section */}
-          <div className="bg-white rounded-xl overflow-hidden">
             <button
-              onClick={() => toggleSection("warmup")}
-              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+              onClick={() => toggleSection("details")}
+              className="w-full flex items-center justify-between"
             >
-              <h3 className="text-[14px] font-semibold text-gray-900">Warm-up</h3>
-              {expandedSections.warmup ? (
-                <ChevronUp className="w-4 h-4 text-gray-500" />
+              <h3 className="text-[13px] font-semibold text-gray-500 uppercase">
+                Client Details
+              </h3>
+              {expandedSections.details ? (
+                <ChevronUp className="w-4 h-4 text-gray-400" />
               ) : (
-                <ChevronDown className="w-4 h-4 text-gray-500" />
+                <ChevronDown className="w-4 h-4 text-gray-400" />
               )}
             </button>
-            
-            {expandedSections.warmup && (
-              <div className="px-4 pb-4 space-y-3 border-t border-gray-100">
-                <div className="pt-3">
-                  <label className="text-[12px] text-gray-500 mb-2 block">Notes</label>
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <p className="text-[12px] text-gray-700 leading-relaxed">
-                      Start by stretching on one leg, and swinging the other leg forward and back. Use small swings that progress into larger swings as your hamstrings. Then transition to side-to-side leg swings.
-                    </p>
-                  </div>
+
+            {expandedSections.details && (
+              <div className="space-y-2 pt-2 border-t border-gray-50">
+                <div className="flex justify-between items-center">
+                  <span className="text-[13px] text-gray-500">Client Name</span>
+                  <span className="text-[13px] text-gray-900 font-medium">
+                    {review.userId?.name}
+                  </span>
                 </div>
-                
-                <div>
-                  <label className="text-[12px] text-gray-500 mb-2 block">Video</label>
-                  <div className="flex items-center justify-between bg-[#FDF8F3] rounded-lg p-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-[#F4DBC7] rounded flex items-center justify-center">
-                        <FileText className="w-4 h-4 text-[#8B6F47]" />
-                      </div>
-                      <div>
-                        <p className="text-[12px] text-gray-900 font-medium">Breakfast-extra.mp4</p>
-                        <p className="text-[11px] text-gray-500">8876 • 2.3 MB</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button className="px-3 py-1.5 text-[11px] font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-white transition-colors">
-                        Get Link
-                      </button>
-                      <button className="px-3 py-1.5 text-[11px] font-medium text-white bg-[#0A4F48] rounded-lg hover:bg-[#083d37] transition-colors">
-                        Play
-                      </button>
-                    </div>
-                  </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-[13px] text-gray-500">Program</span>
+                  <span className="text-[13px] text-gray-900 font-medium">
+                    {review.programId?.title || "N/A"}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-[13px] text-gray-500">Task</span>
+                  <span className="text-[13px] text-gray-900 font-medium">
+                    Day {review.globalDayIndex} - Ex {review.exerciseIndex + 1}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-[13px] text-gray-500">Submitted</span>
+                  <span className="text-[13px] text-gray-900 font-medium">
+                    {new Date(review.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Bodyweight Squats */}
-          <div className="bg-white rounded-xl overflow-hidden border-l-4 border-[#0A4F48]">
-            <button
-              onClick={() => toggleSection("exercise1")}
-              className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
-            >
-              <h3 className="text-[14px] font-semibold text-gray-900">Bodyweight Squats</h3>
-              {expandedSections.exercise1 ? (
-                <ChevronUp className="w-4 h-4 text-gray-500" />
-              ) : (
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              )}
-            </button>
-          </div>
-
-          {/* Glute Bridges */}
+          {/* Submission Preview */}
           <div className="bg-white rounded-xl overflow-hidden">
             <button
-              onClick={() => toggleSection("exercise2")}
+              onClick={() => toggleSection("file")}
               className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
             >
-              <h3 className="text-[14px] font-semibold text-gray-900">Glute Bridges</h3>
-              {expandedSections.exercise2 ? (
+              <h3 className="text-[14px] font-semibold text-gray-900">
+                Submission Proof
+              </h3>
+              {expandedSections.file ? (
                 <ChevronUp className="w-4 h-4 text-gray-500" />
               ) : (
                 <ChevronDown className="w-4 h-4 text-gray-500" />
               )}
             </button>
-          </div>
 
-          {/* Client Feedback */}
-          <div className="bg-white rounded-xl p-4 space-y-3">
-            <h3 className="text-[13px] font-semibold text-gray-500">Client Feedback</h3>
-            
-            <div>
-              <label className="text-[12px] text-gray-500 mb-2 block">Comment</label>
-              <div className="bg-gray-50 rounded-lg p-3">
-                <p className="text-[12px] text-gray-700 leading-relaxed">
-                  A no-cook, meal-prep-friendly option where oats are soaked in milk (dairy or plant-based) in the fridge overnight. They can be customized with toppings like fruits or nut butters.
-                </p>
+            {expandedSections.file && (
+              <div className="px-4 pb-4 space-y-3 border-t border-gray-100">
+                <div className="pt-3">
+                  <label className="text-[12px] text-gray-500 mb-2 block">
+                    Client's Notes
+                  </label>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <p className="text-[12px] text-gray-700 leading-relaxed">
+                      {review.notes || "No notes provided"}
+                    </p>
+                  </div>
+                </div>
+
+                {review.file && (
+                  <div className="rounded-lg overflow-hidden border border-gray-100">
+                    {review.file.match(/\.(mp4|webm|ogg)$/i) ? (
+                      <video
+                        src={`${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}${review.file}`}
+                        controls
+                        className="w-full h-auto"
+                      />
+                    ) : (
+                      <img
+                        src={`${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}${review.file}`}
+                        alt="Proof"
+                        className="w-full h-auto"
+                      />
+                    )}
+                  </div>
+                )}
               </div>
-            </div>
-            
-            <div>
-              <label className="text-[12px] text-gray-500 mb-2 block">Attachment</label>
-              <div className="flex items-center justify-between bg-gray-50 rounded-lg p-3">
-                <FileText className="w-5 h-5 text-gray-400" />
-                <button className="px-4 py-1.5 text-[12px] font-medium text-white bg-[#0A4F48] rounded-lg hover:bg-[#083d37] transition-colors">
-                  Play
-                </button>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Review Section */}
           <div className="bg-white rounded-xl p-4 space-y-3">
-            <h3 className="text-[13px] font-semibold text-gray-500">Review</h3>
-            <button className="w-full px-4 py-2 text-[13px] font-medium text-[#0A4F48] border border-[#0A4F48] rounded-lg hover:bg-[#0A4F48] hover:text-white transition-colors">
-              Add Review
-            </button>
+            <h3 className="text-[13px] font-semibold text-gray-500 uppercase">
+              Your Feedback
+            </h3>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Provide feedback for the client..."
+              className="w-full h-24 text-[13px] border border-gray-200 rounded-lg p-3 focus:outline-none focus:border-[#0A4F48] bg-gray-50/50"
+            />
           </div>
         </div>
 
@@ -196,15 +193,17 @@ export default function ReviewDrawer({ review, onClose }) {
         <div className="p-5 pt-4 bg-white border-t border-gray-200 flex gap-3">
           <button
             onClick={handleImprove}
-            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-[14px]"
+            disabled={processing}
+            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium text-[14px] disabled:opacity-50"
           >
-            Let's Improve
+            Needs Work
           </button>
           <button
             onClick={handleApprove}
-            className="flex-1 px-4 py-3 bg-[#0A4F48] text-white rounded-lg hover:bg-[#083d37] transition-colors font-medium text-[14px]"
+            disabled={processing}
+            className="flex-1 px-4 py-3 bg-[#0A4F48] text-white rounded-lg hover:bg-[#083d37] transition-colors font-medium text-[14px] disabled:opacity-50"
           >
-            Approved
+            {processing ? "..." : "Approve"}
           </button>
         </div>
       </div>

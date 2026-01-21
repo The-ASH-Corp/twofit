@@ -193,12 +193,12 @@ export const getCoachesByAdmin = async (req, res) => {
     });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
-  }   
+  }
 };
 
-export const createFeedback = async (req, res)=> {
+export const createFeedback = async (req, res) => {
   try {
-    const {expertId, userId, rating, feedback} = req.body;
+    const { expertId, userId, rating, feedback } = req.body;
 
     const data = await coachService.createFeedback(expertId, userId, rating, feedback);
 
@@ -208,7 +208,7 @@ export const createFeedback = async (req, res)=> {
       data: data,
     });
   } catch (err) {
-     res.status(400).json({ success: false, message: err.message });
+    res.status(400).json({ success: false, message: err.message });
   }
 };
 
@@ -232,9 +232,17 @@ export const getClientsForExpert = async (req, res) => {
   }
 };
 
-export const getCoachDashboardStats = async(req, res) => {
+export const getCoachDashboardStats = async (req, res) => {
   try {
     const { coachId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(coachId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid coach ID",
+      });
+    }
+
     const stats = await coachService.getCoachDashboardStats(coachId);
 
     res.status(200).json({

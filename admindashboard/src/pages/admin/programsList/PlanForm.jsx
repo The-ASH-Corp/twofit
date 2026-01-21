@@ -225,11 +225,11 @@ export default function PlanForm() {
 
     const data = await dispatch(createNewPlan(payload));
 
-    if (data.payload.success) {
-      toast.success(data.payload.message);
-      navigate(-1); // Navigate back to the previous page
+    if (data.meta.requestStatus === "fulfilled") {
+      toast.success("Plan created successfully");
+      navigate(-1);
     } else {
-      toast.error(data.payload.message);
+      toast.error("Failed to create plan");
     }
   };
   return (
