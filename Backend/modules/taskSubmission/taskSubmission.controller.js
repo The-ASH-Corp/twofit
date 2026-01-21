@@ -11,7 +11,7 @@ const checkAndAdvanceDay = async (userId, globalDayIndex) => {
         populate: { path: 'plan' }
     });
 
-    if (!user?.programType?.plan) return;
+    if (!user?.programType?.plan) return false;
 
     const plan = user.programType.plan;
     let currentDayConfig = null;
@@ -28,16 +28,17 @@ const checkAndAdvanceDay = async (userId, globalDayIndex) => {
         if (currentDayConfig) break;
     }
 
-    if (!currentDayConfig) return;
+    if (!currentDayConfig) return false;
 
-    const totalExercises = currentDayConfig.exercises.length;
+    // Total exercises = workout exercises from plan + 4 static meal tasks
+    const totalExercises = currentDayConfig.exercises.length + 4;
 
     // Count total VERIFIED exercises for this userId and globalDayIndex from nested structure
     const userSubmission = await TaskSubmission.findOne({ userId });
-    if (!userSubmission) return;
+    if (!userSubmission) return false;
 
     const daySubmission = userSubmission.dailySubmissions.find(d => d.globalDayIndex === Number(globalDayIndex));
-    if (!daySubmission) return;
+    if (!daySubmission) return false;
 
     const verifiedSubmissionsCount = daySubmission.exercises.filter(ex => ex.status === "verified").length;
 
@@ -45,8 +46,22 @@ const checkAndAdvanceDay = async (userId, globalDayIndex) => {
         if (user.currentGlobalDay === Number(globalDayIndex)) {
             user.currentGlobalDay += 1;
             await user.save();
+
+            // Notify the client that they've advanced to the next day
+            try {
+                const io = getIO();
+                io.to(userId.toString()).emit("day_advanced", {
+                    newGlobalDay: user.currentGlobalDay,
+                    completedDay: globalDayIndex
+                });
+            } catch (socketError) {
+                console.error("Socket notification for day advancement failed:", socketError.message);
+            }
+
+            return true;
         }
     }
+    return false;
 };
 
 export const submitTask = async (req, res) => {
@@ -360,16 +375,31 @@ export const rejectTask = async (req, res) => {
         let foundGlobalDayIndex = null;
         let foundExerciseIndex = null;
 
+        // Find the rejected task and its globalDayIndex
         userSubmission.dailySubmissions.forEach(day => {
             const ex = day.exercises.find(e => e._id.toString() === id);
             if (ex) {
-                ex.status = "rejected";
-                ex.adminComment = comment || "Rejected by expert";
-                ex.updatedAt = Date.now();
                 foundGlobalDayIndex = day.globalDayIndex;
                 foundExerciseIndex = ex.exerciseIndex;
             }
         });
+
+        // Reject ALL tasks for this day
+        if (foundGlobalDayIndex !== null) {
+            userSubmission.dailySubmissions.forEach(day => {
+                if (day.globalDayIndex === foundGlobalDayIndex) {
+                    day.exercises.forEach(ex => {
+                        if (ex.status !== 'verified') {
+                            ex.status = "rejected";
+                            ex.adminComment = ex._id.toString() === id
+                                ? (comment || "Rejected by expert")
+                                : "Entire day rejected due to one task failure. Please resubmit all tasks for this day.";
+                            ex.updatedAt = Date.now();
+                        }
+                    });
+                }
+            });
+        }
 
         await userSubmission.save();
 
@@ -401,7 +431,7 @@ export const rejectTask = async (req, res) => {
             console.error("Socket notification failed:", socketError.message);
         }
 
-        res.status(200).json({ success: true, message: "Task rejected" });
+        res.status(200).json({ success: true, message: "Task rejected - entire day must be resubmitted" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }

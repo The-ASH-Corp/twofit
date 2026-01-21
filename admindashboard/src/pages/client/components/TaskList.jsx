@@ -36,9 +36,16 @@ export default function TaskList({ plans }) {
         dispatch(getUserTaskStatus()); // Refresh list
       });
 
+      socket.on("day_advanced", (data) => {
+        console.log("Day advanced via socket:", data);
+        // Refresh user profile to get updated currentGlobalDay
+        window.location.reload(); // Simple reload to refresh all data
+      });
+
       return () => {
         socket.off("connect");
         socket.off("task_status_updated");
+        socket.off("day_advanced");
         socket.disconnect();
       };
     }
