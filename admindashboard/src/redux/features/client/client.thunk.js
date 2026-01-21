@@ -117,4 +117,20 @@ export const fetchClientMeasurementHistory = createAsyncThunk(
       );
     }
   }
-);  
+); 
+
+export const getFounderAllClients = createAsyncThunk(
+  "/clients/founder/list",
+  async ({ page, limit }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(
+        `/clients/founder/list/${page}/${limit}`,
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get clients",
+      );
+    }
+  },
+);

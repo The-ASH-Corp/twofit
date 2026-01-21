@@ -24,12 +24,12 @@ export const therapyColumns = [
   //     />
   //   ),
   // },
-  { accessorKey: "name", header: "Head Name" },
-  { accessorKey: "gender", header: "Assigned Category" },
-  { accessorKey: "email", header: "Programs" },
-  { accessorKey: "phone", header: "Sub Admins" },
-  { accessorKey: "phone", header: "Experts" },
-  { accessorKey: "phone", header: "Clients" },
+  { accessorKey: "headName", header: "Head Name" },
+  { accessorKey: "categoryName", header: "Assigned Category" },
+  { accessorKey: "programCount", header: "Programs" },
+  { accessorKey: "adminCount", header: "Sub Admins" },
+  { accessorKey: "coachCount", header: "Experts" },
+  { accessorKey: "userCount", header: "Clients" },
   {
     accessorKey: "status",
     header: "Status",

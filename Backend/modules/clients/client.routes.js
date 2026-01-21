@@ -1,11 +1,25 @@
 import express from "express";
-import { deleteClient, getAllClients, getAllFeedbacks, getClientsBasedOnCoach, getMeasurementHistoryOnly, getSingleClient, getWeightHistoryOnly, updateClient, updateMeasurements, updateWeight } from "./client.controller.js";
+import {
+  deleteClient,
+  getAllClients,
+  getAllFeedbacks,
+  getClientsBasedOnCoach,
+  getMeasurementHistoryOnly,
+  getSingleClient,
+  getWeightHistoryOnly,
+  updateClient,
+  updateMeasurements,
+  updateWeight,
+  getFounderClientList,
+} from "./client.controller.js";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
 
 
 const router = express.Router()
 
 router.get("/all-clients/:page/:limit", getAllClients)
+router.get("/founder/list/:page/:limit", getFounderClientList);
+router.get("/all-clients/:page/:limit", getAllClients);
 router.get("/get-client/:id", getSingleClient)
 router.post("/update-client/:id", updateClient)
 router.delete("/delete-client/:id", deleteClient)

@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchClientWeightHistory, getAllClients, getClient, getClientsBasedOnCoach } from "./client.thunk";
+import { fetchClientWeightHistory, getAllClients, getClient, getClientsBasedOnCoach, getFounderAllClients } from "./client.thunk";
 
 const initialState = {
   allClients: [],
+  founderClientList: [],
   selectedClient: null,
   weightHistory: [],
   currentWeight: null,
@@ -64,7 +65,6 @@ const clientSlice = createSlice({
         state.error = action.payload;
       })
 
-
       .addCase(fetchClientWeightHistory.pending, (state) => {
         state.status = "loading";
       })
@@ -75,6 +75,19 @@ const clientSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchClientWeightHistory.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(getFounderAllClients.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getFounderAllClients.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.founderClientList = action.payload.data.data;
+        state.totalCount = action.payload.data.totalCount;
+        state.error = null;
+      })
+      .addCase(getFounderAllClients.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

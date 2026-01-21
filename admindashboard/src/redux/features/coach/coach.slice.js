@@ -1,11 +1,13 @@
 
 import { createSlice } from "@reduxjs/toolkit";
-import { createCoach, getAllCoaches, getSingleCoach, getUsersAssignedToACoach } from "./coach.thunk";
+import { createCoach, getAllCoaches, getFounderAllCoaches, getSingleCoach, getUsersAssignedToACoach } from "./coach.thunk";
 import { getAllCoachesByAdminId } from "../admins/admin.thunk";
 
 const initialState = {
   allCoaches: [],
   assignedClients: [],
+  founderCoachList: [],
+  coachCount: 0,
   totalClientsCount: 0,
   selectedCoach: null,
   error: null,
@@ -86,7 +88,6 @@ const coachSlice = createSlice({
         state.error = action.payload;
       })
 
-
       .addCase(getUsersAssignedToACoach.pending, (state) => {
         state.status = "loading";
       })
@@ -97,6 +98,19 @@ const coachSlice = createSlice({
         state.error = null;
       })
       .addCase(getUsersAssignedToACoach.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(getFounderAllCoaches.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getFounderAllCoaches.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.founderCoachList = action.payload.data.data;
+        state.coachCount = action.payload.data.totalCount;
+        state.error = null;
+      })
+      .addCase(getFounderAllCoaches.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

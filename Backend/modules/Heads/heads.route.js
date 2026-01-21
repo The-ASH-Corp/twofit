@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post('/create', headsController.createHead);
 router.get("/get-all-heads/:page/:limit", headsController.getAllHeads);
+router.get("/founder/list/:page/:limit", headsController.founderHeadList)
 router.get("/get-head/:id", headsController.getHeadById);
 router.put("/update/:id", headsController.updateHead);
 router.delete("/delete/:id", headsController.deleteHead);

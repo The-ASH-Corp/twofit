@@ -245,3 +245,22 @@ export const getCoachDashboardStats = async(req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 }
+
+export const getFounderCoachList = async (req, res) => {
+  try {
+    const { page, limit } = req.params;
+
+    const list = await coachService.founderCoachList(page, limit);
+
+    res.status(200).json({
+      success: true,
+      data: list,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
