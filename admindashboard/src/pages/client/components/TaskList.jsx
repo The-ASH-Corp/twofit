@@ -56,14 +56,17 @@ export default function TaskList({ plans }) {
     ) || [];
 
   const currentDayData = days[currentGlobalDay - 1];
-  const todayExercises =
+  const workoutExercises =
     currentDayData?.exercises?.map((ex, index) => {
       const submission = tasks?.find(
         (t) =>
-          t.globalDayIndex === currentGlobalDay && t.exerciseIndex === index,
+          t.globalDayIndex === currentGlobalDay &&
+          t.exerciseIndex === index &&
+          t.taskType === "Workout",
       );
       return {
         ...ex,
+        type: "Workout",
         programId: plans.program,
         weekIndex: currentDayData.weekIndex,
         dayIndex: currentDayData.dayIndex,
@@ -73,6 +76,32 @@ export default function TaskList({ plans }) {
         submission,
       };
     }) || [];
+
+  const mealTasks = ["Meal 1", "Meal 2", "Meal 3", "Meal 4"].map(
+    (mealName, index) => {
+      const mealIndex = 100 + index; // Use a high index range for static meals to avoid collisions
+      const submission = tasks?.find(
+        (t) =>
+          t.globalDayIndex === currentGlobalDay &&
+          t.exerciseIndex === mealIndex &&
+          t.taskType === "Meal",
+      );
+      return {
+        name: mealName,
+        type: "Meal",
+        notes: "Log your meal photo/video for review.",
+        programId: plans?.program,
+        weekIndex: currentDayData?.weekIndex || 1,
+        dayIndex: currentDayData?.dayIndex || 1,
+        globalDayIndex: currentGlobalDay,
+        exerciseIndex: mealIndex,
+        status: submission?.status || "todo",
+        submission,
+      };
+    },
+  );
+
+  const todayExercises = [...workoutExercises, ...mealTasks];
 
   return (
     <div className="space-y-3 mt-4">

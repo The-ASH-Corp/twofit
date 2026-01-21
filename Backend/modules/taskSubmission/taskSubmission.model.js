@@ -32,6 +32,11 @@ const taskSubmissionSchema = new mongoose.Schema(
                             type: Number,
                             required: true,
                         },
+                        taskType: {
+                            type: String,
+                            enum: ["Workout", "Meal", "Therapy"],
+                            default: "Workout",
+                        },
                         status: {
                             type: String,
                             enum: ["pending", "verified", "rejected"],

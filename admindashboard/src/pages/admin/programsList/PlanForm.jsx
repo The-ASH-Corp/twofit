@@ -363,7 +363,7 @@ export default function PlanForm() {
                           <div className="p-4 bg-white flex flex-col gap-6 rounded-b-xl">
                             <PlanSection
                               title="Workout Plan"
-                              type="workout"
+                              type="Workout"
                               exercises={day.exercises || []}
                               onAddExercise={(exercise) =>
                                 addExercise(week.id, day.id, exercise)
@@ -570,11 +570,19 @@ const PlanSection = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <InputGroup
-                label={type === "workout" ? "Exercise Name" : "Therapy Type"}
+                label={
+                  type === "Workout"
+                    ? "Exercise Name"
+                    : type === "Meal"
+                      ? "Meal Name"
+                      : "Therapy Type"
+                }
                 placeholder={
-                  type === "workout"
+                  type === "Workout"
                     ? "Enter Exercise Name"
-                    : "Select Therapy Type"
+                    : type === "Meal"
+                      ? "Enter Meal Name"
+                      : "Select Therapy Type"
                 }
                 value={formState.name}
                 onChange={(e) =>
@@ -582,22 +590,31 @@ const PlanSection = ({
                 }
               />
               <InputGroup
-                label={type === "workout" ? "Notes" : "Attach URL"}
-                placeholder={
-                  type === "workout" ? "Add Notes" : "Paste link here"
+                label={
+                  type === "Workout" || type === "Meal" ? "Notes" : "Attach URL"
                 }
-                value={type === "workout" ? formState.notes : formState.url}
+                placeholder={
+                  type === "Workout" || type === "Meal"
+                    ? "Add Notes"
+                    : "Paste link here"
+                }
+                value={
+                  type === "Workout" || type === "Meal"
+                    ? formState.notes
+                    : formState.url
+                }
                 onChange={(e) =>
                   setFormState({
                     ...formState,
-                    [type === "workout" ? "notes" : "url"]: e.target.value,
+                    [type === "Workout" || type === "Meal" ? "notes" : "url"]:
+                      e.target.value,
                   })
                 }
               />
             </div>
             {/* Input Row 2 */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {type === "workout" && (
+              {(type === "Workout" || type === "Meal") && (
                 <InputGroup
                   label="Attach URL"
                   placeholder="Paste link here"
@@ -607,7 +624,7 @@ const PlanSection = ({
                   }
                 />
               )}
-              {type === "therapy" && (
+              {type === "Therapy" && (
                 <InputGroup
                   label="Notes"
                   placeholder="Add Notes"
@@ -633,9 +650,11 @@ const PlanSection = ({
                   <input
                     type="text"
                     placeholder={
-                      type === "workout"
+                      type === "Workout"
                         ? "Upload Exercise Video"
-                        : "Upload Video, Audio and Photos"
+                        : type === "Meal"
+                          ? "Upload Meal Photo/Video"
+                          : "Upload Video, Audio and Photos"
                     }
                     className="w-full px-4 py-2.5 text-xs outline-none text-gray-500 placeholder:text-gray-400 bg-white cursor-pointer"
                     readOnly
@@ -669,12 +688,12 @@ const PlanSection = ({
               className="flex items-center justify-center gap-2 px-4 py-2 bg-[#0A4F48] text-white text-xs font-bold rounded-lg shadow-sm hover:bg-[#08443e] transition-all w-full md:w-fit md:place-self-end"
             >
               {editingId ? <Check size={14} /> : <Plus size={14} />}
-              {editingId ? "Update Exercise" : "Add Exercise"}
+              {editingId ? "Update Item" : "Add Item"}
             </button>
           </div>
 
-          {/* List of Added Exercises (Moved Below) */}
-          {type === "workout" && exercises.length > 0 && (
+          {/* List of Added Items */}
+          {exercises.length > 0 && (
             <div className="flex flex-col gap-2 mt-2">
               {exercises.map((ex) => (
                 <ExistingItem

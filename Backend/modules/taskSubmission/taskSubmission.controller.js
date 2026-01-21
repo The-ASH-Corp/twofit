@@ -51,7 +51,7 @@ const checkAndAdvanceDay = async (userId, globalDayIndex) => {
 
 export const submitTask = async (req, res) => {
     try {
-        const { programId, weekIndex, dayIndex, globalDayIndex, exerciseIndex, notes } = req.body;
+        const { programId, weekIndex, dayIndex, globalDayIndex, exerciseIndex, notes, taskType: explicitTaskType } = req.body;
         const userId = req.user._id || req.user.id;
         const file = req.file ? "/uploads/" + req.file.filename : null;
 
@@ -59,6 +59,38 @@ export const submitTask = async (req, res) => {
         const eIndex = Number(exerciseIndex);
         const wIndex = Number(weekIndex);
         const dIndex = Number(dayIndex);
+
+        let taskType = explicitTaskType || "Workout";
+
+        // If it's a workout, we verify it against the plan to be safe (and to stay consistent)
+        // If it's a meal, we trust the frontend (since meals are static and not in the "plan" document)
+        if (taskType === "Workout") {
+            const user = await User.findById(userId).populate({
+                path: 'programType',
+                populate: { path: 'plan' }
+            });
+
+            if (user?.programType?.plan) {
+                const plan = user.programType.plan;
+                let currentDayConfig = null;
+                let dayCounter = 0;
+
+                for (const week of plan.weeks) {
+                    for (const day of week.days) {
+                        dayCounter++;
+                        if (dayCounter === gIndex) {
+                            currentDayConfig = day;
+                            break;
+                        }
+                    }
+                    if (currentDayConfig) break;
+                }
+
+                if (currentDayConfig && currentDayConfig.exercises[eIndex]) {
+                    taskType = currentDayConfig.exercises[eIndex].type || "Workout";
+                }
+            }
+        }
 
         let userSubmission = await TaskSubmission.findOne({ userId });
 
@@ -72,6 +104,7 @@ export const submitTask = async (req, res) => {
                     dayIndex: dIndex,
                     exercises: [{
                         exerciseIndex: eIndex,
+                        taskType,
                         status: "pending",
                         file,
                         notes,
@@ -91,6 +124,7 @@ export const submitTask = async (req, res) => {
                     dayIndex: dIndex,
                     exercises: [{
                         exerciseIndex: eIndex,
+                        taskType,
                         status: "pending",
                         file,
                         notes,
@@ -106,6 +140,7 @@ export const submitTask = async (req, res) => {
                         return res.status(400).json({ success: false, message: "Task already verified" });
                     }
                     exercise.status = 'pending';
+                    exercise.taskType = taskType;
                     exercise.file = file || exercise.file;
                     exercise.notes = notes || exercise.notes;
                     exercise.adminComment = "";
@@ -113,6 +148,7 @@ export const submitTask = async (req, res) => {
                 } else {
                     day.exercises.push({
                         exerciseIndex: eIndex,
+                        taskType,
                         status: "pending",
                         file,
                         notes,
@@ -166,6 +202,7 @@ export const getPendingSubmissions = async (req, res) => {
         const lowerRole = userRole.toLowerCase();
 
         let matchQuery = {};
+        let taskTypeFilter = null;
 
         const allowedRolesToSeeAll = ["admin", "manager", "head", "founder"];
 
@@ -181,13 +218,22 @@ export const getPendingSubmissions = async (req, res) => {
             }).distinct("_id");
 
             matchQuery.userId = { $in: clientIds };
+
+            if (lowerRole.includes("trainer")) taskTypeFilter = "Workout";
+            else if (lowerRole.includes("dietician") || lowerRole.includes("dietitian")) taskTypeFilter = "Meal";
+            else if (lowerRole.includes("therapist")) taskTypeFilter = "Therapy";
         }
 
         const submissions = await TaskSubmission.aggregate([
             { $match: matchQuery },
             { $unwind: "$dailySubmissions" },
             { $unwind: "$dailySubmissions.exercises" },
-            { $match: { "dailySubmissions.exercises.status": "pending" } },
+            {
+                $match: {
+                    "dailySubmissions.exercises.status": "pending",
+                    ...(taskTypeFilter ? { "dailySubmissions.exercises.taskType": taskTypeFilter } : {})
+                }
+            },
             {
                 $lookup: {
                     from: "users",
@@ -225,6 +271,7 @@ export const getPendingSubmissions = async (req, res) => {
                     globalDayIndex: "$dailySubmissions.globalDayIndex",
                     exerciseIndex: "$dailySubmissions.exercises.exerciseIndex",
                     status: "$dailySubmissions.exercises.status",
+                    taskType: "$dailySubmissions.exercises.taskType",
                     file: "$dailySubmissions.exercises.file",
                     notes: "$dailySubmissions.exercises.notes",
                     createdAt: "$dailySubmissions.exercises.createdAt"

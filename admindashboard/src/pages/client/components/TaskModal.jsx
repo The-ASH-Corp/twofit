@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import { uploadTask } from "@/redux/features/tasks/task.thunk";
 
+import MealPlaceholder from "@/assets/MealPlaceholder.png";
+
 export default function TaskModal({ task, onClose, onSuccess }) {
   const [fileName, setFileName] = useState("Upload File");
   const [file, setFile] = useState(null);
@@ -17,7 +19,8 @@ export default function TaskModal({ task, onClose, onSuccess }) {
   const currentSubmission = tasks?.find(
     (t) =>
       t.globalDayIndex === task.globalDayIndex &&
-      t.exerciseIndex === task.exerciseIndex,
+      t.exerciseIndex === task.exerciseIndex &&
+      t.taskType === task.type,
   );
 
   const effectiveTask = {
@@ -29,6 +32,8 @@ export default function TaskModal({ task, onClose, onSuccess }) {
   const [uploading, setUploading] = useState(false);
   const [videoWatched, setVideoWatched] = useState(false);
 
+  const isMeal = effectiveTask.type === "Meal";
+
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -39,7 +44,11 @@ export default function TaskModal({ task, onClose, onSuccess }) {
 
   const handleUpload = async () => {
     if (!file) {
-      alert("Please upload a photo or video proof.");
+      alert(
+        isMeal
+          ? "Please upload a photo of your meal."
+          : "Please upload a photo or video proof.",
+      );
       return;
     }
 
@@ -59,6 +68,7 @@ export default function TaskModal({ task, onClose, onSuccess }) {
         "exerciseIndex",
         task.exerciseIndex !== undefined ? task.exerciseIndex : 0,
       );
+      formData.append("taskType", task.type || "Workout");
 
       const result = await dispatch(uploadTask(formData));
 
@@ -98,7 +108,7 @@ export default function TaskModal({ task, onClose, onSuccess }) {
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
             <h1 className="text-[#0A4F48] text-[18px] font-bold">
-              {effectiveTask.type || effectiveTask.name}
+              {effectiveTask.name}
             </h1>
             {isVerified && (
               <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">
@@ -128,7 +138,7 @@ export default function TaskModal({ task, onClose, onSuccess }) {
         <div className="flex-1 overflow-y-auto space-y-6 pr-2 -mr-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="w-full aspect-video rounded-2xl overflow-hidden shadow-sm">
             <img
-              src={"src/assets/Workout.png"}
+              src={isMeal ? MealPlaceholder : "src/assets/Workout.png"}
               alt={effectiveTask.name}
               className="w-full h-full object-cover"
             />
@@ -180,7 +190,7 @@ export default function TaskModal({ task, onClose, onSuccess }) {
               )}
           </div>
 
-          {/* PDF Card */}
+          {/* PDF Card / Guide Card */}
           <div className="flex items-center justify-between bg-[#FDF8F3] p-4 rounded-[20px] border border-[#FBEAD9]/50">
             <div className="flex items-center gap-4">
               {/* <div className="w-11 h-11 bg-[#FBEAD9] flex items-center justify-center rounded-xl shadow-sm">
@@ -188,7 +198,9 @@ export default function TaskModal({ task, onClose, onSuccess }) {
               </div> */}
               <div>
                 <p className="text-[14px] font-bold text-gray-800 leading-none mb-1.5">
-                  {effectiveTask.mediaName}
+                  {isMeal
+                    ? "Healthy Diet Plan Guide"
+                    : effectiveTask.mediaName || "Exercise Guide"}
                 </p>
                 {/* <p className="text-[11px] text-gray-400 font-bold uppercase tracking-tight">
                   PDF • 2.4 MB
@@ -203,36 +215,41 @@ export default function TaskModal({ task, onClose, onSuccess }) {
             </button>
           </div>
 
-          {videoWatched && !isVerified && !isPending && (
+          {(isMeal || videoWatched) && !isVerified && !isPending && (
             <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
               <div className="space-y-2">
                 <label className="text-[12px] font-bold text-gray-700 block">
-                  Comment
+                  {isMeal ? "Meal Comment" : "Exercise Comment"}
                 </label>
                 <input
                   type="text"
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
-                  placeholder="Add Comment"
+                  placeholder={
+                    isMeal
+                      ? "Add any details about your meal..."
+                      : "Add Comment"
+                  }
                   className="w-full border border-gray-100 bg-gray-50/30 focus:bg-white focus:border-[#0A4F48] focus:outline-none p-3 px-4 text-[13px] rounded-xl transition-all"
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="text-[12px] font-bold text-gray-700 block">
-                  Attachment
+                  {isMeal ? "Meal Attachment" : "Exercise Attachment"}
                 </label>
                 <label className="w-full flex items-center justify-between border border-gray-100 bg-gray-50/30 rounded-xl p-1.5 cursor-pointer hover:bg-white hover:border-gray-200 transition-all">
                   <span className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-[13px] font-bold truncate max-w-[150px]">
                     {fileName}
                   </span>
                   <span className="text-[13px] text-gray-400 font-medium pr-4">
-                    Upload Photo or video
+                    {isMeal ? "Upload Meal Photo" : "Upload Photo or video"}
                   </span>
                   <input
                     type="file"
                     className="hidden"
                     onChange={handleFileChange}
+                    accept={isMeal ? "image/*" : "video/*,image/*"}
                   />
                 </label>
               </div>
@@ -247,7 +264,7 @@ export default function TaskModal({ task, onClose, onSuccess }) {
           >
             Cancel
           </button>
-          {videoWatched && !isVerified && !isPending && (
+          {(isMeal || videoWatched) && !isVerified && !isPending && (
             <button
               onClick={handleUpload}
               disabled={uploading || !file}
@@ -259,7 +276,7 @@ export default function TaskModal({ task, onClose, onSuccess }) {
         </div>
       </div>
 
-      {/* Video Modal */}
+      {/* Video/Image Modal */}
       {showVideoModal && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div
@@ -269,7 +286,7 @@ export default function TaskModal({ task, onClose, onSuccess }) {
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden">
             <div className="flex justify-between items-center p-4 border-b border-gray-100">
               <h2 className="text-[#0A4F48] text-lg font-bold">
-                Exercise Video
+                {isMeal ? "Dietary Recommendation" : "Exercise Video"}
               </h2>
               <button
                 onClick={() => setShowVideoModal(false)}
@@ -279,21 +296,33 @@ export default function TaskModal({ task, onClose, onSuccess }) {
               </button>
             </div>
             <div className="p-4 flex flex-col gap-4">
-              <video
-                controls
-                autoPlay
-                className="w-full rounded-xl"
-                src={effectiveTask.url}
-                onEnded={() => setVideoWatched(true)}
-              >
-                Your browser does not support the video tag.
-              </video>
+              {isMeal ? (
+                <div className="w-full rounded-xl overflow-hidden shadow-inner bg-gray-50">
+                  <img
+                    src={MealPlaceholder}
+                    alt="Healthy Meal"
+                    className="w-full h-auto max-h-[60vh] object-contain mx-auto"
+                    onLoad={() => setVideoWatched(true)}
+                  />
+                </div>
+              ) : (
+                <video
+                  controls
+                  autoPlay
+                  className="w-full rounded-xl"
+                  src={effectiveTask.url}
+                  onEnded={() => setVideoWatched(true)}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              )}
+
               {videoWatched && (
                 <button
                   onClick={() => setShowVideoModal(false)}
                   className="w-full bg-[#0A4F48] text-white py-3.5 rounded-xl font-bold hover:bg-[#083d38] transition-colors animate-in fade-in slide-in-from-bottom-4 duration-500"
                 >
-                  Mark as Done & Continue
+                  {isMeal ? "Continue to Log Meal" : "Mark as Done & Continue"}
                 </button>
               )}
             </div>
