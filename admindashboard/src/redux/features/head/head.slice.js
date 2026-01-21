@@ -3,6 +3,7 @@ import { createHead, getAllHeads, getHead } from "./head.thunk";
 
 const initialState = {
   allHeads: [],
+  headCount: 0,
   createHead: null,
   head: null,
   status: "idle",
@@ -39,7 +40,8 @@ const headSlice = createSlice({
       })
       .addCase(getAllHeads.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.allHeads = action.payload;
+        state.allHeads = action.payload.data.head;
+        state.headCount = action.payload.data.totalCount;
       })
       .addCase(getAllHeads.rejected, (state, action) => {
         state.status = "failed";

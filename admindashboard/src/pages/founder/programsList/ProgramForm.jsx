@@ -108,6 +108,7 @@ export default function ProgramForm() {
       <BaseForm
         fields={fields}
         initialValues={initialValues}
+        heading={"Program"}
         onSubmit={(values) => {
           handleProgramCreation(values);
         }}

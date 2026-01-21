@@ -29,7 +29,7 @@ export default function AdminsList() {
   const [admins, setAdmins] = useState([]);
 
   useEffect(() => {
-    console.log(data)
+    // console.log(data)
     setAdmins(data.data);
     setTotalCount(data.total);
   }, [data]);
@@ -38,12 +38,12 @@ export default function AdminsList() {
     const value = e.target.value.toLowerCase();
 
     if (!value) {
-      setAdmins(data);
+      setAdmins(data.data);
       return;
     }
 
-    const filtered = data.filter((admin) =>
-      admin.name?.toLowerCase().includes(value)
+    const filtered = data.data.filter((admin) =>
+      admin.name?.toLowerCase().includes(value),
     );
 
     setAdmins(filtered);

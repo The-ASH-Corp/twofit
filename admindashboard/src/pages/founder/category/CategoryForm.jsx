@@ -43,6 +43,7 @@ export default function CategoryForm() {
       <BaseForm
         fields={fields}
         initialValues={initialValues}
+        heading={"Category"}
         onSubmit={(value) => handelSubmit(value)}
       />
     </div>
