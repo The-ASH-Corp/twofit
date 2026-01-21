@@ -4,12 +4,12 @@ import { ClientColumns } from "./ClientColumns";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import {
-  selectAllClients,
   selectClientStatus,
   selectClientError,
   selectTotalClientCount,
+  selectFounderAllClients,
 } from "@/redux/features/client/client.selectors";
-import { getAllClients } from "@/redux/features/client/client.thunk";
+import { getFounderAllClients } from "@/redux/features/client/client.thunk";
 import { useNavigate } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
 
@@ -26,10 +26,10 @@ export default function ClientsTable() {
   }
 
   useEffect(() => {
-    dispatch(getAllClients({ page, limit }));
+    dispatch(getFounderAllClients({ page, limit }));
   }, [dispatch, page, limit]);
 
-  const data = useAppSelector(selectAllClients);
+  const data = useAppSelector(selectFounderAllClients);
   const status = useAppSelector(selectClientStatus);
   const error = useAppSelector(selectClientError);
   const clientsLength = useAppSelector(selectTotalClientCount);
@@ -38,6 +38,7 @@ export default function ClientsTable() {
 
   useEffect(()=>{
     setClient(data)
+    console.log(data)
   },[data])
 
   const searchInputHandler = (e) => {

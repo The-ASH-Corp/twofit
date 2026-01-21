@@ -1,8 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createHead, getAllHeads, getHead } from "./head.thunk";
+import { createHead, getAllHeads, getFounderAllHeads, getHead } from "./head.thunk";
 
 const initialState = {
   allHeads: [],
+  founderHeadList: [],
   headCount: 0,
   createHead: null,
   head: null,
@@ -57,6 +58,19 @@ const headSlice = createSlice({
         state.error = null;
       })
       .addCase(getHead.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(getFounderAllHeads.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getFounderAllHeads.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.founderHeadList = action.payload.data.data;
+        state.headCount = action.payload.data.totalCount;
+        state.error = null;
+      })
+      .addCase(getFounderAllHeads.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

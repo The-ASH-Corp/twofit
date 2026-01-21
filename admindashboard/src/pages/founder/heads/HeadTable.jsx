@@ -2,9 +2,9 @@ import BaseTable from "@/components/table/BaseTable";
 import React, { useEffect, useState } from "react";
 import { therapyColumns } from "./Headcolumns";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllHeads } from "@/redux/features/head/head.thunk";
+import { getFounderAllHeads } from "@/redux/features/head/head.thunk";
 import {
-  selectAllHeads,
+  selectFounderAllHeads,
   selectHeadCount,
   selectHeadStatus,
 } from "@/redux/features/head/head.selectors";
@@ -43,10 +43,10 @@ const TherapyTable = () => {
   };
 
   useEffect(() => {
-    dispatch(getAllHeads({ page, limit }));
+    dispatch(getFounderAllHeads({ page, limit }));
   }, [dispatch, page, limit]);
 
-  const data = useSelector(selectAllHeads);
+  const data = useSelector(selectFounderAllHeads);
   const totalCount = useSelector(selectHeadCount);
   const status = useSelector(selectHeadStatus);
   // const error = useSelector(selectHeadError);
@@ -69,7 +69,7 @@ const TherapyTable = () => {
     }
 
     const filtered = data.filter((head) =>
-      head.name?.toLowerCase().includes(value)
+      head.headName?.toLowerCase().includes(value),
     );
 
     setHeads(filtered);

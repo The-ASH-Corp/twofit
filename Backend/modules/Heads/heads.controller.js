@@ -103,3 +103,16 @@ export const getAllUsersByHead =async(req,res)=>{
     res.status(400).json({success:false,message:error.message})
   }
 }
+
+export const founderHeadList = async (req, res) => {
+  try {
+    const { page, limit } = req.params;
+    const list = await headService.founderHeadList(page, limit)
+    res.status(200).json({
+      success: "true1",
+      data: list,
+    })
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+}

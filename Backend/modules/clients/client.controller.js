@@ -171,3 +171,22 @@ export const getMeasurementHistoryOnly = async (req, res) => {
   }
 };
 
+export const getFounderClientList = async (req, res) => {
+  try {
+    const { page, limit } = req.params;
+
+    const list = await service.founderClientList(page, limit);
+
+    res.status(200).json({
+      success: true,
+      data: list,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+

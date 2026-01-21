@@ -3,26 +3,27 @@ import BaseTable from "../../../components/table/BaseTable";
 import { AdminColumns } from "./AdminColumns";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getAllAdmins } from "@/redux/features/admins/admin.thunk";
+import { getFounderAllAdmins,  } from "@/redux/features/admins/admin.thunk";
 import {
   getAdminError,
   getAdminStatus,
-  getAdmins,
+  selectAdminCount,
+  selectFounderAllAdmins,
 } from "@/redux/features/admins/admins.selecters";
 import { SyncLoader } from "react-spinners";
 
 export default function AdminsList() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [totalCount,setTotalCount]=useState(0)
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(getAllAdmins({ page, limit }));
+    dispatch(getFounderAllAdmins({ page, limit }));
   }, [dispatch, page, limit]);
 
-  const data = useSelector(getAdmins);
+  const data = useSelector(selectFounderAllAdmins);
+  const totalCount = useSelector(selectAdminCount);
   const status = useSelector(getAdminStatus);
   const error = useSelector(getAdminError);
 
@@ -30,20 +31,19 @@ export default function AdminsList() {
 
   useEffect(() => {
     // console.log(data)
-    setAdmins(data.data);
-    setTotalCount(data.total);
+    setAdmins(data);
   }, [data]);
 
   const searchInputHandler = (e) => {
     const value = e.target.value.toLowerCase();
 
     if (!value) {
-      setAdmins(data.data);
+      setAdmins(data);
       return;
     }
 
-    const filtered = data.data.filter((admin) =>
-      admin.name?.toLowerCase().includes(value),
+    const filtered = data.filter((admin) =>
+      admin.adminName?.toLowerCase().includes(value),
     );
 
     setAdmins(filtered);

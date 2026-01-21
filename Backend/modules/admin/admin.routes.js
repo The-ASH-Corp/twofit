@@ -6,6 +6,7 @@ import { adminValidationSchema } from "../../validator/admin.validator.js";
 const router =express.Router()
 
 router.get("/all-admins/:page/:limit",adminController.getAllAdmins)
+router.get("/founder/list/:page/:limit", adminController.getFounderAdminList);
 router.post("/add-admin",validate(adminValidationSchema),adminController.addAdmin)
 router.get("/admin-profile/:id",adminController.getAdminProfile)
 router.get("/get-all-coaches-by-admin/:adminId/:page/:limit", adminController.getAllCoachesByAdmin);
