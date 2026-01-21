@@ -1,0 +1,436 @@
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../redux/features/auth/auth.selectores';
+import { Button } from '../components/ui/button';
+import { X } from 'lucide-react';
+
+const Profile = () => {
+  const user = useSelector(selectUser);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isChangePasswordMode, setIsChangePasswordMode] = useState(false);
+
+  // Form states
+  const [profileForm, setProfileForm] = useState({
+    name: '',
+    dateOfBirth: '',
+    gender: '',
+    email: '',
+    phoneNumber: '',
+    address: ''
+  });
+
+  const [passwordForm, setPasswordForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+
+  // Format date for display
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', { 
+      day: 'numeric', 
+      month: 'numeric', 
+      year: 'numeric' 
+    }).replace(/\//g, '.');
+  };
+
+  // Format date for input field (YYYY-MM-DD)
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toISOString().split('T')[0];
+  };
+
+  // Open edit profile drawer
+  const handleEditProfile = () => {
+    setProfileForm({
+      name: user?.name || '',
+      dateOfBirth: formatDateForInput(user?.dateOfBirth) || '',
+      gender: user?.gender || '',
+      email: user?.email || '',
+      phoneNumber: user?.phoneNumber || user?.phone || '',
+      address: user?.address || ''
+    });
+    setIsEditMode(true);
+  };
+
+  // Handle profile form changes
+  const handleProfileChange = (e) => {
+    setProfileForm({
+      ...profileForm,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // Handle password form changes
+  const handlePasswordChange = (e) => {
+    setPasswordForm({
+      ...passwordForm,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  // Submit profile update
+  const handleProfileSubmit = (e) => {
+    e.preventDefault();
+    // TODO: Implement API call to update profile
+    console.log('Profile Update:', profileForm);
+    setIsEditMode(false);
+  };
+
+  // Submit password change
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
+    // TODO: Implement API call to change password
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      alert('Passwords do not match!');
+      return;
+    }
+    console.log('Password Change:', passwordForm);
+    setIsChangePasswordMode(false);
+    setPasswordForm({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6 lg:p-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+          {/* Personal Info Section */}
+          <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
+            <div className="flex justify-between items-center mb-8">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                {user?.name || 'User Name'}
+              </h1>
+              <Button
+                variant="outline"
+                onClick={handleEditProfile}
+                className="text-sm font-medium"
+              >
+                Edit Profile
+              </Button>
+            </div>
+
+            <div className="space-y-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Personal Info</h2>
+              
+              <div className="space-y-5">
+                <div className="flex justify-between items-start">
+                  <span className="text-sm text-gray-600 font-normal">Date of Birth</span>
+                  <span className="text-sm text-gray-900 font-normal text-right">
+                    {formatDate(user?.dateOfBirth)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-start">
+                  <span className="text-sm text-gray-600 font-normal">Gender</span>
+                  <span className="text-sm text-gray-900 font-normal text-right">
+                    {user?.gender || 'N/A'}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-start">
+                  <span className="text-sm text-gray-600 font-normal">Email Address</span>
+                  <span className="text-sm text-gray-900 font-normal text-right break-all">
+                    {user?.email || 'N/A'}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-start">
+                  <span className="text-sm text-gray-600 font-normal">Phone Number</span>
+                  <span className="text-sm text-gray-900 font-normal text-right">
+                    {user?.phoneNumber || user?.phone || 'N/A'}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-start">
+                  <span className="text-sm text-gray-600 font-normal">Address</span>
+                  <span className="text-sm text-gray-900 font-normal text-right max-w-xs">
+                    {user?.address || 'N/A'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Account Info Section */}
+          <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-xl font-semibold text-gray-900">Account Info</h2>
+              <Button
+                variant="outline"
+                onClick={() => setIsChangePasswordMode(true)}
+                className="text-sm font-medium"
+              >
+                Change Password
+              </Button>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-normal text-gray-900 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  value={user?.email || ''}
+                  disabled
+                  className="w-full px-4 py-3 bg-gray-100 border-0 rounded-md text-sm text-gray-700 focus:outline-none focus:ring-0"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-normal text-gray-900 mb-2">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  value="**********"
+                  disabled
+                  className="w-full px-4 py-3 bg-gray-100 border-0 rounded-md text-sm text-gray-700 focus:outline-none focus:ring-0"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Edit Profile Drawer */}
+      {isEditMode && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          {/* Overlay */}
+          <div
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            onClick={() => setIsEditMode(false)}
+          />
+
+          {/* Drawer */}
+          <div className="relative w-full sm:w-[500px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+            <div className="flex justify-between items-center p-6 border-b border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900">Edit Profile</h2>
+              <button
+                onClick={() => setIsEditMode(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handleProfileSubmit} className="flex-1 overflow-y-auto p-6">
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={profileForm.name}
+                    onChange={handleProfileChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Date of Birth
+                  </label>
+                  <input
+                    type="date"
+                    name="dateOfBirth"
+                    value={profileForm.dateOfBirth}
+                    onChange={handleProfileChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Gender
+                  </label>
+                  <select
+                    name="gender"
+                    value={profileForm.gender}
+                    onChange={handleProfileChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={profileForm.email}
+                    onChange={handleProfileChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    name="phoneNumber"
+                    value={profileForm.phoneNumber}
+                    onChange={handleProfileChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Address
+                  </label>
+                  <textarea
+                    name="address"
+                    value={profileForm.address}
+                    onChange={handleProfileChange}
+                    rows="3"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  />
+                </div>
+              </div>
+            </form>
+
+            <div className="p-6 border-t border-gray-200 flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsEditMode(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                onClick={handleProfileSubmit}
+                className="flex-1"
+              >
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Change Password Drawer */}
+      {isChangePasswordMode && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          {/* Overlay */}
+          <div
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            onClick={() => setIsChangePasswordMode(false)}
+          />
+
+          {/* Drawer */}
+          <div className="relative w-full sm:w-[500px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+            <div className="flex justify-between items-center p-6 border-b border-gray-200">
+              <h2 className="text-xl font-bold text-gray-900">Change Password</h2>
+              <button
+                onClick={() => setIsChangePasswordMode(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handlePasswordSubmit} className="flex-1 overflow-y-auto p-6">
+              <div className="space-y-5">
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Current Password
+                  </label>
+                  <input
+                    type="password"
+                    name="currentPassword"
+                    value={passwordForm.currentPassword}
+                    onChange={handlePasswordChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    name="newPassword"
+                    value={passwordForm.newPassword}
+                    onChange={handlePasswordChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                    minLength="6"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Must be at least 6 characters
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Confirm New Password
+                  </label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={passwordForm.confirmPassword}
+                    onChange={handlePasswordChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                    minLength="6"
+                  />
+                </div>
+              </div>
+            </form>
+
+            <div className="p-6 border-t border-gray-200 flex gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setIsChangePasswordMode(false);
+                  setPasswordForm({
+                    currentPassword: '',
+                    newPassword: '',
+                    confirmPassword: ''
+                  });
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                onClick={handlePasswordSubmit}
+                className="flex-1"
+              >
+                Update Password
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Profile;

@@ -1,0 +1,439 @@
+import TaskSubmission from "./taskSubmission.model.js";
+import User from "../auth/auth.model.js";
+import Plan from "../plan/plan.model.js";
+import mongoose from "mongoose";
+import { getIO } from "../../utils/socket.js";
+
+// Helper to determine if we should advance the user's day
+export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
+    const user = await User.findById(userId).populate({
+        path: 'programType',
+        populate: { path: 'plan' }
+    });
+
+    if (!user?.programType?.plan) return false;
+
+    const plan = user.programType.plan;
+    let currentDayConfig = null;
+    let dayCounter = 0;
+
+    for (const week of plan.weeks) {
+        for (const day of week.days) {
+            dayCounter++;
+            if (dayCounter === Number(globalDayIndex)) {
+                currentDayConfig = day;
+                break;
+            }
+        }
+        if (currentDayConfig) break;
+    }
+
+    if (!currentDayConfig) return false;
+
+    // Total exercises = workout exercises from plan + 4 static meal tasks
+    const totalExercises = currentDayConfig.exercises.length + 4;
+
+    // Count total VERIFIED exercises for this userId and globalDayIndex from nested structure
+    const userSubmission = await TaskSubmission.findOne({ userId });
+    if (!userSubmission) return false;
+
+    const daySubmission = userSubmission.dailySubmissions.find(d => d.globalDayIndex === Number(globalDayIndex));
+    if (!daySubmission) return false;
+
+    const verifiedSubmissionsCount = daySubmission.exercises.filter(ex => ex.status === "verified").length;
+
+    if (verifiedSubmissionsCount >= totalExercises) {
+        if (user.currentGlobalDay === Number(globalDayIndex)) {
+            user.currentGlobalDay += 1;
+            await user.save();
+
+            // Notify the client that they've advanced to the next day
+            try {
+                const io = getIO();
+                io.to(userId.toString()).emit("day_advanced", {
+                    newGlobalDay: user.currentGlobalDay,
+                    completedDay: globalDayIndex
+                });
+            } catch (socketError) {
+                console.error("Socket notification for day advancement failed:", socketError.message);
+            }
+
+            return true;
+        }
+    }
+    return false;
+};
+
+// Helper to get task type from plan
+const getTaskTypeFromPlan = async (userId, globalDayIndex, exerciseIndex) => {
+    const user = await User.findById(userId).populate({
+        path: 'programType',
+        populate: { path: 'plan' }
+    });
+
+    if (user?.programType?.plan) {
+        const plan = user.programType.plan;
+        let currentDayConfig = null;
+        let dayCounter = 0;
+
+        for (const week of plan.weeks) {
+            for (const day of week.days) {
+                dayCounter++;
+                if (dayCounter === globalDayIndex) {
+                    currentDayConfig = day;
+                    break;
+                }
+            }
+            if (currentDayConfig) break;
+        }
+
+        if (currentDayConfig && currentDayConfig.exercises[exerciseIndex]) {
+            return currentDayConfig.exercises[exerciseIndex].type || "Workout";
+        }
+    }
+    return "Workout";
+};
+
+// Helper to notify via socket
+const notifyExpertsAndAdmins = async (userId, submissionId, eventType, extraData = {}) => {
+    try {
+        const io = getIO();
+        const client = await User.findById(userId).select("trainer dietition therapist");
+
+        if (client) {
+            const expertsToNotify = [
+                client.trainer?.toString(),
+                client.dietition?.toString(),
+                client.therapist?.toString()
+            ].filter(id => id);
+
+            expertsToNotify.forEach(expertId => {
+                io.to(expertId).emit(eventType, { userId, submissionId, ...extraData });
+            });
+
+            io.to("admin_tasks").emit(eventType, { userId, submissionId, ...extraData });
+        }
+    } catch (socketError) {
+        console.error("Socket notification failed:", socketError.message);
+    }
+};
+
+export const createTaskSubmission = async (submissionData) => {
+    const { 
+        userId, 
+        programId, 
+        weekIndex, 
+        dayIndex, 
+        globalDayIndex, 
+        exerciseIndex, 
+        notes, 
+        file,
+        taskType: explicitTaskType 
+    } = submissionData;
+
+    const gIndex = Number(globalDayIndex);
+    const eIndex = Number(exerciseIndex);
+    const wIndex = Number(weekIndex);
+    const dIndex = Number(dayIndex);
+
+    let taskType = explicitTaskType || "Workout";
+
+    // If it's a workout, we verify it against the plan to be safe (and to stay consistent)
+    // If it's a meal, we trust the frontend (since meals are static and not in the "plan" document)
+    if (taskType === "Workout") {
+        taskType = await getTaskTypeFromPlan(userId, gIndex, eIndex);
+    }
+
+    let userSubmission = await TaskSubmission.findOne({ userId });
+
+    if (!userSubmission) {
+        userSubmission = new TaskSubmission({
+            userId,
+            programId: mongoose.Types.ObjectId.isValid(programId) ? programId : undefined,
+            dailySubmissions: [{
+                globalDayIndex: gIndex,
+                weekIndex: wIndex,
+                dayIndex: dIndex,
+                exercises: [{
+                    exerciseIndex: eIndex,
+                    taskType,
+                    status: "pending",
+                    file,
+                    notes,
+                    updatedAt: Date.now()
+                }]
+            }]
+        });
+        await userSubmission.save();
+    } else {
+        // Find the day
+        let day = userSubmission.dailySubmissions.find(d => d.globalDayIndex === gIndex);
+
+        if (!day) {
+            userSubmission.dailySubmissions.push({
+                globalDayIndex: gIndex,
+                weekIndex: wIndex,
+                dayIndex: dIndex,
+                exercises: [{
+                    exerciseIndex: eIndex,
+                    taskType,
+                    status: "pending",
+                    file,
+                    notes,
+                    updatedAt: Date.now()
+                }]
+            });
+        } else {
+            // Find the exercise
+            let exercise = day.exercises.find(e => e.exerciseIndex === eIndex);
+
+            if (exercise) {
+                if (exercise.status === 'verified') {
+                    throw new Error("Task already verified");
+                }
+                exercise.status = 'pending';
+                exercise.taskType = taskType;
+                exercise.file = file || exercise.file;
+                exercise.notes = notes || exercise.notes;
+                exercise.adminComment = "";
+                exercise.updatedAt = Date.now();
+            } else {
+                day.exercises.push({
+                    exerciseIndex: eIndex,
+                    taskType,
+                    status: "pending",
+                    file,
+                    notes,
+                    updatedAt: Date.now()
+                });
+            }
+        }
+
+        if (mongoose.Types.ObjectId.isValid(programId)) {
+            userSubmission.programId = programId;
+        }
+        await userSubmission.save();
+    }
+
+    // Get the specific submission object for socket/response (flattened format)
+    const day = userSubmission.dailySubmissions.find(d => d.globalDayIndex === gIndex);
+    const submission = day.exercises.find(e => e.exerciseIndex === eIndex);
+
+    // Notify Experts and Admins via Socket
+    await notifyExpertsAndAdmins(userId, userSubmission._id, "new_task_submission");
+
+    return submission;
+};
+
+export const getPendingTaskSubmissions = async (expertId, userRole) => {
+    const lowerRole = userRole.toLowerCase();
+
+    let matchQuery = {};
+    let taskTypeFilter = null;
+
+    const allowedRolesToSeeAll = ["admin", "manager", "head", "founder"];
+
+    if (!allowedRolesToSeeAll.includes(lowerRole)) {
+        const searchId = new mongoose.Types.ObjectId(expertId);
+
+        const clientIds = await User.find({
+            $or: [
+                { trainer: searchId },
+                { dietition: searchId },
+                { therapist: searchId }
+            ]
+        }).distinct("_id");
+
+        matchQuery.userId = { $in: clientIds };
+
+        if (lowerRole.includes("trainer")) taskTypeFilter = "Workout";
+        else if (lowerRole.includes("dietician") || lowerRole.includes("dietitian")) taskTypeFilter = "Meal";
+        else if (lowerRole.includes("therapist")) taskTypeFilter = "Therapy";
+    }
+
+    const submissions = await TaskSubmission.aggregate([
+        { $match: matchQuery },
+        { $unwind: "$dailySubmissions" },
+        { $unwind: "$dailySubmissions.exercises" },
+        {
+            $match: {
+                "dailySubmissions.exercises.status": "pending",
+                ...(taskTypeFilter ? { "dailySubmissions.exercises.taskType": taskTypeFilter } : {})
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "userDetails"
+            }
+        },
+        { $unwind: "$userDetails" },
+        {
+            $lookup: {
+                from: "programslists", // Mongoose pluralizes ProgramsList to programslists
+                localField: "programId",
+                foreignField: "_id",
+                as: "programDetails"
+            }
+        },
+        { $unwind: { path: "$programDetails", preserveNullAndEmptyArrays: true } },
+        {
+            $project: {
+                _id: "$dailySubmissions.exercises._id",
+                parentSubmissionId: "$_id",
+                userId: {
+                    _id: "$userDetails._id",
+                    name: "$userDetails.name",
+                    email: "$userDetails.email",
+                    profileImage: "$userDetails.profileImage"
+                },
+                programId: {
+                    _id: "$programDetails._id",
+                    title: "$programDetails.title"
+                },
+                weekIndex: "$dailySubmissions.weekIndex",
+                dayIndex: "$dailySubmissions.dayIndex",
+                globalDayIndex: "$dailySubmissions.globalDayIndex",
+                exerciseIndex: "$dailySubmissions.exercises.exerciseIndex",
+                status: "$dailySubmissions.exercises.status",
+                taskType: "$dailySubmissions.exercises.taskType",
+                file: "$dailySubmissions.exercises.file",
+                notes: "$dailySubmissions.exercises.notes",
+                createdAt: "$dailySubmissions.exercises.createdAt"
+            }
+        },
+        { $sort: { createdAt: -1 } }
+    ]);
+
+    return submissions;
+};
+
+export const verifyTaskSubmission = async (submissionId) => {
+    const userSubmission = await TaskSubmission.findOne({ "dailySubmissions.exercises._id": submissionId });
+
+    if (!userSubmission) {
+        throw new Error("Submission not found");
+    }
+
+    let foundGlobalDayIndex = null;
+    let foundExerciseIndex = null;
+
+    userSubmission.dailySubmissions.forEach(day => {
+        const ex = day.exercises.find(e => e._id.toString() === submissionId);
+        if (ex) {
+            ex.status = "verified";
+            ex.updatedAt = Date.now();
+            foundGlobalDayIndex = day.globalDayIndex;
+            foundExerciseIndex = ex.exerciseIndex;
+        }
+    });
+
+    await userSubmission.save();
+
+    // Check if we need to advance the day
+    await checkAndAdvanceDay(userSubmission.userId, foundGlobalDayIndex);
+
+    // Notify Experts and Admins via Socket
+    await notifyExpertsAndAdmins(userSubmission.userId, userSubmission._id, "task_updated", { status: "verified" });
+
+    // Notify the specific client
+    try {
+        const io = getIO();
+        io.to(userSubmission.userId.toString()).emit("task_status_updated", {
+            submissionId: userSubmission._id,
+            status: "verified",
+            globalDayIndex: foundGlobalDayIndex,
+            exerciseIndex: foundExerciseIndex
+        });
+    } catch (socketError) {
+        console.error("Socket notification failed:", socketError.message);
+    }
+
+    return { success: true, message: "Task verified" };
+};
+
+export const rejectTaskSubmission = async (submissionId, comment) => {
+    const userSubmission = await TaskSubmission.findOne({ "dailySubmissions.exercises._id": submissionId });
+    
+    if (!userSubmission) {
+        throw new Error("Submission not found");
+    }
+
+    let foundGlobalDayIndex = null;
+    let foundExerciseIndex = null;
+
+    // Find the rejected task and its globalDayIndex
+    userSubmission.dailySubmissions.forEach(day => {
+        const ex = day.exercises.find(e => e._id.toString() === submissionId);
+        if (ex) {
+            foundGlobalDayIndex = day.globalDayIndex;
+            foundExerciseIndex = ex.exerciseIndex;
+        }
+    });
+
+    // Reject ALL tasks for this day
+    if (foundGlobalDayIndex !== null) {
+        userSubmission.dailySubmissions.forEach(day => {
+            if (day.globalDayIndex === foundGlobalDayIndex) {
+                day.exercises.forEach(ex => {
+                    if (ex.status !== 'verified') {
+                        ex.status = "rejected";
+                        ex.adminComment = ex._id.toString() === submissionId
+                            ? (comment || "Rejected by expert")
+                            : "Entire day rejected due to one task failure. Please resubmit all tasks for this day.";
+                        ex.updatedAt = Date.now();
+                    }
+                });
+            }
+        });
+    }
+
+    await userSubmission.save();
+
+    // Notify Experts and Admins via Socket
+    await notifyExpertsAndAdmins(userSubmission.userId, userSubmission._id, "task_updated", { status: "rejected" });
+
+    // Notify the specific client
+    try {
+        const io = getIO();
+        io.to(userSubmission.userId.toString()).emit("task_status_updated", {
+            submissionId: userSubmission._id,
+            status: "rejected",
+            globalDayIndex: foundGlobalDayIndex,
+            exerciseIndex: foundExerciseIndex
+        });
+    } catch (socketError) {
+        console.error("Socket notification failed:", socketError.message);
+    }
+
+    return { success: true, message: "Task rejected - entire day must be resubmitted" };
+};
+
+export const getUserTaskStatusByUserId = async (userId, globalDayIndex) => {
+    const userSubmission = await TaskSubmission.findOne({ userId });
+    
+    if (!userSubmission) {
+        return [];
+    }
+
+    let flattenedSubmissions = [];
+    userSubmission.dailySubmissions.forEach(day => {
+        if (!globalDayIndex || day.globalDayIndex === Number(globalDayIndex)) {
+            day.exercises.forEach(ex => {
+                const submissionObj = ex.toObject ? ex.toObject() : ex;
+                flattenedSubmissions.push({
+                    ...submissionObj,
+                    globalDayIndex: day.globalDayIndex,
+                    weekIndex: day.weekIndex,
+                    dayIndex: day.dayIndex,
+                    programId: userSubmission.programId,
+                    userId: userSubmission.userId
+                });
+            });
+        }
+    });
+
+    return flattenedSubmissions;
+};

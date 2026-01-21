@@ -2,26 +2,27 @@ import jwt from 'jsonwebtoken'
 import redisClient from '../redis/redisClient.js';
 
 export const generateAccessToken = (user) => {
+  const id = user._id || user.id;
   return jwt.sign(
-    { id: user._id??user.id, role: user.role, email: user.email },
+    { id, role: user.role, email: user.email },
     process.env.JWT_SECRET,
-    { expiresIn: "1hr" }
+    { expiresIn: process.env.ACCESS_TOKEN_EXPIRES || "15m" }
   );
 };
 
 export const generateRefreshToken = (user) => {
-  return jwt.sign({ id: user._id ,role: user.role, email: user.email}, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: "7d",
+  const id = user._id || user.id;
+  return jwt.sign({ id, role: user.role, email: user.email }, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: process.env.REFRESH_TOKEN_EXPIRES || "7d",
   });
 };
 
 
-export const refreshAccessToken = async (req, res, next) => {
+export const refreshAccessToken = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
-  if (!refreshToken){
-    console.log("no refresh token")
-    return res.status(401).json({ message: "Refresh token missing" });
+  if (!refreshToken) {
+    return null;
   }
 
   try {
@@ -33,15 +34,14 @@ export const refreshAccessToken = async (req, res, next) => {
     const storedToken = await redisClient.get(`refresh:${decoded.id}`);
 
     if (!storedToken || storedToken !== refreshToken)
-      return res.status(403).json({ message: "Invalid refresh token" });
+      return null;
 
     const newAccessToken = generateAccessToken(decoded);
 
     res.setHeader("x-access-token", newAccessToken);
 
-    req.user = jwt.verify(newAccessToken, process.env.JWT_SECRET);
-    return next();
+    return decoded; // Return the decoded payload so authMiddleware can fetch the user
   } catch (err) {
-    return res.status(403).json({ message: "Refresh token expired" });
+    return null;
   }
 };

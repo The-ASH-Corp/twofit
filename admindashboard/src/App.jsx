@@ -9,7 +9,7 @@ import {
 import RoleGuard from "./routes/RoleGuard";
 import Login from "./pages/Login";
 import PublicRoutes from "./routes/PublicRoutes";
-
+import Profile from "./pages/Profile";
 import Unauthorized from "./pages/Unauthorized";
 //Founder Pages Imports
 import FounderLayout from "./pages/founder/layout/FounderLayout";
@@ -131,6 +131,7 @@ function App() {
           <Route path="add-therapy" element={<FounderTherapyForm />} />
           <Route path="workout" element={<FounderWorkoutList />} />
           <Route path="workout/create" element={<FounderWorkoutForm />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
 
         {/* HEAD */}
@@ -159,6 +160,7 @@ function App() {
             element={<HeadClientProfile />}
           />
           <Route path="programs" element={<HeadProgramTable />} />
+          <Route path="profile" element={<Profile />} />
         </Route>
 
         {/* ADMIN */}
@@ -187,6 +189,7 @@ function App() {
           <Route path="programs/plans" element={<AdminPlanView />} />
           <Route path="therapy" element={<TherapyList/>}/>
           <Route path="therapy/create" element={<TherapyForm/>}/>
+          <Route path="profile" element={<Profile />} />
           {/* <Route path="therapy/plans" element={<TherapyDetails/>}/> */}
         </Route>
 
@@ -205,6 +208,7 @@ function App() {
           <Route path="chats" element={<ExpertChats />} />
           <Route path="programs" element={<ExpertPrograms />} />
           <Route path ="programs/viewPlan" element={<ExpertPlanDetails />} />
+          <Route path="profile" element={<Profile />} />
           <Route path ="finance" element={<ExpertFinance />} />
         </Route>
 
@@ -221,6 +225,7 @@ function App() {
           <Route index element={<ClientDashboard />} />
           <Route path="feedback" element={<ClientFeedback />} />
           <Route path="progress" element={<ClientProgress />} />
+          <Route path="profile" element={<Profile />} />
           <Route path="daily-plan" element={<DailyPlan />} />
           <Route path="chats" element={<ClientChat />} />
         </Route>

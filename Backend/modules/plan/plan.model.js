@@ -5,6 +5,11 @@ const exerciseSchema = new mongoose.Schema({
     notes: { type: String },
     url: { type: String },
     mediaName: { type: String },
+    type: {
+        type: String,
+        enum: ["Workout", "Meal", "Therapy"],
+        default: "Workout"
+    },
 });
 
 const daySchema = new mongoose.Schema({

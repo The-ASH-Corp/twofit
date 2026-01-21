@@ -2,6 +2,8 @@ import { generatePassword, hashPassword } from "../../utils/password.js";
 import { AdminModel } from "../admin/admin.model.js";
 import { calculateRatingIncentive } from "../payroll/payroll.service.js";
 import { CoachModel } from "./coach.model.js";
+import User from "../auth/auth.model.js";
+import mongoose from "mongoose";
 
 export const createCoach = async (coach) => {
   // Parse JSON stringified fields from FormData
@@ -128,15 +130,15 @@ export const AssignCoachToUser = async (coachId, userId) => {
 
 export const getUsersAssignedToACoach = async (coachId, page, limit) => {
   const skip = (page - 1) * limit;
-  
+
   const coach = await CoachModel.findById(coachId).select("assignedUsers");
-  
+
   if (!coach) {
     return { users: [], total: 0 };
   }
-  
+
   const total = coach.assignedUsers.length;
-  
+
   const paginatedCoach = await CoachModel.findById(coachId)
     .select("assignedUsers")
     .populate({
@@ -147,11 +149,11 @@ export const getUsersAssignedToACoach = async (coachId, page, limit) => {
         limit: limit
       }
     });
-  
+
   return {
     users: paginatedCoach.assignedUsers,
-    total: total 
-   };
+    total: total
+  };
 };
 
 
@@ -182,7 +184,7 @@ export const createFeedback = async (expertId, userId, rating, feedback) => {
 
   if (!coach) throw new Error("Coach not found");
 
-  
+
   const avgRating = calculateAvgRating(coach.feedback);
 
   await CoachModel.findByIdAndUpdate(expertId, { avgRating });
@@ -194,16 +196,34 @@ export const createFeedback = async (expertId, userId, rating, feedback) => {
 
 
 
-export const getCoachDashboardStats =async(coachId) => {
-  const coach = await CoachModel.findById(coachId).select(
-    "assignedUsers assignedPrograms avgRating",
-  );
+export const getCoachDashboardStats = async (coachId) => {
+  const coach = await CoachModel.findById(coachId).select("avgRating adminId assignedPrograms");
   if (!coach) {
     throw new Error("Coach not found");
   }
-  const totalClients = coach.assignedUsers.length;
-  const totalPrograms = coach.assignedPrograms.length;
-  const avarageRating = coach.avgRating;
+
+  const coachObjectId = new mongoose.Types.ObjectId(coachId);
+
+  // Dynamically count assigned clients from User model
+  const totalClients = await User.countDocuments({
+    $or: [
+      { trainer: coachObjectId },
+      { dietition: coachObjectId },
+      { therapist: coachObjectId },
+    ],
+  });
+  
+  // Count programs: Start with what is assigned directly to the coach
+  let totalPrograms = coach.assignedPrograms?.length || 0;
+  
+  // If direct assignments are 0, fallback to checking their associated admin's program list
+  if (totalPrograms === 0 && coach.adminId) {
+    const admin = await AdminModel.findById(coach.adminId).select("program");
+    totalPrograms = admin?.program?.length || 0;
+  }
+  
+  const avarageRating = coach.avgRating || 0;
+
   return {
     totalClients,
     totalPrograms,

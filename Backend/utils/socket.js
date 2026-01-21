@@ -1,4 +1,5 @@
 import { ChatModel } from "../modules/chat/chat.model.js";
+let ioInstance;
 
 
 // auth middleware for sockeyt.io
@@ -24,6 +25,15 @@ const joinHandler = (io, socket) => {
 
   socket.on("broadcast", ({ roomId }) => {
     socket.join(roomId);
+  });
+
+  socket.on("join_task_rooms", ({ role }) => {
+    const lowerRole = (role || "").toLowerCase();
+    const adminRoles = ["admin", "expert", "head", "founder"];
+    if (adminRoles.includes(lowerRole)) {
+      socket.join("admin_tasks");
+      console.log(`Socket ${socket.id} joined admin_tasks room`);
+    }
   });
 };
 
@@ -63,16 +73,18 @@ const messageHandler = (io, socket) => {
 
 
 export default function initSocket(io) {
+  ioInstance = io;
   const onlineUsers = new Map(); // userId -> socketId
-  
+
   io.use(socketAuth);
 
   io.on("connection", (socket) => {
     console.log("User Connected:", socket.userId);
+    socket.join(socket.userId); // Join a room specifically for this user
 
     // Add user to online users
     onlineUsers.set(socket.userId, socket.id);
-    
+
     // Broadcast updated online users list to all clients
     io.emit("online_users", Array.from(onlineUsers.keys()));
 
@@ -90,12 +102,19 @@ export default function initSocket(io) {
 
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.userId);
-      
+
       // Remove user from online users
       onlineUsers.delete(socket.userId);
-      
+
       // Broadcast updated online users list to all clients
       io.emit("online_users", Array.from(onlineUsers.keys()));
     });
   });
 }
+
+export const getIO = () => {
+  if (!ioInstance) {
+    throw new Error("Socket.io not initialized");
+  }
+  return ioInstance;
+};

@@ -5,11 +5,13 @@ import { Bell, Settings } from "lucide-react";
 import { assets } from "../../../assets/asset";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { useNavigate } from "react-router-dom";
 // import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Topbar() {
 
-  const user =useSelector(selectUser)
+  const user =useSelector(selectUser);
+  const navigate = useNavigate();
   return (
     <div className="flex justify-between items-center  ">
       <div>
@@ -29,9 +31,12 @@ export default function Topbar() {
 
         <Bell className="w-6 h-6 text-gray-600 cursor-pointer" />
         <img src={assets.menu} />
-        <img src={assets.profile} className="rounded rounded-full" />
-
-        <div className="flex items-center gap-3">
+        
+        <div 
+          className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={() => navigate('/head/profile')}
+        >
+          <img src={assets.profile} className="rounded rounded-full" />
           <div>
             <p className="text-[18px] font-bold">{user?.name}</p>
             <p className="text-xs text-gray-500">{user?.role}</p>

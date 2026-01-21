@@ -2,9 +2,11 @@ import { Bell, Search, Menu } from "lucide-react";
 import { assets } from "../../../assets/asset";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { useNavigate } from "react-router-dom";
 
 export default function Topbar({ onToggleSidebar }) {
   const user = useSelector(selectUser);
+  const navigate = useNavigate();
 
   return (
     <div className="flex justify-between items-center gap-4">
@@ -44,7 +46,10 @@ export default function Topbar({ onToggleSidebar }) {
             <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-gray-50"></span>
           </button>
 
-          <div className="flex items-center gap-2 pl-2 border-l border-gray-200">
+          <div 
+            className="flex items-center gap-2 pl-2 border-l border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/client/profile')}
+          >
             <div className="hidden md:block text-right">
               <p className="text-sm font-bold text-gray-800 leading-none">
                 {user?.name}
