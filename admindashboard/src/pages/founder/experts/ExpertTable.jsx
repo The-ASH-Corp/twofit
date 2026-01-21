@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import BaseTable from '../../../components/table/BaseTable'
 import { ExpertColumns } from './ExpertColumns'
 import { useDispatch } from 'react-redux';
-import { getAllCoaches } from '@/redux/features/coach/coach.thunk';
+import { getFounderAllCoaches } from '@/redux/features/coach/coach.thunk';
 import { useNavigate } from 'react-router-dom';
-import { selectAllCoaches, selectCoachStatus,  } from '@/redux/features/coach/coach.selector';
+import { selectCoachCount, selectCoachStatus, selectFounderAllCoaches,  } from '@/redux/features/coach/coach.selector';
 import { useAppSelector } from '@/redux/store/hooks';
 import { SyncLoader } from "react-spinners";
 
@@ -20,10 +20,11 @@ export default function ExpertTable() {
   };
 
   useEffect(() => {
-    dispatch(getAllCoaches({ page, limit }));
+    dispatch(getFounderAllCoaches({ page, limit }));
   }, [dispatch, page, limit]);
 
-  const data = useAppSelector(selectAllCoaches);
+  const data = useAppSelector(selectFounderAllCoaches);
+  const totalCount = useAppSelector(selectCoachCount);
   // const error = useAppSelector(selectCoachError);
   const status = useAppSelector(selectCoachStatus);
 
@@ -31,7 +32,7 @@ export default function ExpertTable() {
 
   useEffect(() => {
     setCoaches(data);
-    console.log(data);
+    // console.log(data);
   }, [data]);
 
   const searchInputHandler = (e) => {
@@ -43,7 +44,7 @@ export default function ExpertTable() {
     }
 
     const filtered = data.filter((coach) =>
-      coach.name?.toLowerCase().includes(value)
+      coach.coachName?.toLowerCase().includes(value),
     );
 
     setCoaches(filtered);
@@ -69,7 +70,7 @@ export default function ExpertTable() {
         handleLimitChange={setLimit}
         page={page}
         limit={limit}
-        totalCount={coaches.length}
+        totalCount={totalCount}
       />
     </div>
   );

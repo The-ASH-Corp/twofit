@@ -211,4 +211,89 @@ export const getCoachDashboardStats =async(coachId) => {
   };
 }
 
+export const founderCoachList = async (page, limit) => {
+  try {
+    page = Number(page);
+    limit = Number(limit);
+
+    const skip = (page - 1) * limit;
+
+    const totalCount = await CoachModel.countDocuments();
+
+    const data = await CoachModel.aggregate([
+      // ===== Pagination =====
+      { $skip: skip },
+      { $limit: limit },
+
+      // ===== Admin =====
+      {
+        $lookup: {
+          from: "admins",
+          localField: "adminId",
+          foreignField: "_id",
+          as: "admin",
+        },
+      },
+
+      // ===== Head =====
+      {
+        $lookup: {
+          from: "heads",
+          localField: "admin.headId",
+          foreignField: "_id",
+          as: "head",
+        },
+      },
+
+      // ===== Category =====
+      {
+        $lookup: {
+          from: "categories",
+          localField: "head.programCategory",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+
+      // ===== Final Shape =====
+      {
+        $project: {
+          _id: 0,
+          _id: "$_id",
+          coachName: "$name",
+          role: "$role",
+          status: "$status",
+
+          adminName: {
+            $arrayElemAt: ["$admin.name", 0],
+          },
+
+          headName: {
+            $arrayElemAt: ["$head.name", 0],
+          },
+
+          categoryName: {
+            $arrayElemAt: ["$category.name", 0],
+          },
+
+          clientCount: {
+            $size: { $ifNull: ["$assignedUsers", []] },
+          },
+
+          maxClientLimit: "$maxClient",
+          avgRating: "$avgRating",
+        },
+      },
+    ]);
+
+    return {
+      data,
+      totalCount,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+
   

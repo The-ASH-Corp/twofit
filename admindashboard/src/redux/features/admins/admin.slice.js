@@ -1,8 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createAdmin, getAdminProfile, getAllAdmins } from "./admin.thunk";
+import { createAdmin, getAdminProfile, getAllAdmins, getFounderAllAdmins } from "./admin.thunk";
 
 const initialState = {
   admins: [],
+  founderAdminList: [],
+  adminCount: 0,
   selectedAdmin: null,
   status: "idle", // idle | loading | succeeded | failed
   error: null,
@@ -27,9 +29,9 @@ const adminSlice = createSlice({
         state.admins = action.payload;
         state.error = null;
       })
-      .addCase(getAllAdmins.rejected,(state,action)=>{
-        state.status="failed"
-        state.error=action.payload;
+      .addCase(getAllAdmins.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
       })
       .addCase(getAdminProfile.pending, (state) => {
         state.status = "loading";
@@ -53,6 +55,20 @@ const adminSlice = createSlice({
         state.error = null;
       })
       .addCase(createAdmin.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(getFounderAllAdmins.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(getFounderAllAdmins.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.founderAdminList = action.payload.data.data;
+        state.adminCount = action.payload.data.totalCount;
+        state.error = null;
+      })
+      .addCase(getFounderAllAdmins.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

@@ -6,13 +6,13 @@ export const getAllAdmins = createAsyncThunk(
   async ({ page, limit }, { rejectWithValue }) => {
     try {
       const data = await axiosInstance.get(
-        `/admin/all-admins/${page}/${limit}`
+        `/admin/all-admins/${page}/${limit}`,
       );
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Login failed");
     }
-  }
+  },
 );
 
 export const createAdmin = createAsyncThunk(
@@ -23,10 +23,10 @@ export const createAdmin = createAsyncThunk(
       return data.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "creating admin failed"
+        error.response?.data?.message || "creating admin failed",
       );
     }
-  }
+  },
 );
 
 export const getAdminProfile = createAsyncThunk(
@@ -37,24 +37,26 @@ export const getAdminProfile = createAsyncThunk(
       return data.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Fetching admin profile failed"
+        error.response?.data?.message || "Fetching admin profile failed",
       );
     }
-  }
+  },
 );
 
 export const getAllCoachesByAdminId = createAsyncThunk(
   "coach/getAllCoachesByAdminId",
-  async ({adminId,page,limit}, { rejectWithValue }) => {
+  async ({ adminId, page, limit }, { rejectWithValue }) => {
     try {
-      const data = await axiosInstance.get(`/admin/get-all-coaches-by-admin/${adminId}/${page}/${limit}`);
+      const data = await axiosInstance.get(
+        `/admin/get-all-coaches-by-admin/${adminId}/${page}/${limit}`,
+      );
       return data.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to get coaches by admin id"
+        error.response?.data?.message || "Failed to get coaches by admin id",
       );
     }
-  }
+  },
 );
 
 export const getDashboardData = createAsyncThunk(
@@ -65,22 +67,40 @@ export const getDashboardData = createAsyncThunk(
       return data.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to get dashboard data"
+        error.response?.data?.message || "Failed to get dashboard data",
       );
     }
-  }
+  },
 );
 
 export const getAdminsByHeadId = createAsyncThunk(
   "admins/getAdminsByHeadId",
-  async ({headId,page,limit}, { rejectWithValue }) => {
+  async ({ headId, page, limit }, { rejectWithValue }) => {
     try {
-      const data = await axiosInstance.get(`/admin/get-admin-by-head/${headId}/${page}/${limit}`);
+      const data = await axiosInstance.get(
+        `/admin/get-admin-by-head/${headId}/${page}/${limit}`,
+      );
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to get admins by head id"
+        error.response?.data?.message || "Failed to get admins by head id",
       );
     }
-  }
+  },
+);
+
+export const getFounderAllAdmins = createAsyncThunk(
+  "admins/founder/list",
+  async ({ page, limit }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(
+        `/admin/founder/list/${page}/${limit}`,
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get admins",
+      );
+    }
+  },
 );

@@ -1,4 +1,5 @@
 export const selectAllHeads = (state) => state.head.allHeads;
+export const selectFounderAllHeads = (state) => state.head.founderHeadList;
 export const selectHeadCount = (state) => state.head.headCount;
 export const selectCreateHeads = (state) => state.head.createHead;
 export const selectHead = (state) => state.head.head;

@@ -123,3 +123,112 @@ export const getAdminByHead = async ({headId,page,limit}) => {
     totalCount,
   };
 };
+
+export const founderAdminList = async (page, limit) => {
+  try {
+    page = Number(page);
+    limit = Number(limit);
+
+    const skip = (page - 1) * limit;
+
+    const totalCount = await AdminModel.countDocuments();
+
+    const data = await AdminModel.aggregate([
+      // ===== Pagination =====
+      { $skip: skip },
+      { $limit: limit },
+
+      // ===== Head =====
+      {
+        $lookup: {
+          from: "heads",
+          localField: "headId",
+          foreignField: "_id",
+          as: "head",
+        },
+      },
+
+      // ===== Category via head =====
+      {
+        $lookup: {
+          from: "categories",
+          localField: "head.programCategory",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+
+      // ===== Programs under category =====
+      {
+        $lookup: {
+          from: "programslists",
+          localField: "head.programCategory",
+          foreignField: "category",
+          as: "programs",
+        },
+      },
+
+      // ===== Coaches under admin =====
+      {
+        $lookup: {
+          from: "coaches",
+          localField: "_id",
+          foreignField: "adminId",
+          as: "coaches",
+        },
+      },
+
+      // ===== Users under coaches =====
+      {
+        $lookup: {
+          from: "users",
+          let: { coachIds: "$coaches._id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    { $in: ["$trainer", "$$coachIds"] },
+                    { $in: ["$therapist", "$$coachIds"] },
+                    { $in: ["$dietition", "$$coachIds"] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "users",
+        },
+      },
+
+      // ===== Final Shape =====
+      {
+        $project: {
+          _id: 0,
+          _id: "$_id",
+          adminName: "$name",
+          status: "$status",
+
+          headName: {
+            $arrayElemAt: ["$head.name", 0],
+          },
+
+          categoryName: {
+            $arrayElemAt: ["$category.name", 0],
+          },
+
+          programCount: { $size: "$programs" },
+          coachCount: { $size: "$coaches" },
+          userCount: { $size: "$users" },
+        },
+      },
+    ]);
+
+    return {
+      data,
+      totalCount,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+

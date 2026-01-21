@@ -199,3 +199,81 @@ export const fetchMeasurementHistory = async (userId) => {
     measurementHistory: sortedHistory,
   };
 };
+
+export const founderClientList = async (page, limit) => {
+  try {
+    page = Number(page);
+    limit = Number(limit);
+
+    const skip = (page - 1) * limit;
+
+    const totalCount = await User.countDocuments();
+
+    const data = await User.aggregate([
+      // ===== Pagination =====
+      { $skip: skip },
+      { $limit: limit },
+
+      // ===== Program =====
+      {
+        $lookup: {
+          from: "programslists",
+          localField: "programType",
+          foreignField: "_id",
+          as: "program",
+        },
+      },
+
+      // ===== Final Shape =====
+      {
+        $project: {
+          _id: 0,
+          _id: "$_id",
+          userName: "$name",
+          status: "$status",
+
+          programName: {
+            $arrayElemAt: ["$program.title", 0],
+          },
+
+          durationTaken: "$duration",
+          programStartDate: "$programStartDate",
+          programEndDate: "$programEndDate",
+
+          // ✅ Coach roles only
+          coachRoles: {
+            $filter: {
+              input: [
+                { $cond: [{ $ifNull: ["$trainer", false] }, "trainer", null] },
+                {
+                  $cond: [
+                    { $ifNull: ["$therapist", false] },
+                    "therapist",
+                    null,
+                  ],
+                },
+                {
+                  $cond: [
+                    { $ifNull: ["$dietition", false] },
+                    "dietition",
+                    null,
+                  ],
+                },
+              ],
+              as: "role",
+              cond: { $ne: ["$$role", null] },
+            },
+          },
+        },
+      },
+    ]);
+
+    return {
+      data,
+      totalCount,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+

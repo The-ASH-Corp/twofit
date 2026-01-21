@@ -1,8 +1,8 @@
-const expertColors = {
-  Dietitian: "bg-[#FFF5ED] text-black",
-  Therapist: "bg-[#E7F9F4] text-black",
-  Trainer: "bg-[#EBF2FE] text-black",
-};
+// const expertColors = {
+//   Dietitian: "bg-[#FFF5ED] text-black",
+//   Therapist: "bg-[#E7F9F4] text-black",
+//   Trainer: "bg-[#EBF2FE] text-black",
+// };
 
 const statusColors = {
   Active: "bg-[#45C4A2] text-white",
@@ -30,48 +30,26 @@ export const AdminColumns = [
   //     />
   //   ),
   // },
-  { accessorKey: "name", header: "Expert Name" },
-   { accessorKey: "role", header: "Role",
-    cell:({row})=>{
-        const role=row.original.role
-        const expertColor=expertColors[role] || "bg-gray-200 text-gray-700"
+  { accessorKey: "adminName", header: "Admin Name" },
+  // {
+  //   accessorKey: "role",
+  //   header: "Role",
+  //   cell: ({ row }) => {
+  //     const role = row.original.role;
+  //     const expertColor = expertColors[role] || "bg-gray-200 text-gray-700";
 
-        return (
-        <span className={`px-2 py-1 text-[11px] rounded-xl ${expertColor}`}>
-          {role}
-        </span>
-      );
-
-    }
-   },
-     { accessorKey: "specialization", header: "Specialisation" },
-
-  // { accessorKey: "clients", header: "Clients" },
- 
-//   {
-//     accessorKey: "experts",
-//     header: "Experts",
-//     cell: ({ row }) => (
-//       <div className="flex gap-2 flex-wrap">
-//         {row.original.experts.map((exp) => {
-//           const colorClass =
-//             expertColors[exp] || "bg-gray-100 text-gray-700 border";
-
-//           return (
-//             <span
-//               key={exp}
-//               className={`px-2 py-1 text-[11px] rounded-sm ${colorClass}`}
-//             >
-//               {exp}
-//             </span>
-//           );
-//         })}
-//       </div>
-//     ),
-//   },
-  // { accessorKey: "maxClient", header: "Maximum Limit" },
-  // { accessorKey: "rating", header: "Rating" },
-  // { accessorKey: "responseTime", header: "Response Time" },
+  //     return (
+  //       <span className={`px-2 py-1 text-[11px] rounded-xl ${expertColor}`}>
+  //         {role}
+  //       </span>
+  //     );
+  //   },
+  // },
+  { accessorKey: "headName", header: "Head Name" },
+  { accessorKey: "categoryName", header: "Assigned Category" },
+  { accessorKey: "programCount", header: "Programs" },
+  { accessorKey: "coachCount", header: "Experts" },
+  { accessorKey: "userCount", header: "Clients" },
 
   {
     accessorKey: "status",
