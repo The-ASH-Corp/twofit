@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { SyncLoader } from "react-spinners";
+
 import {
   Users,
   UserCheck,
@@ -310,56 +312,63 @@ const Dashboard = () => {
     },
   ];
 
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+      </div>
+    );
+
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA] h-[calc(100vh-120px)] overflow-auto  no-scrollbar">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          {
-            label: "Total Clients",
-            value: founder?.data?.totalClient,
-            icon: <Users size={20} className="text-[#0A4F48]" />,
-            bg: "bg-[#EBF3F2]",
-          },
-          {
-            label: "Headers",
-            value: founder?.data?.totalHeads,
-            icon: <UserCheck size={20} className="text-[#DAA520]" />,
-            bg: "bg-[#FAF3E0]",
-          },
-          {
-            label: "Sub Admins",
-            value: founder?.data?.totalAdmins,
-            icon: <FileText size={20} className="text-[#0A4F48]" />,
-            bg: "bg-[#EBF3F2]",
-          },
-          {
-            label: "Total Programs",
-            value: founder?.data?.totalPrograms,
-            icon: <Layout size={20} className="text-[#DAA520]" />,
-            bg: "bg-[#FAF3E0]",
-          },
-        ].map((card, i) => (
-          <div
-            key={i}
-            className="bg-white p-5 rounded-2xl flex items-center justify-between shadow-sm"
-          >
-            <div className="flex flex-col gap-1">
-              <span className="text-sm text-[#66706D] font-medium">
-                {card.label}
-              </span>
-              <span className="text-2xl font-bold text-[#0A4F48]">
-                {card.value}
-              </span>
-            </div>
-            <div className={`${card.bg} p-3 rounded-full`}>{card.icon}</div>
-          </div>
-        ))}
-      </div>
 
       <div className="flex gap-6 lg:flex-row flex-col">
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              {
+                label: "Total Clients",
+                value: founder?.data?.totalClient,
+                icon: <Users size={20} className="text-[#0A4F48]" />,
+                bg: "bg-[#EBF3F2]",
+              },
+              {
+                label: "Headers",
+                value: founder?.data?.totalHeads,
+                icon: <UserCheck size={20} className="text-[#DAA520]" />,
+                bg: "bg-[#FAF3E0]",
+              },
+              {
+                label: "Sub Admins",
+                value: founder?.data?.totalAdmins,
+                icon: <FileText size={20} className="text-[#0A4F48]" />,
+                bg: "bg-[#EBF3F2]",
+              },
+              {
+                label: "Total Programs",
+                value: founder?.data?.totalPrograms,
+                icon: <Layout size={20} className="text-[#DAA520]" />,
+                bg: "bg-[#FAF3E0]",
+              },
+            ].map((card, i) => (
+              <div
+                key={i}
+                className="bg-white p-5 rounded-2xl flex items-center justify-between shadow-sm"
+              >
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm text-[#66706D] font-medium">
+                    {card.label}
+                  </span>
+                  <span className="text-2xl font-bold text-[#0A4F48]">
+                    {card.value}
+                  </span>
+                </div>
+                <div className={`${card.bg} p-3 rounded-full`}>{card.icon}</div>
+              </div>
+            ))}
+          </div>
           {/* Row 2: Client Growth & Client Compliance */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <DashboardCard title="Client Growth" subTitle="Last 6 Months">
@@ -515,8 +524,8 @@ const Dashboard = () => {
                             report.expert === "Dietitian"
                               ? "bg-[#FAF3E0] text-[#DAA520]"
                               : report.expert === "Trainer"
-                              ? "bg-[#EBF3F2] text-[#0A4F48]"
-                              : "bg-[#F0FDF4] text-[#15803D]"
+                                ? "bg-[#EBF3F2] text-[#0A4F48]"
+                                : "bg-[#F0FDF4] text-[#15803D]"
                           }`}
                         >
                           {report.expert}
@@ -638,7 +647,7 @@ const Dashboard = () => {
               ].map((notif, i) => (
                 <div key={i} className="flex gap-4">
                   <div
-                    className={`${notif.bg} p-2.5 h-fit rounded-full flex-shrink-0`}
+                    className={`${notif.bg} p-2.5 h-fit rounded-full shrink-0`}
                   >
                     {notif.icon}
                   </div>

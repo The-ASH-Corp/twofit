@@ -3,11 +3,12 @@ import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import { useEffect } from "react";
 import {
-  selectAllCategories,
   selectCategoryError,
   selectCategoryStatus,
+  selectFounderCategories,
+  selectTotalCategories,
 } from "@/redux/features/category/category.selector";
-import { getAllCategories } from "@/redux/features/category/category.thunk";
+import { getFounderCategories } from "@/redux/features/category/category.thunk";
 import { CategoryListColumns } from "./CategoryListColumns";
 import BaseTable from "@/components/table/BaseTable";
 import { SyncLoader } from "react-spinners";
@@ -16,22 +17,22 @@ import { SyncLoader } from "react-spinners";
 export default function CategoryTable() {
   const dispatch = useDispatch(); 
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10)
-  const [totalCount, setTotalCount] = useState(0);
+  const [limit, setLimit] = useState(10);
   useEffect(() => {
-    dispatch(getAllCategories({ page, limit }));
+    dispatch(getFounderCategories({ page, limit }));
   }, [dispatch, page, limit]);
 
-    const data = useAppSelector(selectAllCategories);
+    const data = useAppSelector(selectFounderCategories);
+    const totalCount = useAppSelector(selectTotalCategories);
     const status = useAppSelector(selectCategoryStatus);
     const error = useAppSelector(selectCategoryError);
 
     const [ categories, setCategories] = useState([]);
-    console.log(data)
+    // console.log(data)
 
     useEffect(()=>{
-      setCategories(data.data)
-      setTotalCount(data.total);
+      setCategories(data);
+      console.log(data)
     },[data])
 
   const searchInputHandler = (e) => {

@@ -7,6 +7,7 @@ import {
   getAllProgramByCategory,
   getAllProgramsByExpert,
   getAllProgramsByAdmin,
+  founderProgramList,
 } from "./allPrograma.service.js";
 
 export const createProgramController = async (req, res) => {
@@ -95,3 +96,20 @@ export const getAllProgramControllerByAdmin = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   } 
 };
+
+export const getFounderProgramList = async (req,res) => {
+  try {
+    const page = Number(req.params.page);
+    const limit = Number(req.params.limit);
+    const list = await founderProgramList(page,limit);
+    return res.status(200).json({
+      success: true,
+      data: list,
+    })
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+}

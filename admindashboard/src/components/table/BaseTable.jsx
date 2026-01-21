@@ -128,10 +128,10 @@ export default function BaseTable({
               All Status
               <MdOutlineKeyboardArrowDown className="w-4 h-4 shrink-0" />
             </button>
-            <button className="bg-[#EBF3F2] rounded-md text-[11px] sm:text-[12px] font-semibold px-2 sm:px-3 py-2 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
+            {/* <button className="bg-[#EBF3F2] rounded-md text-[11px] sm:text-[12px] font-semibold px-2 sm:px-3 py-2 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
               Bulk Actions
               <MdOutlineKeyboardArrowDown className="w-4 h-4 shrink-0" />
-            </button>
+            </button> */}
             {actionPath ? (
               <button
                 onClick={() => navigate(actionPath)}
