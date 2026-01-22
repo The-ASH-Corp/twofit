@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { getUserTaskStatus } from "@/redux/features/tasks/task.thunk";
+import { refreshProfile } from "@/redux/features/auth/auth.thunk";
 import { useEffect } from "react";
 import { socket } from "@/utils/socket";
 import { selectToken } from "@/redux/features/auth/auth.selectores";
@@ -33,13 +34,14 @@ export default function TaskList({ plans }) {
 
       socket.on("task_status_updated", (data) => {
         console.log("Task status updated via socket:", data);
-        dispatch(getUserTaskStatus()); // Refresh list
+        dispatch(getUserTaskStatus()); // Refresh task list
       });
 
       socket.on("day_advanced", (data) => {
         console.log("Day advanced via socket:", data);
-        // Refresh user profile to get updated currentGlobalDay
-        window.location.reload(); // Simple reload to refresh all data
+        // Refresh user profile to get updated currentGlobalDay and task list
+        dispatch(refreshProfile({ id: user._id, role: user.role }));
+        dispatch(getUserTaskStatus());
       });
 
       return () => {
