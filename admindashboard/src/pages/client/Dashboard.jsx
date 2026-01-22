@@ -22,7 +22,8 @@ export default function Dashboard() {
   const user = useAppSelector(selectUser);
   const dispatch = useDispatch();
   const fetchDashboardData = async () => {
-    const program = await dispatch(getProgramById(user?.programType)).unwrap();
+    const programId = typeof user?.programType === 'object' ? user?.programType?._id : user?.programType;
+    const program = await dispatch(getProgramById(programId)).unwrap();
     const coaches = await dispatch(
       getAllCoachesByAdmin([user?.trainer, user?.therapist, user?.dietition]),
     ).unwrap();
