@@ -21,6 +21,7 @@ import FounderHeadsProfile from "./pages/founder/heads/HeadProfile";
 import FounderHeadForm from "./pages/founder/heads/HeadForm"
 import FounderCategoryList from "./pages/founder/category/CategoryTable";
 import FounderCategoryForm from "./pages/founder/category/CategoryForm";
+import FounderCategoryEditForm from "./pages/founder/category/CategoryEditForm";
 import FounderExpertList from "./pages/founder/experts/ExpertTable";
 import FounderExpertProfile from "./pages/founder/experts/ExpertProfile";
 import FounderAdminList from "./pages/founder/admin/AdminsList";
@@ -90,11 +91,8 @@ function App() {
           element={
             <PublicRoutes>
               {" "}
-              <Login />
-              {" "}
+              <Login />{" "}
             </PublicRoutes>
-           
-               
           }
         />
 
@@ -127,6 +125,10 @@ function App() {
           <Route path="programs/create" element={<FounderProgramsForm />} />
           <Route path="category" element={<FounderCategoryList />} />
           <Route path="category/create" element={<FounderCategoryForm />} />
+          <Route
+            path="category/edit/:id"
+            element={<FounderCategoryEditForm />}
+          />
           <Route path="finance" element={<FounderFinanceList />} />
           <Route path="therapy" element={<FounderTherapyList />} />
           <Route path="add-therapy" element={<FounderTherapyForm />} />
@@ -188,8 +190,8 @@ function App() {
           <Route path="programs" element={<AdminProgramTable />} />
           <Route path="programs/create" element={<PlanForm />} />
           <Route path="programs/plans" element={<AdminPlanView />} />
-          <Route path="therapy" element={<TherapyList/>}/>
-          <Route path="therapy/create" element={<TherapyForm/>}/>
+          <Route path="therapy" element={<TherapyList />} />
+          <Route path="therapy/create" element={<TherapyForm />} />
           <Route path="profile" element={<Profile />} />
           {/* <Route path="therapy/plans" element={<TherapyDetails/>}/> */}
         </Route>
@@ -208,9 +210,9 @@ function App() {
           <Route path="clients/profile/:id" element={<ExpertClientProfile />} />
           <Route path="chats" element={<ExpertChats />} />
           <Route path="programs" element={<ExpertPrograms />} />
-          <Route path ="programs/viewPlan" element={<ExpertPlanDetails />} />
+          <Route path="programs/viewPlan" element={<ExpertPlanDetails />} />
           <Route path="profile" element={<Profile />} />
-          <Route path ="finance" element={<ExpertFinance />} />
+          <Route path="finance" element={<ExpertFinance />} />
         </Route>
 
         {/* CLIENT */}

@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
- import { getAllCategories, getFounderCategories } from "./category.thunk";
+ import { getAllCategories, getCategory, getFounderCategories } from "./category.thunk";
 
 const initialState = {
   allCategories: [],
@@ -22,6 +22,19 @@ const categorySlice = createSlice({
     builder
 
       //get all program slices
+      .addCase(getCategory.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(getCategory.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.selectedCategory = action.payload.data;
+        state.error = null;
+      })
+      .addCase(getCategory.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
       .addCase(getAllCategories.pending, (state) => {
         state.status = "loading";
         state.error = null;
