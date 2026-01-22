@@ -1,12 +1,8 @@
-// src/components/layout/Topbar.jsx
-
-// import { Input } from "@/components/ui/input";
 import { Bell, Settings } from "lucide-react";
 import { assets } from "../../../assets/asset";
 import { useSelector } from "react-redux";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useNavigate } from "react-router-dom";
-// import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 export default function Topbar() {
 

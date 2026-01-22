@@ -9,7 +9,6 @@ const Profile = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isChangePasswordMode, setIsChangePasswordMode] = useState(false);
 
-  // Form states
   const [profileForm, setProfileForm] = useState({
     name: '',
     dateOfBirth: '',
@@ -25,7 +24,6 @@ const Profile = () => {
     confirmPassword: ''
   });
 
-  // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
@@ -43,7 +41,6 @@ const Profile = () => {
     return date.toISOString().split('T')[0];
   };
 
-  // Open edit profile drawer
   const handleEditProfile = () => {
     setProfileForm({
       name: user?.name || '',
@@ -56,7 +53,6 @@ const Profile = () => {
     setIsEditMode(true);
   };
 
-  // Handle profile form changes
   const handleProfileChange = (e) => {
     setProfileForm({
       ...profileForm,
@@ -64,7 +60,6 @@ const Profile = () => {
     });
   };
 
-  // Handle password form changes
   const handlePasswordChange = (e) => {
     setPasswordForm({
       ...passwordForm,
@@ -72,7 +67,6 @@ const Profile = () => {
     });
   };
 
-  // Submit profile update
   const handleProfileSubmit = (e) => {
     e.preventDefault();
     // TODO: Implement API call to update profile
@@ -80,7 +74,6 @@ const Profile = () => {
     setIsEditMode(false);
   };
 
-  // Submit password change
   const handlePasswordSubmit = (e) => {
     e.preventDefault();
     // TODO: Implement API call to change password
@@ -120,28 +113,28 @@ const Profile = () => {
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Personal Info</h2>
               
               <div className="space-y-5">
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start border-b border-gray-200 pb-3">
                   <span className="text-sm text-gray-600 font-normal">Date of Birth</span>
                   <span className="text-sm text-gray-900 font-normal text-right">
                     {formatDate(user?.dateOfBirth)}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start border-b border-gray-200 pb-3">
                   <span className="text-sm text-gray-600 font-normal">Gender</span>
                   <span className="text-sm text-gray-900 font-normal text-right">
                     {user?.gender || 'N/A'}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start border-b border-gray-200 pb-3">
                   <span className="text-sm text-gray-600 font-normal">Email Address</span>
                   <span className="text-sm text-gray-900 font-normal text-right break-all">
                     {user?.email || 'N/A'}
                   </span>
                 </div>
 
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between items-start border-b border-gray-200 pb-3">
                   <span className="text-sm text-gray-600 font-normal">Phone Number</span>
                   <span className="text-sm text-gray-900 font-normal text-right">
                     {user?.phoneNumber || user?.phone || 'N/A'}
@@ -274,6 +267,7 @@ const Profile = () => {
                   <input
                     type="email"
                     name="email"
+                    readOnly
                     value={profileForm.email}
                     onChange={handleProfileChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -311,17 +305,9 @@ const Profile = () => {
 
             <div className="p-6 border-t border-gray-200 flex gap-3">
               <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsEditMode(false)}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
                 type="submit"
                 onClick={handleProfileSubmit}
-                className="flex-1"
+                className="flex-1 bg-[#0A4F48] text-white hover:bg-[#083d38]"
               >
                 Save Changes
               </Button>
@@ -404,24 +390,9 @@ const Profile = () => {
 
             <div className="p-6 border-t border-gray-200 flex gap-3">
               <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setIsChangePasswordMode(false);
-                  setPasswordForm({
-                    currentPassword: '',
-                    newPassword: '',
-                    confirmPassword: ''
-                  });
-                }}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
                 type="submit"
                 onClick={handlePasswordSubmit}
-                className="flex-1"
+                className="flex-1 bg-[#0A4F48] text-white hover:bg-[#083d38]"
               >
                 Update Password
               </Button>
