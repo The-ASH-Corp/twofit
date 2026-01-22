@@ -168,7 +168,9 @@ const ExpertCenterSide = ({ expert }) => {
       {/* Rating Score Card */}
       <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
-          <h3 className="text-sm sm:text-base font-bold text-[#0A4F48]">Rating Score</h3>
+          <h3 className="text-sm sm:text-base font-bold text-[#0A4F48]">
+            Rating Score
+          </h3>
           <div className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D] w-fit">
             Last 8 Months <ChevronDown size={14} />
           </div>
@@ -265,7 +267,8 @@ const ExpertCenterSide = ({ expert }) => {
               Assigned Clients
             </h3>
             <span className="text-xs text-[#66706D] font-medium">
-              {totalResults} <span className="mx-1 text-gray-300">|</span> Max 30
+              {totalResults} <span className="mx-1 text-gray-300">|</span> Max{" "}
+              {expert.maxClient}
             </span>
           </div>
           <MoreHorizontal size={20} className="text-gray-400 hidden sm:block" />

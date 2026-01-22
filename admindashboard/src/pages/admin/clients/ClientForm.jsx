@@ -245,7 +245,7 @@ export default function ClientForm() {
           options: coachesOfAdmin
             ? coachesOfAdmin
                 ?.filter((coach) => coach?.role === "Trainer")
-                ?.map((coach) => ({ label: coach.name, value: coach._id }))
+                ?.map((coach) => ({ label: coach.name, value: coach?._id }))
             : [],
         },
         {

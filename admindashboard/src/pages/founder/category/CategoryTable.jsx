@@ -50,6 +50,9 @@ export default function CategoryTable() {
     setCategories(filtered);
   };
 
+  const [activeRowId, setActiveRowId] = useState(null);
+
+
   if (status === "loading") return (
     <div className="flex justify-center items-center h-[calc(100vh-120px)]">
       <SyncLoader color="#0A4F48" loading margin={2} size={20} />
@@ -59,7 +62,7 @@ export default function CategoryTable() {
   return (
     <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
       <BaseTable
-        columns={CategoryListColumns}
+        columns={CategoryListColumns(activeRowId, setActiveRowId)}
         data={categories}
         pageLabel={"Category List"}
         actionLabel="Add Category"

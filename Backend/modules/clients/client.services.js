@@ -244,18 +244,19 @@ export const founderClientList = async (page, limit) => {
           coachRoles: {
             $filter: {
               input: [
-                { $cond: [{ $ifNull: ["$trainer", false] }, "trainer", null] },
+                { $cond: [{ $ifNull: ["$trainer", false] }, "Trainer", null] },
+
                 {
                   $cond: [
-                    { $ifNull: ["$therapist", false] },
-                    "therapist",
+                    { $ifNull: ["$dietition", false] },
+                    "Dietitian",
                     null,
                   ],
                 },
                 {
                   $cond: [
-                    { $ifNull: ["$dietition", false] },
-                    "dietition",
+                    { $ifNull: ["$therapist", false] },
+                    "Therapist",
                     null,
                   ],
                 },
