@@ -7,11 +7,10 @@ export const login = createAsyncThunk(
     try {
       const data = await axiosInstance.post("/auth/login", credentials);
       return data.data;
-
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Login failed");
     }
-  }
+  },
 );
 
 export const createClient = createAsyncThunk(
@@ -22,10 +21,12 @@ export const createClient = createAsyncThunk(
 
       return data;
     } catch (error) {
-      console.log(error)
-      return rejectWithValue(error.response?.data?.message || "Failed to create client");
+      console.log(error);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to create client",
+      );
     }
-  }
+  },
 );
 
 export const logout = createAsyncThunk(
@@ -37,7 +38,7 @@ export const logout = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Logout failed");
     }
-  }
+  },
 );
 
 export const refreshProfile = createAsyncThunk(
@@ -45,18 +46,66 @@ export const refreshProfile = createAsyncThunk(
   async ({ id, role }, { rejectWithValue }) => {
     try {
       let endpoint;
-      
+
       // Determine the correct endpoint based on role
-      if (role === 'client' || role === 'user') {
+      if (role === "client" || role === "user") {
         endpoint = `/clients/get-client/${id}`;
       } else {
         endpoint = `/admin/admin-profile/${id}`;
       }
-      
+
       const data = await axiosInstance.get(endpoint);
       return data.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Failed to refresh profile");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to refresh profile",
+      );
     }
-  }
+  },
+);
+
+export const forgotPassword = createAsyncThunk(
+  "auth/forgotPassword",
+  async ({ email }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.post("/auth/forgot-password", { email });
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to send OTP",
+      );
+    }
+  },
+);
+
+export const verifyOTP = createAsyncThunk(
+  "auth/verifyOTP",
+  async ({ email, otp }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.post("/auth/verify-otp", { email, otp });
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to verify OTP",
+      );
+    }
+  },
+);
+
+export const resetPassword = createAsyncThunk(
+  "auth/resetPassword",
+  async ({ email, otp, newPassword }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.post("/auth/reset-password", {
+        email,
+        otp,
+        newPassword,
+      });
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to reset password",
+      );
+    }
+  },
 );

@@ -8,11 +8,7 @@ import {
   Layout,
   MoreHorizontal,
   Bell,
-  TrendingUp,
   ChevronDown,
-  Flame,
-  CheckCircle2,
-  AlertCircle,
   MessageSquare,
   RefreshCw,
 } from "lucide-react";
@@ -29,7 +25,7 @@ import {
   Legend,
   Filler,
 } from "chart.js";
-import { Bar, Line, Doughnut } from "react-chartjs-2";
+import { Bar, Doughnut } from "react-chartjs-2";
 import { useDispatch } from "react-redux";
 import { founderDashboardData } from "@/redux/features/founder/founder.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
@@ -59,7 +55,6 @@ const Dashboard = () => {
   }, [dispatch]);
 
   const data = useAppSelector(selectFounderDashBoard);
-  // const error = useAppSelector(selectFounderError);
   const status = useAppSelector(selectFounderStatus);
 
   const [founder, setFounder] = useState();
@@ -133,31 +128,7 @@ const Dashboard = () => {
     ],
   };
 
-  // const newClientsData = {
-  //   labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-  //   datasets: [
-  //     {
-  //       label: "Clients joined",
-  //       data: [45, 52, 40, 75, 55, 65],
-  //       borderColor: "#0A4F48",
-  //       backgroundColor: (context) => {
-  //         const ctx = context.chart.ctx;
-  //         const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-  //         gradient.addColorStop(0, "rgba(10, 79, 72, 0.1)");
-  //         gradient.addColorStop(1, "rgba(10, 79, 72, 0)");
-  //         return gradient;
-  //       },
-  //       fill: true,
-  //       tension: 0.4,
-  //       borderWidth: 3,
-  //       pointBackgroundColor: "#fff",
-  //       pointBorderColor: "#0A4F48",
-  //       pointBorderWidth: 2,
-  //       pointRadius: 4,
-  //       pointHoverRadius: 6,
-  //     },
-  //   ],
-  // };
+  
 
   const expertPerformanceData = {
     labels: ["Task Completion", "Rating", "Clients Assigned"],
