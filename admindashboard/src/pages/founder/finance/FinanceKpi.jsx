@@ -3,15 +3,16 @@ import KpiCard from "@/components/cards/KpiCard";
 import React, { useState } from "react";
 import PayrollMenu from "./PayrollMenu";
 import { useAppSelector } from "@/redux/store/hooks";
-import { selectEmployeeCount, selectTotalSalary } from "@/redux/features/finance/finance.selector";
+import { selectEmployeeCount, selectTotalBaseSalary, selectTotalIncentive, selectTotalSalary } from "@/redux/features/finance/finance.selector";
 
 export default function FinanceKpi() {
   // console.log(data)
   const [payrollOpen, setPayrollOpen] = useState(false);
   const count = useAppSelector(selectEmployeeCount);
   const totalPayroll = useAppSelector(selectTotalSalary);
-  const pendingPayroll = useAppSelector(selectTotalSalary);
-  const CompletedPayroll = (totalPayroll - pendingPayroll)
+  const totalBaseSalary = useAppSelector(selectTotalBaseSalary);
+  const totalIncentive = useAppSelector(selectTotalIncentive);
+
 
 
   return (
@@ -25,7 +26,7 @@ export default function FinanceKpi() {
             className="text-[12px] font-semibold px-3.5 py-2.5 bg-[#0A4F48] rounded-md text-white"
             onClick={() => setPayrollOpen(!payrollOpen)}
           >
-           Add Incentives
+            Add Incentives
           </button>
         </div>
       </div>
@@ -38,22 +39,22 @@ export default function FinanceKpi() {
           bg="#0A4F48"
         />
         <KpiCard
-          title="Total Payroll"
-          value={`₹ ${totalPayroll?.toLocaleString("en-IN")}`}
+          title="Total Incentive"
+          value={`₹ ${totalIncentive?.toLocaleString("en-IN")}`}
           icon={assets.totalPayroll}
           iconClass="bg-[#F4DBC7]"
           bg="#F4DBC7"
         />
         <KpiCard
-          title="Pending Payroll"
-          value={`₹ ${pendingPayroll?.toLocaleString("en-IN")}`}
+          title="Total Base Salary"
+          value={`₹ ${totalBaseSalary?.toLocaleString("en-IN")}`}
           icon={assets.pendingPayroll}
           iconClass="bg-[#0A4F48]"
           bg="#0A4F48"
         />
         <KpiCard
-          title="Completed Payroll"
-          value={`₹ ${CompletedPayroll?.toLocaleString("en-IN")}`}
+          title="Total Payroll"
+          value={`₹ ${totalPayroll?.toLocaleString("en-IN")}`}
           icon={assets.totalPayroll}
           iconClass="bg-[#F4DBC7]"
           bg="#F4DBC7"
