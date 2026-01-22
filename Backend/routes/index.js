@@ -12,22 +12,24 @@ import payrollRouts from "../modules/payroll/payroll.route.js"
 import planRoutes from "../modules/plan/plan.route.js"
 import founderRoutes from "../modules/founder/founder.routes.js"
 import financeRoutes from "../modules/finance/finance.route.js"
+import taskSubmissionRoutes from "../modules/taskSubmission/taskSubmission.routes.js";
 
 const router = express.Router();
 
-router.use('/',authRoutes)
-router.use("/clients",clientRoutes)
+router.use('/', authRoutes)
+router.use("/clients", clientRoutes)
 router.use("/coach", coachRoutes);
 router.use("/programs", programRoutes);
-router.use("/chats",chatRoutes)
+router.use("/chats", chatRoutes)
 router.use("/therapy", therapyRouts);
-router.use("/admin",adminRoutes)
+router.use("/admin", adminRoutes)
 router.use("/heads", headRouts);
 router.use("/category", categoryRouts);
 router.use("/payroll", payrollRouts);
-router.use("/plans",planRoutes)
+router.use("/plans", planRoutes)
 router.use("/founder", founderRoutes)
 router.use("/finance", financeRoutes)
+router.use("/tasks", taskSubmissionRoutes);
 
 
 

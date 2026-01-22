@@ -135,7 +135,7 @@ const ChatWindow = ({
           </div>
 
           {/* Message Input */}
-          <div className="bg-white lg:rounded-b-lg px-4 lg:px-6 py-3 lg:py-4 border-t">
+          <div className="bg-white lg:rounded-b-lg px-4 lg:px-6 py-3 lg:py-4">
             <div className="flex items-center gap-2 lg:gap-3 bg-gray-50 rounded-xl lg:rounded-lg p-2">
               <button className="text-gray-400 hover:text-gray-600 transition">
                 <Paperclip size={20} />

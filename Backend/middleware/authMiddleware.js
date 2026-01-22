@@ -6,37 +6,52 @@ import { HeadsModel } from "../modules/Heads/heads.modal.js";
 import { FounderModel } from "../seeds/createAdmin.js";
 import { CoachModel } from "../modules/coach/coach.model.js";
 
+const findUserById = async (id) => {
+  return (
+    (await User.findById(id).select("-password")) ||
+    (await AdminModel.findById(id).select("-password")) ||
+    (await HeadsModel.findById(id).select("-password")) ||
+    (await FounderModel.findById(id).select("-password")) ||
+    (await CoachModel.findById(id).select("-password"))
+  );
+};
+
 export const authMiddleware = async (req, res, next) => {
   try {
     const auth = req.headers.authorization;
 
     if (!auth) {
-      console.log("no token issue")
-      return res.status(401).json({ message: "No token provided" });}
+      return res.status(401).json({ message: "No token provided" });
+    }
 
     const token = auth.split(" ")[1];
+    let decoded;
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (err) {
+      if (err.name === "TokenExpiredError") {
+        const refreshedDecoded = await refreshAccessToken(req, res);
+        if (!refreshedDecoded) {
+          return res.status(401).json({ message: "Token expired and refresh failed" });
+        }
+        decoded = refreshedDecoded;
+      } else {
+        return res.status(401).json({ message: "Invalid token" });
+      }
+    }
 
-    let user =
-      (await User.findById(decoded.id).select("-password") ||
-        (await AdminModel.findById(decoded.id).select("-password") ||
-          (await HeadsModel.findById(decoded.id).select("-password")) ||
-          (await FounderModel.findById(decoded.id).select("-password")) ||
-          await CoachModel.findById(decoded.id).select("-password")));
+    const user = await findUserById(decoded.id);
 
     if (!user) {
-      console.log("no user found issue")
       return res.status(401).json({ message: "User not found" });
     }
 
     req.user = user;
     next();
   } catch (err) {
-    if (err.name !== "TokenExpiredError")
-      return res.status(401).json({ message: "Invalid token" });
-
-    return refreshAccessToken(req, res, next);
+    console.error("Auth middleware error:", err);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 

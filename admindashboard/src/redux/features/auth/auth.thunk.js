@@ -42,9 +42,18 @@ export const logout = createAsyncThunk(
 
 export const refreshProfile = createAsyncThunk(
   "auth/refreshProfile",
-  async (id, { rejectWithValue }) => {
+  async ({ id, role }, { rejectWithValue }) => {
     try {
-      const data = await axiosInstance.get(`/admin/admin-profile/${id}`);
+      let endpoint;
+      
+      // Determine the correct endpoint based on role
+      if (role === 'client' || role === 'user') {
+        endpoint = `/clients/get-client/${id}`;
+      } else {
+        endpoint = `/admin/admin-profile/${id}`;
+      }
+      
+      const data = await axiosInstance.get(endpoint);
       return data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to refresh profile");

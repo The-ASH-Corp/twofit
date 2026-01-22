@@ -16,6 +16,9 @@ import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { getCoachDashboardStats } from "@/redux/features/coach/coach.thunk";
+import { getPendingSubmissions } from "@/redux/features/tasks/task.thunk";
+import { socket } from "@/utils/socket";
+import { selectToken } from "@/redux/features/auth/auth.selectores";
 
 ChartJS.register(
   CategoryScale,
@@ -24,7 +27,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  ArcElement
+  ArcElement,
 );
 
 export default function Dashboard() {
@@ -347,17 +350,53 @@ export default function Dashboard() {
   };
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
+  const token = useAppSelector(selectToken);
+  const { pendingTasks } = useAppSelector((state) => state.tasks);
   const [dashboardStats, setDashboardStats] = useState(null);
+
+  const fetched = React.useRef(false);
+
   const fetchData = async () => {
-    const response = await dispatch(
-      getCoachDashboardStats( user._id )
-    );
-    setDashboardStats(response.payload);
+      dispatch(getCoachDashboardStats(user._id)).then((res) => {
+        if (res.meta?.requestStatus === "fulfilled") {
+          setDashboardStats(res.payload);
+        }
+      });
+    dispatch(getPendingSubmissions());
   };
+
   useEffect(() => {
-    fetchData();
-  }, []);
-  console.log("dashboardStats", dashboardStats);
+    if (user?._id && token) {
+      fetchData();
+
+      // Socket.IO Setup
+      socket.auth = { userId: user._id, token: token };
+      socket.connect();
+
+      socket.on("connect", () => {
+        console.log("Dashboard socket connected");
+        socket.emit("join_task_rooms", { role: user.role });
+      });
+
+      socket.on("new_task_submission", (data) => {
+        console.log("New task submission received via socket:", data);
+        fetchData(); // Refresh data in real-time
+      });
+
+      socket.on("task_updated", (data) => {
+        console.log("Task updated via socket:", data);
+        fetchData(); // Refresh data in real-time
+      });
+
+      return () => {
+        socket.off("connect");
+        socket.off("new_task_submission");
+        socket.off("task_updated");
+        socket.disconnect();
+      };
+    }
+  }, [dispatch, user?._id, token]);
+
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA] h-[calc(100vh-120px)] overflow-auto no-scrollbar">
       {/* Top Metrics */}
@@ -370,7 +409,9 @@ export default function Dashboard() {
             <p className="text-[13px] text-gray-500 font-medium">
               Total Clients
             </p>
-            <p className="text-[24px] font-bold text-gray-900">{dashboardStats?.totalClients || 0}</p>
+            <p className="text-[24px] font-bold text-gray-900">
+              {dashboardStats?.totalClients || 0}
+            </p>
           </div>
         </div>
 
@@ -382,7 +423,9 @@ export default function Dashboard() {
             <p className="text-[13px] text-gray-500 font-medium">
               Pending Reviews
             </p>
-            <p className="text-[24px] font-bold text-gray-900">{dashboardStats?.pendingReviews || 0}</p>
+            <p className="text-[24px] font-bold text-gray-900">
+              {pendingTasks?.length}
+            </p>
           </div>
         </div>
 
@@ -404,7 +447,9 @@ export default function Dashboard() {
           </div>
           <div>
             <p className="text-[13px] text-gray-500 font-medium">Programs</p>
-            <p className="text-[24px] font-bold text-gray-900">{dashboardStats?.totalPrograms || 0}</p>
+            <p className="text-[24px] font-bold text-gray-900">
+              {dashboardStats?.totalPrograms || 0}
+            </p>
           </div>
         </div>
       </div>
@@ -480,42 +525,54 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {pendingReviews.map((review) => (
-                    <tr
-                      key={review.id}
-                      className="border-b border-gray-50 hover:bg-gray-50/50"
-                    >
-                      <td className="py-4 text-[13px] text-gray-900 font-medium">
-                        {review.clientName}
-                      </td>
-                      <td className="py-4 text-[13px] text-gray-600">
-                        {review.program}
-                      </td>
-                      <td className="py-4 text-[13px] text-gray-600">
-                        {review.mealType}
-                      </td>
-                      <td className="py-4 text-[13px] text-gray-600">
-                        {review.dateTime}
-                      </td>
-                      <td className="py-4">
-                        <span
-                          className={`text-[12px] font-semibold px-3 py-1 rounded-full ${getStatusColor(
-                            review.status
-                          )}`}
-                        >
-                          {review.status}
-                        </span>
-                      </td>
-                      <td className="py-4">
-                        <button
-                          onClick={() => setSelectedReview(review)}
-                          className="bg-[#0A4F48] text-white text-[13px] font-medium px-5 py-2 rounded-lg hover:bg-[#083d37] transition-colors"
-                        >
-                          Review
-                        </button>
+                  {pendingTasks?.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan="6"
+                        className="py-10 text-center text-gray-400 italic"
+                      >
+                        No pending reviews for your assigned clients.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    pendingTasks?.map((review) => (
+                      <tr
+                        key={review._id}
+                        className="border-b border-gray-50 hover:bg-gray-50/50"
+                      >
+                        <td className="py-4 text-[13px] text-gray-900 font-medium">
+                          {review.userId?.name}
+                        </td>
+                        <td className="py-4 text-[13px] text-gray-600">
+                          {review.programId?.title || "N/A"}
+                        </td>
+                        <td className="py-4 text-[13px] text-gray-600">
+                          Day {review.globalDayIndex} - Ex{" "}
+                          {review.exerciseIndex + 1}
+                        </td>
+                        <td className="py-4 text-[13px] text-gray-600">
+                          {new Date(review.createdAt).toLocaleString()}
+                        </td>
+                        <td className="py-4">
+                          <span
+                            className={`text-[12px] font-semibold px-3 py-1 rounded-full ${getStatusColor(
+                              "In Review",
+                            )}`}
+                          >
+                            PENDING
+                          </span>
+                        </td>
+                        <td className="py-4">
+                          <button
+                            onClick={() => setSelectedReview(review)}
+                            className="bg-[#0A4F48] text-white text-[13px] font-medium px-5 py-2 rounded-lg hover:bg-[#083d37] transition-colors"
+                          >
+                            Review
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -570,7 +627,9 @@ export default function Dashboard() {
                   <div className="w-3 h-3 rounded-full bg-[#F4DBC7]"></div>
                   <span className="text-[13px] text-gray-600">Rating</span>
                 </div>
-                <span className="text-[15px] font-bold text-gray-900">{dashboardStats?.avarageRating || 0}</span>
+                <span className="text-[15px] font-bold text-gray-900">
+                  {dashboardStats?.avarageRating || 0}
+                </span>
               </div>
 
               <div className="flex justify-between items-center">

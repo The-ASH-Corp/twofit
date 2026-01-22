@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ChastList from "./ChastList";
 import ChatWindow from "./ChatWindow";
-import { selectAllCoaches } from "@/redux/features/coach/coach.selector";
 import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
 import MobileBottomNav from "../components/MobileBottomNav";
 
@@ -17,7 +16,7 @@ export default function Chats() {
   useEffect(() => {
     fetchAllExperts();
     socket.auth = {
-      userId: user._id,
+      userId: user?._id,
       token: localStorage.getItem("token"),
     };
 

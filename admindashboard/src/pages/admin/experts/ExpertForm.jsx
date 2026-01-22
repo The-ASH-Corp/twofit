@@ -251,7 +251,7 @@ export default function ExpertForm() {
       const coach = await dispatch(createCoach(formData));
 
       if (coach.meta.requestStatus === "fulfilled") {
-        await dispatch(refreshProfile(user._id));
+        await dispatch(refreshProfile({ id: user._id, role: user.role }));
         toast("Coach created successfully", { type: "success" });
         navigate(-1);
       } else {

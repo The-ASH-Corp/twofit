@@ -22,8 +22,11 @@ export default function Dashboard() {
   const user = useAppSelector(selectUser);
   const dispatch = useDispatch();
   const fetchDashboardData = async () => {
-    const program = await dispatch(getProgramById(user?.programType)).unwrap();
-    const coaches = await dispatch(getAllCoachesByAdmin([user?.trainer,user?.therapist,user?.dietition])).unwrap();
+    const programId = typeof user?.programType === 'object' ? user?.programType?._id : user?.programType;
+    const program = await dispatch(getProgramById(programId)).unwrap();
+    const coaches = await dispatch(
+      getAllCoachesByAdmin([user?.trainer, user?.therapist, user?.dietition]),
+    ).unwrap();
     setProgram(program);
     setCoaches(coaches);
   };
@@ -36,83 +39,83 @@ export default function Dashboard() {
       <div className="w-full grid lg:grid-cols-[1fr_350px] grid-cols-1 gap-8 lg:p-2 p-4 lg:pb-2 pb-24">
         {/* Main Content Area */}
         <div className="flex flex-col space-y-8">
-        {/* Top Section: Hero and KPI Cards */}
-        <div className="grid lg:grid-cols-[1.5fr_1fr] grid-cols-1 gap-6">
-          <HeroCard program={program} />
-          <div className="grid grid-cols-2 gap-4">
-            <KpiCard
-              title="Program Days"
-              value={`${program?.programDays || 0}/ ${program?.plan?.duration || 0}`}
-              icon={assets.website}
-              bg="#0A4F48"
-              iconColor="white"
-            />
-            <KpiCard
-              title="Overall Compliance"
-              value="75%"
-              icon={assets.website}
-              bg="#0A4F48"
-              iconColor="white"
-            />
-            <KpiCard
-              title="Weight Progress"
-              value={user?.currentWeight || 0}
-              icon={assets.website}
-              bg="#F4DBC7"
-            />
-            <KpiCard
-              title="Active Streak"
-              value="12 Days"
-              icon={assets.website}
-              bg="#F4DBC7"
-            />
+          {/* Top Section: Hero and KPI Cards */}
+          <div className="grid lg:grid-cols-[1.5fr_1fr] grid-cols-1 gap-6">
+            <HeroCard program={program} />
+            <div className="grid grid-cols-2 gap-4">
+              <KpiCard
+                title="Program Days"
+                value={`${user?.currentGlobalDay || 1}/ ${program?.plan?.duration || 0}`}
+                icon={assets.website}
+                bg="#0A4F48"
+                iconColor="white"
+              />
+              <KpiCard
+                title="Overall Compliance"
+                value="75%"
+                icon={assets.website}
+                bg="#0A4F48"
+                iconColor="white"
+              />
+              <KpiCard
+                title="Weight Progress"
+                value={user?.currentWeight || 0}
+                icon={assets.website}
+                bg="#F4DBC7"
+              />
+              <KpiCard
+                title="Active Streak"
+                value="12 Days"
+                icon={assets.website}
+                bg="#F4DBC7"
+              />
+            </div>
+          </div>
+
+          {/* Mobile Only: Diet Plan Card */}
+          <div className="lg:hidden">
+            <DietPlanCard />
+          </div>
+
+          {/* Middle Section: Charts */}
+          <div className="grid lg:grid-cols-2 grid-cols-1 gap-6 lg:order-2 order-3">
+            <div className="bg-white p-6 rounded-2xl shadow-sm">
+              <h2 className="text-[#0A4F48] font-bold text-sm mb-4">
+                Last Week Compliance
+              </h2>
+              <ComplianceChart />
+            </div>
+            <div className="bg-white p-6 rounded-2xl shadow-sm">
+              <h2 className="text-[#0A4F48] font-bold text-sm mb-4">
+                Weight Progress
+              </h2>
+              <ProgressChart />
+            </div>
+          </div>
+
+          {/* Bottom Section: My Tasks */}
+          <div className="lg:order-3 order-2">
+            <h2 className="text-[#0A4F48] font-bold text-lg">My Tasks</h2>
+            <TaskList plans={program?.plan} />
+          </div>
+
+          {/* Mobile Only: Measurements */}
+          <div className="lg:hidden order-4">
+            <Measeurement />
           </div>
         </div>
 
-        {/* Mobile Only: Diet Plan Card */}
-        <div className="lg:hidden">
+        {/* Right Sidebar Area - Desktop Only */}
+        <div className="space-y-4 hidden lg:block">
           <DietPlanCard />
-        </div>
-
-        {/* Middle Section: Charts */}
-        <div className="grid lg:grid-cols-2 grid-cols-1 gap-6 lg:order-2 order-3">
-          <div className="bg-white p-6 rounded-2xl shadow-sm">
-            <h2 className="text-[#0A4F48] font-bold text-sm mb-4">
-              Last Week Compliance
-            </h2>
-            <ComplianceChart />
-          </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm">
-            <h2 className="text-[#0A4F48] font-bold text-sm mb-4">
-              Weight Progress
-            </h2>
-            <ProgressChart />
-          </div>
-        </div>
-
-        {/* Bottom Section: My Tasks */}
-        <div className="lg:order-3 order-2">
-          <h2 className="text-[#0A4F48] font-bold text-lg">My Tasks</h2>
-          <TaskList plans={program?.plan} />
-        </div>
-
-        {/* Mobile Only: Measurements */}
-        <div className="lg:hidden order-4">
+          <ExpertsList expert={coaches} />
           <Measeurement />
+          <NotificationsList />
         </div>
       </div>
 
-      {/* Right Sidebar Area - Desktop Only */}
-      <div className="space-y-4 hidden lg:block">
-        <DietPlanCard />
-        <ExpertsList expert={coaches}/>
-        <Measeurement />
-        <NotificationsList />
-      </div>
-    </div>
-
-    {/* Mobile Bottom Navigation */}
-    <MobileBottomNav />
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </>
   );
 }
