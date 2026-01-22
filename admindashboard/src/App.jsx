@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import PublicRoutes from "./routes/PublicRoutes";
 import Profile from "./pages/Profile";
 import Unauthorized from "./pages/Unauthorized";
+import ForgotPasswordEmail from "./pages/ForgotPassword";
 //Founder Pages Imports
 import FounderLayout from "./pages/founder/layout/FounderLayout";
 import FounderDashboard from "./pages/founder/Dashboard";
@@ -18,33 +19,33 @@ import FounderClientsTable from "./pages/founder/clients/ClientsTable";
 import FounderClientProfile from "./pages/founder/clients/ClientProfile";
 import FounderHeadsList from "./pages/founder/heads/HeadTable";
 import FounderHeadsProfile from "./pages/founder/heads/HeadProfile";
-import FounderHeadForm from "./pages/founder/heads/HeadForm"
+import FounderHeadForm from "./pages/founder/heads/HeadForm";
 import FounderCategoryList from "./pages/founder/category/CategoryTable";
 import FounderCategoryForm from "./pages/founder/category/CategoryForm";
 import FounderExpertList from "./pages/founder/experts/ExpertTable";
 import FounderExpertProfile from "./pages/founder/experts/ExpertProfile";
 import FounderAdminList from "./pages/founder/admin/AdminsList";
-import FounderAdminProfile from "./pages/founder/admin/AdminProfile"
+import FounderAdminProfile from "./pages/founder/admin/AdminProfile";
 import FounderProgramsList from "./pages/founder/programsList/ProgramTable";
 import FounderProgramsForm from "./pages/founder/programsList/ProgramForm";
 import FounderTherapyList from "./pages/founder/therapy/TherapyTable";
 import FounderTherapyForm from "./pages/founder/therapy/TherapyForm";
 import FounderWorkoutList from "./pages/founder/workout/WorkoutList";
-import FounderWorkoutForm from "./pages/founder/workout/WorkoutForm"
+import FounderWorkoutForm from "./pages/founder/workout/WorkoutForm";
 import FounderFinanceList from "./pages/founder/finance/FinanceTable";
 //Head Pages Imports
 import HeadLayout from "./pages/head/layout/HeadLayout";
 import HeadDashboard from "./pages/head/Dashboard";
 import HeadClientsTable from "./pages/head/clients/ClientsTable";
-import HeadExperList from "./pages/head/experts/ExpertTable"
-import HeadAdminsList from "./pages/head/admin/AdminsList"
-import HeadFinanceTable from "./pages/head/finance/FinanceTable"
-import HeadExpertTable from "./pages/head/experts/ExpertTable"
-import HeadAddAdmin from "./pages/head/admin/AdminForm"
-import HeadExpertProfile from "./pages/head/experts/ExpertProfile"
-import HeadAdminProfile from "./pages/head/admin/AdminProfile"
-import HeadClientProfile from "./pages/head/clients/ClientProfile"
-import HeadProgramTable from "./pages/head/programsList/ProgramTable"
+import HeadExperList from "./pages/head/experts/ExpertTable";
+import HeadAdminsList from "./pages/head/admin/AdminsList";
+import HeadFinanceTable from "./pages/head/finance/FinanceTable";
+import HeadExpertTable from "./pages/head/experts/ExpertTable";
+import HeadAddAdmin from "./pages/head/admin/AdminForm";
+import HeadExpertProfile from "./pages/head/experts/ExpertProfile";
+import HeadAdminProfile from "./pages/head/admin/AdminProfile";
+import HeadClientProfile from "./pages/head/clients/ClientProfile";
+import HeadProgramTable from "./pages/head/programsList/ProgramTable";
 
 //Admin Pages Imports
 import AppLayout from "./pages/admin/layout/AppLayout";
@@ -52,33 +53,32 @@ import AdminDashboard from "./pages/admin/Dashboard";
 import AdminChats from "./pages/admin/chats/Chats";
 import AdminClientsTable from "./pages/admin/clients/ClientsTable";
 import AdminExpertTable from "./pages/admin/experts/ExpertTable";
-import AdminFinance from "./pages/admin/finance/FinanceTable"
-import AdminAddExpert from "./pages/admin/experts/ExpertForm"
+import AdminFinance from "./pages/admin/finance/FinanceTable";
+import AdminAddExpert from "./pages/admin/experts/ExpertForm";
 import AdminExpertProfile from "./pages/admin/experts/ExpertProfile";
 import AdminClientProfile from "./pages/admin/clients/ClientProfile";
 import AdminAddClient from "./pages/admin/clients/ClientForm";
 import AdminProgramTable from "./pages/admin/programsList/ProgramTable";
 import PlanForm from "./pages/admin/programsList/PlanForm";
-import AdminPlanView from "./pages/admin/programsList/PlanDetailsView"
+import AdminPlanView from "./pages/admin/programsList/PlanDetailsView";
 //Expert Pages Imports
 import ExpertLayout from "./pages/expert/layout/ExpertLayout";
 import ExpertDashboard from "./pages/expert/Dashboard";
 import ExpertClientsTable from "./pages/expert/clients/ClientsTable";
 import ExpertChats from "./pages/expert/chats/Chats";
 import ExpertPrograms from "./pages/expert/programsList/ProgramTable";
-import ExpertPlanDetails from "./pages/expert/programsList/PlanDetailsView"
-import ExpertFinance from "./pages/expert/finance/FinanceTable"
-import ExpertClientProfile from "./pages/expert/clients/ClientProfile"
+import ExpertPlanDetails from "./pages/expert/programsList/PlanDetailsView";
+import ExpertFinance from "./pages/expert/finance/FinanceTable";
+import ExpertClientProfile from "./pages/expert/clients/ClientProfile";
 // Client Pages Import
-import ClientLayout from './pages/client/layout/ClientLayout'
-import ClientDashboard from './pages/client/Dashboard'
+import ClientLayout from "./pages/client/layout/ClientLayout";
+import ClientDashboard from "./pages/client/Dashboard";
 import ClientFeedback from "./pages/client/feedback/Feedback";
 import ClientProgress from "./pages/client/progress/Progress";
 import DailyPlan from "./pages/client/dailyPlan/DailyPlan";
-import ClientChat from "./pages/client/chats/Chats"
+import ClientChat from "./pages/client/chats/Chats";
 import TherapyList from "./pages/admin/therapy/TherapyTable";
 import TherapyForm from "./pages/admin/therapy/TherapyForm";
-import TherapyDetails from "./pages/admin/therapy/TherapyDetails";
 
 function App() {
   return (
@@ -89,15 +89,20 @@ function App() {
           path="/login"
           element={
             <PublicRoutes>
-              {" "}
               <Login />
-              {" "}
             </PublicRoutes>
-           
-               
           }
         />
 
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoutes>
+              <ForgotPasswordEmail />
+            </PublicRoutes>
+          }
+        />
+        
         {/* FOUNDER */}
         <Route
           path="/founder"
@@ -188,8 +193,8 @@ function App() {
           <Route path="programs" element={<AdminProgramTable />} />
           <Route path="programs/create" element={<PlanForm />} />
           <Route path="programs/plans" element={<AdminPlanView />} />
-          <Route path="therapy" element={<TherapyList/>}/>
-          <Route path="therapy/create" element={<TherapyForm/>}/>
+          <Route path="therapy" element={<TherapyList />} />
+          <Route path="therapy/create" element={<TherapyForm />} />
           <Route path="profile" element={<Profile />} />
           {/* <Route path="therapy/plans" element={<TherapyDetails/>}/> */}
         </Route>
@@ -208,9 +213,9 @@ function App() {
           <Route path="clients/profile/:id" element={<ExpertClientProfile />} />
           <Route path="chats" element={<ExpertChats />} />
           <Route path="programs" element={<ExpertPrograms />} />
-          <Route path ="programs/viewPlan" element={<ExpertPlanDetails />} />
+          <Route path="programs/viewPlan" element={<ExpertPlanDetails />} />
           <Route path="profile" element={<Profile />} />
-          <Route path ="finance" element={<ExpertFinance />} />
+          <Route path="finance" element={<ExpertFinance />} />
         </Route>
 
         {/* CLIENT */}
