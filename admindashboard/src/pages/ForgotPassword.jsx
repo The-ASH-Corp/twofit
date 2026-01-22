@@ -3,6 +3,8 @@ import { assets } from "../assets/asset";
 import { useDispatch } from "react-redux";
 import { GoArrowLeft } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
+import { forgotPassword, resetPassword, verifyOTP } from "@/redux/features/auth/auth.thunk";
+import { toast } from "react-toastify";
 
 const ForgotPasswordEmail = () => {
   useEffect(() => {
@@ -31,16 +33,15 @@ const ForgotPasswordEmail = () => {
     e.preventDefault();
     setError("");
     setLoading(true);
-    
-    // try {
+    try {
       // Send OTP to email
-      // await axiosInstance.post("/auth/forgot-password", { email: formData.email });
+      await dispatch(forgotPassword({ email: formData.email })).unwrap();
       setStep(2);
-    // } catch (err) {
-      // setError(err.response?.data?.message || "Failed to send OTP");
-    // } finally {
+    } catch (err) {
+      setError(err || "Failed to send OTP");
+    } finally {
       setLoading(false);
-    // }
+    }
   };
 
   // Handle OTP input change
@@ -77,18 +78,14 @@ const ForgotPasswordEmail = () => {
     }
 
     setLoading(true);
-    // try {
-      // Verify OTP
-      // await axiosInstance.post("/auth/verify-otp", { 
-        // email: formData.email, 
-        // otp: otpCode 
-      // });
+    try {
+      await dispatch(verifyOTP({ email: formData.email, otp: otpCode })).unwrap();
       setStep(3);
-    // } catch (err) {
-      // setError(err.response?.data?.message || "Invalid OTP");
-    // } finally {
+    } catch (err) {
+      setError(err.response?.data?.message || "Invalid OTP");
+    } finally {
       setLoading(false);
-    // }
+    }
   };
 
   // Handle password reset
@@ -107,25 +104,21 @@ const ForgotPasswordEmail = () => {
     }
 
     setLoading(true);
-    // try {
+    try {
       const otpCode = formData.otp.join("");
-      // await axiosInstance.post("/auth/reset-password", {
-      //   email: formData.email,
-      //   otp: otpCode,
-      //   newPassword: formData.newPassword,
-      // });
+      await dispatch(resetPassword({ email: formData.email, otp: otpCode, newPassword: formData.newPassword })).unwrap(); 
       
-      alert("Password reset successfully!");
+      toast.success("Password reset successfully!");
       navigate("/login");
-    // } catch (err) {
-      // setError(err.response?.data?.message || "Failed to reset password");
-    // } finally {
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to reset password");
+    } finally {
       setLoading(false);
-    // }
+    }
   };
  
   return (
-    <div className="h-[100vh] w-full flex items-center justify-center lg:justify-between overflow-hidden">
+    <div className="h-screen w-full flex items-center justify-center lg:justify-between overflow-hidden">
       {/* image */}
       <div className="hidden lg:flex lg:w-[50%] lg:h-full bg-[#0A4F48] flex-col items-center justify-start pt-20 xl:pt-30 gap-16 xl:gap-25 px-12 xl:px-16.5">
         <h1 className="text-white font-bold text-[52px] xl:text-[60px] tracking-[-4%] text-center BricolageGrotesque leading-[100%]">
@@ -247,7 +240,7 @@ const ForgotPasswordEmail = () => {
                 </button>
                 <div className="flex gap-2 mt-2 w-full justify-center">
                 <p className="text-gray-500">Didn't receive the email? </p>
-                <p className="font-bold underline cursor-pointer">Click to resend</p>
+                <p className="font-bold underline cursor-pointer" onClick={handleEmailSubmit}>Click to resend</p>
                 </div>
               </div>
               <div className="flex items-center justify-center gap-2 mt-4">

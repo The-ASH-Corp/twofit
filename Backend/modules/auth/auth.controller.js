@@ -72,26 +72,44 @@ export const logoutController = async (req, res) => {
   }
 };
 
-// export const forgotPasswordController = async (req, res) => {
-//   try {
-//     const { email } = req.body;
+export const forgotPasswordController = async (req, res) => {
+  try {
+    const { email } = req.body;
 
-//     const result = await service.forgotPassword(email);
+    const result = await service.forgotPassword(email);
 
-//     res.json({ success: true, message: result.message });
-//   } catch (err) {
-//     res.status(400).json({ success: false, message: err.message });
-//   }
-// };
+    res.json({ success: true, message: result.message });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
 
-// export const resetPasswordController = async (req, res) => {
-//   try {
-//     const { token, newPassword } = req.body;
 
-//     const result = await service.resetPassword({ token, newPassword });
+export const verifyOTPController = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    const result = await service.verifyOTP({ email, otp });
+    res.json({ success: true, message: result.message });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
 
-//     res.json({ success: true, message: result.message });
-//   } catch (err) {
-//     res.status(400).json({ success: false, message: err.message });
-//   }
-// };
+export const resetPasswordController = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Email, OTP, and new password are required" 
+      });
+    }
+
+    const result = await service.resetPassword({ email, otp, newPassword });
+
+    res.json({ success: true, message: result.message });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
