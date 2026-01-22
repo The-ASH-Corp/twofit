@@ -33,12 +33,12 @@ export const adminCreateUser = async (userData) => {
     targetWeight: userData.targetWeight,
     weightHistory: initialWeight
       ? [
-        {
-          weight: initialWeight,
-          date: new Date(),
-          isInitial: true,
-        },
-      ]
+          {
+            weight: initialWeight,
+            date: new Date(),
+            isInitial: true,
+          },
+        ]
       : [],
     medicalConditions: userData.medicalconditions,
     allergies: userData.allergy,
@@ -49,9 +49,9 @@ export const adminCreateUser = async (userData) => {
     duration: userData.duration,
     programEndDate: userData.endDate,
     programStartDate: userData.startDate,
-    dietition: userData.dietician,
-    trainer: userData.trainer,
-    therapist: userData.therapist,
+    dietition: userData.dietician || null,
+    trainer: userData.trainer || null,
+    therapist: userData.therapist || null,
     autoSendGuide: userData.autoSendGuide || false,
     automatedReminder: userData.automatedReminder || false,
     autoSendWelcome: userData.autoSendWelcome || false,

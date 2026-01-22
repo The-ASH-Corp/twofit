@@ -1,8 +1,8 @@
-const expertColors={
-  Dietitian:"bg-[#FFF5ED] text-black",
-  Therapist:"bg-[#E7F9F4] text-black",
-  Trainer:"bg-[#EBF2FE] text-black"
-}
+const expertColors = {
+  Dietitian: "bg-[#FFF5ED] text-black",
+  Therapist: "bg-[#E7F9F4] text-black",
+  Trainer: "bg-[#EBF2FE] text-black",
+};
 
 const statusColors={
   Active:"bg-[#45C4A2] text-white",
@@ -34,28 +34,27 @@ export const ClientColumns = [
   { accessorKey: "userName", header: "Client Name" },
   { accessorKey: "programName", header: "Program" },
   { accessorKey: "durationTaken", header: "Duration" },
-  // {
-  //   accessorKey: "coachRoles",
-  //   header: "Experts",
-  //   cell: ({ row }) => (
-  //     <div className="flex gap-2 flex-wrap">
-  //       {row.original.experts.map((exp) => {
-  //         const colorClass =
-  //           expertColors[exp] || "bg-gray-100 text-gray-700 border";
+  {
+    accessorKey: "coachRoles",
+    header: "Experts",
+    cell: ({ row }) => (
+      <div className="flex gap-2 flex-wrap">
+        {row.original.coachRoles.map((exp) => {
+          const colorClass =
+            expertColors[exp] || "bg-gray-100 text-gray-700 border";
 
-  //         return (
-  //           <span
-  //             key={exp}
-  //             className={`px-2 py-1 text-[11px] rounded-sm ${colorClass}`}
-  //           >
-  //             {exp}
-  //           </span>
-  //         );
-  //       })}
-  //     </div>
-  //   ),
-  // },
-  { accessorKey: "coachRoles", header: "Experts" },
+          return (
+            <span
+              key={exp}
+              className={`px-2 py-1 text-[11px] rounded-sm ${colorClass}`}
+            >
+              {exp}
+            </span>
+          );
+        })}
+      </div>
+    ),
+  },
   { accessorKey: "programStartDate", header: "Start Date" },
   { accessorKey: "programEndDate", header: "End Date" },
   {
