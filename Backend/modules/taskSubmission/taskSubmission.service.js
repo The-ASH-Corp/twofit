@@ -225,6 +225,106 @@ export const createTaskSubmission = async (submissionData) => {
     return submission;
 };
 
+export const createMultipleWorkoutSubmissions = async (submissionData) => {
+    const { 
+        userId, 
+        programId, 
+        weekIndex, 
+        dayIndex, 
+        globalDayIndex, 
+        exerciseIndices,
+        notes, 
+        file,
+        taskType 
+    } = submissionData;
+
+    const gIndex = Number(globalDayIndex);
+    const wIndex = Number(weekIndex);
+    const dIndex = Number(dayIndex);
+
+    if (!Array.isArray(exerciseIndices) || exerciseIndices.length === 0) {
+        throw new Error("Exercise indices must be a non-empty array");
+    }
+
+    let userSubmission = await TaskSubmission.findOne({ userId });
+
+    if (!userSubmission) {
+        userSubmission = new TaskSubmission({
+            userId,
+            programId: mongoose.Types.ObjectId.isValid(programId) ? programId : undefined,
+            dailySubmissions: [{
+                globalDayIndex: gIndex,
+                weekIndex: wIndex,
+                dayIndex: dIndex,
+                exercises: exerciseIndices.map(eIndex => ({
+                    exerciseIndex: Number(eIndex),
+                    taskType: taskType || "Workout",
+                    status: "pending",
+                    file,
+                    notes,
+                    updatedAt: Date.now()
+                }))
+            }]
+        });
+        await userSubmission.save();
+    } else {
+        let day = userSubmission.dailySubmissions.find(d => d.globalDayIndex === gIndex);
+
+        if (!day) {
+            userSubmission.dailySubmissions.push({
+                globalDayIndex: gIndex,
+                weekIndex: wIndex,
+                dayIndex: dIndex,
+                exercises: exerciseIndices.map(eIndex => ({
+                    exerciseIndex: Number(eIndex),
+                    taskType: taskType || "Workout",
+                    status: "pending",
+                    file,
+                    notes,
+                    updatedAt: Date.now()
+                }))
+            });
+        } else {
+            // Update or add each exercise
+            for (const eIndex of exerciseIndices) {
+                const exerciseIndex = Number(eIndex);
+                let exercise = day.exercises.find(e => e.exerciseIndex === exerciseIndex);
+
+                if (exercise) {
+                    if (exercise.status === 'verified') {
+                        throw new Error("One or more tasks already verified");
+                    }
+                    exercise.status = 'pending';
+                    exercise.taskType = taskType || "Workout";
+                    exercise.file = file || exercise.file;
+                    exercise.notes = notes || exercise.notes;
+                    exercise.adminComment = "";
+                    exercise.updatedAt = Date.now();
+                } else {
+                    day.exercises.push({
+                        exerciseIndex,
+                        taskType: taskType || "Workout",
+                        status: "pending",
+                        file,
+                        notes,
+                        updatedAt: Date.now()
+                    });
+                }
+            }
+        }
+
+        if (mongoose.Types.ObjectId.isValid(programId)) {
+            userSubmission.programId = programId;
+        }
+        await userSubmission.save();
+    }
+
+    // Notify Experts and Admins via Socket
+    await notifyExpertsAndAdmins(userId, userSubmission._id, "new_task_submission");
+
+    return { success: true, message: "All workout tasks submitted successfully" };
+};
+
 export const getPendingTaskSubmissions = async (expertId, userRole) => {
     const lowerRole = userRole.toLowerCase();
 

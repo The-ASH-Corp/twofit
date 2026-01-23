@@ -354,7 +354,31 @@ export default function Dashboard() {
   const { pendingTasks } = useAppSelector((state) => state.tasks);
   const [dashboardStats, setDashboardStats] = useState(null);
 
-  const fetched = React.useRef(false);
+  // Group pending tasks by user and day
+  const groupedPendingTasks = React.useMemo(() => {
+    if (!pendingTasks || pendingTasks.length === 0) return [];
+    
+    const groups = {};
+    
+    pendingTasks.forEach(task => {
+      const key = `${task.userId?._id}-${task.globalDayIndex}`;
+      if (!groups[key]) {
+        groups[key] = {
+          userId: task.userId,
+          programId: task.programId,
+          globalDayIndex: task.globalDayIndex,
+          weekIndex: task.weekIndex,
+          dayIndex: task.dayIndex,
+          tasks: [],
+          createdAt: task.createdAt
+        };
+      }
+      groups[key].tasks.push(task);
+    });
+    
+    return Object.values(groups);
+  }, [pendingTasks]);
+
 
   const fetchData = async () => {
       dispatch(getCoachDashboardStats(user._id)).then((res) => {
@@ -525,7 +549,7 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {pendingTasks?.length === 0 ? (
+                  {groupedPendingTasks?.length === 0 ? (
                     <tr>
                       <td
                         colSpan="6"
@@ -535,23 +559,22 @@ export default function Dashboard() {
                       </td>
                     </tr>
                   ) : (
-                    pendingTasks?.map((review) => (
+                    groupedPendingTasks?.map((group) => (
                       <tr
-                        key={review._id}
+                        key={`${group.userId?._id}-${group.globalDayIndex}`}
                         className="border-b border-gray-50 hover:bg-gray-50/50"
                       >
                         <td className="py-4 text-[13px] text-gray-900 font-medium">
-                          {review.userId?.name}
+                          {group.userId?.name}
                         </td>
                         <td className="py-4 text-[13px] text-gray-600">
-                          {review.programId?.title || "N/A"}
+                          {group.programId?.title || "N/A"}
                         </td>
                         <td className="py-4 text-[13px] text-gray-600">
-                          Day {review.globalDayIndex} - Ex{" "}
-                          {review.exerciseIndex + 1}
+                          Day {group.globalDayIndex} ({group.tasks.length} {group.tasks.length === 1 ? 'task' : 'tasks'})
                         </td>
                         <td className="py-4 text-[13px] text-gray-600">
-                          {new Date(review.createdAt).toLocaleString()}
+                          {new Date(group.createdAt).toLocaleString()}
                         </td>
                         <td className="py-4">
                           <span
@@ -564,7 +587,7 @@ export default function Dashboard() {
                         </td>
                         <td className="py-4">
                           <button
-                            onClick={() => setSelectedReview(review)}
+                            onClick={() => setSelectedReview(group)}
                             className="bg-[#0A4F48] text-white text-[13px] font-medium px-5 py-2 rounded-lg hover:bg-[#083d37] transition-colors"
                           >
                             Review
