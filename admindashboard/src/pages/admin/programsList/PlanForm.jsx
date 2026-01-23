@@ -233,7 +233,7 @@ export default function PlanForm() {
     }
   };
   return (
-    <div className="flex flex-col lg:flex-row gap-6 p-6 h-[calc(95vh-120px)] overflow-y-auto bg-[#F8F9FA]">
+    <div className="flex flex-col lg:flex-row gap-6 p-6 h-[calc(95vh-140px)] overflow-y-auto bg-[#F8F9FA]">
       {/* Left Content - Form Area */}
       <div className="flex-1 flex flex-col gap-6">
         {/* Header Section */}
