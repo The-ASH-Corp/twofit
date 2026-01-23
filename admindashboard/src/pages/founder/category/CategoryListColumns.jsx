@@ -1,6 +1,6 @@
-import { IoMdClose } from "react-icons/io";
+import ActionMenu from "@/components/actionMenu/ActionMenu";
 
-export const CategoryListColumns = (activeRowId, setActiveRowId, navigate) => [
+export const CategoryListColumns = () => [
   { accessorKey: "categoryName", header: "Category Name" },
   { accessorKey: "programsCount", header: "Programs" },
   { accessorKey: "adminsCount", header: "Sub Admins" },
@@ -10,57 +10,8 @@ export const CategoryListColumns = (activeRowId, setActiveRowId, navigate) => [
   {
     id: "_id",
     header: "Action",
-    cell: ({ row }) => {
-      // console.log("row.id:", row.id, "row._id:", row.original._id);
-
-      const isOpen = activeRowId === row.id;
-
-      const handelEdit = (id) => {
-        // console.log(id);
-        setActiveRowId(false);
-        navigate(`/founder/category/edit/${id}`);
-      };
-
-      return (
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
-            setActiveRowId(isOpen ? null : row.id);
-          }}
-          className="relative h-3"
-        >
-          <button>...</button>
-
-          {isOpen && (
-            <>
-              <div
-                onClick={() => setActiveRowId(false)}
-                className="fixed inset-0 z-9 bg-black/2 w-full h-screen"
-              ></div>
-              <div
-                className="absolute z-10 rounded-lg   shadow-[0_10px_30px_rgba(0,0,0,0.25)] w-30 h-fit p-2 bg-white flex flex-col items-center gap-2"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div
-                  onClick={() => setActiveRowId(false)}
-                  className="w-full flex items-center justify-end px-1"
-                >
-                  <IoMdClose />
-                </div>
-                <button
-                  onClick={() => handelEdit(row.id)}
-                  className="w-full bg-[#EBF3F2] hover:bg-[#0A4F48] hover:text-white p-2 rounded-lg"
-                >
-                  Edit
-                </button>
-                <button className=" w-full bg-[#EBF3F2] hover:bg-red-400 hover:text-white p-2 rounded-lg">
-                  Delete
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <ActionMenu row={row} editActionPath="/founder/category/edit/" />
+    ),
   },
 ];

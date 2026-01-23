@@ -64,7 +64,7 @@ export default function CategoryTable() {
   return (
     <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
       <BaseTable
-        columns={CategoryListColumns(activeRowId, setActiveRowId, navigate)}
+        columns={CategoryListColumns()}
         data={categories}
         pageLabel={"Category List"}
         actionLabel="Add Category"

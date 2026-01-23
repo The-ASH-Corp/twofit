@@ -89,7 +89,7 @@ const TherapyTable = () => {
     <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
       <BaseTable
         data={heads}
-        columns={therapyColumns}
+        columns={therapyColumns()}
         actionLabel="Add Head"
         actionPath="/founder/heads/create"
         profilePath={profilePath}
