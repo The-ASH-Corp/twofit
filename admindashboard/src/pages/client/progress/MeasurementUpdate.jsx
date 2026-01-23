@@ -3,6 +3,7 @@ import { updateMeasurementOfClient } from "../../../redux/features/client/client
 import { useState } from "react";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { toast } from "react-toastify";
 
 export default function MeasurementUpdate({ onClose }) {
   const [chest, setChest] = useState("");
@@ -14,12 +15,12 @@ export default function MeasurementUpdate({ onClose }) {
 
   const handleSubmit = async () => {
     if (!user?._id) {
-      alert("User not found");
+      toast.error("User not found");
       return;
     }
 
     if (!chest || !waist || !hip) {
-      alert("Please fill all fields");
+      toast.info("Please fill all fields");
       return;
     }
 
@@ -33,11 +34,11 @@ export default function MeasurementUpdate({ onClose }) {
         })
       ).unwrap();
 
-      alert("Measurements updated successfully");
+      toast.success("Measurements updated successfully");
       if (onClose) onClose();
     } catch (err) {
       console.error(err);
-      alert("Failed to update measurements");
+      toast.error("Failed to update measurements");
     }
   };
 

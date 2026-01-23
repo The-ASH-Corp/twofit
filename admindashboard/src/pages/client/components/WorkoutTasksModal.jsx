@@ -3,6 +3,7 @@ import { X, ChevronDown, ChevronUp } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { uploadMultipleWorkoutTasks } from "@/redux/features/tasks/task.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
+import { toast } from "react-toastify";
 
 export default function WorkoutTasksModal({ workoutTasks, onClose, onSuccess }) {
   const [expandedIndex, setExpandedIndex] = useState(null);
@@ -80,7 +81,7 @@ export default function WorkoutTasksModal({ workoutTasks, onClose, onSuccess }) 
 
   const handleSubmit = async () => {
     if (!file) {
-      alert("Please upload a photo or video proof.");
+      toast.info("Please upload a photo or video proof.");
       return;
     }
 
@@ -104,11 +105,11 @@ export default function WorkoutTasksModal({ workoutTasks, onClose, onSuccess }) 
         if (onSuccess) onSuccess();
         onClose();
       } else {
-        alert(result.payload || "Submission failed. Please try again.");
+        toast.error(result.payload || "Submission failed. Please try again.");
       }
     } catch (err) {
       console.error("Upload error:", err);
-      alert("An unexpected error occurred: " + (err.message || "Unknown error"));
+      toast.error("An unexpected error occurred: " + (err.message || "Unknown error"));
     } finally {
       setUploading(false);
     }

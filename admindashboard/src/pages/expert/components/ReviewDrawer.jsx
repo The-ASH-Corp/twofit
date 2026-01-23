@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { verifyTask, rejectTask } from "@/redux/features/tasks/task.thunk";
+import { toast } from "react-toastify";
 
 export default function ReviewDrawer({ review, onClose }) {
   if (!review) return null;
@@ -50,7 +51,7 @@ export default function ReviewDrawer({ review, onClose }) {
 
   const handleImprove = async () => {
     if (!comment) {
-      alert("Please provide a comment for improvement");
+      toast.info("Please provide a comment for improvement");
       return;
     }
     setProcessing(true);

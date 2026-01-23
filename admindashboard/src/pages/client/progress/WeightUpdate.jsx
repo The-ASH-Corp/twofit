@@ -3,6 +3,7 @@ import { updateWeightOfClient } from "@/redux/features/client/client.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
 import {  useState } from "react";
 import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 
 export default function WeightUpdate({ onClose }) {
   const dispatch = useDispatch();
@@ -12,12 +13,12 @@ export default function WeightUpdate({ onClose }) {
 
   const handleSubmit = async () => {
     if (!weight) {
-      alert("Please enter weight");
+      toast.info("Please enter weight");
       return;
     }
 
     if (!user?._id) {
-      alert("User not found");
+      toast.error("User not found");
       return;
     }
 
@@ -29,11 +30,11 @@ export default function WeightUpdate({ onClose }) {
         })
       ).unwrap();
       console.log("Updated client:", res);
-      alert("Weight updated successfully");
+      toast.success("Weight updated successfully");
       if (onClose) onClose();
     } catch (err) {
       console.log(err);
-      alert("Failed to update weight");
+      toast.error("Failed to update weight");
     }
   };
 
