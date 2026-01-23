@@ -84,7 +84,7 @@ const programSlice = createSlice({
       .addCase(getFounderPrograms.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.founderProgramList = action.payload.data.data;
-        state.totalProgram = action.payload.data.data.totalCount;
+        state.totalProgram = action.payload.data.totalCount;
         state.error = null;
       })
       .addCase(getFounderPrograms.rejected, (state, action) => {

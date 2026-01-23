@@ -55,7 +55,7 @@ const categorySlice = createSlice({
       .addCase(getFounderCategories.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.founderCategory = action.payload.data.data;
-        state.totalCategory = action.payload.data.data.totalCount;
+        state.totalCategory = action.payload.data.totalCount;
         state.error = null;
       })
       .addCase(getFounderCategories.rejected, (state, action) => {

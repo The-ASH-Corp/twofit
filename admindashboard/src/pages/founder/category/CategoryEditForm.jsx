@@ -52,7 +52,7 @@ const CategoryEditForm = () => {
         updateCategories({ id, updatedData: value }),
       ).unwrap();
       if (category.success) {
-        toast.success("Category created successfully");
+        toast.success("Category updated successfully");
         navigate("/founder/category");
       } else {
         toast.error("Failed to create category");
