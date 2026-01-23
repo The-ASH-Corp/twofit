@@ -22,6 +22,7 @@ import FounderHeadsProfile from "./pages/founder/heads/HeadProfile";
 import FounderHeadForm from "./pages/founder/heads/HeadForm";
 import FounderCategoryList from "./pages/founder/category/CategoryTable";
 import FounderCategoryForm from "./pages/founder/category/CategoryForm";
+import FounderCategoryEditForm from "./pages/founder/category/CategoryEditForm";
 import FounderExpertList from "./pages/founder/experts/ExpertTable";
 import FounderExpertProfile from "./pages/founder/experts/ExpertProfile";
 import FounderAdminList from "./pages/founder/admin/AdminsList";
@@ -133,6 +134,10 @@ function App() {
           <Route path="programs/create" element={<FounderProgramsForm />} />
           <Route path="category" element={<FounderCategoryList />} />
           <Route path="category/create" element={<FounderCategoryForm />} />
+          <Route
+            path="category/edit/:id"
+            element={<FounderCategoryEditForm />}
+          />
           <Route path="finance" element={<FounderFinanceList />} />
           <Route path="therapy" element={<FounderTherapyList />} />
           <Route path="add-therapy" element={<FounderTherapyForm />} />

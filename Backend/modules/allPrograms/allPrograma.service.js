@@ -160,7 +160,7 @@ export const founderProgramList = async (page, limit) => {
       {
         $project: {
           _id: 0,
-          programId: "$_id",
+          _id: "$_id",
           programTitle: "$title",
 
           categoryName: {

@@ -17,7 +17,7 @@ export default function CategoryForm() {
     },
   ];
   const initialValues = {
-    name: "",
+    name: "shebin",
   };
 
   const dispatch = useDispatch();
@@ -43,7 +43,7 @@ export default function CategoryForm() {
       <BaseForm
         fields={fields}
         initialValues={initialValues}
-        heading={"Category"}
+        heading={"Add Category"}
         onSubmit={(value) => handelSubmit(value)}
       />
     </div>
