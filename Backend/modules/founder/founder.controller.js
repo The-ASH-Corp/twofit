@@ -14,3 +14,15 @@ export const getDashboardData = async (req, res) => {
 
 }
 
+export const getFounderProfile = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const profile = await founderService.getFounderProfile(id);
+        res.status(200).json({
+            success: true,
+            data: profile,
+        })
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+}

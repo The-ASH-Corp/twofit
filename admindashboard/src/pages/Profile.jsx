@@ -1,54 +1,65 @@
-import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../redux/features/auth/auth.selectores';
-import { Button } from '../components/ui/button';
-import { X } from 'lucide-react';
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "../redux/features/auth/auth.selectores";
+import { Button } from "../components/ui/button";
+import { X, Eye, EyeOff } from "lucide-react";
+import { toast } from "react-toastify";
+import { changePassword, editProfile, refreshProfile } from "@/redux/features/auth/auth.thunk";
 
 const Profile = () => {
+  const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isChangePasswordMode, setIsChangePasswordMode] = useState(false);
 
   const [profileForm, setProfileForm] = useState({
-    name: '',
-    dateOfBirth: '',
-    gender: '',
-    email: '',
-    phoneNumber: '',
-    address: ''
+    name: "",
+    dob: "",
+    gender: "",
+    email: "",
+    phone: "",
+    address: "",
   });
 
   const [passwordForm, setPasswordForm] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const [showPassword, setShowPassword] = useState({
+    currentPassword: false,
+    newPassword: false,
+    confirmPassword: false,
   });
 
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return "N/A";
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB', { 
-      day: 'numeric', 
-      month: 'numeric', 
-      year: 'numeric' 
-    }).replace(/\//g, '.');
+    return date
+      .toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "numeric",
+        year: "numeric",
+      })
+      .replace(/\//g, ".");
   };
 
   // Format date for input field (YYYY-MM-DD)
   const formatDateForInput = (dateString) => {
-    if (!dateString) return '';
+    if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toISOString().split('T')[0];
+    return date.toISOString().split("T")[0];
   };
 
   const handleEditProfile = () => {
     setProfileForm({
-      name: user?.name || '',
-      dateOfBirth: formatDateForInput(user?.dateOfBirth) || '',
-      gender: user?.gender || '',
-      email: user?.email || '',
-      phoneNumber: user?.phoneNumber || user?.phone || '',
-      address: user?.address || ''
+      name: user?.name || "",
+      dob: formatDateForInput(user?.dob) || "",
+      gender: user?.gender || "",
+      email: user?.email || "",
+      phone: user?.phone || "",
+      address: user?.address || "",
     });
     setIsEditMode(true);
   };
@@ -56,38 +67,59 @@ const Profile = () => {
   const handleProfileChange = (e) => {
     setProfileForm({
       ...profileForm,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handlePasswordChange = (e) => {
     setPasswordForm({
       ...passwordForm,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
-  const handleProfileSubmit = (e) => {
+  const handleProfileSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement API call to update profile
-    console.log('Profile Update:', profileForm);
-    setIsEditMode(false);
+    try {
+      await dispatch(editProfile(profileForm)).unwrap();
+      await dispatch(refreshProfile({id:user._id, role:user.role})).unwrap();
+      toast.success("Profile updated successfully!");
+      setIsEditMode(false);
+    } catch (error) {
+      toast.error(error?.message || "Failed to update profile. Please try again.");
+    }
   };
 
-  const handlePasswordSubmit = (e) => {
+  const handlePasswordSubmit = async (e) => {
     e.preventDefault();
-    // TODO: Implement API call to change password
     if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-      alert('Passwords do not match!');
+      toast.error("Passwords do not match!");
       return;
     }
-    console.log('Password Change:', passwordForm);
-    setIsChangePasswordMode(false);
-    setPasswordForm({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    });
+    try {
+      await dispatch(changePassword(passwordForm)).unwrap();
+      toast.success("Password changed successfully!");
+      setIsChangePasswordMode(false);
+      setPasswordForm({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+      setShowPassword({
+        currentPassword: false,
+        newPassword: false,
+        confirmPassword: false,
+      });
+    } catch (error) {
+      toast.error(error?.message || "Failed to change password. Please try again.");
+    }
+  };
+
+  const togglePasswordVisibility = (field) => {
+    setShowPassword(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
   };
 
   return (
@@ -98,53 +130,65 @@ const Profile = () => {
           <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
             <div className="flex justify-between items-center mb-8">
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                {user?.name || 'User Name'}
+                {user?.name || "User Name"}
               </h1>
               <Button
                 variant="outline"
                 onClick={handleEditProfile}
-                className="text-sm font-medium"
+                className="text-sm font-medium bg-[#EBF3F2] border-0 hover:bg-[#d4e3e1]"
               >
                 Edit Profile
               </Button>
             </div>
 
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Personal Info</h2>
-              
+              <h2 className="text-xl font-semibold text-[#0A4F48] mb-6">
+                Personal Info
+              </h2>
+
               <div className="space-y-5">
                 <div className="flex justify-between items-start border-b border-gray-200 pb-3">
-                  <span className="text-sm text-gray-600 font-normal">Date of Birth</span>
+                  <span className="text-sm text-gray-600 font-normal">
+                    Date of Birth
+                  </span>
                   <span className="text-sm text-gray-900 font-normal text-right">
-                    {formatDate(user?.dateOfBirth)}
+                    {formatDate(user?.dob)}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-start border-b border-gray-200 pb-3">
-                  <span className="text-sm text-gray-600 font-normal">Gender</span>
+                  <span className="text-sm text-gray-600 font-normal">
+                    Gender
+                  </span>
                   <span className="text-sm text-gray-900 font-normal text-right">
-                    {user?.gender || 'N/A'}
+                    {user?.gender || "N/A"}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-start border-b border-gray-200 pb-3">
-                  <span className="text-sm text-gray-600 font-normal">Email Address</span>
+                  <span className="text-sm text-gray-600 font-normal">
+                    Email Address
+                  </span>
                   <span className="text-sm text-gray-900 font-normal text-right break-all">
-                    {user?.email || 'N/A'}
+                    {user?.email || "N/A"}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-start border-b border-gray-200 pb-3">
-                  <span className="text-sm text-gray-600 font-normal">Phone Number</span>
+                  <span className="text-sm text-gray-600 font-normal">
+                    Phone Number
+                  </span>
                   <span className="text-sm text-gray-900 font-normal text-right">
-                    {user?.phoneNumber || user?.phone || 'N/A'}
+                    {user?.phone || "N/A"}
                   </span>
                 </div>
 
                 <div className="flex justify-between items-start">
-                  <span className="text-sm text-gray-600 font-normal">Address</span>
+                  <span className="text-sm text-gray-600 font-normal">
+                    Address
+                  </span>
                   <span className="text-sm text-gray-900 font-normal text-right max-w-xs">
-                    {user?.address || 'N/A'}
+                    {user?.address || "N/A"}
                   </span>
                 </div>
               </div>
@@ -154,11 +198,13 @@ const Profile = () => {
           {/* Account Info Section */}
           <div className="bg-white rounded-lg shadow-sm p-6 md:p-8">
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-xl font-semibold text-gray-900">Account Info</h2>
+              <h2 className="text-xl font-semibold text-[#0A4F48]">
+                Account Info
+              </h2>
               <Button
                 variant="outline"
                 onClick={() => setIsChangePasswordMode(true)}
-                className="text-sm font-medium"
+                className="text-sm font-medium bg-[#EBF3F2] border-0 hover:bg-[#d4e3e1]"
               >
                 Change Password
               </Button>
@@ -171,7 +217,7 @@ const Profile = () => {
                 </label>
                 <input
                   type="email"
-                  value={user?.email || ''}
+                  value={user?.email || ""}
                   disabled
                   className="w-full px-4 py-3 bg-gray-100 border-0 rounded-md text-sm text-gray-700 focus:outline-none focus:ring-0"
                 />
@@ -214,7 +260,10 @@ const Profile = () => {
               </button>
             </div>
 
-            <form onSubmit={handleProfileSubmit} className="flex-1 overflow-y-auto p-6">
+            <form
+              onSubmit={handleProfileSubmit}
+              className="flex-1 overflow-y-auto p-6"
+            >
               <div className="space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2">
@@ -235,9 +284,10 @@ const Profile = () => {
                     Date of Birth
                   </label>
                   <input
+                    required
                     type="date"
-                    name="dateOfBirth"
-                    value={profileForm.dateOfBirth}
+                    name="dob"
+                    value={profileForm.dob}
                     onChange={handleProfileChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
@@ -248,6 +298,7 @@ const Profile = () => {
                     Gender
                   </label>
                   <select
+                    required
                     name="gender"
                     value={profileForm.gender}
                     onChange={handleProfileChange}
@@ -281,10 +332,11 @@ const Profile = () => {
                   </label>
                   <input
                     type="tel"
-                    name="phoneNumber"
-                    value={profileForm.phoneNumber}
+                    name="phone"
+                    value={profileForm.phone}
                     onChange={handleProfileChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
                   />
                 </div>
 
@@ -293,6 +345,7 @@ const Profile = () => {
                     Address
                   </label>
                   <textarea
+                    required
                     name="address"
                     value={profileForm.address}
                     onChange={handleProfileChange}
@@ -328,7 +381,9 @@ const Profile = () => {
           {/* Drawer */}
           <div className="relative w-full sm:w-[500px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
             <div className="flex justify-between items-center p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">Change Password</h2>
+              <h2 className="text-xl font-bold text-gray-900">
+                Change Password
+              </h2>
               <button
                 onClick={() => setIsChangePasswordMode(false)}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
@@ -337,35 +392,64 @@ const Profile = () => {
               </button>
             </div>
 
-            <form onSubmit={handlePasswordSubmit} className="flex-1 overflow-y-auto p-6">
+            <form
+              onSubmit={handlePasswordSubmit}
+              className="flex-1 overflow-y-auto p-6"
+            >
               <div className="space-y-5">
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     Current Password
                   </label>
-                  <input
-                    type="password"
-                    name="currentPassword"
-                    value={passwordForm.currentPassword}
-                    onChange={handlePasswordChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword.currentPassword ? "text" : "password"}
+                      name="currentPassword"
+                      value={passwordForm.currentPassword}
+                      onChange={handlePasswordChange}
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('currentPassword')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                    >
+                      {showPassword.currentPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     New Password
                   </label>
-                  <input
-                    type="password"
-                    name="newPassword"
-                    value={passwordForm.newPassword}
-                    onChange={handlePasswordChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                    minLength="6"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword.newPassword ? "text" : "password"}
+                      name="newPassword"
+                      value={passwordForm.newPassword}
+                      onChange={handlePasswordChange}
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                      minLength="6"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('newPassword')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                    >
+                      {showPassword.newPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
                   <p className="text-xs text-gray-500 mt-1">
                     Must be at least 6 characters
                   </p>
@@ -375,15 +459,28 @@ const Profile = () => {
                   <label className="block text-sm font-medium text-gray-900 mb-2">
                     Confirm New Password
                   </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={passwordForm.confirmPassword}
-                    onChange={handlePasswordChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                    minLength="6"
-                  />
+                  <div className="relative">
+                    <input
+                      type={showPassword.confirmPassword ? "text" : "password"}
+                      name="confirmPassword"
+                      value={passwordForm.confirmPassword}
+                      onChange={handlePasswordChange}
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      required
+                      minLength="6"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => togglePasswordVisibility('confirmPassword')}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
+                    >
+                      {showPassword.confirmPassword ? (
+                        <EyeOff className="w-5 h-5" />
+                      ) : (
+                        <Eye className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </form>

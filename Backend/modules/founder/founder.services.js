@@ -27,3 +27,8 @@ export const getDashboardData = async() => {
       Therapists,
     };
 } 
+
+export const getFounderProfile = async (id) => {
+    const profile = await User.findById(id).select("-password");
+    return profile;
+}
