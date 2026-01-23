@@ -28,6 +28,7 @@ const menuItems = [
       },
     ],
   },
+  {label:"Therapy",icon:assets.clients,path:"/founder/therapy"},
   { label: "Finance", icon: assets.website, path: "/founder/finance" },
   // { label: "Therapy", icon: assets.website, path: "/founder/therapy" },
   // { label: "Workout", icon: assets.website, path: "/founder/workout" },
