@@ -1,10 +1,11 @@
 import BaseForm from '@/components/form/BaseForm';
 import { selectCategoryById, selectCategoryError, selectCategoryStatus } from '@/redux/features/category/category.selector';
-import { getCategory } from '@/redux/features/category/category.thunk';
+import { getCategory, updateCategories } from '@/redux/features/category/category.thunk';
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { SyncLoader } from "react-spinners";
+import { toast } from "react-toastify";
 
 
 const CategoryEditForm = () => {
@@ -42,21 +43,23 @@ const CategoryEditForm = () => {
   };
 
 //   const dispatch = useDispatch();
-//   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handelSubmit = async (value) => {
-//     try {
-//       console.log(value);
-//       const category = await dispatch(createCategory(value)).unwrap();
-//       if (category.success) {
-//         toast.success("Category created successfully");
-//         navigate("/founder/category");
-//       } else {
-//         toast.error("Failed to create category");
-//       }
-//     } catch (error) {
-//       console.error("Category creation failed:", error);
-//     }
+    try {
+      console.log(value);
+      const category = await dispatch(
+        updateCategories({ id, updatedData: value }),
+      ).unwrap();
+      if (category.success) {
+        toast.success("Category created successfully");
+        navigate("/founder/category");
+      } else {
+        toast.error("Failed to create category");
+      }
+    } catch (error) {
+      console.error("Category updating failed:", error);
+    }
   };
 
   if (status === "loading")

@@ -37,7 +37,25 @@ export const getAllCategories = createAsyncThunk(
   "category/getAllCategories",
   async ({ page, limit }, { rejectWithValue }) => {
     try {
-      const data = await axiosInstance.get(`/category/list/${page}/${limit}`);
+      const data = await axiosInstance.put(`/category/list/${page}/${limit}`);
+      // console.log(data.data)
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get categories",
+      );
+    }
+  },
+);
+
+export const updateCategories = createAsyncThunk(
+  "category/update",
+  async ( {id, updatedData} , { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.put(
+        `/category/update/${id}`,
+        updatedData,
+      );
       // console.log(data.data)
       return data;
     } catch (error) {
