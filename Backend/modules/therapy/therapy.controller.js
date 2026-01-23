@@ -1,96 +1,28 @@
-import { success } from "zod"
-import * as therapyService from "./therapy.service.js"
+import * as therapyService from './therapy.service.js'; ;
 
-export const createTherapy = async (req, res) => {
-    try {
-        const { name, sets, attachment } = req.body;
-        console.log(req.file)
-        const therapyData = {
-          name,
-          sets,
-          attachment,
-          media: `/uploads/${req.file.filename}`,
-        };
-        const therapy = await therapyService.createTherapy(therapyData)
-        res.status(201).json({
-          success: true,
-          message: "Therapy created successfully",
-          data: therapy,
-        });
-    } catch (error) {
-      console.log(error)
-        return res.status(400).json({
-
-            success: false,
-            message: error,
-        })
-    }
-}
-
-export const getAllTherapy = async (req, res) => {
-    try {
-      const { page, limit } = req.params;
-        const therapies = await therapyService.getAllTherapy(page, limit);
-        res.status(200).json({
-          success: true,
-          data: therapies,
-        });
-    } catch (error) {
-        return res.status(400).json({
-          success: false,
-          message: error,
-        });
-    }
-}
-
-export const getTherapy = async (req, res) => {
-    try {
-        const therapy = await therapyService.getTherapy(req.params.id)
-        res.status(200).json({
-            success: true,
-            data: therapy
-        })
-    } catch (error) {
-        return res.status(400).json({
-          success: false,
-          message: error,
-        });
-    }
-}
-
-export const updateTherapy = async (req, res) => {
-    try {
-      // console.log(req.body, req.params.id)
-        const therapy = await therapyService.updateTherapy(
-          req.params.id,
-          req.body
-        );
-        res.status(200).json({
-          success: true,
-          message: "Therapy updated successfully",
-          data: therapy,
-        });
-    } catch (error) {
-         return res.status(400).json({
-           success: false,
-           message: error,
-         });
-    }
-}
-
-export const deleteTherapy = async (req, res) => {
+export const createTherapyController = async (req, res) => {
   try {
-    const therapy = await therapyService.deleteTherapy(req.params.id);
-
-    res.status(200).json({
+    const therapy = await therapyService.createTherapy(req.body);
+    res.status(201).json({
       success: true,
-      message: "Therapy deleted successfully",
+      message: "Therapy created successfully",
       data: therapy,
     });
   } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: error,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
-}
+};
+
+export const getTherapyController = async (req, res) => {
+  try {
+    const therapy = await therapyService.getTherapyById(req.params.id);
+    if (!therapy) {
+      return res.status(404).json({ message: "Therapy not found" });
+    }
+    res.status(200).json({ success: true, data: therapy });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+ 

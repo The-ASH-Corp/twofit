@@ -79,6 +79,7 @@ import DailyPlan from "./pages/client/dailyPlan/DailyPlan";
 import ClientChat from "./pages/client/chats/Chats";
 import TherapyList from "./pages/admin/therapy/TherapyTable";
 import TherapyForm from "./pages/admin/therapy/TherapyForm";
+import TherapyDetails from "./pages/admin/therapy/TherapyDetails";
 
 function App() {
   return (

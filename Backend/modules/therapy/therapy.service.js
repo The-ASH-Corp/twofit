@@ -1,29 +1,11 @@
-import { id } from "zod/v4/locales";
-import { TherapyModel } from "./therapy.model.js"
+import Therapy from './therapy.model.js'
 
-
-export const  createTherapy = async (therapy) => {
-    return await TherapyModel.create({
-      name: therapy.name,
-      sets: therapy.sets,
-      attachment: therapy.attachment,
-      media: therapy.media,
-    });
-}
-
-export const getAllTherapy = async (page, limit) => {
-  const skip = (page - 1) * limit;
-  return await TherapyModel.find().skip(skip).limit(limit);
+export const createTherapy = async (data) => {
+  return await Therapy.create(data);
 };
 
-export const getTherapy = async (id) => {
-    return await TherapyModel.findById(id)
-}
 
-export const updateTherapy = async (id, updatedData) => {
-    return await TherapyModel.findByIdAndUpdate( id, updatedData)
-}
 
-export const deleteTherapy = async (id) => {
-    return await TherapyModel.findByIdAndDelete(id)
-}
+ export const getTherapyById = async (therapyId) => {
+  return await Therapy.findById(therapyId);
+};

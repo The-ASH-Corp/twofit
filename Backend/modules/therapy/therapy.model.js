@@ -1,10 +1,29 @@
 import mongoose from "mongoose";
 
-const therapySchema = new mongoose.Schema({
+const therapyPlanSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  sets: { type: String, required: true},
-  attachment: {type: String, required: true},
-  media: {type: String, },
+  notes: String,
+  url: String,
+  mediaName: String,
 });
 
-export const TherapyModel = mongoose.model("Therapy", therapySchema)
+const daySchema = new mongoose.Schema({
+  name: { type: String, required: true }, 
+  therapies: [therapyPlanSchema],
+});
+
+const weekSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  days: [daySchema],
+});
+
+const therapySchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true }, 
+    duration: { type: String, required: true }, 
+    weeks: [weekSchema],
+  },
+  { timestamps: true }
+);
+
+export default mongoose.model("Therapy", therapySchema);
