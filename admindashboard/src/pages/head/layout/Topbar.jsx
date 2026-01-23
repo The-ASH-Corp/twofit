@@ -10,32 +10,55 @@ export default function Topbar() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const getBreadcrumbs = () => {
-    const pathSegments = location.pathname.split('/').filter(segment => segment);
-    
+const isIdSegment = (segment) => {
+  // MongoDB ObjectId (24 hex chars)
+  if (/^[a-f\d]{24}$/i.test(segment)) return true;
 
-    const filteredSegments = pathSegments.filter(segment => 
-      !['founder', 'admin', 'client', 'expert', 'head'].includes(segment.toLowerCase())
-    );
+  // Long random IDs / UUID-like strings
+  if (segment.length > 10 && /[0-9]/.test(segment)) return true;
 
-    const breadcrumbs = [{ name: 'Dashboard', path: `/${pathSegments[0] || 'founder'}` }];
-    
-    let currentPath = `/${pathSegments[0] || 'founder'}`;
-    filteredSegments.forEach((segment) => {
-      currentPath += `/${segment}`;
+  return false;
+};
 
-      const formattedName = segment
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-      breadcrumbs.push({ name: formattedName, path: currentPath });
+const getBreadcrumbs = () => {
+  const pathSegments = location.pathname
+    .split('/')
+    .filter(Boolean);
+
+  const filteredSegments = pathSegments.filter(
+    segment =>
+      !['founder', 'admin', 'client', 'expert', 'head'].includes(segment.toLowerCase()) &&
+      !isIdSegment(segment) // ⬅️ skip ID
+  );
+
+  const baseRole = pathSegments[0] || 'head';
+
+  const breadcrumbs = [
+    { name: 'Dashboard', path: `/${baseRole}` }
+  ];
+
+  let currentPath = `/${baseRole}`;
+
+  filteredSegments.forEach(segment => {
+    currentPath += `/${segment}`;
+
+    const formattedName = segment
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+
+    breadcrumbs.push({
+      name: formattedName,
+      path: currentPath
     });
+  });
 
-    return breadcrumbs;
-  };
+  return breadcrumbs;
+};
 
-  const breadcrumbs = getBreadcrumbs();
-  const currentPage = breadcrumbs[breadcrumbs.length - 1]?.name || 'Dashboard';
+const breadcrumbs = getBreadcrumbs();
+const currentPage =
+  breadcrumbs[breadcrumbs.length - 1]?.name || 'Dashboard';
 
   return (
     <div className="flex justify-between items-center  ">

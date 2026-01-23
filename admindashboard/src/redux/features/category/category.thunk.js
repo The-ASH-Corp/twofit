@@ -37,7 +37,7 @@ export const getAllCategories = createAsyncThunk(
   "category/getAllCategories",
   async ({ page, limit }, { rejectWithValue }) => {
     try {
-      const data = await axiosInstance.put(`/category/list/${page}/${limit}`);
+      const data = await axiosInstance.get(`/category/list/${page}/${limit}`);
       // console.log(data.data)
       return data;
     } catch (error) {
