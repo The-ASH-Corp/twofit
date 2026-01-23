@@ -1,13 +1,11 @@
-import express from "express"
-import * as therapyController from "./therapy.controller.js"
-import { uploader } from "../../middleware/upload.js";
-
+import express from "express";
+import { createTherapy } from "./therapy.service.js";
+import { createTherapyController, getTherapyController } from "./therapy.controller.js";
+ 
 const router = express.Router();
 
-router.post("/create", uploader.single("media"), therapyController.createTherapy);
-router.get("/get-all-therapy/:page/:limit", therapyController.getAllTherapy);
-router.get("/get-therapy/:id", therapyController.getTherapy);
-router.put("/update/:id", therapyController.updateTherapy);
-router.delete("/delete/:id", therapyController.deleteTherapy);
+router.post("/", createTherapyController);
+router.get("/:id", getTherapyController);
+ 
 
-export default router
+export default router;

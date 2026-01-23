@@ -90,3 +90,58 @@ export const adminUserCreateValidator = z.object({
         data.programEndDate.getTime() !== data.programStartDate.getTime()
     ),
 }).strict()
+
+// Password reset validators
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string({
+      required_error: "Email is required",
+      invalid_type_error: "Email must be a string",
+    })
+    .email("Invalid email format")
+    .trim()
+    .toLowerCase(),
+}).strict();
+
+export const verifyOTPSchema = z.object({
+  email: z
+    .string({
+      required_error: "Email is required",
+      invalid_type_error: "Email must be a string",
+    })
+    .email("Invalid email format")
+    .trim()
+    .toLowerCase(),
+  otp: z
+    .string({
+      required_error: "OTP is required",
+      invalid_type_error: "OTP must be a string",
+    })
+    .regex(/^\d{4}$/, "OTP must be exactly 4 digits")
+    .length(4, "OTP must be exactly 4 digits"),
+}).strict();
+
+export const resetPasswordSchema = z.object({
+  email: z
+    .string({
+      required_error: "Email is required",
+      invalid_type_error: "Email must be a string",
+    })
+    .email("Invalid email format")
+    .trim()
+    .toLowerCase(),
+  otp: z
+    .string({
+      required_error: "OTP is required",
+      invalid_type_error: "OTP must be a string",
+    })
+    .regex(/^\d{4}$/, "OTP must be exactly 4 digits")
+    .length(4, "OTP must be exactly 4 digits"),
+  newPassword: z
+    .string({
+      required_error: "New password is required",
+      invalid_type_error: "Password must be a string",
+    })
+    .min(6, "Password must be at least 6 characters")
+    .max(100, "Password must not exceed 100 characters"),
+}).strict();

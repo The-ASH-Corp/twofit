@@ -1,30 +1,12 @@
-import nodemailer from "nodemailer";
+import sgMail from "@sendgrid/mail";
 
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-
-
-console.log("ENV HOST:", process.env.BREVO_SMTP_HOST);
-console.log("ENV PORT:", process.env.BREVO_SMTP_PORT);
-console.log("ENV USER:", process.env.BREVO_SMTP_USER);
-console.log("ENV KEY:", process.env.BREVO_SMTP_KEY ? "Loaded" : "Missing");
-
-export const mailer = nodemailer.createTransport({
-  host: process.env.BREVO_SMTP_HOST,   // smtp-relay.brevo.com
-  port: Number(process.env.BREVO_SMTP_PORT), // 587
-  secure: false,
-  auth: {
-    user: process.env.BREVO_SMTP_USER,  // Your Brevo email
-    pass: process.env.BREVO_SMTP_KEY,   // Brevo SMTP Key
-  },
-   tls: {
-    rejectUnauthorized: false
-  }
-});
 
 export const sendEmail = async ({ to, subject, html }) => {
   try {
-    await mailer.sendMail({
-      from: process.env.BREVO_SMTP_USER,
+    await sgMail.send({
+      from: `TwoFit App <${process.env.SENDGRID_FROM_EMAIL}>`,
       to,
       subject,
       html,
