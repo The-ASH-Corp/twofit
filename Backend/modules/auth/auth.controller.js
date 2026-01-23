@@ -113,3 +113,27 @@ export const resetPasswordController = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 };
+
+export const editProfileController = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const updateData = req.body;
+    const updatedUser = await service.editUserProfile(userId, updateData);
+
+    res.json({ success: true, message: "Profile updated successfully", data: updatedUser });
+  } catch (err) {
+    console.log(err);
+    res.status(400).json({ success: false, message: err.message });
+  } 
+};
+
+export const editPasswordController = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { currentPassword, newPassword } = req.body;
+    const result = await service.changeUserPassword(userId, currentPassword, newPassword);
+    res.json({ success: true, message: result.message });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};

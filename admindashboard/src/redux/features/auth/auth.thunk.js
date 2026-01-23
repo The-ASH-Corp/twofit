@@ -47,13 +47,23 @@ export const refreshProfile = createAsyncThunk(
     try {
       let endpoint;
 
-      // Determine the correct endpoint based on role
-      if (role === "client" || role === "user") {
-        endpoint = `/clients/get-client/${id}`;
-      } else {
-        endpoint = `/admin/admin-profile/${id}`;
+      switch (role) {
+        case "admin":
+          endpoint = `/admin/admin-profile/${id}`;
+          break;
+        case "user":
+          endpoint = `/clients/get-client/${id}`;
+          break;
+        case "expert":
+          endpoint = `/coach/get-coach/${id}`;
+          break;
+        case "head":
+          endpoint = `/heads/get-head/${id}`;
+          break;
+        case "founder":
+          endpoint = `/founder/founder-profile/${id}`;
+          break;
       }
-
       const data = await axiosInstance.get(endpoint);
       return data.data;
     } catch (error) {
@@ -105,6 +115,38 @@ export const resetPassword = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to reset password",
+      );
+    }
+  },
+);
+
+
+export const editProfile = createAsyncThunk(
+  "auth/editProfile",
+  async (profileData, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.patch("/auth/edit-profile", profileData);
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to edit profile",
+      );
+    }
+  },
+);
+
+export const changePassword = createAsyncThunk(
+  "auth/changePassword",
+  async (passwordData, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.put(
+        "/auth/change-password",
+        passwordData,
+      );
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to change password",
       );
     }
   },
