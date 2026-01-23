@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function ExtendPlan({ onClose }) {
   const [duration, setDuration] = useState("");
@@ -16,12 +17,12 @@ export default function ExtendPlan({ onClose }) {
 
   const handleSubmit = () => {
     if (!duration) {
-      alert("Please select a duration");
+      toast.info("Please select a duration");
       return;
     }
 
     console.log({ duration, notes });
-    alert("Plan extended successfully");
+    toast.success("Plan extended successfully");
     onClose();
   };
 

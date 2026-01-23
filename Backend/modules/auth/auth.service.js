@@ -95,9 +95,17 @@ export const loginUser = async ({ email, password }) => {
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
 
+  // Ensure Redis is connected before storing
+  if (!redisClient.isOpen) {
+    console.error("Redis not connected, attempting to connect...");
+    await redisClient.connect();
+  }
+
   await redisClient.set(`refresh:${user._id}`, refreshToken, {
-    EX: 7 * 24 * 60 * 60,
+    EX: 7 * 24 * 60 * 60, // 7 days
   });
+
+  console.log("Refresh token stored in Redis for user:", user._id);
 
   return { user, accessToken, refreshToken };
 };
