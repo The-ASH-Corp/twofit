@@ -7,6 +7,7 @@ import MultipleSelectForm from "./MultipleSelectForm";
 import FormCheckboxGroup from "./FormCheckboxGroup";
 import FormTimeRange from "./FormTimeRange";
 import FormFileInput from "./FormFileInput";
+import { useNavigate } from "react-router-dom";
 
 export default function BaseForm({
   fields,
@@ -16,6 +17,7 @@ export default function BaseForm({
   // submitLabel,
   heading,
 }) {
+  const navigate = useNavigate();
   return (
     <Formik
       initialValues={initialValues}
@@ -158,7 +160,7 @@ export default function BaseForm({
                             />
                           </div>
                         );
-                      }else if (field.type === "multiple") {
+                      } else if (field.type === "multiple") {
                         return (
                           <MultipleSelectForm
                             key={field._id}
@@ -189,7 +191,11 @@ export default function BaseForm({
             <div className="flex justify-end items-center text-[12px] font-semibold  w-full">
               {/* <h2>Save as Draft</h2> */}
               <div className="flex gap-2">
-                <button className="bg-[#EBF3F2]  rounded-md p-2  ">
+                <button
+                  onClick={() => navigate(-1)}
+                  type="button"
+                  className="bg-[#EBF3F2]  rounded-md p-2  "
+                >
                   Cancel
                 </button>
                 <button

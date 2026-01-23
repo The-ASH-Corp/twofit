@@ -1,5 +1,5 @@
 import BaseForm from '@/components/form/BaseForm';
-import { selectAllCategories, selectCategoryError, selectCategoryStatus } from '@/redux/features/category/category.selector';
+import { selectAllCategories } from '@/redux/features/category/category.selector';
 import { getAllCategories } from '@/redux/features/category/category.thunk';
 import { createHead } from '@/redux/features/head/head.thunk';
 import { useAppSelector } from '@/redux/store/hooks';

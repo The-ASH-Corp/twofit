@@ -17,7 +17,7 @@ export default function CategoryForm() {
     },
   ];
   const initialValues = {
-    name: "shebin",
+    name: "",
   };
 
   const dispatch = useDispatch();
