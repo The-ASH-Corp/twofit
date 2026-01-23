@@ -12,9 +12,9 @@ import express from 'express'
 
 router.post('/create',createCategoryController)
 router.get('/list/:page/:limit',getAllCategoryController)
-router.get('/list/:catId',getSingleCategoryController)
+router.get('/list/:id',getSingleCategoryController)
 router.get("/founder/list/:page/:limit", gatFounderCategoryList);
-router.put('/update/:catId',updateCategoryController)
+router.put('/update/:id',updateCategoryController)
 router.delete('/delete/:catId',deleteSingleCategoryController)
 router.delete('/delete',deleteAllCategoriesController)
 

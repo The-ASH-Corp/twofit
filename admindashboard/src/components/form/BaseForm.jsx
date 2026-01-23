@@ -196,7 +196,7 @@ export default function BaseForm({
                   className="bg-[#0A4F48] p-2 rounded-md text-white"
                   type="submit"
                 >
-                  Save & Add {heading ?? "Client"}
+                  Save & {heading ?? "Client"}
                 </button>
               </div>
             </div>

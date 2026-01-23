@@ -35,10 +35,6 @@ export const getAllCategory = async (page, limit) => {
 
 export const getSingleCategory=async(id)=>{
    try {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Error("Invalid category ID");
-    }
-
     const category = await categoryModel.findById(id);
     if (!category) {
       throw new Error("Category not found");
@@ -52,10 +48,7 @@ export const getSingleCategory=async(id)=>{
 
 export const updateCategory=async(id,data)=>{
   try {
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      throw new Error("Invalid category ID");
-    }
-
+    console.log(id, data)
     if (!data?.name) {
       throw new Error("Category name is required");
     }
@@ -176,7 +169,7 @@ export const founderCategoryList = async (page, limit) => {
       {
         $project: {
           _id: 0,
-          categoryId: "$_id",
+          _id: "$_id",
           categoryName: "$name",
 
           programsCount: { $size: "$programs" },
