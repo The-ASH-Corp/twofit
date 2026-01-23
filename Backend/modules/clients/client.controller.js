@@ -1,4 +1,6 @@
 import * as service from "./client.services.js";
+import { getUserComplianceStats } from "../../utils/complianceCalculator.js";
+import { getSingleProgram } from "../allPrograms/allPrograma.service.js";
 
 export const getAllClients = async (req, res) => {
   try {
@@ -186,6 +188,36 @@ export const getFounderClientList = async (req, res) => {
       success: false,
       message: error.message,
     });
+  }
+};
+
+export const getComplianceStats = async (req, res) => {
+  try {
+    const userId = req.user._id || req.user.id;
+    const user = await service.getSingleClient(userId);
+    
+    if (!user || !user.programType) {
+      return res.status(200).json({ 
+        success: true, 
+        data: {
+          overall: 0,
+          workout: 0,
+          diet: 0,
+          therapy: 0,
+          weeklyData: []
+        }
+      });
+    }
+
+    const programId = typeof user.programType === 'object' ? user.programType._id : user.programType;
+    const program = await getSingleProgram(programId);
+    
+    const complianceData = await getUserComplianceStats(userId, program?.plan);
+    
+    res.status(200).json({ success: true, data: complianceData });
+  } catch (error) {
+    console.error("Compliance stats error:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
