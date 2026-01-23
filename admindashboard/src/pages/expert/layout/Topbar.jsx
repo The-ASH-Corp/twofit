@@ -12,36 +12,57 @@ export default function Topbar() {
 
   const user = useSelector(selectUser);
   const navigate = useNavigate();
-  const location = useLocation();
+   const location = useLocation();
+  
+const isIdSegment = (segment) => {
+  // MongoDB ObjectId (24 hex chars)
+  if (/^[a-f\d]{24}$/i.test(segment)) return true;
 
-  // Function to generate breadcrumbs from the current path
-  const getBreadcrumbs = () => {
-    const pathSegments = location.pathname.split('/').filter(segment => segment);
-    
-    // Remove the role segment (e.g., 'founder', 'admin', 'client', etc.)
-    const filteredSegments = pathSegments.filter(segment => 
-      !['founder', 'admin', 'client', 'expert', 'head'].includes(segment.toLowerCase())
-    );
+  // Long random IDs / UUID-like strings
+  if (segment.length > 10 && /[0-9]/.test(segment)) return true;
 
-    // Create breadcrumb items
-    const breadcrumbs = [{ name: 'Dashboard', path: `/${pathSegments[0] || 'expert'}` }];
-    
-    let currentPath = `/${pathSegments[0] || 'expert'}`;
-    filteredSegments.forEach((segment) => {
-      currentPath += `/${segment}`;
-      // Format segment name (capitalize and replace dashes with spaces)
-      const formattedName = segment
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ');
-      breadcrumbs.push({ name: formattedName, path: currentPath });
+  return false;
+};
+
+const getBreadcrumbs = () => {
+  const pathSegments = location.pathname
+    .split('/')
+    .filter(Boolean);
+
+  const filteredSegments = pathSegments.filter(
+    segment =>
+      !['founder', 'admin', 'client', 'expert', 'head'].includes(segment.toLowerCase()) &&
+      !isIdSegment(segment) // ⬅️ skip ID
+  );
+
+  const baseRole = pathSegments[0] || 'expert';
+
+  const breadcrumbs = [
+    { name: 'Dashboard', path: `/${baseRole}` }
+  ];
+
+  let currentPath = `/${baseRole}`;
+
+  filteredSegments.forEach(segment => {
+    currentPath += `/${segment}`;
+
+    const formattedName = segment
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+
+    breadcrumbs.push({
+      name: formattedName,
+      path: currentPath
     });
+  });
 
-    return breadcrumbs;
-  };
+  return breadcrumbs;
+};
 
-  const breadcrumbs = getBreadcrumbs();
-  const currentPage = breadcrumbs[breadcrumbs.length - 1]?.name || 'Dashboard';
+const breadcrumbs = getBreadcrumbs();
+const currentPage =
+  breadcrumbs[breadcrumbs.length - 1]?.name || 'Dashboard';
 
   return (
     <div className="flex justify-between items-center  ">
