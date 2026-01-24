@@ -31,12 +31,16 @@ export const authMiddleware = async (req, res, next) => {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
       if (err.name === "TokenExpiredError") {
+        console.log("Access token expired, attempting refresh...");
         const refreshedDecoded = await refreshAccessToken(req, res);
         if (!refreshedDecoded) {
+          console.log("Refresh failed - no refresh token or invalid");
           return res.status(401).json({ message: "Token expired and refresh failed" });
         }
+        console.log("Token refreshed successfully for user:", refreshedDecoded.id);
         decoded = refreshedDecoded;
       } else {
+        console.error("Token verification error:", err.message);
         return res.status(401).json({ message: "Invalid token" });
       }
     }

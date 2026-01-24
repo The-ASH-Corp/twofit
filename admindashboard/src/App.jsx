@@ -136,9 +136,15 @@ function App() {
             path="programs/edit/:id"
             element={<FounderProgramsEditForm />}
           />
-          <Route path="programs/add-program" element={<FounderProgramsForm />} />
-          <Route path="category" element={<FounderCategoryList />} />
-          <Route path="category/add-category" element={<FounderCategoryForm />} />
+          <Route
+            path="programs/add-program"
+            element={<FounderProgramsForm />}
+          />
+          <Route path="categories" element={<FounderCategoryList />} />
+          <Route
+            path="categories/add-category"
+            element={<FounderCategoryForm />}
+          />
           <Route
             path="category/edit/:id"
             element={<FounderCategoryEditForm />}

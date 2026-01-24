@@ -6,6 +6,7 @@ import { useAppSelector } from "@/redux/store/hooks";
 import { uploadTask } from "@/redux/features/tasks/task.thunk";
 
 import MealPlaceholder from "@/assets/MealPlaceholder.png";
+import { toast } from "react-toastify";
 
 export default function TaskModal({ task, onClose, onSuccess }) {
   const [fileName, setFileName] = useState("Upload File");
@@ -44,7 +45,7 @@ export default function TaskModal({ task, onClose, onSuccess }) {
 
   const handleUpload = async () => {
     if (!file) {
-      alert(
+      toast.info(
         isMeal
           ? "Please upload a photo of your meal."
           : "Please upload a photo or video proof.",
@@ -76,14 +77,14 @@ export default function TaskModal({ task, onClose, onSuccess }) {
         if (onSuccess) onSuccess();
         onClose();
       } else {
-        alert(
+        toast.error(
           result.payload ||
             "Submission failed. Please check your connection and try again.",
         );
       }
     } catch (err) {
       console.error("Upload error:", err);
-      alert(
+      toast.error(
         "An unexpected error occurred: " + (err.message || "Unknown error"),
       );
     } finally {

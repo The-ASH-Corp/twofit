@@ -15,6 +15,20 @@ export const uploadTask = createAsyncThunk(
     }
 );
 
+export const uploadMultipleWorkoutTasks = createAsyncThunk(
+    "tasks/uploadMultipleWorkoutTasks",
+    async (formData, { rejectWithValue }) => {
+        try {
+            const body = await axiosInstance.post("/tasks/submit-multiple-workouts", formData);
+            return body.data;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to upload workout tasks"
+            );
+        }
+    }
+);
+
 export const getUserTaskStatus = createAsyncThunk(
     "tasks/getUserTaskStatus",
     async (_, { rejectWithValue }) => {

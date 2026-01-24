@@ -6,7 +6,9 @@ import {
   logoutController,
   forgotPasswordController,
   verifyOTPController,
-  resetPasswordController
+  resetPasswordController,
+  editProfileController,
+  editPasswordController
 } from "./auth.controller.js";
 
 import { authMiddleware } from "../../middleware/authMiddleware.js";
@@ -31,8 +33,6 @@ router.post(
 
 router.post("/auth/login", validate(userLoginSchema), loginController);
 
-router.post("/admin/login", validate(userLoginSchema), adminLoginController);
-
 router.post("/auth/logout", authMiddleware, logoutController);
 
 router.post("/auth/forgot-password", validate(forgotPasswordSchema), forgotPasswordController);
@@ -40,5 +40,9 @@ router.post("/auth/forgot-password", validate(forgotPasswordSchema), forgotPassw
 router.post("/auth/verify-otp", validate(verifyOTPSchema), verifyOTPController);
 
 router.post("/auth/reset-password", validate(resetPasswordSchema), resetPasswordController);
+
+router.patch("/auth/edit-profile", authMiddleware, allowRoles("admin", "user", "expert", "head", "founder"),editProfileController);
+
+router.put("/auth/change-password", authMiddleware, allowRoles("admin", "user", "expert", "head", "founder"), editPasswordController);
 
 export default router;

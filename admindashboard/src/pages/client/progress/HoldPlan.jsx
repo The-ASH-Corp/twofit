@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function HoldPlan({ onClose }) {
   const [reason, setReason] = useState("");
@@ -16,12 +17,12 @@ export default function HoldPlan({ onClose }) {
 
   const handleSubmit = () => {
     if (!reason) {
-      alert("Please select a reason");
+      toast.info("Please select a reason");
       return;
     }
 
     console.log({ reason, notes });
-    alert("Plan held successfully");
+    toast.success("Plan held successfully");
     onClose();
   };
 

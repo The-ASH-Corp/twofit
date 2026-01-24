@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import TaskModal from "./TaskModal";
+import WorkoutTasksModal from "./WorkoutTasksModal";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
@@ -17,6 +18,8 @@ export default function TaskList({ plans }) {
 
   const [isOpen, setIsOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const [isWorkoutModalOpen, setIsWorkoutModalOpen] = useState(false);
+  const [workoutTasks, setWorkoutTasks] = useState([]);
 
   const currentGlobalDay = user?.currentGlobalDay || 1;
 
@@ -110,11 +113,45 @@ export default function TaskList({ plans }) {
     },
   );
 
-  const todayExercises = [...workoutExercises, ...mealTasks];
+  // Group workout tasks into a single item
+  const groupedTasks = [];
+  
+  if (workoutExercises.length > 0) {
+    // Get overall status for all workout tasks
+    const getWorkoutOverallStatus = () => {
+      const allVerified = workoutExercises.every(ex => ex.status === "verified");
+      const anyPending = workoutExercises.some(ex => ex.status === "pending");
+      const anyRejected = workoutExercises.some(ex => ex.status === "rejected");
+      
+      if (allVerified) return "verified";
+      if (anyPending) return "pending";
+      if (anyRejected) return "rejected";
+      return "todo";
+    };
+
+    const workoutOverallStatus = getWorkoutOverallStatus();
+    const workoutSubmission = workoutExercises.find(ex => ex.submission);
+
+    groupedTasks.push({
+      name: "Workout",
+      type: "WorkoutGroup",
+      notes: `${workoutExercises.length} exercises`,
+      status: workoutOverallStatus,
+      submission: workoutSubmission?.submission,
+      workoutTasks: workoutExercises,
+      programId: workoutExercises[0].programId,
+      weekIndex: workoutExercises[0].weekIndex,
+      dayIndex: workoutExercises[0].dayIndex,
+      globalDayIndex: workoutExercises[0].globalDayIndex,
+    });
+  }
+
+  // Add meal tasks individually
+  groupedTasks.push(...mealTasks);
 
   return (
     <div className="space-y-3 mt-4">
-      {todayExercises?.map((item, index) => (
+      {groupedTasks?.map((item, index) => (
         <div
           key={index}
           className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-gray-50 hover:shadow-md transition-shadow"
@@ -158,8 +195,13 @@ export default function TaskList({ plans }) {
             </button>
             <button
               onClick={() => {
-                setIsOpen(!isOpen);
-                setSelectedTask(item);
+                if (item.type === "WorkoutGroup") {
+                  setWorkoutTasks(item.workoutTasks);
+                  setIsWorkoutModalOpen(true);
+                } else {
+                  setSelectedTask(item);
+                  setIsOpen(true);
+                }
               }}
               className="bg-[#0A4F48] text-[13px] font-bold px-6 py-2 text-white rounded-lg hover:bg-[#083d38] transition-colors"
             >
@@ -173,6 +215,14 @@ export default function TaskList({ plans }) {
         <TaskModal
           task={selectedTask}
           onClose={() => setIsOpen(!isOpen)}
+          onSuccess={() => dispatch(getUserTaskStatus())}
+        />
+      )}
+
+      {isWorkoutModalOpen && (
+        <WorkoutTasksModal
+          workoutTasks={workoutTasks}
+          onClose={() => setIsWorkoutModalOpen(false)}
           onSuccess={() => dispatch(getUserTaskStatus())}
         />
       )}

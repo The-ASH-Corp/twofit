@@ -95,33 +95,22 @@ export const loginUser = async ({ email, password }) => {
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
 
-  await redisClient.set(`refresh:${user._id}`, refreshToken, {
-    EX: 7 * 24 * 60 * 60,
-  });
-
-  return { user, accessToken, refreshToken };
-};
-
-export const adminLogin = async ({ email, password }) => {
-  const user = await User.findOne({ email, role: "admin" });
-
-  if (!user) throw new Error("Invalid admin credentials");
-
-  const match = await bcrypt.compare(password, user.password);
-  if (!match) throw new Error("Invalid admin credentials");
-
-  const accessToken = generateAccessToken(user);
-  const refreshToken = generateRefreshToken(user);
+  // Ensure Redis is connected before storing
+  if (!redisClient.isOpen) {
+    console.error("Redis not connected, attempting to connect...");
+    await redisClient.connect();
+  }
 
   await redisClient.set(`refresh:${user._id}`, refreshToken, {
-    EX: 7 * 24 * 60 * 60,
+    EX: 7 * 24 * 60 * 60, // 7 days
   });
+
+  console.log("Refresh token stored in Redis for user:", user._id);
 
   return { user, accessToken, refreshToken };
 };
 
 export const forgotPassword = async (email) => {
-
   const user =
     (await User.findOne({ email })) ||
     (await AdminModel.findOne({ email })) ||
@@ -129,19 +118,19 @@ export const forgotPassword = async (email) => {
     (await FounderModel.findOne({ email })) ||
     (await CoachModel.findOne({ email }));
 
-  if (!user) {  
+  if (!user) {
     throw new Error("User is not registered");
   }
 
   const rateLimitKey = `otp:ratelimit:${email}`;
   const requestCount = await redisClient.get(rateLimitKey);
-  
+
   if (requestCount && parseInt(requestCount) >= 100) {
     throw new Error("Too many OTP requests. Please try again after 1 hour");
   }
 
   const otp = Math.floor(1000 + Math.random() * 9000).toString();
-  
+
   const hashedOTP = await bcrypt.hash(otp, 10);
 
   const otpKey = `otp:${email}`;
@@ -209,7 +198,6 @@ export const forgotPassword = async (email) => {
 };
 
 export const verifyOTP = async ({ email, otp }) => {
-
   if (!email || !otp) {
     throw new Error("Email and OTP are required");
   }
@@ -221,7 +209,7 @@ export const verifyOTP = async ({ email, otp }) => {
   // Check for brute force attempts
   const attemptKey = `otp:attempts:${email}`;
   const attempts = await redisClient.get(attemptKey);
-  
+
   if (attempts && parseInt(attempts) >= 5) {
     throw new Error("Too many failed attempts. Please request a new OTP");
   }
@@ -241,13 +229,13 @@ export const verifyOTP = async ({ email, otp }) => {
     } else {
       await redisClient.incr(attemptKey);
     }
-    
+
     const remainingAttempts = 5 - parseInt(attempts || 0) - 1;
     throw new Error(`Invalid OTP. ${remainingAttempts} attempts remaining`);
   }
 
   await redisClient.set(`otp:verified:${email}`, "true", { EX: 5 * 60 }); // 5 minutes to complete password reset
-  
+
   await redisClient.del(attemptKey);
 
   return { message: "OTP verified successfully" };
@@ -255,7 +243,6 @@ export const verifyOTP = async ({ email, otp }) => {
 
 export const resetPassword = async ({ email, otp, newPassword }) => {
   try {
-
     if (!email || !otp || !newPassword) {
       throw new Error("Email, OTP, and new password are required");
     }
@@ -283,12 +270,12 @@ export const resetPassword = async ({ email, otp, newPassword }) => {
       throw new Error("Invalid OTP");
     }
 
-     const user =
-    (await User.findOne({ email })) ||
-    (await AdminModel.findOne({ email })) ||
-    (await HeadsModel.findOne({ email })) ||
-    (await FounderModel.findOne({ email })) ||
-    (await CoachModel.findOne({ email }));
+    const user =
+      (await User.findOne({ email })) ||
+      (await AdminModel.findOne({ email })) ||
+      (await HeadsModel.findOne({ email })) ||
+      (await FounderModel.findOne({ email })) ||
+      (await CoachModel.findOne({ email }));
 
     if (!user) {
       throw new Error("User not found");
@@ -353,9 +340,58 @@ export const resetPassword = async ({ email, otp, newPassword }) => {
       `,
     });
 
-    return { message: "Password reset successfully. Please login with your new password" };
+    return {
+      message:
+        "Password reset successfully. Please login with your new password",
+    };
   } catch (err) {
     console.error("Password reset error:", err);
     throw err;
   }
 };
+
+export const editUserProfile = async (userId, profileData) => {
+    const user =
+      (await User.findOne({ email: profileData.email })) ||
+      (await AdminModel.findOne({ email: profileData.email })) ||
+      (await HeadsModel.findOne({ email: profileData.email })) ||
+      (await FounderModel.findOne({ email: profileData.email })) ||
+      (await CoachModel.findOne({ email: profileData.email }));
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  Object.keys(profileData).forEach((key) => {
+    user[key] = profileData[key];
+  });
+
+  await user.save();
+  return user;
+};
+
+
+export const changeUserPassword = async (userId, currentPassword, newPassword) => {
+  const user =
+    (await User.findById(userId).select("+password")) ||
+    (await AdminModel.findById(userId).select("+password")) ||
+    (await HeadsModel.findById(userId).select("+password")) ||
+    (await FounderModel.findById(userId).select("+password")) ||
+    (await CoachModel.findById(userId).select("+password"));
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+  if (!isMatch) {
+    throw new Error("Current password is incorrect");
+  }
+  if (newPassword.length < 6) {
+    throw new Error("New password must be at least 6 characters long");
+  }
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  user.password = hashedPassword;
+  await user.save();
+
+  return { message: "Password changed successfully" };
+}

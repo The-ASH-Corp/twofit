@@ -27,6 +27,40 @@ export const submitTask = async (req, res) => {
     }
 };
 
+export const submitMultipleWorkoutTasks = async (req, res) => {
+    try {
+        const { programId, weekIndex, dayIndex, globalDayIndex, exerciseIndices, notes, taskType } = req.body;
+        const userId = req.user._id || req.user.id;
+        const file = req.file ? "/uploads/" + req.file.filename : null;
+
+        // Parse exerciseIndices if it's a string
+        const indices = typeof exerciseIndices === 'string' ? JSON.parse(exerciseIndices) : exerciseIndices;
+
+        if (!Array.isArray(indices) || indices.length === 0) {
+            return res.status(400).json({ success: false, message: "Exercise indices must be a non-empty array" });
+        }
+
+        const submission = await taskSubmissionService.createMultipleWorkoutSubmissions({
+            userId,
+            programId,
+            weekIndex,
+            dayIndex,
+            globalDayIndex,
+            exerciseIndices: indices,
+            notes,
+            file,
+            taskType: taskType || "Workout"
+        });
+
+        res.status(200).json({ success: true, data: submission });
+    } catch (error) {
+        if (error.message === "Task already verified") {
+            return res.status(400).json({ success: false, message: error.message });
+        }
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 export const getPendingSubmissions = async (req, res) => {
     try {
         const expertId = (req.user._id || req.user.id);
