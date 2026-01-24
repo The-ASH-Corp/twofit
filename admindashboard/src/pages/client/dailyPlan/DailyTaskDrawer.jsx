@@ -69,15 +69,8 @@ export default function DailyTaskDrawer({
                 <div className="flex items-center gap-2">
                   {task.type === "Meal" &&
                     (task.status === "todo" || task.status === "pending") && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSkip && onSkip(task);
-                        }}
-                        className="text-[10px] lg:text-[11px] font-semibold px-2 lg:px-2.5 py-0.5 rounded-full border border-gray-300 text-gray-500 hover:bg-gray-200 transition-colors"
-                      >
-                        Skip
-                      </button>
+                      // Removed restricted skip button
+                      <></>
                     )}
                   <span
                     className={`text-[11px] lg:text-[12px] font-semibold px-2.5 lg:px-3 py-1 rounded-full border ${
