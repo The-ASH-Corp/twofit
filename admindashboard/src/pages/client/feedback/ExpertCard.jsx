@@ -6,7 +6,7 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useDispatch } from "react-redux";
 import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
 
-export default function ExpertCard() {
+export default function ExpertCard({ fetchFeedbackData }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedExpert, setSelectedExpert] = useState(null);
   const user = useAppSelector(selectUser);
@@ -16,10 +16,12 @@ export default function ExpertCard() {
   const fetchExperts = async () => {
     try {
       const coaches = await dispatch(
-        getAllCoachesByAdmin([user?.trainer, user?.therapist, user?.dietition])
+        getAllCoachesByAdmin([user?.trainer, user?.therapist, user?.dietition]),
       ).unwrap();
 
-      setExperts(coaches.filter((coach) => coach !== null && coach !== undefined));
+      setExperts(
+        coaches.filter((coach) => coach !== null && coach !== undefined),
+      );
     } catch (error) {
       console.error("Error fetching experts:", error);
     }
@@ -142,7 +144,7 @@ export default function ExpertCard() {
       </div>
 
       {isOpen ? (
-        <Modal expert={selectedExpert} onClose={() => setIsOpen(false)} />
+        <Modal expert={selectedExpert} onClose={() => setIsOpen(false)} fetchFeedbackData={fetchFeedbackData} />
       ) : (
         ""
       )}

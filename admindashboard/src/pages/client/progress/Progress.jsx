@@ -220,8 +220,6 @@ export default function Progress() {
     },
   };
 
-  console.log("Compliance Data:", complianceData);
-
   return (
     <>
       {/* Header - Desktop */}
