@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 export const therapyColumns = [
   // {
   //   id: "select",
@@ -18,8 +20,40 @@ export const therapyColumns = [
   //     />
   //   ),
   // },
-  { accessorKey: "name", header: "therapy Name" },
-  { accessorKey: "sets", header: "Sets" },
-  { accessorKey: "attachment", header: "attachment" },
-  { id: "actions", header: "media", cell: () => "⋯" },
-];
+  { accessorKey: "name", header: "Therapy Name" },
+  {accessorKey:"Clients",header:"No of Clients"},
+  
+   {
+    id: "actions",
+    header: "Action",
+    cell: ({ row }) => <ActionCell row={row} />,
+  }]
+
+  const ActionCell = ({ row }) => {
+  const navigate = useNavigate();
+  const { _id, title, plans = [] } = row.original;
+  const hasPlans = plans.length > 0;
+
+  const handleNavigation = () => {
+    if (hasPlans) {
+      navigate("/founder/therapy/plans", {
+        state: { programId: _id, title },
+      });
+    } else {
+      navigate("/founder/therapy/create", {
+        state: { programId: _id, title },
+      });
+    }
+  };
+    return (
+    <button
+      onClick={handleNavigation}
+      className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-lg ${
+        hasPlans ? "bg-[#EBF3F2] text-[#0A4F48]" : "bg-[#0A4F48] text-white"
+      } transition-colors`}
+    >
+      {hasPlans ? "View Plan" : "Add Plan"}
+    </button>
+  );
+
+  }
