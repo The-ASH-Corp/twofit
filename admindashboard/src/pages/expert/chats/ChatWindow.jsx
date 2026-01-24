@@ -1,5 +1,7 @@
 import { Mic, Paperclip } from "lucide-react";
 import React from "react";
+import chatShimmer from "../../../assets/ChatShimmer.json";
+import Lottie from "lottie-react";
 
 const ChatWindow = ({
   client,
@@ -121,7 +123,7 @@ const ChatWindow = ({
         </div>
       ) : (
         <p className="flex items-center justify-center w-full h-full">
-          select one chat
+          <Lottie animationData={chatShimmer}  loop  style={{ width: 600, height: 600 }} autoPlay />
         </p>
       )}
     </div>

@@ -20,9 +20,27 @@ export const getSingleClient = async (req, res) => {
   try {
     const { id } = req.params;
     const client = await service.getSingleClient(id);
+
+    // Calculate next day unlock time if applicable
+    let nextDayUnlockTime = null;
+    let isNextDayLocked = false;
+
+    if (client.lastDayCompletionTime) {
+      const completionDate = new Date(client.lastDayCompletionTime);
+      const unlockDate = new Date(completionDate);
+      unlockDate.setDate(unlockDate.getDate() + 1);
+      unlockDate.setHours(0, 0, 0, 0); // 12 AM next day
+
+      // If NOW < unlockDate, it IS locked
+      if (new Date() < unlockDate) {
+        isNextDayLocked = true;
+        nextDayUnlockTime = unlockDate;
+      }
+    }
+
     res.status(200).json({
       success: true,
-      data: client,
+      data: { ...client.toObject(), nextDayUnlockTime, isNextDayLocked },
     })
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
@@ -113,16 +131,16 @@ export const getAllFeedbacks = async (req, res) => {
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
-}; 
+};
 
 
- 
+
 export const getWeightHistoryOnly = async (req, res) => {
-      console.log("req.user:", req.user);
+  console.log("req.user:", req.user);
 
   try {
-    const userId = req.user.id; 
-  
+    const userId = req.user.id;
+
 
 
     const data = await service.fetchWeightHistoryService(userId);
@@ -195,10 +213,10 @@ export const getComplianceStats = async (req, res) => {
   try {
     const userId = req.user._id || req.user.id;
     const user = await service.getSingleClient(userId);
-    
+
     if (!user || !user.programType) {
-      return res.status(200).json({ 
-        success: true, 
+      return res.status(200).json({
+        success: true,
         data: {
           overall: 0,
           workout: 0,
@@ -211,9 +229,9 @@ export const getComplianceStats = async (req, res) => {
 
     const programId = typeof user.programType === 'object' ? user.programType._id : user.programType;
     const program = await getSingleProgram(programId);
-    
+
     const complianceData = await getUserComplianceStats(userId, program?.plan);
-    
+
     res.status(200).json({ success: true, data: complianceData });
   } catch (error) {
     console.error("Compliance stats error:", error);

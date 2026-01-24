@@ -2,7 +2,7 @@ import * as taskSubmissionService from "./taskSubmission.service.js";
 
 export const submitTask = async (req, res) => {
     try {
-        const { programId, weekIndex, dayIndex, globalDayIndex, exerciseIndex, notes, taskType } = req.body;
+        const { programId, weekIndex, dayIndex, globalDayIndex, exerciseIndex, notes, taskType, status } = req.body;
         const userId = req.user._id || req.user.id;
         const file = req.file ? "/uploads/" + req.file.filename : null;
 
@@ -15,12 +15,13 @@ export const submitTask = async (req, res) => {
             exerciseIndex,
             notes,
             file,
-            taskType
+            taskType,
+            status // Pass status (e.g., "skipped")
         });
 
         res.status(200).json({ success: true, data: submission });
     } catch (error) {
-        if (error.message === "Task already verified") {
+        if (error.message === "Task already verified" || error.message === "Workouts cannot be skipped.") {
             return res.status(400).json({ success: false, message: error.message });
         }
         res.status(500).json({ success: false, message: error.message });
@@ -109,7 +110,26 @@ export const getUserTaskStatus = async (req, res) => {
 
         const data = await taskSubmissionService.getUserTaskStatusByUserId(userId, globalDayIndex);
 
-        res.status(200).json({ success: true, data });
+        // Fetch User to check lock status
+        const User = (await import("../auth/auth.model.js")).default;
+        const user = await User.findById(userId).select("lastDayCompletionTime");
+
+        let nextDayUnlockTime = null;
+        let isNextDayLocked = false;
+
+        if (user && user.lastDayCompletionTime) {
+            const completionDate = new Date(user.lastDayCompletionTime);
+            const unlockDate = new Date(completionDate);
+            unlockDate.setDate(unlockDate.getDate() + 1);
+            unlockDate.setHours(0, 0, 0, 0);
+
+            if (new Date() < unlockDate) {
+                isNextDayLocked = true;
+                nextDayUnlockTime = unlockDate;
+            }
+        }
+
+        res.status(200).json({ success: true, data, nextDayUnlockTime, isNextDayLocked });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
     }
