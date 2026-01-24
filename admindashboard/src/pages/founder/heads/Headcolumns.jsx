@@ -1,10 +1,12 @@
+import ActionMenu from "@/components/actionMenu/ActionMenu";
+
 const statusColors = {
   Active: "bg-[#45C4A2] text-white",
   Inactive: "bg-[#66706D] text-white",
   Suspended: "bg-[#FB5858] text-white",
 };
 
-export const therapyColumns = [
+export const therapyColumns = () => [
   // {
   //   id: "select",
   //   header: ({ table }) => (
@@ -44,5 +46,11 @@ export const therapyColumns = [
       );
     },
   },
-  { id: "actions", header: "actions", cell: () => "⋯" },
+  {
+    id: "actions",
+    header: "actions",
+    cell: ({ row }) => (
+      <ActionMenu row={row}  />
+    ),
+  },
 ];
