@@ -14,7 +14,9 @@ const ActionMenu = ({ row, editActionPath }) => {
   const handelEdit = (id) => {
     // console.log(id);
     setActiveRowId(false);
-    navigate(`${editActionPath}${id}`);
+    if(editActionPath){
+      navigate(`${editActionPath}${id}`);
+    }
   };
 
   const handleDelete = () => {
@@ -29,7 +31,7 @@ const ActionMenu = ({ row, editActionPath }) => {
   };
 
   return (
-    <div className="relative h-3">
+    <div className="relative h-3" onClick={(e) => e.stopPropagation()}>
       <button
         className="w-full  text-start pl-2"
         onClick={(e) => {
@@ -44,7 +46,7 @@ const ActionMenu = ({ row, editActionPath }) => {
         <>
           <div
             onClick={() => setActiveRowId(null)}
-            className="fixed inset-0 z-30 bg-black/2 w-full h-screen"
+            className="fixed inset-0 z-30 bg-black/1.5 w-full h-screen"
           ></div>
           <div
             className="absolute z-40 rounded-lg   shadow-[0_10px_30px_rgba(0,0,0,0.25)] w-30 h-fit p-2 bg-white flex flex-col items-center gap-2"

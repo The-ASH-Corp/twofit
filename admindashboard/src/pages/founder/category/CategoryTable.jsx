@@ -12,14 +12,12 @@ import { getFounderCategories } from "@/redux/features/category/category.thunk";
 import { CategoryListColumns } from "./CategoryListColumns";
 import BaseTable from "@/components/table/BaseTable";
 import { SyncLoader } from "react-spinners";
-import { useNavigate } from "react-router-dom";
 
 
 export default function CategoryTable() {
   const dispatch = useDispatch(); 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const navigate = useNavigate();
   useEffect(() => {
     dispatch(getFounderCategories({ page, limit }));
   }, [dispatch, page, limit]);
@@ -52,8 +50,6 @@ export default function CategoryTable() {
     setCategories(filtered);
   };
 
-  const [activeRowId, setActiveRowId] = useState(null);
-
 
   if (status === "loading") return (
     <div className="flex justify-center items-center h-[calc(100vh-120px)]">
@@ -68,7 +64,7 @@ export default function CategoryTable() {
         data={categories}
         pageLabel={"Category List"}
         actionLabel="Add Category"
-        actionPath="/founder/category/create"
+        actionPath="/founder/categories/add-category"
         onSearchInputChange={searchInputHandler}
         handlePageChange={setPage}
         handleLimitChange={setLimit}

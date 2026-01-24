@@ -29,11 +29,14 @@ import FounderAdminList from "./pages/founder/admin/AdminsList";
 import FounderAdminProfile from "./pages/founder/admin/AdminProfile";
 import FounderProgramsList from "./pages/founder/programsList/ProgramTable";
 import FounderProgramsForm from "./pages/founder/programsList/ProgramForm";
+import FounderProgramsEditForm from "./pages/founder/programsList/ProgramEditForm";
 import FounderTherapyList from "./pages/founder/therapy/TherapyTable";
 import FounderTherapyForm from "./pages/founder/therapy/TherapyForm";
 import FounderWorkoutList from "./pages/founder/workout/WorkoutList";
 import FounderWorkoutForm from "./pages/founder/workout/WorkoutForm";
 import FounderFinanceList from "./pages/founder/finance/FinanceTable";
+import FounderTherapyPlanView from "./pages/founder/therapy/TherapyViewPlan"
+
 //Head Pages Imports
 import HeadLayout from "./pages/head/layout/HeadLayout";
 import HeadDashboard from "./pages/head/Dashboard";
@@ -104,7 +107,7 @@ function App() {
             </PublicRoutes>
           }
         />
-        
+
         {/* FOUNDER */}
         <Route
           path="/founder"
@@ -117,7 +120,7 @@ function App() {
           <Route index element={<FounderDashboard />} />
           <Route path="heads" element={<FounderHeadsList />} />
           <Route path="heads/profile/:id" element={<FounderHeadsProfile />} />
-          <Route path="heads/create" element={<FounderHeadForm />} />
+          <Route path="heads/add-head" element={<FounderHeadForm />} />
           <Route path="admins" element={<FounderAdminList />} />
           <Route path="admins/profile/:id" element={<FounderAdminProfile />} />
           <Route path="experts" element={<FounderExpertList />} />
@@ -131,16 +134,31 @@ function App() {
             element={<FounderClientProfile />}
           />
           <Route path="programs" element={<FounderProgramsList />} />
-          <Route path="programs/create" element={<FounderProgramsForm />} />
-          <Route path="category" element={<FounderCategoryList />} />
-          <Route path="category/create" element={<FounderCategoryForm />} />
+          <Route
+            path="programs/edit/:id"
+            element={<FounderProgramsEditForm />}
+          />
+          <Route
+            path="programs/add-program"
+            element={<FounderProgramsForm />}
+          />
+          <Route path="categories" element={<FounderCategoryList />} />
+          <Route
+            path="categories/add-category"
+            element={<FounderCategoryForm />}
+          />
           <Route
             path="category/edit/:id"
             element={<FounderCategoryEditForm />}
           />
           <Route path="finance" element={<FounderFinanceList />} />
           <Route path="therapy" element={<FounderTherapyList />} />
+<<<<<<< HEAD
           <Route path="therapy/create" element={<FounderTherapyForm />} />
+          <Route path="therapy/plan/:id" element={<FounderTherapyPlanView/>}/>
+=======
+          <Route path="therapy/add-therapy" element={<FounderTherapyForm />} />
+>>>>>>> origin/master
           <Route path="workout" element={<FounderWorkoutList />} />
           <Route path="workout/create" element={<FounderWorkoutForm />} />
           <Route path="profile" element={<Profile />} />
