@@ -1,37 +1,69 @@
 import { assets } from "@/assets/asset";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ProgressChart from "../components/ProgressChart";
-import WeightChart from "../components/Measeurement";
 import WeightUpdate from "./WeightUpdate";
 import MeasurementUpdate from "./MeasurementUpdate";
 import HoldPlan from "./HoldPlan";
 import ExtendPlan from "./ExtendPlan";
-import { Download, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Bar } from "react-chartjs-2";
 import MobileBottomNav from "../components/MobileBottomNav";
+import { useAppSelector } from "@/redux/store/hooks";
+import { useDispatch } from "react-redux";
+import { getProgramById } from "@/redux/features/program/program.thunk";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { fetchClientComplianceStats } from "@/redux/features/client/client.thunk";
 
 export default function Progress() {
+  const [program, setProgram] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [panelType, setPanelType] = useState(null);
+  const [complianceData, setComplianceData] = useState(null);
+
+  const user = useAppSelector(selectUser);
+  const dispatch = useDispatch();
+
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      const programId =
+        typeof user?.programType === "object"
+          ? user?.programType?._id
+          : user?.programType;
+      const program = await dispatch(getProgramById(programId)).unwrap();
+      const compliance = await dispatch(fetchClientComplianceStats()).unwrap();
+      
+      setProgram(program);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, dispatch]);
+
+  useEffect(() => {
+    if (user?._id && user?.programType) {
+      fetchDashboardData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?._id, user?.programType]);
 
   const kpiData = [
     {
       title: "Program Days",
-      value: "12 / 60",
+      value: `${user?.currentGlobalDay || 1}/ ${program?.plan?.duration || 0}`,
       icon: assets.website,
       bg: "#0A4F48",
       iconColor: true,
     },
     {
       title: "Weight Progress",
-      value: "75 kg",
+      value: `${user?.currentWeight || 0} kg`,
       icon: assets.website,
       bg: "#F4DBC7",
       iconColor: false,
     },
     {
       title: "Overall Compliance",
-      value: "75%",
+      value: `${complianceData?.overall || 0}%`,
       icon: assets.website,
       bg: "#0A4F48",
       iconColor: true,
@@ -195,43 +227,6 @@ export default function Progress() {
         <h1 className="text-[#0A4F48] font-bold text-[20px]">
           Overall Progress
         </h1>
-        <div className="flex gap-3">
-          <button
-            onClick={() => {
-              setIsOpen(true);
-              setPanelType("hold");
-            }}
-            className="bg-white border border-gray-200 text-gray-700 px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-gray-50 transition-colors"
-          >
-            Hold Plan
-          </button>
-          <button
-            onClick={() => {
-              setIsOpen(true);
-              setPanelType("extend");
-            }}
-            className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-[#083d38] transition-colors"
-          >
-            Extend Plan
-          </button>
-          <button className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-[#083d38] transition-colors flex items-center gap-2">
-            <span>PDF</span>
-            <Download className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Header */}
-      <div className="lg:hidden mb-4">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-[#0A4F48] font-semibold text-[16px]">
-            Overall Progress
-          </h1>
-          <button className="bg-[#0A4F48] text-white px-3 py-2 rounded-lg text-[12px] font-medium flex items-center gap-2">
-            <span>PDF</span>
-            <Download className="w-4 h-4" />
-          </button>
-        </div>
       </div>
 
       {/* Desktop Layout */}
@@ -410,28 +405,6 @@ export default function Progress() {
           ))}
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-3">
-          <button
-            onClick={() => {
-              setIsOpen(true);
-              setPanelType("hold");
-            }}
-            className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg text-[13px] font-medium"
-          >
-            Hold Plan
-          </button>
-          <button
-            onClick={() => {
-              setIsOpen(true);
-              setPanelType("extend");
-            }}
-            className="flex-1 bg-[#0A4F48] text-white py-3 rounded-lg text-[13px] font-medium"
-          >
-            Extend Plan
-          </button>
-        </div>
-
         {/* Weight Progress Card */}
         <div className="bg-white rounded-xl p-4 shadow-sm">
           <div className="flex justify-between items-center mb-3">
@@ -503,10 +476,7 @@ export default function Progress() {
           </div>
           <div className="space-y-2">
             {compliance.map((item, i) => (
-              <div
-                key={i}
-                className="relative bg-gray-50 rounded-lg p-3 pl-4"
-              >
+              <div key={i} className="relative bg-gray-50 rounded-lg p-3 pl-4">
                 <div
                   className="absolute left-0 top-0 w-1 h-full rounded-l-lg"
                   style={{ background: item.color }}

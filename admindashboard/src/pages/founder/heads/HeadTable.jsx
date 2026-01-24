@@ -11,7 +11,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
 
-const TherapyTable = () => {
+const HeadTable = () => {
   // const therapyData = [
   //   {
   //     name: "Therapy A",
@@ -91,7 +91,7 @@ const TherapyTable = () => {
         data={heads}
         columns={therapyColumns()}
         actionLabel="Add Head"
-        actionPath="/founder/heads/create"
+        actionPath="/founder/heads/add-head"
         profilePath={profilePath}
         pageLabel={"Heads"}
         onSearchInputChange={searchInputHandler}
@@ -105,4 +105,4 @@ const TherapyTable = () => {
   );
 };
 
-export default TherapyTable;
+export default HeadTable;

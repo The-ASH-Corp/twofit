@@ -102,7 +102,19 @@ export const fetchClientWeightHistory = createAsyncThunk(
   }
 );
 
-
+export const fetchClientComplianceStats = createAsyncThunk(
+  "client/fetchClientComplianceStats",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/clients/compliance-stats");
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch compliance stats"
+      );
+    }
+  }
+);
 
 export const fetchClientMeasurementHistory = createAsyncThunk(
   "client/fetchClientMeasurementHistory",

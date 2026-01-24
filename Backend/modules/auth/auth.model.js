@@ -95,6 +95,8 @@ const userSchema = new mongoose.Schema(
 
     currentGlobalDay: { type: Number, default: 1 },
 
+    lastDayCompletionTime: { type: Date },
+
   },
   { timestamps: true }
 );
