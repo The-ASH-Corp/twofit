@@ -14,31 +14,23 @@ export const createNewPlan = createAsyncThunk("therapy/createNewPlan", async (pl
 
 
 
-// export const getPlanById = createAsyncThunk("plans/getPlanById", async (planId, { rejectWithValue }) => {
-//     try {
-//         const data = await axiosInstance.get(`/plans/get-plan-by-id/${planId}`, { rejectWithValue })
-//         return data.data
-//     } catch (error) {
+export const getTherapyPlanById = createAsyncThunk("therapy/getPlanById", async (planId, { rejectWithValue }) => {
+    try {
+        const data = await axiosInstance.get(`/therapy/plan/${planId}`, { rejectWithValue })
+        return data.data
+    } catch (error) {
         
-//         return rejectWithValue(error.response?.data?.message || "Failed to fetch plan");
-//     }
-// })
+        return rejectWithValue(error.response?.data?.message || "Failed to fetch plan");
+    }
+})
 
-// export const getPlanByProgramId = createAsyncThunk("plans/getPlanByProgramId", async (programId, { rejectWithValue }) => {
-//     try {
-//         const data = await axiosInstance.get(`/plans/get-plan-by-programId/${programId}`, { rejectWithValue })
-//         return data.data
-//     } catch (error) {
-//         return rejectWithValue(error.response?.data?.message || "Failed to fetch plan");
-//     }
-// })
+ 
 
 export const uploadPlanMedia = createAsyncThunk(
-    "plans/uploadMedia",
+    "therapy/uploadMedia",
     async ({ formData, onUploadProgress }, { rejectWithValue }) => {
         try {
-            // axiosInstance interceptor returns response.data, so we just capture that
-            const data = await axiosInstance.post("/therapy/upload-media", formData, {
+             const data = await axiosInstance.post("/therapy/upload-media", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },

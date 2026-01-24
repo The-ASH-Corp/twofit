@@ -34,6 +34,8 @@ import FounderTherapyForm from "./pages/founder/therapy/TherapyForm";
 import FounderWorkoutList from "./pages/founder/workout/WorkoutList";
 import FounderWorkoutForm from "./pages/founder/workout/WorkoutForm";
 import FounderFinanceList from "./pages/founder/finance/FinanceTable";
+import FounderTherapyPlanView from "./pages/founder/therapy/TherapyViewPlan"
+
 //Head Pages Imports
 import HeadLayout from "./pages/head/layout/HeadLayout";
 import HeadDashboard from "./pages/head/Dashboard";
@@ -141,6 +143,7 @@ function App() {
           <Route path="finance" element={<FounderFinanceList />} />
           <Route path="therapy" element={<FounderTherapyList />} />
           <Route path="therapy/create" element={<FounderTherapyForm />} />
+          <Route path="therapy/plan/:id" element={<FounderTherapyPlanView/>}/>
           <Route path="workout" element={<FounderWorkoutList />} />
           <Route path="workout/create" element={<FounderWorkoutForm />} />
           <Route path="profile" element={<Profile />} />
