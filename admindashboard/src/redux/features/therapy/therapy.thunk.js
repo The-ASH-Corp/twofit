@@ -52,7 +52,7 @@ export const fetchTherapyPlans = createAsyncThunk(
       const data = await axiosInstance.get(
         "/therapy"
       );
-      return data.data;
+      return data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch plans"
