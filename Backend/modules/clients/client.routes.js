@@ -11,6 +11,7 @@ import {
   updateMeasurements,
   updateWeight,
   getFounderClientList,
+  getComplianceStats,
 } from "./client.controller.js";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
 
@@ -31,6 +32,7 @@ router.put("/:userId/measurements", updateMeasurements);
 router.get("/get-all-feedbacks/:userId", getAllFeedbacks)
 router.get("/weight-history",authMiddleware, getWeightHistoryOnly);
 router.get("/measurement-history",authMiddleware, getMeasurementHistoryOnly);
+router.get("/compliance-stats",authMiddleware, getComplianceStats);
 
 
 export default router;

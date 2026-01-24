@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { assets } from "@/assets/asset";
 import KpiCard from "@/components/cards/KpiCard";
 import HeroCard from "./components/HeroCard";
@@ -15,24 +15,41 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useDispatch } from "react-redux";
 import { getProgramById } from "@/redux/features/program/program.thunk";
 import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
+import { fetchClientComplianceStats } from "@/redux/features/client/client.thunk";
 
 export default function Dashboard() {
   const [program, setProgram] = useState(null);
   const [coaches, setCoaches] = useState([]);
+  const [complianceData, setComplianceData] = useState(null);
   const user = useAppSelector(selectUser);
   const dispatch = useDispatch();
-  const fetchDashboardData = async () => {
-    const programId = typeof user?.programType === 'object' ? user?.programType?._id : user?.programType;
-    const program = await dispatch(getProgramById(programId)).unwrap();
-    const coaches = await dispatch(
-      getAllCoachesByAdmin([user?.trainer, user?.therapist, user?.dietition]),
-    ).unwrap();
-    setProgram(program);
-    setCoaches(coaches);
-  };
+  
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      const programId = typeof user?.programType === 'object' ? user?.programType?._id : user?.programType;
+      const program = await dispatch(getProgramById(programId)).unwrap();
+      const coaches = await dispatch(
+        getAllCoachesByAdmin([user?.trainer, user?.therapist, user?.dietition]),
+      ).unwrap();
+      const compliance = await dispatch(fetchClientComplianceStats()).unwrap();
+      
+      console.log("Compliance Data:", compliance);
+      
+      setProgram(program);
+      setCoaches(coaches);
+      setComplianceData(compliance);
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, dispatch]);
+  
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    if (user?._id && user?.programType) {
+      fetchDashboardData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?._id, user?.programType]);
 
   return (
     <>
@@ -52,7 +69,7 @@ export default function Dashboard() {
               />
               <KpiCard
                 title="Overall Compliance"
-                value="75%"
+                value={`${complianceData?.overall || 0}%`}
                 icon={assets.website}
                 bg="#0A4F48"
                 iconColor="white"
@@ -83,7 +100,13 @@ export default function Dashboard() {
               <h2 className="text-[#0A4F48] font-bold text-sm mb-4">
                 Last Week Compliance
               </h2>
-              <ComplianceChart />
+              {complianceData?.weeklyData ? (
+                <ComplianceChart data={complianceData.weeklyData} />
+              ) : (
+                <div className="h-[220px] flex items-center justify-center">
+                  <p className="text-gray-400 text-sm">Loading compliance data...</p>
+                </div>
+              )}
             </div>
             <div className="bg-white p-6 rounded-2xl shadow-sm">
               <h2 className="text-[#0A4F48] font-bold text-sm mb-4">

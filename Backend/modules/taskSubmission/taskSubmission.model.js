@@ -39,7 +39,7 @@ const taskSubmissionSchema = new mongoose.Schema(
                         },
                         status: {
                             type: String,
-                            enum: ["pending", "verified", "rejected"],
+                            enum: ["pending", "verified", "rejected", "skipped", "missed"],
                             default: "pending",
                         },
                         file: {
