@@ -268,7 +268,7 @@ const ExpertCenterSide = ({ expert }) => {
             </h3>
             <span className="text-xs text-[#66706D] font-medium">
               {totalResults} <span className="mx-1 text-gray-300">|</span> Max{" "}
-              {expert.maxClient}
+              {expert?.maxClient}
             </span>
           </div>
           <MoreHorizontal size={20} className="text-gray-400 hidden sm:block" />

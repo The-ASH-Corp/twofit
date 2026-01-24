@@ -31,37 +31,81 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
     if (!currentDayConfig) return false;
 
     // Total exercises = workout exercises from plan + 4 static meal tasks
+    // NOTE: This assumes 4 meal tasks per day constant.
     const totalExercises = currentDayConfig.exercises.length + 4;
 
-    // Count total VERIFIED exercises for this userId and globalDayIndex from nested structure
+    // Count total VERIFIED/SKIPPED exercises for this userId and globalDayIndex
     const userSubmission = await TaskSubmission.findOne({ userId });
     if (!userSubmission) return false;
 
     const daySubmission = userSubmission.dailySubmissions.find(d => d.globalDayIndex === Number(globalDayIndex));
     if (!daySubmission) return false;
 
-    const verifiedSubmissionsCount = daySubmission.exercises.filter(ex => ex.status === "verified").length;
+    // Filter for verified OR skipped
+    const completedTasks = daySubmission.exercises.filter(ex =>
+        ex.status === "verified" || ex.status === "skipped"
+    );
 
-    if (verifiedSubmissionsCount >= totalExercises) {
+    const completedCount = completedTasks.length;
+
+    // ADDITIONAL CHECK: Workouts CANNOT be skipped.
+    // Ensure all workout tasks are strictly "verified" (not skipped).
+ 
+    const hasSkippedWorkout = completedTasks.some(ex => ex.taskType === "Workout" && ex.status === "skipped");
+    if (hasSkippedWorkout) return false; // Strict rule: Workouts cannot be skipped.
+
+    if (completedCount >= totalExercises) {
         if (user.currentGlobalDay === Number(globalDayIndex)) {
-            user.currentGlobalDay += 1;
+            // Check if we already have a completion time for this day? 
+            user.lastDayCompletionTime = new Date(); // Record completion time
             await user.save();
 
-            // Notify the client that they've advanced to the next day
+            // Notify the client that they've completed the day
             try {
                 const io = getIO();
-                io.to(userId.toString()).emit("day_advanced", {
-                    newGlobalDay: user.currentGlobalDay,
-                    completedDay: globalDayIndex
+                // Send "day_completed" instead of "day_advanced"
+                io.to(userId.toString()).emit("day_completed", {
+                    completedDay: globalDayIndex,
+                    nextDayUnlockTime: new Date(new Date().setHours(24, 0, 0, 0)) // Midnight next day
                 });
             } catch (socketError) {
-                console.error("Socket notification for day advancement failed:", socketError.message);
+                console.error("Socket notification for day completion failed:", socketError.message);
             }
 
             return true;
         }
     }
     return false;
+};
+
+// NEW HELPER: Attempt to advance day if time condition met
+export const attemptDayAdvancement = async (userId) => {
+    const user = await User.findById(userId);
+    if (!user || !user.lastDayCompletionTime) return user; // No completion recorded or user invalid
+
+    // Check if NOW > Next Midnight of lastDayCompletionTime
+    const completionDate = new Date(user.lastDayCompletionTime);
+    const unlockDate = new Date(completionDate);
+    unlockDate.setDate(unlockDate.getDate() + 1);
+    unlockDate.setHours(0, 0, 0, 0); // 12 AM next day
+
+    if (new Date() >= unlockDate) {
+        // Unlock time passed! Advance the day.
+        user.currentGlobalDay += 1;
+        user.lastDayCompletionTime = null; // Clear completion time reset for next day cycle
+        await user.save();
+
+        // Notify user of actual advancement?
+        try {
+            const io = getIO();
+            io.to(userId.toString()).emit("day_advanced", {
+                newGlobalDay: user.currentGlobalDay
+            });
+        } catch (socketError) {
+            console.error("Socket notification for lazy day advancement failed:", socketError.message);
+        }
+    }
+    return user;
 };
 
 // Helper to get task type from plan
@@ -119,16 +163,17 @@ const notifyExpertsAndAdmins = async (userId, submissionId, eventType, extraData
 };
 
 export const createTaskSubmission = async (submissionData) => {
-    const { 
-        userId, 
-        programId, 
-        weekIndex, 
-        dayIndex, 
-        globalDayIndex, 
-        exerciseIndex, 
-        notes, 
+    const {
+        userId,
+        programId,
+        weekIndex,
+        dayIndex,
+        globalDayIndex,
+        exerciseIndex,
+        notes,
         file,
-        taskType: explicitTaskType 
+        taskType: explicitTaskType,
+        status: statusInput
     } = submissionData;
 
     const gIndex = Number(globalDayIndex);
@@ -137,11 +182,15 @@ export const createTaskSubmission = async (submissionData) => {
     const dIndex = Number(dayIndex);
 
     let taskType = explicitTaskType || "Workout";
+    let status = statusInput === "skipped" ? "skipped" : "pending";
 
     // If it's a workout, we verify it against the plan to be safe (and to stay consistent)
     // If it's a meal, we trust the frontend (since meals are static and not in the "plan" document)
     if (taskType === "Workout") {
         taskType = await getTaskTypeFromPlan(userId, gIndex, eIndex);
+        if (status === "skipped") {
+            throw new Error("Workouts cannot be skipped.");
+        }
     }
 
     let userSubmission = await TaskSubmission.findOne({ userId });
@@ -157,7 +206,7 @@ export const createTaskSubmission = async (submissionData) => {
                 exercises: [{
                     exerciseIndex: eIndex,
                     taskType,
-                    status: "pending",
+                    status: status,
                     file,
                     notes,
                     updatedAt: Date.now()
@@ -177,7 +226,7 @@ export const createTaskSubmission = async (submissionData) => {
                 exercises: [{
                     exerciseIndex: eIndex,
                     taskType,
-                    status: "pending",
+                    status: status,
                     file,
                     notes,
                     updatedAt: Date.now()
@@ -191,7 +240,7 @@ export const createTaskSubmission = async (submissionData) => {
                 if (exercise.status === 'verified') {
                     throw new Error("Task already verified");
                 }
-                exercise.status = 'pending';
+                exercise.status = status;
                 exercise.taskType = taskType;
                 exercise.file = file || exercise.file;
                 exercise.notes = notes || exercise.notes;
@@ -201,7 +250,7 @@ export const createTaskSubmission = async (submissionData) => {
                 day.exercises.push({
                     exerciseIndex: eIndex,
                     taskType,
-                    status: "pending",
+                    status: status,
                     file,
                     notes,
                     updatedAt: Date.now()
@@ -215,27 +264,32 @@ export const createTaskSubmission = async (submissionData) => {
         await userSubmission.save();
     }
 
+    // If SKIPPED, we check if we can advance the day
+    if (status === "skipped") {
+        await checkAndAdvanceDay(userId, gIndex);
+    }
+
     // Get the specific submission object for socket/response (flattened format)
     const day = userSubmission.dailySubmissions.find(d => d.globalDayIndex === gIndex);
     const submission = day.exercises.find(e => e.exerciseIndex === eIndex);
 
     // Notify Experts and Admins via Socket
-    await notifyExpertsAndAdmins(userId, userSubmission._id, "new_task_submission");
+    await notifyExpertsAndAdmins(userId, userSubmission._id, "new_task_submission", { status });
 
     return submission;
 };
 
 export const createMultipleWorkoutSubmissions = async (submissionData) => {
-    const { 
-        userId, 
-        programId, 
-        weekIndex, 
-        dayIndex, 
-        globalDayIndex, 
+    const {
+        userId,
+        programId,
+        weekIndex,
+        dayIndex,
+        globalDayIndex,
         exerciseIndices,
-        notes, 
+        notes,
         file,
-        taskType 
+        taskType
     } = submissionData;
 
     const gIndex = Number(globalDayIndex);
@@ -456,7 +510,7 @@ export const verifyTaskSubmission = async (submissionId) => {
 
 export const rejectTaskSubmission = async (submissionId, comment) => {
     const userSubmission = await TaskSubmission.findOne({ "dailySubmissions.exercises._id": submissionId });
-    
+
     if (!userSubmission) {
         throw new Error("Submission not found");
     }
@@ -513,7 +567,7 @@ export const rejectTaskSubmission = async (submissionId, comment) => {
 
 export const getUserTaskStatusByUserId = async (userId, globalDayIndex) => {
     const userSubmission = await TaskSubmission.findOne({ userId });
-    
+
     if (!userSubmission) {
         return [];
     }

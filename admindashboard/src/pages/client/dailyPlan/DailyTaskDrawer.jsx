@@ -1,14 +1,23 @@
 import React from "react";
 import { X } from "lucide-react";
 
-export default function DailyTaskDrawer({ selectedDate, tasks, onClose }) {
+export default function DailyTaskDrawer({
+  selectedDate,
+  tasks,
+  onClose,
+  onSkip,
+  onTaskClick,
+}) {
   if (!selectedDate) return null;
 
   const statusColors = {
+    verified: "bg-green-50 text-green-700 border-green-200",
+    pending: "bg-yellow-50 text-yellow-700 border-yellow-200",
+    rejected: "bg-red-50 text-red-700 border-red-200",
+    todo: "bg-gray-50 text-gray-700 border-gray-200",
+    missed: "bg-gray-100 text-gray-700 border-gray-300",
     completed: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    skipped: "bg-yellow-50 text-yellow-700 border-yellow-200",
-    missed: "bg-red-50 text-red-700 border-red-200",
-    pending: "bg-gray-50 text-gray-700 border-gray-200",
+    skipped: "bg-orange-50 text-orange-700 border-orange-200",
     "in review": "bg-purple-50 text-purple-700 border-purple-200",
     improve: "bg-orange-50 text-orange-700 border-orange-200",
   };
@@ -34,7 +43,7 @@ export default function DailyTaskDrawer({ selectedDate, tasks, onClose }) {
         <div className="flex justify-between items-center p-5 lg:p-6 pb-4 border-b border-gray-100">
           {/* Mobile handle bar */}
           <div className="lg:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-gray-300 rounded-full"></div>
-          
+
           <h2 className="font-bold text-[15px] lg:text-[16px] text-gray-800">
             {formatDate(selectedDate)}
           </h2>
@@ -52,18 +61,33 @@ export default function DailyTaskDrawer({ selectedDate, tasks, onClose }) {
               <div
                 key={index}
                 className="flex items-center justify-between py-3.5 lg:py-3 px-4 bg-gray-50/50 rounded-xl hover:bg-gray-50 transition-colors"
+                onClick={() => onTaskClick && onTaskClick(task)} // Add click handler
               >
                 <span className="text-[14px] lg:text-[15px] font-medium text-gray-800">
                   {task.name}
                 </span>
-                <span
-                  className={`text-[11px] lg:text-[12px] font-semibold px-2.5 lg:px-3 py-1 rounded-full border ${
-                    statusColors[task.status.toLowerCase()] ||
-                    statusColors.pending
-                  }`}
-                >
-                  {task.status}
-                </span>
+                <div className="flex items-center gap-2">
+                  {task.type === "Meal" &&
+                    (task.status === "todo" || task.status === "pending") && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSkip && onSkip(task);
+                        }}
+                        className="text-[10px] lg:text-[11px] font-semibold px-2 lg:px-2.5 py-0.5 rounded-full border border-gray-300 text-gray-500 hover:bg-gray-200 transition-colors"
+                      >
+                        Skip
+                      </button>
+                    )}
+                  <span
+                    className={`text-[11px] lg:text-[12px] font-semibold px-2.5 lg:px-3 py-1 rounded-full border ${
+                      statusColors[task.status.toLowerCase()] ||
+                      statusColors.pending
+                    }`}
+                  >
+                    {task.status}
+                  </span>
+                </div>
               </div>
             ))
           ) : (

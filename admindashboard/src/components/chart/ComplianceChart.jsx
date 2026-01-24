@@ -11,16 +11,18 @@ import {
 } from "recharts";
 import LegendHeader from "./LegendHeader";
 
-export default function ComplianceChart() {
+export default function ComplianceChart({ data }) {
+  // Use provided data or fallback to static data
+  const chartData = (data && Array.isArray(data) && data.length > 0) ? data : weeklyCompliance;
   return (
     <div className="h-[220px] w-full">
       <LegendHeader />
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          data={weeklyCompliance}
+          data={chartData}
           stackOffset="expand"
           barSize={32}
-          margin={{ top: 0, right: 0, left: -35, bottom: 0 }}
+          margin={{ top: 0, right: 0, left: -27, bottom: 0 }}
         >
           <CartesianGrid horizontal={true} vertical={false} stroke="#F1F5F9" />
           <XAxis

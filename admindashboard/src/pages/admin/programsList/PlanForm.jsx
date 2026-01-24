@@ -409,9 +409,9 @@ export default function PlanForm() {
         <div className="max-w-7xl mx-auto flex flex-col gap-3">
           {/* <hr className="w-full text-gray-300" /> */}
           <div className="flex items-center justify-between w-full text-[12px] font-semibold">
-            <button className="text-[#011412]">Save as Draft</button>
+            <button className="text-[#011412]"></button>
             <div className="flex gap-2">
-              <button className="bg-[#EBF3F2] rounded-md p-2 min-w-[80px]">
+              <button className="bg-[#EBF3F2] rounded-md p-2 min-w-[80px]" type="button" onClick={()=>navigate(-1)}>
                 Cancel
               </button>
               <button
@@ -617,6 +617,7 @@ const PlanSection = ({
               {(type === "Workout" || type === "Meal") && (
                 <InputGroup
                   label="Attach URL"
+                  readOnly={true}
                   placeholder="Paste link here"
                   value={formState.url}
                   onChange={(e) =>
@@ -718,10 +719,12 @@ const InputGroup = ({
   bg = "transparent",
   value,
   onChange,
+  readOnly
 }) => (
   <div className="flex flex-col gap-1.5">
     <label className="text-xs font-bold text-[#011412]">{label}</label>
     <input
+    readOnly={readOnly}
       type="text"
       placeholder={placeholder}
       className={`w-full p-3 ${
