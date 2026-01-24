@@ -140,7 +140,7 @@ function App() {
           />
           <Route path="finance" element={<FounderFinanceList />} />
           <Route path="therapy" element={<FounderTherapyList />} />
-          <Route path="add-therapy" element={<FounderTherapyForm />} />
+          <Route path="therapy/create" element={<FounderTherapyForm />} />
           <Route path="workout" element={<FounderWorkoutList />} />
           <Route path="workout/create" element={<FounderWorkoutForm />} />
           <Route path="profile" element={<Profile />} />
