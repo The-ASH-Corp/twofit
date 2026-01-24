@@ -60,7 +60,7 @@ export default function ProgramTable() {
         data={programs}
         pageLabel={"Program List"}
         actionLabel="Add Program"
-        actionPath="/founder/programs/create"
+        actionPath="/founder/programs/add-program"
         onSearchInputChange={searchInputHandler}
         handlePageChange={setPage}
         handleLimitChange={setLimit}

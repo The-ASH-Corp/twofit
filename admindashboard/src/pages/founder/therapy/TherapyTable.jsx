@@ -95,7 +95,7 @@ const TherapyTable = () => {
         data={plans}
         columns={therapyColumns}
         actionLabel="Add Therapy"
-        actionPath="/founder/therapy/create"
+        actionPath="/founder/therapy/add-therapy"
         // profilePath= {profilePath}
         pageLabel={"Therapies"}
         // onSearchInputChange={searchInputHandler}
