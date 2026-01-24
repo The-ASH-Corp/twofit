@@ -152,9 +152,7 @@ export default function DailyPlan() {
       if (skipped > 0) summary.push({ type: "skipped", count: skipped });
       if (missed > 0) summary.push({ type: "missed", count: missed });
       if (todo > 0) summary.push({ type: "todo", count: todo }); // Optional: explicit todo summary if needed, but usually we just want exceptions.
-      // Actually, original code didn't push 'missed' here explicitly if we already counted it in `missed` variable.
-      // Wait, original code pushed missed ONLY IF todo > 0 && isBeforeToday.
-      // Now `missed` count captures that. So `summary` logic holds.
+ 
 
       newCalendarData[dateKey] = {
         summary,

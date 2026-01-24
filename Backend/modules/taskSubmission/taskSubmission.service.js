@@ -50,20 +50,13 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
 
     // ADDITIONAL CHECK: Workouts CANNOT be skipped.
     // Ensure all workout tasks are strictly "verified" (not skipped).
-    // Logic: If any workout task is skipped, we do NOT advance.
+ 
     const hasSkippedWorkout = completedTasks.some(ex => ex.taskType === "Workout" && ex.status === "skipped");
     if (hasSkippedWorkout) return false; // Strict rule: Workouts cannot be skipped.
 
     if (completedCount >= totalExercises) {
         if (user.currentGlobalDay === Number(globalDayIndex)) {
             // Check if we already have a completion time for this day? 
-            // The prompt implies we mark it as completed NOW.
-
-            // Advance the day
-            // CHANGE: DO NOT INCREMENT DAY IMMEDIATELY.
-            // Requirement: "change the gobel day in each 24 hr in midnight 12 am"
-
-            // user.currentGlobalDay += 1; // Removed immediate increment
             user.lastDayCompletionTime = new Date(); // Record completion time
             await user.save();
 
