@@ -4,6 +4,8 @@
 //   Trainer: "bg-[#EBF2FE] text-black",
 // };
 
+import ActionMenu from "@/components/actionMenu/ActionMenu";
+
 // const statusColors = {
 //   Active: "bg-[#45C4A2] text-white",
 //   Inactive: "bg-[#66706D] text-white",
@@ -34,5 +36,11 @@ export const ProgramListColumns = [
   { accessorKey: "categoryName", header: "category" },
   { accessorKey: "expertCount", header: "Experts" },
   { accessorKey: "userCount", header: "Clients" },
-  { id: "actions", header: "Action", cell: () => "⋯" },
+  {
+    id: "actions",
+    header: "Action",
+    cell: ({ row }) => (
+      <ActionMenu row={row} editActionPath="/founder/programs/edit/" />
+    ),
+  },
 ];
