@@ -63,7 +63,7 @@ export default function ComplianceChart({ data }) {
                           </span>
                         </div>
                         <span className="text-gray-800">
-                          {Math.round(entry.value * 100)}%
+                          {Math.round(entry.value)}%
                         </span>
                       </div>
                     ))}

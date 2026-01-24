@@ -1,6 +1,7 @@
 import * as service from "./client.services.js";
 import { getUserComplianceStats } from "../../utils/complianceCalculator.js";
 import { getSingleProgram } from "../allPrograms/allPrograma.service.js";
+import { attemptDayAdvancement } from "../taskSubmission/taskSubmission.service.js";
 
 export const getAllClients = async (req, res) => {
   try {
@@ -19,6 +20,10 @@ export const getAllClients = async (req, res) => {
 export const getSingleClient = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Attempt to advance day if cooldown has expired
+    await attemptDayAdvancement(id);
+
     const client = await service.getSingleClient(id);
 
     // Calculate next day unlock time if applicable

@@ -31,7 +31,7 @@ export default function Progress() {
           : user?.programType;
       const program = await dispatch(getProgramById(programId)).unwrap();
       const compliance = await dispatch(fetchClientComplianceStats()).unwrap();
-      
+      setComplianceData(compliance);
       setProgram(program);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -80,20 +80,20 @@ export default function Progress() {
   const compliance = [
     {
       title: "Diet",
-      missed: "Missed Diet: 26",
-      percentage: "82%",
+      missed: `Missed Diet:${complianceData?.stats?.missedCount + complianceData?.stats?.skippedCount}`,
+      percentage: `${((complianceData?.stats?.missedCount + complianceData?.stats?.skippedCount)*complianceData?.stats?.expectedMeals)/100}%`,
       color: "#0A4F48",
     },
     {
       title: "Workout",
-      missed: "Missed Workout: 29",
-      percentage: "75%",
+      missed: `Missed Workout: 0`,
+      percentage: `0%`,
       color: "#F4DBC7",
     },
     {
       title: "Therapy",
-      missed: "Missed Therapy: 16",
-      percentage: "68%",
+      missed: "Missed Therapy: 0",
+      percentage: "0%",
       color: "#EBF3F2",
     },
   ];
@@ -220,6 +220,8 @@ export default function Progress() {
     },
   };
 
+  console.log("Compliance Data:", complianceData);
+
   return (
     <>
       {/* Header - Desktop */}
@@ -340,7 +342,7 @@ export default function Progress() {
               <h3 className="text-[#0A4F48] font-bold text-[16px]">
                 Compliance
               </h3>
-              <span className="text-[18px] font-bold text-gray-800">78%</span>
+              <span className="text-[18px] font-bold text-gray-800">{complianceData?.overall}%</span>
             </div>
             <div className="space-y-3">
               {compliance.map((item, i) => (
@@ -349,8 +351,8 @@ export default function Progress() {
                   className="relative bg-gray-50 rounded-xl p-4 pl-5"
                 >
                   <div
-                    className="absolute left-0 top-0 w-1.5 h-full rounded-l-xl"
-                    style={{ background: item.color }}
+                    className={`absolute left-0 top-0  h-full rounded-l-xl`}
+                    style={{ background: item.color, width: item.percentage }}
                   />
                   <div className="flex items-center justify-between">
                     <p className="text-[13px] font-medium text-gray-700">
@@ -472,7 +474,7 @@ export default function Progress() {
             <h3 className="text-[#0A4F48] font-semibold text-[14px]">
               Compliance
             </h3>
-            <span className="text-[16px] font-bold text-gray-800">78%</span>
+            <span className="text-[16px] font-bold text-gray-800">{complianceData?.overall}%</span>
           </div>
           <div className="space-y-2">
             {compliance.map((item, i) => (

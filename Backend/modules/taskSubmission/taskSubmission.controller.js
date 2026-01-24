@@ -108,6 +108,9 @@ export const getUserTaskStatus = async (req, res) => {
         const userId = req.user._id || req.user.id;
         const { globalDayIndex } = req.query;
 
+        // Attempt to advance day if cooldown has expired
+        await taskSubmissionService.attemptDayAdvancement(userId);
+
         const data = await taskSubmissionService.getUserTaskStatusByUserId(userId, globalDayIndex);
 
         // Fetch User to check lock status
