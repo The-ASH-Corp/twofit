@@ -13,7 +13,7 @@ import { useEffect } from "react";
 import { socket } from "@/utils/socket";
 import { selectToken } from "@/redux/features/auth/auth.selectores";
 
-export default function TaskList({ plans }) {
+export default function TaskList({ plans, therapyDays }) {
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
   const token = useAppSelector(selectToken);
@@ -119,6 +119,31 @@ export default function TaskList({ plans }) {
       };
     },
   );
+  const todayTherapy =
+    therapyDays?.find((day) => day.name === `Day ${currentGlobalDay}`) || null;
+  const therapyTasks =
+    todayTherapy?.therapies?.map((therapy, index) => {
+      const submission = tasks?.find(
+        (t) =>
+          t.globalDayIndex === currentGlobalDay &&
+          t.exerciseIndex === index &&
+          t.taskType === "Therapy",
+      );
+
+      return {
+        name: therapy.type,
+        type: "Therapy",
+        notes: therapy.notes,
+        mediaUrl: therapy.url,
+        mediaName: therapy.mediaName,
+        weekIndex: 1,
+        dayIndex: currentGlobalDay,
+        globalDayIndex: currentGlobalDay,
+        exerciseIndex: index,
+        status: submission?.status || "todo",
+        submission,
+      };
+    }) || [];
 
   // Group workout tasks into a single item
   const groupedTasks = [];
@@ -159,6 +184,8 @@ export default function TaskList({ plans }) {
 
   // Add meal tasks individually
   groupedTasks.push(...mealTasks);
+  groupedTasks.push(...therapyTasks);
+
 
   const handleSkipTask = (task) => {
     setSkipConfirmation({ isOpen: true, task });

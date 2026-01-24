@@ -15,26 +15,46 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useDispatch } from "react-redux";
 import { getProgramById } from "@/redux/features/program/program.thunk";
 import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
-import { fetchClientComplianceStats } from "@/redux/features/client/client.thunk";
+import {
+  fetchClientComplianceStats,
+  getClient,
+} from "@/redux/features/client/client.thunk";
+import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 
 export default function Dashboard() {
   const [program, setProgram] = useState(null);
   const [coaches, setCoaches] = useState([]);
   const [complianceData, setComplianceData] = useState(null);
   const user = useAppSelector(selectUser);
+  const clientUser = useAppSelector(selectSelectedClient);
   const dispatch = useDispatch();
-  
+
+  // const user = useAppSelector(selectUser);
+
+  useEffect(() => {
+  if (user?._id) {
+    dispatch(getClient({ id: user._id }));
+  }
+}, [user?._id, dispatch]);
+
+
+  console.log("USER:", clientUser);
+  console.log("THERAPY TYPE:", clientUser?.therapyType);
+
   const fetchDashboardData = useCallback(async () => {
     try {
-      const programId = typeof user?.programType === 'object' ? user?.programType?._id : user?.programType;
+      const programId =
+        typeof user?.programType === "object"
+          ? user?.programType?._id
+          : user?.programType;
       const program = await dispatch(getProgramById(programId)).unwrap();
       const coaches = await dispatch(
         getAllCoachesByAdmin([user?.trainer, user?.therapist, user?.dietition]),
       ).unwrap();
       const compliance = await dispatch(fetchClientComplianceStats()).unwrap();
-      
+
       console.log("Compliance Data:", compliance);
-      
+
       setProgram(program);
       setCoaches(coaches);
       setComplianceData(compliance);
@@ -43,7 +63,7 @@ export default function Dashboard() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, dispatch]);
-  
+
   useEffect(() => {
     if (user?._id && user?.programType) {
       fetchDashboardData();
@@ -51,7 +71,9 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?._id, user?.programType]);
 
-  return (
+const therapyDays =
+  clientUser?.therapyType?.weeks?.[0]?.days || [];
+   return (
     <>
       <div className="w-full grid lg:grid-cols-[1fr_350px] grid-cols-1 gap-8 lg:p-2 p-4 lg:pb-2 pb-24">
         {/* Main Content Area */}
@@ -104,7 +126,9 @@ export default function Dashboard() {
                 <ComplianceChart data={complianceData.weeklyData} />
               ) : (
                 <div className="h-[220px] flex items-center justify-center">
-                  <p className="text-gray-400 text-sm">Loading compliance data...</p>
+                  <p className="text-gray-400 text-sm">
+                    Loading compliance data...
+                  </p>
                 </div>
               )}
             </div>
@@ -119,7 +143,7 @@ export default function Dashboard() {
           {/* Bottom Section: My Tasks */}
           <div className="lg:order-3 order-2">
             <h2 className="text-[#0A4F48] font-bold text-lg">My Tasks</h2>
-            <TaskList plans={program?.plan} />
+            <TaskList plans={program?.plan} therapyDays={therapyDays}/>
           </div>
 
           {/* Mobile Only: Measurements */}
