@@ -153,12 +153,9 @@ function App() {
           />
           <Route path="finance" element={<FounderFinanceList />} />
           <Route path="therapy" element={<FounderTherapyList />} />
-<<<<<<< HEAD
           <Route path="therapy/create" element={<FounderTherapyForm />} />
           <Route path="therapy/plan/:id" element={<FounderTherapyPlanView/>}/>
-=======
-          <Route path="therapy/add-therapy" element={<FounderTherapyForm />} />
->>>>>>> origin/master
+          
           <Route path="workout" element={<FounderWorkoutList />} />
           <Route path="workout/create" element={<FounderWorkoutForm />} />
           <Route path="profile" element={<Profile />} />
