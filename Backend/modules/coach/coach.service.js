@@ -87,7 +87,7 @@ export const createCoach = async (coach) => {
   await AdminModel.findByIdAndUpdate(
     coach.adminId,
     { $addToSet: { experts: coachCreated._id } },
-    { new: true }
+    { new: true },
   );
 
   return coachCreated;
@@ -124,7 +124,7 @@ export const AssignCoachToUser = async (coachId, userId) => {
   return await CoachModel.findByIdAndUpdate(
     coachId,
     { $addToSet: { assignedUsers: userId } },
-    { new: true }
+    { new: true },
   );
 };
 
@@ -146,25 +146,24 @@ export const getUsersAssignedToACoach = async (coachId, page, limit) => {
       select: "-password",
       options: {
         skip: skip,
-        limit: limit
-      }
+        limit: limit,
+      },
     });
 
   return {
     users: paginatedCoach.assignedUsers,
-    total: total
+    total: total,
   };
 };
-
 
 export const getCoachesByAdmin = async ({ adminIds }) => {
   let coaches = adminIds.map((adminId) =>
     CoachModel.findOne({ _id: adminId })
       .select("-password")
-      .populate("assignedPrograms")
+      .populate("assignedPrograms"),
   );
   return await Promise.all(coaches);
-}
+};
 
 const calculateAvgRating = (feedback = []) => {
   if (!feedback.length) return 0;
@@ -172,32 +171,41 @@ const calculateAvgRating = (feedback = []) => {
   return Number((total / feedback.length).toFixed(1));
 };
 
-
-
 export const createFeedback = async (expertId, userId, rating, feedback) => {
+  const exists = await CoachModel.findOne({
+    _id: expertId,
+    "feedback.userId": userId,
+  });
+
+  if (exists) {
+    throw new Error("You have already submitted a review for this coach"); 
+  }
   // Push feedback
   const coach = await CoachModel.findByIdAndUpdate(
     expertId,
     { $push: { feedback: { userId, rating, feedback } } },
-    { new: true }
+    { new: true },
   );
 
   if (!coach) throw new Error("Coach not found");
 
-
   const avgRating = calculateAvgRating(coach.feedback);
 
-  await CoachModel.findByIdAndUpdate(expertId, { avgRating });
+  const avgrating = await CoachModel.findByIdAndUpdate(
+    expertId,
+    { avgRating },
+    { new: true },
+  );
 
   await calculateRatingIncentive(expertId);
 
-  return coach;
+  return avgrating;
 };
 
-
-
 export const getCoachDashboardStats = async (coachId) => {
-  const coach = await CoachModel.findById(coachId).select("avgRating adminId assignedPrograms");
+  const coach = await CoachModel.findById(coachId).select(
+    "avgRating adminId assignedPrograms",
+  );
   if (!coach) {
     throw new Error("Coach not found");
   }
@@ -212,16 +220,16 @@ export const getCoachDashboardStats = async (coachId) => {
       { therapist: coachObjectId },
     ],
   });
-  
+
   // Count programs: Start with what is assigned directly to the coach
   let totalPrograms = coach.assignedPrograms?.length || 0;
-  
+
   // If direct assignments are 0, fallback to checking their associated admin's program list
   if (totalPrograms === 0 && coach.adminId) {
     const admin = await AdminModel.findById(coach.adminId).select("program");
     totalPrograms = admin?.program?.length || 0;
   }
-  
+
   const avarageRating = coach.avgRating || 0;
 
   return {
@@ -229,7 +237,7 @@ export const getCoachDashboardStats = async (coachId) => {
     totalPrograms,
     avarageRating,
   };
-}
+};
 
 export const founderCoachList = async (page, limit) => {
   try {
@@ -314,6 +322,3 @@ export const founderCoachList = async (page, limit) => {
     throw error;
   }
 };
-
-
-  

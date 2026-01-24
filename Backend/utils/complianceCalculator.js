@@ -16,7 +16,7 @@ export const getUserComplianceStats = async (userId, programPlan) => {
         }
 
         // Calculate total expected tasks per type
-        const totalDays = programPlan.duration || 0;
+        const totalDays = programPlan.duration.split(" ")[0] || 0;
         const daysWithPlan = programPlan.weeks?.flatMap((week, weekIndex) =>
             week.days.map((day, dayIndex) => ({
                 weekIndex: weekIndex + 1,
@@ -41,6 +41,8 @@ export const getUserComplianceStats = async (userId, programPlan) => {
         let completedWorkouts = 0;
         let completedMeals = 0;
         let completedTherapy = 0;
+        let skippedCount = 0;
+        let missedCount = 0;
 
         userSubmission.dailySubmissions.forEach(day => {
             day.exercises.forEach(ex => {
@@ -48,6 +50,10 @@ export const getUserComplianceStats = async (userId, programPlan) => {
                     if (ex.taskType === 'Workout') completedWorkouts++;
                     else if (ex.taskType === 'Meal') completedMeals++;
                     else if (ex.taskType === 'Therapy') completedTherapy++;
+                } else if (ex.status === 'skipped') {
+                    skippedCount++;
+                } else if (ex.status === 'missed') {
+                    missedCount++;
                 }
             });
         });
@@ -126,7 +132,9 @@ export const getUserComplianceStats = async (userId, programPlan) => {
                 completedMeals,
                 expectedMeals,
                 completedTherapy,
-                expectedTherapy
+                expectedTherapy,
+                skippedCount,
+                missedCount
             }
         };
     } catch (error) {

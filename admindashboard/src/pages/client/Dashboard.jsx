@@ -52,9 +52,6 @@ export default function Dashboard() {
         getAllCoachesByAdmin([user?.trainer, user?.therapist, user?.dietition]),
       ).unwrap();
       const compliance = await dispatch(fetchClientComplianceStats()).unwrap();
-
-      console.log("Compliance Data:", compliance);
-
       setProgram(program);
       setCoaches(coaches);
       setComplianceData(compliance);
