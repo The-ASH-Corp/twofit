@@ -11,7 +11,7 @@ const menuItems = [
     path: "/admin",
   },
   { label: "Programs", icon: assets.programs, path: "/admin/programs" },
-  { label: "Therapy", icon: assets.programs, path: "/admin/therapy" },
+  // { label: "Therapy", icon: assets.programs, path: "/admin/therapy" },
   { label: "Experts", icon: assets.experts, path: "/admin/experts" },
   { label: "Clients", icon: assets.clients, path: "/admin/clients" },
   { label: "Chats", icon: assets.chats, path: "/admin/chats" },

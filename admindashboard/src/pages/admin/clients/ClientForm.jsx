@@ -3,13 +3,12 @@ import BaseForm from "../../../components/form/BaseForm";
 import { createClient } from "../../../redux/features/auth/auth.thunk";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import {
-  getAllProgramsByAdmin,
-} from "@/redux/features/program/program.thunk";
+import { getAllProgramsByAdmin } from "@/redux/features/program/program.thunk";
 import { useEffect, useState } from "react";
 import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { fetchTherapyPlans } from "@/redux/features/therapy/therapy.thunk";
 
 const initialValues = {
   fullname: "",
@@ -25,6 +24,7 @@ const initialValues = {
   currentWeight: "",
   targetWeight: "",
   programType: "",
+  therapyType: "",
   duration: "",
   startDate: "",
   endDate: "",
@@ -47,13 +47,14 @@ export default function ClientForm() {
   const [program, setProgram] = useState(null);
   const [coachesOfAdmin, setCoachesOfAdmin] = useState([]);
   const [selectedProgram, setSelectedProgram] = useState(null);
+  const [therapy, setTherapy] = useState([]);
   const dispatch = useDispatch();
 
   const user = useSelector(selectUser);
 
   const fetchProgram = async () => {
     await dispatch(
-      getAllProgramsByAdmin({ adminId: user._id, page: 1, limit: 120 })
+      getAllProgramsByAdmin({ adminId: user._id, page: 1, limit: 120 }),
     ).then((res) => {
       setProgram(res.payload.data);
     });
@@ -61,9 +62,21 @@ export default function ClientForm() {
     setCoachesOfAdmin(coachessOfAdmin.payload);
   };
 
+  const fetchTherapy = async () => {
+    const res = await dispatch(fetchTherapyPlans());
+    if (res.payload?.data) {
+      setTherapy(res.payload.data);
+    }
+  };
+
   useEffect(() => {
     fetchProgram();
+    fetchTherapy();
   }, []);
+
+  useEffect(() => {
+    console.log("Therapy dropdown data:", therapy);
+  }, [therapy]);
 
   const setProgramId = (programId) => {
     const selectedProgram = program?.find((p) => p._id === programId);
@@ -205,7 +218,7 @@ export default function ClientForm() {
             calculateEndDate(
               form.values.startDate,
               e.target.value,
-              form.setFieldValue
+              form.setFieldValue,
             );
           },
         },
@@ -217,11 +230,28 @@ export default function ClientForm() {
             calculateEndDate(
               e.target.value,
               form.values.duration,
-              form.setFieldValue
+              form.setFieldValue,
             );
           },
         },
         { name: "endDate", label: "End Date", type: "date", readOnly: true },
+      ],
+    },
+    {
+      section: "Therapy Assignment",
+      position: "right",
+      fields: [
+        {
+          name: "therapyType",
+          label: "Therapy",
+          type: "select",
+          options: therapy
+            ? therapy.map((t) => ({
+                label: t.name,
+                value: t._id,
+              }))
+            : [],
+        },
       ],
     },
     {

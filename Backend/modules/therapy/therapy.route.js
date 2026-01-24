@@ -1,11 +1,15 @@
 import express from "express";
 import { createTherapy } from "./therapy.service.js";
-import { createTherapyController, getTherapyController } from "./therapy.controller.js";
+import { createTherapyController, getAllTherapyController, getATherapyController, uploadMedia } from "./therapy.controller.js";
+import { uploader } from "../../middleware/upload.js";
  
 const router = express.Router();
 
 router.post("/", createTherapyController);
-router.get("/:id", getTherapyController);
+router.post("/upload-media", uploader.single("file"), uploadMedia);
+router.get("/",getAllTherapyController)
+
+router.get("/plan/:id", getATherapyController);
  
 
 export default router;
