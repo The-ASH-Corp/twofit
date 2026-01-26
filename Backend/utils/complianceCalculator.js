@@ -1,7 +1,7 @@
 import TaskSubmission from "../modules/taskSubmission/taskSubmission.model.js";
 import User from "../modules/auth/auth.model.js";
 
-export const getUserComplianceStats = async (userId, programPlan) => {
+export const getUserComplianceStats = async (userId, programPlan, therapyPlan = null) => {
     try {
         const userSubmission = await TaskSubmission.findOne({ userId });
         
@@ -25,6 +25,15 @@ export const getUserComplianceStats = async (userId, programPlan) => {
                 exercises: day.exercises || []
             }))
         ) || [];
+        
+        const daysWithTherapy = therapyPlan?.weeks?.flatMap((week, weekIndex) =>
+            week.days.map((day, dayIndex) => ({
+                weekIndex: weekIndex + 1,
+                dayIndex: dayIndex + 1,
+                globalIndex: weekIndex * 7 + dayIndex + 1,
+                therapies: day.therapies || []
+            }))
+        ) || [];
 
         // Count expected tasks
         let expectedWorkouts = 0;
@@ -32,9 +41,12 @@ export const getUserComplianceStats = async (userId, programPlan) => {
         let expectedTherapy = 0;
 
         daysWithPlan.forEach(day => {
-            expectedWorkouts += day.exercises.length;
-            // Count therapy tasks if they exist in the plan
+            expectedWorkouts += day.exercises.filter(ex => !ex.type || ex.type === 'Workout').length;
             expectedTherapy += day.exercises.filter(ex => ex.type === 'Therapy').length;
+        });
+        
+        daysWithTherapy.forEach(day => {
+            expectedTherapy += day.therapies.length;
         });
 
         // Count completed (verified) tasks from submissions
@@ -88,6 +100,7 @@ export const getUserComplianceStats = async (userId, programPlan) => {
             if (dayIndex <= 0) continue;
 
             const dayData = daysWithPlan.find(d => d.globalIndex === dayIndex);
+            const therapyDayData = daysWithTherapy.find(d => d.globalIndex === dayIndex);
             const daySubmission = userSubmission.dailySubmissions.find(d => d.globalDayIndex === dayIndex);
 
             const expectedForDay = (dayData?.exercises.length || 0) + 4; // exercises + 4 meals
@@ -108,9 +121,11 @@ export const getUserComplianceStats = async (userId, programPlan) => {
                 ex => ex.taskType === 'Therapy' && ex.status === 'verified'
             ).length || 0;
 
-            const expectedWorkoutForDay = dayData?.exercises.filter(ex => ex.type !== 'Therapy').length || 0;
+            const expectedWorkoutForDay = dayData?.exercises.filter(ex => !ex.type || ex.type === 'Workout').length || 0;
             const expectedMealForDay = 4;
-            const expectedTherapyForDay = dayData?.exercises.filter(ex => ex.type === 'Therapy').length || 0;
+            const expectedTherapyFromPlan = dayData?.exercises.filter(ex => ex.type === 'Therapy').length || 0;
+            const expectedTherapyFromTherapyPlan = therapyDayData?.therapies.length || 0;
+            const expectedTherapyForDay = expectedTherapyFromPlan + expectedTherapyFromTherapyPlan;
 
             last7Days.push({
                 day: `Day ${dayIndex}`,
