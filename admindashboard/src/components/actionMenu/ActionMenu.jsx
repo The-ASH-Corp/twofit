@@ -1,12 +1,14 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { IoMdClose } from "react-icons/io";
-import DeletePopUp from './DeletePopUp';
+import DeletePopUp from "./DeletePopUp";
+// import { useDispatch } from "react-redux";
+// import { deleteCategory } from "@/redux/features/category/category.thunk";
+// import { toast } from "react-toastify";
 
-const ActionMenu = ({ row, editActionPath }) => {
-
-  const [activeRowId, setActiveRowId] = useState(null);  
-  const [showDelete, setShowDelete] = useState(false);
+const ActionMenu = ({ row, editActionPath, deleteActionPath }) => {
+  const [activeRowId, setActiveRowId] = useState(null);
+  
   const isOpen = activeRowId === row.id;
   const navigate = useNavigate();
   
@@ -14,21 +16,20 @@ const ActionMenu = ({ row, editActionPath }) => {
   const handelEdit = (id) => {
     // console.log(id);
     setActiveRowId(false);
-    if(editActionPath){
+    if (editActionPath) {
       navigate(`${editActionPath}${id}`);
     }
   };
 
-  const handleDelete = () => {
-    setShowDelete(false);
-    setActiveRowId(null);
-    console.log("Delete ID:", row.id);
-    // dispatch(deleteCategory(row.id))
+  const handelDelete = (id) => {
+    // console.log(id);
+    setActiveRowId(false);
+    if (editActionPath) {
+      navigate(`${deleteActionPath}${id}`);
+    }
   };
-  const handleClose = () => {
-    setShowDelete(false);
-    console.log("Delete ID2:", row.id);
-  };
+
+
 
   return (
     <div className="relative h-3" onClick={(e) => e.stopPropagation()}>
@@ -42,7 +43,7 @@ const ActionMenu = ({ row, editActionPath }) => {
         ...
       </button>
 
-      {isOpen && !showDelete && (
+      {isOpen && (
         <>
           <div
             onClick={() => setActiveRowId(null)}
@@ -65,10 +66,7 @@ const ActionMenu = ({ row, editActionPath }) => {
               Edit
             </button>
             <button
-              onClick={() => {
-                setShowDelete(true);
-                setActiveRowId(null);
-              }}
+              onClick={() => handelDelete(row.id)}
               className=" w-full bg-[#EBF3F2] hover:bg-red-400 hover:text-white p-2 rounded-lg"
             >
               Delete
@@ -76,11 +74,8 @@ const ActionMenu = ({ row, editActionPath }) => {
           </div>
         </>
       )}
-      {showDelete && (
-        <DeletePopUp onClose={handleClose} onConfirm={handleDelete} />
-      )}
     </div>
   );
 };
 
-export default ActionMenu
+export default ActionMenu;

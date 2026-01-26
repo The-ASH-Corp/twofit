@@ -78,19 +78,29 @@ export const updateCategoryController = async (req, res) => {
  
 export const deleteSingleCategoryController = async (req, res) => {
   try {
-    const category = await deleteSingleCategory(req.params.id);
+    const result = await deleteSingleCategory(req.params.id);
+
+    if (!result.canDelete) {
+      return res.status(409).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
     return res.status(200).json({
       success: true,
-      message: "Category deleted successfully",
-      data: category,
+      message: result.message,
+      data: result.category,
     });
   } catch (error) {
-    return res.status(404).json({
+    return res.status(400).json({
       success: false,
       message: error.message,
     });
   }
 };
+
+
 
  
 export const deleteAllCategoriesController = async (req, res) => {
