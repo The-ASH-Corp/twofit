@@ -30,7 +30,6 @@ export default function AdminsList() {
   const [admins, setAdmins] = useState([]);
 
   useEffect(() => {
-    // console.log(data)
     setAdmins(data);
   }, [data]);
 

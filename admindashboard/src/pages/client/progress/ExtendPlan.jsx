@@ -20,8 +20,6 @@ export default function ExtendPlan({ onClose }) {
       toast.info("Please select a duration");
       return;
     }
-
-    console.log({ duration, notes });
     toast.success("Plan extended successfully");
     onClose();
   };

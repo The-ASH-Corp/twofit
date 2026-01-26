@@ -91,7 +91,6 @@ const ExpertLeftSide = ({ expert }) => {
 
   const isFounderPage = useMatch("/founder/experts/profile/:id");
   const isHeadPage = useMatch("/head/experts/profile/:id");
-  // console.log(isFounderPage);
 
   return (
     <div className="w-full flex flex-col gap-4 sm:gap-6  pb-4 sm:pb-6">

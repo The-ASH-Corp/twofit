@@ -48,7 +48,6 @@ export const getSingleCategory=async(id)=>{
 
 export const updateCategory=async(id,data)=>{
   try {
-    console.log(id, data)
     if (!data?.name) {
       throw new Error("Category name is required");
     }

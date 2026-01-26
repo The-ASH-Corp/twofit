@@ -62,7 +62,6 @@ export const getAllProgramsByCategory = createAsyncThunk(
       const data = await axiosInstance.get(
         `/programs/get-all-programs-by-category/${category}/${page}/${limit}`
       );
-      console.log(data);
       return data;
       
     } catch (error) {
@@ -112,7 +111,6 @@ export const getFounderPrograms = createAsyncThunk(
       const data = await axiosInstance.get(
         `/programs/founder/list/${page}/${limit}`,
       );
-      console.log(`data`)
       return data;
     } catch (error) {
       return rejectWithValue(

@@ -60,9 +60,6 @@ export default function TherapyViewPlan() {
       console.error("Fetch therapy plan error", err);
     }
   };
-useEffect(() => {
-  console.log("Updated weeks:", weeks);
-}, [weeks]);
 
   
   useEffect(() => {

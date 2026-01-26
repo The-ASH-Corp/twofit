@@ -61,7 +61,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     setFounder(data);
-    console.log(data);
   }, [data]);
   // Mock Data for Charts
   const growthData = {

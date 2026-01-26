@@ -22,12 +22,10 @@ const CategoryEditForm = () => {
 
   const dispatch = useDispatch();
   const { id } = useParams();
-  // console.log(id)
 
   useEffect(() => {
       if (id) {
         dispatch(getCategory({id}));
-        //  console.log(expert);
       }
     }, [id, dispatch]);
 
@@ -47,7 +45,6 @@ const CategoryEditForm = () => {
 
   const handelSubmit = async (value) => {
     try {
-      console.log(value);
       const category = await dispatch(
         updateCategories({ id, updatedData: value }),
       ).unwrap();

@@ -28,8 +28,6 @@ const HeadForm = () => {
           setCategories(data.data)
         },[data])
 
-        console.log(categories)
-
     const fields = [
       {
         section: "Personal Information",
@@ -159,7 +157,6 @@ const HeadForm = () => {
   const handelSubmit = async (value) => {
     try {
       const result = await dispatch(createHead(value)).unwrap();
-       console.log(result)
       if (result.success) {
         toast.success("Head created successfully");
         navigate("/founder/heads");

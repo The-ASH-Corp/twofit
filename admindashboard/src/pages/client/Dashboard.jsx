@@ -38,9 +38,6 @@ export default function Dashboard() {
 }, [user?._id, dispatch]);
 
 
-  console.log("USER:", clientUser);
-  console.log("THERAPY TYPE:", clientUser?.therapyType);
-
   const fetchDashboardData = useCallback(async () => {
     try {
       const programId =

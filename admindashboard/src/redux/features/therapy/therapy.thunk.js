@@ -2,7 +2,6 @@ import axiosInstance from "@/utils/axiosInstance";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const createNewPlan = createAsyncThunk("therapy/createNewPlan", async (planData, { rejectWithValue }) => {
-     console.log(planData)
     try {
         const data = await axiosInstance.post("/therapy", planData, { rejectWithValue })
         return data.data

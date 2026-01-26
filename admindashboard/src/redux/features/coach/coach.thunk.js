@@ -35,7 +35,6 @@ export const getAllCoaches = createAsyncThunk(
       const data = await axiosInstance.get(
         `/coach/get-all-coaches/${page}/${limit}`,
       );
-      // console.log(data)
       return data.data;
     } catch (error) {
       return rejectWithValue(
@@ -114,7 +113,6 @@ export const getFounderAllCoaches = createAsyncThunk(
       const data = await axiosInstance.get(
         `/coach/founder/list/${page}/${limit}`,
       );
-      // console.log(data)
       return data;
     } catch (error) {
       return rejectWithValue(

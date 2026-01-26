@@ -141,7 +141,6 @@ export const getAllFeedbacks = async (req, res) => {
 
 
 export const getWeightHistoryOnly = async (req, res) => {
-  console.log("req.user:", req.user);
 
   try {
     const userId = req.user.id;

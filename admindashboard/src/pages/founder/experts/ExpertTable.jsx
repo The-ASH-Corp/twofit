@@ -32,7 +32,6 @@ export default function ExpertTable() {
 
   useEffect(() => {
     setCoaches(data);
-    // console.log(data);
   }, [data]);
 
   const searchInputHandler = (e) => {
