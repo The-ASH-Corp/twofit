@@ -16,7 +16,6 @@ const WorkoutList = () => {
 
   useEffect(() => {
     dispatch(getAllWorkout({ page, limit }));
-    console.log(page);
   }, [dispatch, page, limit]);
 
   const data = useSelector(selectAllWorkout);
@@ -44,7 +43,6 @@ const WorkoutList = () => {
     setWorkout(filtered);
   };
 
-  console.log(heads);
 
   if (status === "loading")
     return (

@@ -38,9 +38,6 @@ export default function Dashboard() {
 }, [user?._id, dispatch]);
 
 
-  console.log("USER:", clientUser);
-  console.log("THERAPY TYPE:", clientUser?.therapyType);
-
   const fetchDashboardData = useCallback(async () => {
     try {
       const programId =
@@ -101,10 +98,11 @@ const therapyDays =
               />
               <KpiCard
                 title="Active Streak"
-                value="12 Days"
+                value={`${complianceData?.streaks?.activeStreak || 0} Days`}
                 icon={assets.website}
                 bg="#F4DBC7"
               />
+           
             </div>
           </div>
 

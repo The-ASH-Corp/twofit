@@ -28,7 +28,6 @@ ChartJS.register(
 );
 
 const ExpertCenterSide = ({ expert }) => {
-  console.log(expert?.assignedUsers);
   const ratingData = {
     labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
     datasets: [

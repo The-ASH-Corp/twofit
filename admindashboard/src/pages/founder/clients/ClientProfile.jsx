@@ -23,7 +23,6 @@ const ClientProfile = () => {
   useEffect(() => {
     if (id) {
       dispatch(getClient({ id: id }));
-      // console.log(client)
     }
   }, [id, dispatch]);
 

@@ -38,7 +38,6 @@ export default function ClientsTable() {
 
   useEffect(()=>{
     setClient(data)
-    console.log(data)
   },[data])
 
   const searchInputHandler = (e) => {

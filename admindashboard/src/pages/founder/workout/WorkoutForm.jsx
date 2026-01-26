@@ -28,7 +28,6 @@ const WorkoutForm = () => {
   
 
     const handelSubmit = (value) => {
-      console.log(value);
       dispatch(createWorkout(value));
       navigate("/founder/workout")
     };

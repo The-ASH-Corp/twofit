@@ -15,7 +15,6 @@ import { SyncLoader } from "react-spinners";
 const AdminProfile = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
-  console.log(id);
 
   const expert = useSelector(getSelectedAdmin);
   const status = useSelector(getAdminStatus);
@@ -24,10 +23,8 @@ const AdminProfile = () => {
   useEffect(() => {
     if (id) {
       dispatch(getAdminProfile(id));
-      //  console.log(expert);
     }
   }, [id, dispatch]);
-  //  console.log(expert);
 
   if (status === "loading")
     return (

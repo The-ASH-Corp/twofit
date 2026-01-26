@@ -1,5 +1,5 @@
 import * as service from "./client.services.js";
-import { getUserComplianceStats } from "../../utils/complianceCalculator.js";
+import { getUserComplianceStats, calculateUserStreaks } from "../../utils/complianceCalculator.js";
 import { getSingleProgram } from "../allPrograms/allPrograma.service.js";
 import { attemptDayAdvancement } from "../taskSubmission/taskSubmission.service.js";
 
@@ -141,7 +141,6 @@ export const getAllFeedbacks = async (req, res) => {
 
 
 export const getWeightHistoryOnly = async (req, res) => {
-  console.log("req.user:", req.user);
 
   try {
     const userId = req.user.id;
@@ -236,8 +235,15 @@ export const getComplianceStats = async (req, res) => {
     const program = await getSingleProgram(programId);
 
     const complianceData = await getUserComplianceStats(userId, program?.plan);
+    const streakData = await calculateUserStreaks(userId);
 
-    res.status(200).json({ success: true, data: complianceData });
+    res.status(200).json({ 
+        success: true, 
+        data: {
+            ...complianceData,
+            streaks: streakData
+        } 
+    });
   } catch (error) {
     console.error("Compliance stats error:", error);
     res.status(500).json({ success: false, message: error.message });

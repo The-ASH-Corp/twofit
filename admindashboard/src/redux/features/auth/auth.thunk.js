@@ -21,7 +21,6 @@ export const createClient = createAsyncThunk(
 
       return data;
     } catch (error) {
-      console.log(error);
       return rejectWithValue(
         error.response?.data?.message || "Failed to create client",
       );

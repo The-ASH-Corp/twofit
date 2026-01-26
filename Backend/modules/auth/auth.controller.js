@@ -10,7 +10,6 @@ export const createUserByAdmin = async (req, res) => {
       data: user,
     });
   } catch (err) {
-    console.log(err);
 
     res.status(400).json({ success: false, message: err.message });
   }
@@ -31,7 +30,6 @@ export const loginController = async (req, res) => {
 
     res.json({ success: true, message: "Login successful", data });
   } catch (err) {
-    console.log(err);
 
     res.status(400).json({ success: false, message: err.message });
   }
@@ -122,7 +120,6 @@ export const editProfileController = async (req, res) => {
 
     res.json({ success: true, message: "Profile updated successfully", data: updatedUser });
   } catch (err) {
-    console.log(err);
     res.status(400).json({ success: false, message: err.message });
   } 
 };

@@ -74,9 +74,7 @@ export default function ClientForm() {
     fetchTherapy();
   }, []);
 
-  useEffect(() => {
-    console.log("Therapy dropdown data:", therapy);
-  }, [therapy]);
+
 
   const setProgramId = (programId) => {
     const selectedProgram = program?.find((p) => p._id === programId);

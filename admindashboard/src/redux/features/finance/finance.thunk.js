@@ -6,7 +6,6 @@ export const getAllEmployees = createAsyncThunk(
   async ({ page, limit }, { rejectWithValue }) => {
     try {
       const data = await axiosInstance.get(`/finance/employees/${page}/${limit}`);
-      //   console.log(data);
       return data;
     } catch (error) {
       return rejectWithValue(

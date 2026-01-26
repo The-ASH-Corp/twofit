@@ -15,7 +15,6 @@ import { SyncLoader } from "react-spinners";
 const ExpertProfile = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
-  console.log(id);
 
   const expert = useSelector(selectCoachById);
   const status = useSelector(selectCoachStatus);
@@ -24,10 +23,8 @@ const ExpertProfile = () => {
   useEffect(() => {
     if (id) {
       dispatch(getSingleCoach(id));
-      //  console.log(expert);
     }
   }, [id, dispatch]);
-  //  console.log(expert);
 
   if (status === "loading")
     return (

@@ -23,7 +23,6 @@ export const getCategory = createAsyncThunk(
   async ({ id }, { rejectWithValue }) => {
     try {
       const data = await axiosInstance.get(`category/list/${id}`);
-      // console.log(data.data)
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -38,7 +37,6 @@ export const getAllCategories = createAsyncThunk(
   async ({ page, limit }, { rejectWithValue }) => {
     try {
       const data = await axiosInstance.get(`/category/list/${page}/${limit}`);
-      // console.log(data.data)
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -56,7 +54,6 @@ export const updateCategories = createAsyncThunk(
         `/category/update/${id}`,
         updatedData,
       );
-      // console.log(data.data)
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -91,7 +88,6 @@ export const getFounderCategories = createAsyncThunk(
       const data = await axiosInstance.get(
         `/category/founder/list/${page}/${limit}`,
       );
-      // console.log(data.data)
       return data;
     } catch (error) {
       return rejectWithValue(

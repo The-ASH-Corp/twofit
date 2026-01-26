@@ -15,7 +15,6 @@ import { SyncLoader } from "react-spinners";
 const HeadProfile = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
-  console.log(id);
 
   const head = useSelector(selectHead);
   const status = useSelector(selectHeadStatus);
@@ -24,10 +23,8 @@ const HeadProfile = () => {
   useEffect(() => {
     if (id) {
       dispatch(getHead(id));
-      //  console.log(expert);
     }
   }, [id, dispatch]);
-  //  console.log(expert);
 
   if (status === "loading")
     return (

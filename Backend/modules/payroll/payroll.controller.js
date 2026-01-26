@@ -4,7 +4,6 @@ import * as payrollService from "./payroll.service.js"
 export const updatePayroll = async (req, res) => {
     try {
         const payroll = await payrollService.updatePayroll(req.body);
-        // console.log(payroll)
         res.status(200).json({
           success: true,
           message: "payroll updated successfully",
