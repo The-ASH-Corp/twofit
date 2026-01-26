@@ -17,7 +17,8 @@ export const getSingleClient = async (id) => {
     .populate("programType")
     .populate("trainer")
     .populate("dietition")
-    .populate("therapist");
+    .populate("therapist")
+    .populate("therapyType");
   return client;
 };
 

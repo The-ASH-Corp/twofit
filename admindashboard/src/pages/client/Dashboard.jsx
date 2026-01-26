@@ -29,8 +29,6 @@ export default function Dashboard() {
   const clientUser = useAppSelector(selectSelectedClient);
   const dispatch = useDispatch();
 
-  // const user = useAppSelector(selectUser);
-
   useEffect(() => {
   if (user?._id) {
     dispatch(getClient({ id: user._id }));
@@ -65,8 +63,7 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?._id, user?.programType]);
 
-const therapyDays =
-  clientUser?.therapyType?.weeks?.[0]?.days || [];
+
    return (
     <>
       <div className="w-full grid lg:grid-cols-[1fr_350px] grid-cols-1 gap-8 lg:p-2 p-4 lg:pb-2 pb-24">
@@ -138,7 +135,7 @@ const therapyDays =
           {/* Bottom Section: My Tasks */}
           <div className="lg:order-3 order-2">
             <h2 className="text-[#0A4F48] font-bold text-lg">My Tasks</h2>
-            <TaskList plans={program?.plan} therapyDays={therapyDays}/>
+            <TaskList plans={program?.plan} therapyPlan={clientUser?.therapyType}/>
           </div>
 
           {/* Mobile Only: Measurements */}

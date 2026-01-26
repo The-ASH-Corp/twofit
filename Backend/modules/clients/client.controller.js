@@ -1,6 +1,7 @@
 import * as service from "./client.services.js";
 import { getUserComplianceStats, calculateUserStreaks } from "../../utils/complianceCalculator.js";
 import { getSingleProgram } from "../allPrograms/allPrograma.service.js";
+import { getTherapyById } from "../therapy/therapy.service.js";
 import { attemptDayAdvancement } from "../taskSubmission/taskSubmission.service.js";
 
 export const getAllClients = async (req, res) => {
@@ -234,7 +235,16 @@ export const getComplianceStats = async (req, res) => {
     const programId = typeof user.programType === 'object' ? user.programType._id : user.programType;
     const program = await getSingleProgram(programId);
 
-    const complianceData = await getUserComplianceStats(userId, program?.plan);
+    const therapyId = typeof user.therapyType === 'object' 
+        ? user.therapyType._id 
+        : user.therapyType;
+    
+    let therapyPlan = null;
+    if (therapyId) {
+        therapyPlan = await getTherapyById(therapyId);
+    }
+
+    const complianceData = await getUserComplianceStats(userId, program?.plan, therapyPlan);
     const streakData = await calculateUserStreaks(userId);
 
     res.status(200).json({ 
