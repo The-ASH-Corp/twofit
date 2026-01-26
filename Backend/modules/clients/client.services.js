@@ -145,11 +145,20 @@ export const updateMeasurementsService = async (
   return user;
 };
 
-export const getAllFeedbacksService = async (userId) => {
+export const getAllFeedbacksService = async (userId, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+
+  const totalCount = await CoachModel.countDocuments({
+    "feedback.userId": userId,
+  });
+
   const feedbacks = await CoachModel.find({ "feedback.userId": userId })
     .select("name role feedback")
-    .populate("feedback.userId", "name email");
-  return feedbacks;
+    .populate("feedback.userId", "name email")
+    .skip(skip)
+    .limit(limit);
+
+  return { feedbacks, totalCount };
 };
 
 export const fetchWeightHistoryService = async (userId) => {
