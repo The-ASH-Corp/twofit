@@ -129,10 +129,20 @@ export const updateMeasurements = async (req, res) => {
 export const getAllFeedbacks = async (req, res) => {
   try {
     const { userId } = req.params;
-    const feedbacks = await service.getAllFeedbacksService(userId);
+    const { page = 1, limit = 10 } = req.query;
+
+    const { feedbacks, totalCount } = await service.getAllFeedbacksService(
+      userId,
+      parseInt(page),
+      parseInt(limit)
+    );
+
     res.status(200).json({
       success: true,
       data: feedbacks,
+      total: totalCount,
+      page: parseInt(page),
+      totalPages: Math.ceil(totalCount / limit),
     });
   } catch (error) {
     res.status(400).json({ message: error.message });

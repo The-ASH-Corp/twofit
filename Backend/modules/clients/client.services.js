@@ -1,5 +1,6 @@
 import User from "../auth/auth.model.js";
 import { CoachModel } from "../coach/coach.model.js";
+import mongoose from "mongoose";
 
 export const getAllClient = async (page, limit) => {
   const skip = (page - 1) * limit;
@@ -145,11 +146,38 @@ export const updateMeasurementsService = async (
   return user;
 };
 
-export const getAllFeedbacksService = async (userId) => {
-  const feedbacks = await CoachModel.find({ "feedback.userId": userId })
-    .select("name role feedback")
-    .populate("feedback.userId", "name email");
-  return feedbacks;
+export const getAllFeedbacksService = async (userId, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+
+  const pipeline = [
+    { $match: { "feedback.userId": new mongoose.Types.ObjectId(userId) } },
+    { $unwind: "$feedback" },
+    { $match: { "feedback.userId": new mongoose.Types.ObjectId(userId) } },
+    {
+      $facet: {
+        totalCount: [{ $count: "count" }],
+        feedbacks: [
+          { $sort: { "feedback.createdAt": -1 } },
+          { $skip: skip },
+          { $limit: limit },
+          {
+            $project: {
+              name: 1,
+              role: 1,
+              feedback: ["$feedback"],
+            },
+          },
+        ],
+      },
+    },
+  ];
+
+  const result = await CoachModel.aggregate(pipeline);
+
+  const feedbacks = result[0].feedbacks;
+  const totalCount = result[0].totalCount[0]?.count || 0;
+
+  return { feedbacks, totalCount };
 };
 
 export const fetchWeightHistoryService = async (userId) => {
@@ -278,4 +306,3 @@ export const founderClientList = async (page, limit) => {
     throw error;
   }
 };
-
