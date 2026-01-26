@@ -15,7 +15,7 @@ router.get('/list/:page/:limit',getAllCategoryController)
 router.get('/list/:id',getSingleCategoryController)
 router.get("/founder/list/:page/:limit", gatFounderCategoryList);
 router.put('/update/:id',updateCategoryController)
-router.delete('/delete/:catId',deleteSingleCategoryController)
+router.delete('/delete/:id',deleteSingleCategoryController)
 router.delete('/delete',deleteAllCategoriesController)
 
 

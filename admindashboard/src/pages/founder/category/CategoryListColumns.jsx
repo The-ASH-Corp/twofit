@@ -1,9 +1,12 @@
 import ActionMenu from "@/components/actionMenu/ActionMenu";
 
+
+
 export const CategoryListColumns = () => [
   { accessorKey: "categoryName", header: "Category Name" },
-  { accessorKey: "programsCount", header: "Programs" },
+  { accessorKey: "headNames", header: "Head Name" },
   { accessorKey: "adminsCount", header: "Sub Admins" },
+  { accessorKey: "programsCount", header: "Programs" },
   { accessorKey: "expertCount", header: "Experts" },
   { accessorKey: "clientCount", header: "Clients" },
 
@@ -11,7 +14,11 @@ export const CategoryListColumns = () => [
     id: "_id",
     header: "Action",
     cell: ({ row }) => (
-      <ActionMenu row={row} editActionPath="/founder/category/edit/" />
+      <ActionMenu
+        row={row}
+        editActionPath="/founder/category/edit/"
+        deleteActionPath="/founder/category/delete/"
+      />
     ),
   },
 ];

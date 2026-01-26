@@ -1,4 +1,7 @@
 import { categoryModel } from "./category.model.js"
+import { HeadsModel } from "../Heads/heads.modal.js";
+import ProgramModel from "../allPrograms/allPrograma.model.js";
+import mongoose from "mongoose";
 
 export const createCategory= async (data)=>{
     try {
@@ -77,22 +80,55 @@ export const updateCategory=async(id,data)=>{
     throw error;
   }
 }
-export const deleteSingleCategory=async(id)=>{
-   try {
+export const deleteSingleCategory = async (id) => {
+  try {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new Error("Invalid category ID");
     }
 
-    const deleted = await categoryModel.findByIdAndDelete(id);
-    if (!deleted) {
+    const category = await categoryModel.findById(id);
+    if (!category) {
       throw new Error("Category not found");
     }
 
-    return deleted;
+    const headsUsingCategory = await HeadsModel.find(
+      { programCategory: id },
+      { name: 1 },
+    );
+
+    const programsUsingCategory = await ProgramModel.find(
+      { category: id },
+      { title: 1 },
+    );
+
+    // ❌ Category is in use
+    if (headsUsingCategory.length || programsUsingCategory.length) {
+      const headNames = headsUsingCategory.map((h) => h.name).join(", ");
+      const programNames = programsUsingCategory.map((p) => p.title).join(", ");
+
+      let message = "Cannot delete category.";
+
+      if (headNames) message += ` Heads: ${headNames}.`;
+      if (programNames) message += ` Programs: ${programNames}.`;
+
+      return {
+        canDelete: false,
+        message,
+      };
+    }
+
+    await categoryModel.findByIdAndDelete(id);
+
+    return {
+      canDelete: true,
+      message: "Category deleted successfully",
+      category,
+    };
   } catch (error) {
     throw error;
   }
-}
+};
+
 
 export const deleteAllCategory=async( )=>{
  try {
@@ -173,7 +209,13 @@ export const founderCategoryList = async (page, limit) => {
           categoryName: "$name",
 
           programsCount: { $size: "$programs" },
-          // headsCount: { $size: "$heads" },
+          headNames: {
+            $map: {
+              input: "$heads",
+              as: "head",
+              in: "$$head.name",
+            },
+          },
           adminsCount: { $size: "$admins" },
           expertCount: { $size: "$coaches" },
           clientCount: { $size: "$users" },
