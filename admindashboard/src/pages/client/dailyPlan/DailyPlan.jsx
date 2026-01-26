@@ -7,12 +7,15 @@ import { getUserTaskStatus, uploadTask } from "@/redux/features/tasks/task.thunk
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { getProgramById } from "@/redux/features/program/program.thunk";
+import { getClient } from "@/redux/features/client/client.thunk";
+import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function DailyPlan() {
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
+  const clientUser = useAppSelector(selectSelectedClient);
   const { tasks } = useAppSelector((state) => state.tasks);
 
   const [selectedStatus, setSelectedStatus] = useState("All Status");
@@ -21,12 +24,15 @@ export default function DailyPlan() {
   const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth()); // Current month (0-based)
   const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
   const [program, setProgram] = useState(null);
+  const [therapyPlan, setTherapyPlan] = useState(null);
   const [calendarData, setCalendarData] = useState({});
 
-  // Fetch program and tasks on mount
+  // Fetch program, therapy plan and tasks on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
+        await dispatch(getClient({ id: user._id }));
+
         if (user?.programType) {
           const programId =
             typeof user.programType === "object"
@@ -37,6 +43,7 @@ export default function DailyPlan() {
           ).unwrap();
           setProgram(programData);
         }
+
         await dispatch(getUserTaskStatus()).unwrap();
       } catch (error) {
         console.error("Error fetching daily plan data:", error);
@@ -47,6 +54,15 @@ export default function DailyPlan() {
       fetchData();
     }
   }, [dispatch, user?._id, user?.programType]);
+
+  // Set therapy plan when clientUser is populated
+  useEffect(() => {
+    if (clientUser?.therapyType && typeof clientUser.therapyType === 'object') {
+       if (clientUser.therapyType.weeks) {
+         setTherapyPlan(clientUser.therapyType);
+       }
+    }
+  }, [clientUser]);
 
   // Calculate calendar data based on tasks and program
   useEffect(() => {
@@ -80,6 +96,17 @@ export default function DailyPlan() {
         })),
       ).sort((a, b) => a.globalIndex - b.globalIndex) || [];
 
+    // Flatten therapy days if available
+    const sortedTherapyDays =
+      therapyPlan?.weeks?.flatMap((week, weekIndex) =>
+        week.days.map((day, dayIndex) => ({
+          ...day,
+          weekIndex: weekIndex + 1,
+          dayIndex: dayIndex + 1,
+          globalIndex: weekIndex * 7 + dayIndex + 1,
+        })),
+      ) || [];
+
     let programIndex = 0;
     const MAX_DAYS = 1000;
     let loopCount = 0;
@@ -88,6 +115,8 @@ export default function DailyPlan() {
     while (programIndex < sortedDays.length && loopCount < MAX_DAYS) {
       loopCount++;
       const currentPDay = sortedDays[programIndex];
+      const currentTherapyDay = sortedTherapyDays.find(d => d.globalIndex === currentPDay.globalIndex);
+      
       const dateKey = getDateKey(iteratorDate);
       const isBeforeToday = iteratorDate < today;
 
@@ -124,10 +153,11 @@ export default function DailyPlan() {
         const taskList = [];
         const workoutCount = currentPDay.exercises?.length || 0;
         const mealCount = 4;
-        const totalExpected = workoutCount + mealCount;
+        const therapyCount = currentTherapyDay?.therapies?.length || 0;
+        const totalExpected = workoutCount + mealCount + therapyCount;
 
         // Helper to process individual task items
-        const processItem = (idx, type, name) => {
+        const processItem = (idx, type, name, meta = {}) => {
           const submission = dayTasks.find(
             (t) =>
               t.exerciseIndex === idx &&
@@ -147,6 +177,7 @@ export default function DailyPlan() {
             dayIndex: currentPDay.dayIndex,
             exerciseIndex: idx,
             programId: program._id,
+            ...meta
           });
         };
 
@@ -156,6 +187,16 @@ export default function DailyPlan() {
 
         for (let i = 0; i < 4; i++) {
           processItem(100 + i, "Meal", `Meal ${i + 1}`);
+        }
+        
+        // Process Therapy Tasks
+        if (currentTherapyDay && currentTherapyDay.therapies) {
+           currentTherapyDay.therapies.forEach((therapy, idx) => {
+              processItem(idx, "Therapy", therapy.type || "Therapy Task", {
+                  notes: therapy.notes,
+                  mediaUrl: therapy.url
+              });
+           });
         }
 
         // Calculate stats
@@ -186,7 +227,6 @@ export default function DailyPlan() {
           totalExpected,
           allMissed: false,
         };
-
         // Advance to next Program Day
         programIndex++;
       } else {
@@ -211,7 +251,7 @@ export default function DailyPlan() {
     }
     
     setCalendarData(newCalendarData);
-  }, [program, tasks, user?.programStartDate]);
+  }, [program, therapyPlan, tasks, user?.programStartDate]);
 
   const handleSkipTask = async (task) => {
     if (task.type !== "Meal") return;

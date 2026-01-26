@@ -6,7 +6,7 @@ export default function DailyTaskDrawer({
   tasks,
   allMissed,
   onClose,
-  onSkip,
+  // onSkip,
   onTaskClick,
 }) {
   if (!selectedDate) return null;
