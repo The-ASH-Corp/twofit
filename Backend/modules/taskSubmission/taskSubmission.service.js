@@ -267,7 +267,7 @@ export const createTaskSubmission = async (submissionData) => {
             });
         } else {
             // Find the exercise
-            let exercise = day.exercises.find(e => e.exerciseIndex === eIndex);
+            let exercise = day.exercises.find(e => e.exerciseIndex === eIndex && e.taskType === taskType);
 
             if (exercise) {
                 if (exercise.status === 'verified') {
@@ -371,16 +371,16 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
             });
         } else {
             // Update or add each exercise
+            const targetTaskType = taskType || "Workout";
             for (const eIndex of exerciseIndices) {
                 const exerciseIndex = Number(eIndex);
-                let exercise = day.exercises.find(e => e.exerciseIndex === exerciseIndex);
-
+                let exercise = day.exercises.find(e => e.exerciseIndex === exerciseIndex && e.taskType === targetTaskType);
                 if (exercise) {
                     if (exercise.status === 'verified') {
                         throw new Error("One or more tasks already verified");
                     }
                     exercise.status = 'pending';
-                    exercise.taskType = taskType || "Workout";
+                    exercise.taskType = targetTaskType;
                     exercise.file = file || exercise.file;
                     exercise.notes = notes || exercise.notes;
                     exercise.adminComment = "";
