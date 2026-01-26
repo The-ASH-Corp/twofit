@@ -172,9 +172,7 @@ const assignedExperts = [
       {/* Today’s Task */}
       <div className="w-full flex flex-col items-center gap-4 p-4 bg-white rounded-lg">
         <div className="w-full flex justify-between items-center">
-          <h2 className="font-bold text-[16px] text-[#0A4F48]">
-            Health Details
-          </h2>
+          <h2 className="font-bold text-[16px] text-[#0A4F48]">Today’s Task</h2>
           <button>
             <img src={assets.threeDotVector} alt="dot menu" className="w-3.5" />
           </button>

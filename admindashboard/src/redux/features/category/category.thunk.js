@@ -63,6 +63,24 @@ export const updateCategories = createAsyncThunk(
   },
 );
 
+export const deleteCategory = createAsyncThunk(
+  "category/list/:id",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.delete(`category/delete/${id}`);
+      // console.log(data.data)
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || {
+          success: false,
+          message: "Failed to delete category",
+        },
+      );
+    }
+  },
+);
+
 export const getFounderCategories = createAsyncThunk(
   "category/founder/list",
   async ({ page, limit }, { rejectWithValue }) => {

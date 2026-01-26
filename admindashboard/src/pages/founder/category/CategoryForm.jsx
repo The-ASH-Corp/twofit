@@ -28,7 +28,7 @@ export default function CategoryForm() {
       const category = await dispatch(createCategory(value)).unwrap();
       if (category.success) {
         toast.success("Category created successfully");
-        navigate("/founder/category");
+        navigate("/founder/categories");
       } else {
         toast.error("Failed to create category");
       } 
