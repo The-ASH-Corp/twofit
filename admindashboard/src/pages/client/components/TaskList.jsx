@@ -14,7 +14,7 @@ import { useEffect } from "react";
 import { socket } from "@/utils/socket";
 import { selectToken } from "@/redux/features/auth/auth.selectores";
 
-export default function TaskList({ plans, therapyPlan }) {
+export default function TaskList({ plans, therapyPlan, programTitle }) {
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
   const token = useAppSelector(selectToken);
@@ -99,7 +99,11 @@ export default function TaskList({ plans, therapyPlan }) {
       };
     }) || [];
 
-  const mealTasks = ["Meal 1", "Meal 2", "Meal 3", "Meal 4"].map(
+  const isWeightLoss = programTitle?.toLowerCase().includes("weight loss");
+  const numberOfMeals = isWeightLoss ? 5 : 6;
+  const mealNames = Array.from({ length: numberOfMeals }, (_, i) => `Meal ${i + 1}`);
+
+  const mealTasks = mealNames.map(
     (mealName, index) => {
       const mealIndex = 100 + index; // Use a high index range for static meals to avoid collisions
       const submission = tasks?.find(
@@ -303,9 +307,7 @@ export default function TaskList({ plans, therapyPlan }) {
 
           <div className="flex gap-2">
             {item.type === "Meal" &&
-              (!item.submission ||
-                item.submission.status === "pending" ||
-                item.submission.status === "todo") && (
+              (!item.submission || item.submission.status === "todo") && (
                 <button
                   onClick={() => handleSkipTask(item)}
                   className="bg-gray-50 px-6 py-2 rounded-lg text-[13px] font-bold text-gray-400 hover:bg-gray-100 transition-colors"

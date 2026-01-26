@@ -151,8 +151,10 @@ export default function DailyPlan() {
       if (mapDayToDate) {
         // Build the task list for this day
         const taskList = [];
+        const isWeightLoss = program?.title?.toLowerCase().includes("weight loss");
+        const mealCount = isWeightLoss ? 5 : 6;
+
         const workoutCount = currentPDay.exercises?.length || 0;
-        const mealCount = 4;
         const therapyCount = currentTherapyDay?.therapies?.length || 0;
         const totalExpected = workoutCount + mealCount + therapyCount;
 
@@ -185,7 +187,7 @@ export default function DailyPlan() {
           processItem(idx, "Workout", ex.name || `Exercise ${idx + 1}`);
         });
 
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < mealCount; i++) {
           processItem(100 + i, "Meal", `Meal ${i + 1}`);
         }
         

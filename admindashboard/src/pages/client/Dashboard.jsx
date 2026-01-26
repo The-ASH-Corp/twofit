@@ -135,7 +135,11 @@ export default function Dashboard() {
           {/* Bottom Section: My Tasks */}
           <div className="lg:order-3 order-2">
             <h2 className="text-[#0A4F48] font-bold text-lg">My Tasks</h2>
-            <TaskList plans={program?.plan} therapyPlan={clientUser?.therapyType}/>
+            <TaskList 
+              plans={program?.plan} 
+              therapyPlan={clientUser?.therapyType}
+              programTitle={program?.title}
+            />
           </div>
 
           {/* Mobile Only: Measurements */}

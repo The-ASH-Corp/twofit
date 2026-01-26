@@ -244,7 +244,7 @@ export const getComplianceStats = async (req, res) => {
         therapyPlan = await getTherapyById(therapyId);
     }
 
-    const complianceData = await getUserComplianceStats(userId, program?.plan, therapyPlan);
+    const complianceData = await getUserComplianceStats(userId, program?.plan, therapyPlan, program?.title);
     const streakData = await calculateUserStreaks(userId);
 
     res.status(200).json({ 
