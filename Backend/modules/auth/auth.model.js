@@ -74,6 +74,11 @@ const userSchema = new mongoose.Schema(
       ref: "ProgramsList",
       required: true,
     },
+    therapyType:{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"Therapy",
+      require:true,
+    },
 
     duration: { type: Number, required: true },
 

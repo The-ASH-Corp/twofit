@@ -45,6 +45,7 @@ export const adminCreateUser = async (userData) => {
     foodPreferences: userData.foodPreference,
     profileImage: userData?.profileImage || "",
     programType: userData.programType,
+    therapyType:userData.therapyType,
     duration: userData.duration,
     programEndDate: userData.endDate,
     programStartDate: userData.startDate,

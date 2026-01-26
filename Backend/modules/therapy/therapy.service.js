@@ -6,6 +6,10 @@ export const createTherapy = async (data) => {
 
 
 
- export const getTherapyById = async (therapyId) => {
-  return await Therapy.findById(therapyId);
+ export const getAllTherapy = async () => {
+  return await Therapy.find();
 };
+
+export const getTherapyById=async(therapyId)=>{
+  return await Therapy.findById(therapyId)
+}

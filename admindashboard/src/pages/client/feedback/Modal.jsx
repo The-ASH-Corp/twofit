@@ -1,24 +1,38 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
-import { assets } from "@/assets/asset";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useAppSelector } from "@/redux/store/hooks";
 import { useDispatch } from "react-redux";
 import { createFeedback } from "@/redux/features/client/client.thunk";
 import { toast } from "react-toastify";
 
-export default function Modal({ expert, onClose }) {
+export default function Modal({ expert, onClose, fetchFeedbackData }) {
   const dispatch = useDispatch();
   const [rating, setRating] = useState(0);
   const [feedback, setFeedback] = useState("");
   const user = useAppSelector(selectUser);
 
   const handleSubmit = async () => {
-    const values = { expertId: expert._id, rating, feedback, userId: user._id };
-    const response = await dispatch(createFeedback(values));
-    if (response?.payload?.success) {
-      onClose();
+    try {
+      const values = {
+        expertId: expert._id,
+        rating,
+        feedback,
+        userId: user._id,
+      };
+
+      await dispatch(createFeedback(values)).unwrap();
+
+      fetchFeedbackData();
       toast.success("Feedback submitted successfully");
+    } catch (error) {
+      toast.error(
+        error || "Failed to submit feedback",
+      );
+    } finally {
+      onClose();
+      setRating(0);
+      setFeedback("");
     }
   };
 

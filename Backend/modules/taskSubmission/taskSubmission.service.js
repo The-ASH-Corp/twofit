@@ -42,34 +42,42 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
     if (!daySubmission) return false;
 
     // Filter for verified OR skipped
-    const completedTasks = daySubmission.exercises.filter(ex =>
-        ex.status === "verified" || ex.status === "skipped"
-    );
+    // Filter for eligible exercises
+    const completedTasks = daySubmission.exercises.filter(ex => {
+        if (ex.taskType === "Workout") {
+            // Workouts: Verify, Pending. (Skipped/Rejected not allowed to count)
+            return ex.status === "verified" || ex.status === "pending";
+        }
+        // Others: Verify, Pending, Skipped, Rejected all count towards "completion" of the list check
+        return ["verified", "pending", "skipped", "rejected"].includes(ex.status);
+    });
 
     const completedCount = completedTasks.length;
 
     // ADDITIONAL CHECK: Workouts CANNOT be skipped.
     // Ensure all workout tasks are strictly "verified" (not skipped).
- 
+
     const hasSkippedWorkout = completedTasks.some(ex => ex.taskType === "Workout" && ex.status === "skipped");
     if (hasSkippedWorkout) return false; // Strict rule: Workouts cannot be skipped.
 
     if (completedCount >= totalExercises) {
         if (user.currentGlobalDay === Number(globalDayIndex)) {
             // Check if we already have a completion time for this day? 
-            user.lastDayCompletionTime = new Date(); // Record completion time
-            await user.save();
+            if (!user.lastDayCompletionTime) {
+                user.lastDayCompletionTime = new Date(); // Record completion time
+                await user.save();
 
-            // Notify the client that they've completed the day
-            try {
-                const io = getIO();
-                // Send "day_completed" instead of "day_advanced"
-                io.to(userId.toString()).emit("day_completed", {
-                    completedDay: globalDayIndex,
-                    nextDayUnlockTime: new Date(new Date().setHours(24, 0, 0, 0)) // Midnight next day
-                });
-            } catch (socketError) {
-                console.error("Socket notification for day completion failed:", socketError.message);
+                // Notify the client that they've completed the day
+                try {
+                    const io = getIO();
+                    // Send "day_completed" instead of "day_advanced"
+                    io.to(userId.toString()).emit("day_completed", {
+                        completedDay: globalDayIndex,
+                        nextDayUnlockTime: new Date(new Date().setHours(24, 0, 0, 0)) // Midnight next day
+                    });
+                } catch (socketError) {
+                    console.error("Socket notification for day completion failed:", socketError.message);
+                }
             }
 
             return true;
@@ -91,6 +99,31 @@ export const attemptDayAdvancement = async (userId) => {
 
     if (new Date() >= unlockDate) {
         // Unlock time passed! Advance the day.
+        const previousDay = user.currentGlobalDay;
+
+        // Auto-verify all pending tasks from the completed day
+        const userSubmission = await TaskSubmission.findOne({ userId });
+        if (userSubmission) {
+            const completedDaySubmission = userSubmission.dailySubmissions.find(
+                d => d.globalDayIndex === previousDay
+            );
+
+            if (completedDaySubmission) {
+                let hasChanges = false;
+                completedDaySubmission.exercises.forEach(ex => {
+                    if (ex.status === 'pending') {
+                        ex.status = 'verified';
+                        ex.updatedAt = Date.now();
+                        hasChanges = true;
+                    }
+                });
+
+                if (hasChanges) {
+                    await userSubmission.save();
+                }
+            }
+        }
+
         user.currentGlobalDay += 1;
         user.lastDayCompletionTime = null; // Clear completion time reset for next day cycle
         await user.save();
@@ -264,10 +297,8 @@ export const createTaskSubmission = async (submissionData) => {
         await userSubmission.save();
     }
 
-    // If SKIPPED, we check if we can advance the day
-    if (status === "skipped") {
-        await checkAndAdvanceDay(userId, gIndex);
-    }
+    // Check if we can complete the day (regardless of status: skipped, verified, or pending)
+    await checkAndAdvanceDay(userId, gIndex);
 
     // Get the specific submission object for socket/response (flattened format)
     const day = userSubmission.dailySubmissions.find(d => d.globalDayIndex === gIndex);
@@ -375,6 +406,9 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
 
     // Notify Experts and Admins via Socket
     await notifyExpertsAndAdmins(userId, userSubmission._id, "new_task_submission");
+
+    // Check if day is complete
+    await checkAndAdvanceDay(userId, gIndex);
 
     return { success: true, message: "All workout tasks submitted successfully" };
 };
@@ -527,19 +561,24 @@ export const rejectTaskSubmission = async (submissionId, comment) => {
         }
     });
 
-    // Reject ALL tasks for this day
+    // Reject ONLY the specific task
     if (foundGlobalDayIndex !== null) {
         userSubmission.dailySubmissions.forEach(day => {
             if (day.globalDayIndex === foundGlobalDayIndex) {
-                day.exercises.forEach(ex => {
-                    if (ex.status !== 'verified') {
-                        ex.status = "rejected";
-                        ex.adminComment = ex._id.toString() === submissionId
-                            ? (comment || "Rejected by expert")
-                            : "Entire day rejected due to one task failure. Please resubmit all tasks for this day.";
-                        ex.updatedAt = Date.now();
+                const ex = day.exercises.find(e => e._id.toString() === submissionId);
+                if (ex && ex.status !== 'verified') {
+                    ex.status = "rejected";
+                    ex.adminComment = comment || "Rejected by expert";
+                    ex.updatedAt = Date.now();
+
+                    // If it's a Workout, we must revoke day completion (cooldown) to force resubmission
+                    if (ex.taskType === "Workout") {
+                       
+                        User.findByIdAndUpdate(userSubmission.userId, {
+                            $unset: { lastDayCompletionTime: 1 }
+                        }).exec();
                     }
-                });
+                }
             }
         });
     }
@@ -562,7 +601,7 @@ export const rejectTaskSubmission = async (submissionId, comment) => {
         console.error("Socket notification failed:", socketError.message);
     }
 
-    return { success: true, message: "Task rejected - entire day must be resubmitted" };
+    return { success: true, message: "Task rejected" };
 };
 
 export const getUserTaskStatusByUserId = async (userId, globalDayIndex) => {

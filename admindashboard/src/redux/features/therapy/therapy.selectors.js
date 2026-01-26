@@ -1,3 +1,13 @@
-// export const selectAllTherapies = (state) => state.therapy.allTherapies;
-// export const selectTherapyStatus = (state) => state.therapy.status;
-// export const selectTherapyError = (state) => state.therapy.error;
+export const selectTherapyState = (state) => state.therapy;
+
+export const selectTherapyPlans = (state) =>
+  state.therapy?.plans || [];
+
+export const selectTherapyPlan = (state) =>
+  state.therapy?.plan || null;
+
+export const selectTherapyLoading = (state) =>
+  state.therapy?.loading;
+
+export const selectTherapyError = (state) =>
+  state.therapy?.error;

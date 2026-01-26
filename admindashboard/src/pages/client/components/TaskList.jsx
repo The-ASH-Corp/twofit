@@ -4,13 +4,16 @@ import WorkoutTasksModal from "./WorkoutTasksModal";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { getUserTaskStatus } from "@/redux/features/tasks/task.thunk";
+import {
+  getUserTaskStatus,
+  uploadTask,
+} from "@/redux/features/tasks/task.thunk";
 import { refreshProfile } from "@/redux/features/auth/auth.thunk";
 import { useEffect } from "react";
 import { socket } from "@/utils/socket";
 import { selectToken } from "@/redux/features/auth/auth.selectores";
 
-export default function TaskList({ plans }) {
+export default function TaskList({ plans, therapyDays }) {
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
   const token = useAppSelector(selectToken);
@@ -20,6 +23,10 @@ export default function TaskList({ plans }) {
   const [selectedTask, setSelectedTask] = useState(null);
   const [isWorkoutModalOpen, setIsWorkoutModalOpen] = useState(false);
   const [workoutTasks, setWorkoutTasks] = useState([]);
+  const [skipConfirmation, setSkipConfirmation] = useState({
+    isOpen: false,
+    task: null,
+  });
 
   const currentGlobalDay = user?.currentGlobalDay || 1;
 
@@ -112,17 +119,46 @@ export default function TaskList({ plans }) {
       };
     },
   );
+  const todayTherapy =
+    therapyDays?.find((day) => day.name === `Day ${currentGlobalDay}`) || null;
+  const therapyTasks =
+    todayTherapy?.therapies?.map((therapy, index) => {
+      const submission = tasks?.find(
+        (t) =>
+          t.globalDayIndex === currentGlobalDay &&
+          t.exerciseIndex === index &&
+          t.taskType === "Therapy",
+      );
+
+      return {
+        name: therapy.type,
+        type: "Therapy",
+        notes: therapy.notes,
+        mediaUrl: therapy.url,
+        mediaName: therapy.mediaName,
+        weekIndex: 1,
+        dayIndex: currentGlobalDay,
+        globalDayIndex: currentGlobalDay,
+        exerciseIndex: index,
+        status: submission?.status || "todo",
+        submission,
+      };
+    }) || [];
 
   // Group workout tasks into a single item
   const groupedTasks = [];
-  
+
   if (workoutExercises.length > 0) {
     // Get overall status for all workout tasks
     const getWorkoutOverallStatus = () => {
-      const allVerified = workoutExercises.every(ex => ex.status === "verified");
-      const anyPending = workoutExercises.some(ex => ex.status === "pending");
-      const anyRejected = workoutExercises.some(ex => ex.status === "rejected");
-      
+      const allVerified = workoutExercises.every(
+        (ex) => ex.status === "verified",
+      );
+      const anyPending = workoutExercises.some((ex) => ex.status === "pending");
+      const anyRejected = workoutExercises.some(
+        (ex) => ex.status === "rejected",
+      );
+
       if (allVerified) return "verified";
       if (anyPending) return "pending";
       if (anyRejected) return "rejected";
@@ -130,7 +166,7 @@ export default function TaskList({ plans }) {
     };
 
     const workoutOverallStatus = getWorkoutOverallStatus();
-    const workoutSubmission = workoutExercises.find(ex => ex.submission);
+    const workoutSubmission = workoutExercises.find((ex) => ex.submission);
 
     groupedTasks.push({
       name: "Workout",
@@ -148,6 +184,37 @@ export default function TaskList({ plans }) {
 
   // Add meal tasks individually
   groupedTasks.push(...mealTasks);
+  groupedTasks.push(...therapyTasks);
+
+
+  const handleSkipTask = (task) => {
+    setSkipConfirmation({ isOpen: true, task });
+  };
+
+  const confirmSkip = async () => {
+    const task = skipConfirmation.task;
+    if (!task) return;
+
+    const formData = new FormData();
+    formData.append("programId", task.programId); // Ensure programId is available in task object
+    formData.append("weekIndex", task.weekIndex);
+    formData.append("dayIndex", task.dayIndex);
+    formData.append("globalDayIndex", task.globalDayIndex);
+    formData.append("exerciseIndex", task.exerciseIndex);
+    formData.append("taskType", "Meal");
+    formData.append("status", "skipped");
+    formData.append("notes", "Skipped by user");
+
+    try {
+      await dispatch(uploadTask(formData)).unwrap();
+      // Refresh tasks handled by socket or manual refresh
+      dispatch(getUserTaskStatus());
+      setSkipConfirmation({ isOpen: false, task: null });
+    } catch (error) {
+      console.error("Failed to skip task:", error);
+      alert("Failed to skip task: " + error);
+    }
+  };
 
   return (
     <div className="space-y-3 mt-4">
@@ -190,9 +257,17 @@ export default function TaskList({ plans }) {
           </div>
 
           <div className="flex gap-2">
-            <button className="bg-gray-50 px-6 py-2 rounded-lg text-[13px] font-bold text-gray-400 hover:bg-gray-100 transition-colors">
-              Skip
-            </button>
+            {item.type === "Meal" &&
+              (!item.submission ||
+                item.submission.status === "pending" ||
+                item.submission.status === "todo") && (
+                <button
+                  onClick={() => handleSkipTask(item)}
+                  className="bg-gray-50 px-6 py-2 rounded-lg text-[13px] font-bold text-gray-400 hover:bg-gray-100 transition-colors"
+                >
+                  Skip
+                </button>
+              )}
             <button
               onClick={() => {
                 if (item.type === "WorkoutGroup") {
@@ -225,6 +300,37 @@ export default function TaskList({ plans }) {
           onClose={() => setIsWorkoutModalOpen(false)}
           onSuccess={() => dispatch(getUserTaskStatus())}
         />
+      )}
+
+      {/* Skip Confirmation Modal */}
+      {skipConfirmation.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl transform transition-all scale-100">
+            <h3 className="text-lg font-bold text-[#0A4F48] mb-2">
+              Skip this meal?
+            </h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Are you sure you want to skip this meal? This action cannot be
+              undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() =>
+                  setSkipConfirmation({ isOpen: false, task: null })
+                }
+                className="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmSkip}
+                className="flex-1 px-4 py-2 rounded-lg bg-[#0A4F48] text-white font-medium hover:bg-[#083d38] transition-colors"
+              >
+                Confirm Skip
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

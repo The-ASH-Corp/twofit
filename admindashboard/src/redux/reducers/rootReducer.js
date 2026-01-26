@@ -8,7 +8,7 @@ import adminReducer from "../features/admins/admin.slice"
 
 import programReducer from "../features/program/program.slice"
 import categoryReducer from "../features/category/category.slice"
-// import therapyReducer from "../features/therapy/therapy.slice"
+import therapyReducer from "../features/therapy/therapy.slice"
 import headReducer from "../features/head/head.slice"
 import workoutReducer from "../features/workout/workout.slice"
 import payrollReducer from "../features/payroll/payroll.slice"
@@ -24,7 +24,7 @@ export default combineReducers({
   category: categoryReducer,
   chat: chatReducer,
   admin: adminReducer,
-  // therapy: therapyReducer,
+  therapy: therapyReducer,
   head: headReducer,
   workout: workoutReducer,
   payroll: payrollReducer,

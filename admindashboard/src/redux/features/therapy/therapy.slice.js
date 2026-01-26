@@ -1,48 +1,56 @@
-// import { createSlice } from "@reduxjs/toolkit" ;
-// import  { createTherapy, getAllTherapies } from "./therapy.thunk";
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  fetchTherapyPlans,
+  getTherapyPlanById,
+} from "./therapy.thunk";
 
+const initialState = {
+  plans: [],        // all therapy plans (for dropdown, listing)
+  plan: null,       // single therapy plan (for client dashboard)
+  loading: false,
+  error: null,
+};
 
-// const initialState = {
-//     allTherapies: [],
-//     therapies: null,
-//     status: "idle", 
-//     error: null,
-// }
+const therapySlice = createSlice({
+  name: "therapy",
+  initialState,
+  reducers: {
+    clearTherapyPlan(state) {
+      state.plan = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
 
-// const therapySlice = createSlice({
-//     name: "therapy",
-//     initialState,
-//     reducers: {
-//         clearTherapyError(state) {
-//             state.error = null;
-//         },
-//     },
-//     extraReducers: (builder) => {
-//         builder
-//         .addCase(createTherapy.pending, (state) => {
-//             state.status = "loading";
-//         })
-//         .addCase(createTherapy.fulfilled, (state, action) => {
-//             state.status = "succeeded";
-//             state.therapies = action.payload;
-//         })
-//         .addCase(createTherapy.rejected, (state, action) => {
-//             state.status = "failed";
-//             state.error = action.payload;
-//         })
-//         .addCase(getAllTherapies.pending, (state) => {
-//             state.status = "loading";
-//         })
-//         .addCase(getAllTherapies.fulfilled, (state, action) => {
-//             state.status = "succeeded";
-//             state.allTherapies = action.payload;
-//         })
-//         .addCase(getAllTherapies.rejected, (state, action) => {
-//             state.status = "failed";
-//             state.error = action.payload;
-//         })
-//     }
-// })
+      
+      .addCase(fetchTherapyPlans.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTherapyPlans.fulfilled, (state, action) => {
+        state.loading = false;
+        state.plans = action.payload?.data || [];
+      })
+      .addCase(fetchTherapyPlans.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error?.message;
+      })
 
-// export const { clearTherapyError } = therapySlice.actions;
-// export default therapySlice.reducer;
+      
+       .addCase(getTherapyPlanById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getTherapyPlanById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.plan = action.payload?.data || null;
+      })
+      .addCase(getTherapyPlanById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error?.message;
+      });
+  },
+});
+
+export const { clearTherapyPlan } = therapySlice.actions;
+export default therapySlice.reducer;
