@@ -148,3 +148,82 @@ export const getUserComplianceStats = async (userId, programPlan) => {
         };
     }
 };
+
+export const calculateUserStreaks = async (userId) => {
+    try {
+        const userSubmission = await TaskSubmission.findOne({ userId });
+        if (!userSubmission) return { activeStreak: 0, longestStreak: 0 };
+
+        // Get all dates with at least one verified task
+        const activeDates = new Set();
+        
+        userSubmission.dailySubmissions.forEach(day => {
+            day.exercises.forEach(ex => {
+                if (ex.status === 'verified' && ex.updatedAt) {
+                    const dateStr = new Date(ex.updatedAt).toISOString().split('T')[0];
+                    activeDates.add(dateStr);
+                }
+            });
+        });
+
+        if (activeDates.size === 0) return { activeStreak: 0, longestStreak: 0 };
+
+        const sortedDates = Array.from(activeDates).sort();
+
+        let currentStreak = 0;
+        let longestStreak = 0;
+        let prevDate = null;
+        let streakEnd = null;
+
+        // Logic: Iterate sorted dates. If diff is 1 day, increment streak. Else reset.
+        for (const dateStr of sortedDates) {
+            const currentDate = new Date(dateStr);
+            currentDate.setHours(0, 0, 0, 0); // Normalize
+
+            if (prevDate) {
+                const diffTime = Math.abs(currentDate - prevDate);
+                const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays === 1) {
+                    currentStreak++;
+                } else {
+                    currentStreak = 1;
+                }
+            } else {
+                currentStreak = 1;
+            }
+
+            if (currentStreak > longestStreak) {
+                longestStreak = currentStreak;
+            }
+            
+            streakEnd = dateStr;
+            prevDate = currentDate;
+        }
+
+        // Calculate Active Streak
+        
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+        
+        let activeStreak = 0;
+        
+        // Check if the very last active date was today or yesterday
+
+        if (streakEnd === todayStr || streakEnd === yesterdayStr) {
+             activeStreak = currentStreak;
+        } else {
+            activeStreak = 0;
+        }
+
+        return { activeStreak, longestStreak };
+
+    } catch (error) {
+        console.error("Error calculating streaks:", error);
+        return { activeStreak: 0, longestStreak: 0 };
+    }
+};

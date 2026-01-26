@@ -70,7 +70,7 @@ export default function Progress() {
     },
     {
       title: "Active Streak",
-      value: "12 Days",
+      value: `${complianceData?.streaks?.activeStreak || 0} Days`,
       icon: assets.website,
       bg: "#F4DBC7",
       iconColor: false,
@@ -81,7 +81,7 @@ export default function Progress() {
     {
       title: "Diet",
       missed: `Missed Diet:${complianceData?.stats?.missedCount + complianceData?.stats?.skippedCount}`,
-      percentage: `${((complianceData?.stats?.missedCount + complianceData?.stats?.skippedCount)*complianceData?.stats?.expectedMeals)/100}%`,
+      percentage: `${((complianceData?.stats?.missedCount + complianceData?.stats?.skippedCount) * complianceData?.stats?.expectedMeals) / 100}%`,
       color: "#0A4F48",
     },
     {
@@ -323,13 +323,17 @@ export default function Progress() {
                 <p className="text-[13px] font-medium text-gray-700">
                   Active Streak
                 </p>
-                <p className="text-[#0A4F48] font-bold text-[15px]">12 Days</p>
+                <p className="text-[#0A4F48] font-bold text-[15px]">
+                  {complianceData?.streaks?.activeStreak} Days
+                </p>
               </div>
               <div className="bg-gray-50 rounded-xl p-4 flex justify-between items-center">
                 <p className="text-[13px] font-medium text-gray-700">
                   Longest Streak
                 </p>
-                <p className="font-bold text-[15px] text-gray-800">16 Days</p>
+                <p className="font-bold text-[15px] text-gray-800">
+                  {complianceData?.streaks?.longestStreak} Days
+                </p>
               </div>
             </div>
           </div>
@@ -340,7 +344,9 @@ export default function Progress() {
               <h3 className="text-[#0A4F48] font-bold text-[16px]">
                 Compliance
               </h3>
-              <span className="text-[18px] font-bold text-gray-800">{complianceData?.overall}%</span>
+              <span className="text-[18px] font-bold text-gray-800">
+                {complianceData?.overall}%
+              </span>
             </div>
             <div className="space-y-3">
               {compliance.map((item, i) => (
@@ -472,7 +478,9 @@ export default function Progress() {
             <h3 className="text-[#0A4F48] font-semibold text-[14px]">
               Compliance
             </h3>
-            <span className="text-[16px] font-bold text-gray-800">{complianceData?.overall}%</span>
+            <span className="text-[16px] font-bold text-gray-800">
+              {complianceData?.overall}%
+            </span>
           </div>
           <div className="space-y-2">
             {compliance.map((item, i) => (

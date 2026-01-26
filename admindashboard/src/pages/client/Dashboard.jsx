@@ -101,10 +101,11 @@ const therapyDays =
               />
               <KpiCard
                 title="Active Streak"
-                value="12 Days"
+                value={`${complianceData?.streaks?.activeStreak || 0} Days`}
                 icon={assets.website}
                 bg="#F4DBC7"
               />
+           
             </div>
           </div>
 
