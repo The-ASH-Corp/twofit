@@ -99,11 +99,11 @@ export default function Progress() {
   ];
 
   const measurementsData = {
-    labels: ["W 1", "W 2", "W 3", "W 4"],
+    labels: user?.measurementHistory?.map((_, i) => `W ${i + 1}`) || [],
     datasets: [
       {
         label: "Chest",
-        data: [96, 94, 92, 95],
+        data: user?.measurementHistory?.map((h) => h.chest) || [],
         backgroundColor: "#F4DBC7",
         borderRadius: {
           topLeft: 6,
@@ -115,7 +115,7 @@ export default function Progress() {
       },
       {
         label: "Waist",
-        data: [85, 82, 80, 78],
+        data: user?.measurementHistory?.map((h) => h.waist) || [],
         backgroundColor: "#E8F5F3",
         borderRadius: {
           topLeft: 6,
@@ -126,8 +126,8 @@ export default function Progress() {
         barThickness: 18,
       },
       {
-        label: "Hips",
-        data: [105, 102, 100, 98],
+        label: "Hip",
+        data: user?.measurementHistory?.map((h) => h.hip) || [],
         backgroundColor: "#0A4F48",
         borderRadius: {
           topLeft: 6,
@@ -181,7 +181,9 @@ export default function Progress() {
           },
           afterBody: (tooltipItems) => {
             const current = tooltipItems[0].parsed.y;
-            const start = 120; // You can make this dynamic based on your data
+            const start = user.measurementHistory[0][
+              tooltipItems[0].dataset.label.toLowerCase()
+            ];
             const change = current - start;
             return [
               `Current         ${current} cm`,
@@ -219,6 +221,8 @@ export default function Progress() {
       },
     },
   };
+  const lastWeightUpdateDate = user.measurementHistory.at(-1)?.date || "";
+  const lastMeasurementUpdateDate = user.weightHistory.at(-1)?.date || "";
 
   return (
     <>
@@ -275,15 +279,20 @@ export default function Progress() {
                 <h3 className="text-[#0A4F48] font-bold text-[15px]">
                   Weight Progress
                 </h3>
-                <button
-                  className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-[#083d38] transition-colors"
-                  onClick={() => {
-                    setIsOpen(true);
-                    setPanelType("weight");
-                  }}
-                >
-                  Update
-                </button>
+                {!lastWeightUpdateDate ||
+                (new Date() - new Date(lastWeightUpdateDate)) /
+                  (1000 * 60 * 60 * 24) >=
+                  7 ? (
+                  <button
+                    className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-[#083d38] transition-colors"
+                    onClick={() => {
+                      setIsOpen(true);
+                      setPanelType("weight");
+                    }}
+                  >
+                    Update
+                  </button>
+                ) : null}
               </div>
               <ProgressChart />
             </div>
@@ -294,15 +303,20 @@ export default function Progress() {
                 <h3 className="text-[#0A4F48] font-bold text-[15px]">
                   Measurements
                 </h3>
-                <button
-                  className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-[#083d38] transition-colors"
-                  onClick={() => {
-                    setIsOpen(true);
-                    setPanelType("measurement");
-                  }}
-                >
-                  Update
-                </button>
+                {!lastMeasurementUpdateDate ||
+                (new Date() - new Date(lastMeasurementUpdateDate)) /
+                  (1000 * 60 * 60 * 24) >=
+                  7 ? (
+                  <button
+                    className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-[#083d38] transition-colors"
+                    onClick={() => {
+                      setIsOpen(true);
+                      setPanelType("measurement");
+                    }}
+                  >
+                    Update
+                  </button>
+                ) : null}
               </div>
               <div className="h-[280px] w-full">
                 <Bar data={measurementsData} options={chartOptions} />
@@ -417,15 +431,20 @@ export default function Progress() {
             <h3 className="text-[#0A4F48] font-semibold text-[14px]">
               Weight Progress
             </h3>
-            <button
-              onClick={() => {
-                setIsOpen(true);
-                setPanelType("weight");
-              }}
-              className="bg-[#0A4F48] text-white px-3 py-1.5 rounded-lg text-[12px] font-medium"
-            >
-              Update
-            </button>
+            {!lastWeightUpdateDate ||
+            (new Date() - new Date(lastWeightUpdateDate)) /
+              (1000 * 60 * 60 * 24) >=
+              7 ? (
+              <button
+                onClick={() => {
+                  setIsOpen(true);
+                  setPanelType("weight");
+                }}
+                className="bg-[#0A4F48] text-white px-3 py-1.5 rounded-lg text-[12px] font-medium"
+              >
+                Update
+              </button>
+            ) : null}
           </div>
           <ProgressChart />
         </div>
@@ -436,15 +455,20 @@ export default function Progress() {
             <h3 className="text-[#0A4F48] font-semibold text-[14px]">
               Measurements
             </h3>
-            <button
-              onClick={() => {
-                setIsOpen(true);
-                setPanelType("measurement");
-              }}
-              className="bg-[#0A4F48] text-white px-3 py-1.5 rounded-lg text-[12px] font-medium"
-            >
-              Update
-            </button>
+            {!lastMeasurementUpdateDate ||
+            (new Date() - new Date(lastMeasurementUpdateDate)) /
+              (1000 * 60 * 60 * 24) >=
+              7 ? (
+              <button
+                onClick={() => {
+                  setIsOpen(true);
+                  setPanelType("measurement");
+                }}
+                className="bg-[#0A4F48] text-white px-3 py-1.5 rounded-lg text-[12px] font-medium"
+              >
+                Update
+              </button>
+            ) : null}
           </div>
           <div className="h-[220px] w-full">
             <Bar data={measurementsData} options={chartOptions} />
@@ -461,13 +485,17 @@ export default function Progress() {
               <p className="text-[12px] font-medium text-gray-700">
                 Active Streak
               </p>
-              <p className="text-[#0A4F48] font-bold text-[14px]">12 Days</p>
+              <p className="text-[#0A4F48] font-bold text-[14px]">
+                {complianceData?.streaks?.activeStreak} Days
+              </p>
             </div>
             <div className="bg-gray-50 rounded-lg p-3 flex justify-between items-center">
               <p className="text-[12px] font-medium text-gray-700">
                 Longest Streak
               </p>
-              <p className="font-bold text-[14px] text-gray-800">16 Days</p>
+              <p className="font-bold text-[14px] text-gray-800">
+                {complianceData?.streaks?.longestStreak} Days
+              </p>
             </div>
           </div>
         </div>
@@ -486,8 +514,8 @@ export default function Progress() {
             {compliance.map((item, i) => (
               <div key={i} className="relative bg-gray-50 rounded-lg p-3 pl-4">
                 <div
-                  className="absolute left-0 top-0 w-1 h-full rounded-l-lg"
-                  style={{ background: item.color }}
+                  className="absolute left-0 top-0 w-1 h-full rounded-l-lg "
+                  style={{ background: item.color, width: item.percentage }}
                 />
                 <div className="flex items-center justify-between">
                   <p className="text-[12px] font-medium text-gray-700">

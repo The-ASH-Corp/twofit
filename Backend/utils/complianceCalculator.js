@@ -1,7 +1,7 @@
 import TaskSubmission from "../modules/taskSubmission/taskSubmission.model.js";
 import User from "../modules/auth/auth.model.js";
 
-export const getUserComplianceStats = async (userId, programPlan, therapyPlan = null) => {
+export const getUserComplianceStats = async (userId, programPlan, therapyPlan = null, programTitle = "") => {
     try {
         const userSubmission = await TaskSubmission.findOne({ userId });
         
@@ -36,8 +36,11 @@ export const getUserComplianceStats = async (userId, programPlan, therapyPlan = 
         ) || [];
 
         // Count expected tasks
+        const isWeightLoss = programTitle?.toLowerCase().includes("weight loss");
+        const mealCountPerDay = isWeightLoss ? 5 : 6;
+
         let expectedWorkouts = 0;
-        let expectedMeals = 4 * totalDays; // 4 meals per day
+        let expectedMeals = mealCountPerDay * totalDays;
         let expectedTherapy = 0;
 
         daysWithPlan.forEach(day => {
@@ -103,7 +106,7 @@ export const getUserComplianceStats = async (userId, programPlan, therapyPlan = 
             const therapyDayData = daysWithTherapy.find(d => d.globalIndex === dayIndex);
             const daySubmission = userSubmission.dailySubmissions.find(d => d.globalDayIndex === dayIndex);
 
-            const expectedForDay = (dayData?.exercises.length || 0) + 4; // exercises + 4 meals
+            const expectedForDay = (dayData?.exercises.length || 0) + mealCountPerDay; // exercises + mealCount meals
             let completedForDay = 0;
 
             if (daySubmission) {
@@ -122,7 +125,7 @@ export const getUserComplianceStats = async (userId, programPlan, therapyPlan = 
             ).length || 0;
 
             const expectedWorkoutForDay = dayData?.exercises.filter(ex => !ex.type || ex.type === 'Workout').length || 0;
-            const expectedMealForDay = 4;
+            const expectedMealForDay = mealCountPerDay;
             const expectedTherapyFromPlan = dayData?.exercises.filter(ex => ex.type === 'Therapy').length || 0;
             const expectedTherapyFromTherapyPlan = therapyDayData?.therapies.length || 0;
             const expectedTherapyForDay = expectedTherapyFromPlan + expectedTherapyFromTherapyPlan;
