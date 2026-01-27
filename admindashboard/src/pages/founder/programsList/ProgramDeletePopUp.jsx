@@ -1,28 +1,26 @@
-import { deleteCategory } from '@/redux/features/category/category.thunk';
+import { deleteProgram } from '@/redux/features/program/program.thunk';
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
-const DeletePopUp = () => {
+const ProgramDeletePopUp = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const [errorMessage, setErrorMessage] = useState(null);
 
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const { id } = useParams();
-      const [errorMessage, setErrorMessage] = useState(null);
-    
-
-      const handleDelete = async () => {
-        // console.log("Delete ID:", row.id);
-        try {
-          await dispatch(deleteCategory({ id })).unwrap();
-          toast.success("Category deleted successfully");
-          navigate("/founder/categories");
-        } catch (error) {
-          setErrorMessage(error.message);
-          toast.error(error.message);
-        }
-      };
+  const handleDelete = async () => {
+    // console.log("Delete ID:", row.id);
+    try {
+      await dispatch(deleteProgram({ id })).unwrap();
+      toast.success("program deleted successfully");
+      navigate("/founder/programs");
+    } catch (error) {
+      setErrorMessage(error.message)
+      toast.error(error.message);
+    }
+  };
   return (
     <>
       {/* Modal */}
@@ -33,7 +31,7 @@ const DeletePopUp = () => {
           onClick={() => navigate(-1)}
         ></div>
         <div className="absolute z-40 bg-white rounded-lg w-80 p-5 shadow-xl">
-          <h3 className="text-lg font-semibold mb-2">Delete Category?</h3>
+          <h3 className="text-lg font-semibold mb-2">Delete program?</h3>
 
           <p className="text-sm text-gray-600 mb-4">
             {errorMessage ? errorMessage : "This action cannot be undone."}
@@ -60,6 +58,6 @@ const DeletePopUp = () => {
       </div>
     </>
   );
-};
+}
 
-export default DeletePopUp
+export default ProgramDeletePopUp

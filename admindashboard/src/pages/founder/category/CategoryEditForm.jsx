@@ -16,12 +16,22 @@ const CategoryEditForm = () => {
       fields: [
         { name: "name", label: "Category Name", type: "text" },
         { name: "programLimit", label: "Max Program Limit", type: "number" },
+        {
+          name: "status",
+          label: "Status",
+          type: "select",
+          options: [
+            { label: "Draft", value: "Draft" },
+            { label: "Published", value: "Published" },
+          ],
+        },
       ],
     },
   ];
 
   const dispatch = useDispatch();
   const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
       if (id) {
@@ -35,13 +45,16 @@ const CategoryEditForm = () => {
 
 
 
+
+
   const initialValues = {
     name: category?.name,
     programLimit: category?.programLimit,
+    status: category?.status
   };
 
 //   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  
 
   const handelSubmit = async (value) => {
     try {
@@ -50,12 +63,13 @@ const CategoryEditForm = () => {
       ).unwrap();
       if (category.success) {
         toast.success("Category updated successfully");
-        navigate("/founder/category");
+        navigate("/founder/categories");
       } else {
         toast.error("Failed to create category");
       }
     } catch (error) {
-      console.error("Category updating failed:", error);
+      // console.log(error)
+      toast.error(`Category updating failed: ${error}`);
     }
   };
 
