@@ -14,7 +14,7 @@ export const getUserComplianceStats = async (userId, programPlan, therapyPlan = 
                 weeklyData: []
             };
         }
-
+console.log(programPlan?.duration)
         // Calculate total expected tasks per type
         const totalDays = programPlan.duration.split(" ")[0] || 0;
         const daysWithPlan = programPlan.weeks?.flatMap((week, weekIndex) =>
