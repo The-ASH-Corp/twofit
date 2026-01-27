@@ -118,7 +118,7 @@ export default function ExpertForm() {
       fields: [
         selectedRole === "Therapist"
           ? {
-              name: "chooseProgram",
+              name: "chooseTherapy",
               label: "Choose Therapy",
               type: "multiple",
               options: therapy?.map((thr) => ({
@@ -221,10 +221,12 @@ export default function ExpertForm() {
     autoSendGuide: false,
     automatedReminder: false,
     chooseProgram: user?.program || "",
+    chooseTherapy:user?.therapy || "",
     certifications: null,
   };
 
   const handleCoachCreation = async (values) => {
+    console.log(values)
     try {
       const formData = new FormData();
 
