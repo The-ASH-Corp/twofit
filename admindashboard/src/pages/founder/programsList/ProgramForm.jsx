@@ -57,8 +57,8 @@ export default function ProgramForm() {
           label: "Status",
           type: "select",
           options: [
-            { label: "Draft", value: "draft" },
-            { label: "Published", value: "published" },
+            { label: "Draft", value: "Draft" },
+            { label: "Published", value: "Published" },
           ],
         },
       ],

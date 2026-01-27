@@ -1,10 +1,10 @@
-import { categoryModel } from "./category.model.js"
+import { categoryModel } from "./category.model.js";
 import { HeadsModel } from "../Heads/heads.modal.js";
 import ProgramModel from "../allPrograms/allPrograma.model.js";
 import mongoose from "mongoose";
 
-export const createCategory= async (data)=>{
-    try {
+export const createCategory = async (data) => {
+  try {
     if (!data?.name) {
       throw new Error("Category name is required");
     }
@@ -16,28 +16,28 @@ export const createCategory= async (data)=>{
     if (exists) {
       throw new Error("Category already exists");
     }
-   return await categoryModel.create(data)
-    } catch (error) {
-    throw error;
-  }
-}
-
-export const getAllCategory = async (page, limit) => {
-  try {
-    const skip = (page - 1) * limit;
-    const totalCount = await categoryModel.countDocuments()
-    const category =  await categoryModel.find().skip(skip).limit(limit)
-     return {
-      category,
-      totalCount
-     }
+    return await categoryModel.create(data);
   } catch (error) {
     throw error;
   }
 };
 
-export const getSingleCategory=async(id)=>{
-   try {
+export const getAllCategory = async (page, limit) => {
+  try {
+    const skip = (page - 1) * limit;
+    const totalCount = await categoryModel.countDocuments();
+    const category = await categoryModel.find().skip(skip).limit(limit);
+    return {
+      category,
+      totalCount,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getSingleCategory = async (id) => {
+  try {
     const category = await categoryModel.findById(id);
     if (!category) {
       throw new Error("Category not found");
@@ -47,11 +47,11 @@ export const getSingleCategory=async(id)=>{
   } catch (error) {
     throw error;
   }
-}
+};
 
-export const updateCategory=async(id,data)=>{
+export const updateCategory = async (id, data) => {
   try {
-    console.log(id, data)
+    console.log(id, data);
     if (!data?.name) {
       throw new Error("Category name is required");
     }
@@ -67,8 +67,8 @@ export const updateCategory=async(id,data)=>{
 
     const updated = await categoryModel.findByIdAndUpdate(
       id,
-      { name: data.name.trim() },
-      { new: true, runValidators: true }
+      { name: data.name.trim(),programLimit:data.programLimit, status: data.status },
+      { new: true, runValidators: true },
     );
 
     if (!updated) {
@@ -79,7 +79,7 @@ export const updateCategory=async(id,data)=>{
   } catch (error) {
     throw error;
   }
-}
+};
 export const deleteSingleCategory = async (id) => {
   try {
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -106,10 +106,10 @@ export const deleteSingleCategory = async (id) => {
       const headNames = headsUsingCategory.map((h) => h.name).join(", ");
       const programNames = programsUsingCategory.map((p) => p.title).join(", ");
 
-      let message = "Cannot delete category.";
+      let message = "Cannot delete category.this category";
 
-      if (headNames) message += ` Heads: ${headNames}.`;
-      if (programNames) message += ` Programs: ${programNames}.`;
+      if (headNames) message += `Assigned to Heads: ${headNames}.`;
+      if (programNames) message += `Assigned to Programs: ${programNames}.`;
 
       return {
         canDelete: false,
@@ -129,14 +129,13 @@ export const deleteSingleCategory = async (id) => {
   }
 };
 
-
-export const deleteAllCategory=async( )=>{
- try {
+export const deleteAllCategory = async () => {
+  try {
     return await categoryModel.deleteMany({});
   } catch (error) {
     throw error;
   }
-}
+};
 
 export const founderCategoryList = async (page, limit) => {
   try {
@@ -207,6 +206,7 @@ export const founderCategoryList = async (page, limit) => {
           _id: 0,
           _id: "$_id",
           categoryName: "$name",
+          categoryStatus: "$status",
 
           programsCount: { $size: "$programs" },
           headNames: {

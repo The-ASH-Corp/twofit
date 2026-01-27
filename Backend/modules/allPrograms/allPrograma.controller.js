@@ -49,7 +49,7 @@ export const getSingleProgramController = async (req, res) => {
 export const updateSingleProgramController = async (req, res) => {
   try {
     const program = await updateProgram(req.params.id, req.body);
-    res.status(200).json({ status: true, data: program });
+    res.status(200).json({ success: true, data: program });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
   }
@@ -57,10 +57,27 @@ export const updateSingleProgramController = async (req, res) => {
 
 export const deleteProgramController = async (req, res) => {
   try {
-    const program = await deleteProgram(req.params.id);
-    res.status(200).json({ status: true, data: program });
+    const result = await deleteProgram(req.params.id);
+
+    // Program in use
+    if (!result.canDelete) {
+      return res.status(409).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    //  Deleted
+    return res.status(200).json({
+      success: true,
+      message: result.message,
+      data: result.program,
+    });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    return res.status(400).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 

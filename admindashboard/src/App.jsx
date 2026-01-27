@@ -20,6 +20,7 @@ import FounderClientProfile from "./pages/founder/clients/ClientProfile";
 import FounderHeadsList from "./pages/founder/heads/HeadTable";
 import FounderHeadsProfile from "./pages/founder/heads/HeadProfile";
 import FounderHeadForm from "./pages/founder/heads/HeadForm";
+import FounderHeadEditForm from "./pages/founder/heads/HeadEditForm";
 import FounderCategoryList from "./pages/founder/category/CategoryTable";
 import FounderCategoryForm from "./pages/founder/category/CategoryForm";
 import FounderCategoryEditForm from "./pages/founder/category/CategoryEditForm";
@@ -31,6 +32,7 @@ import FounderAdminProfile from "./pages/founder/admin/AdminProfile";
 import FounderProgramsList from "./pages/founder/programsList/ProgramTable";
 import FounderProgramsForm from "./pages/founder/programsList/ProgramForm";
 import FounderProgramsEditForm from "./pages/founder/programsList/ProgramEditForm";
+import FounderProgramsDelete from "./pages/founder/programsList/ProgramDeletePopUp";
 import FounderTherapyList from "./pages/founder/therapy/TherapyTable";
 import FounderTherapyForm from "./pages/founder/therapy/TherapyForm";
 import FounderWorkoutList from "./pages/founder/workout/WorkoutList";
@@ -121,6 +123,7 @@ function App() {
           <Route index element={<FounderDashboard />} />
           <Route path="heads" element={<FounderHeadsList />} />
           <Route path="heads/profile/:id" element={<FounderHeadsProfile />} />
+          <Route path="heads/edit/:id" element={<FounderHeadEditForm />} />
           <Route path="heads/add-head" element={<FounderHeadForm />} />
           <Route path="admins" element={<FounderAdminList />} />
           <Route path="admins/profile/:id" element={<FounderAdminProfile />} />
@@ -140,6 +143,10 @@ function App() {
             element={<FounderProgramsEditForm />}
           />
           <Route
+            path="programs/delete/:id"
+            element={<FounderProgramsDelete />}
+          />
+          <Route
             path="programs/add-program"
             element={<FounderProgramsForm />}
           />
@@ -149,18 +156,18 @@ function App() {
             element={<FounderCategoryForm />}
           />
           <Route
-            path="category/edit/:id"
+            path="categories/edit/:id"
             element={<FounderCategoryEditForm />}
           />
           <Route
-            path="category/delete/:id"
+            path="categories/delete/:id"
             element={<FounderCategoryDelete />}
           />
           <Route path="finance" element={<FounderFinanceList />} />
           <Route path="therapy" element={<FounderTherapyList />} />
           <Route path="therapy/create" element={<FounderTherapyForm />} />
-          <Route path="therapy/plan/:id" element={<FounderTherapyPlanView/>}/>
-          
+          <Route path="therapy/plan/:id" element={<FounderTherapyPlanView />} />
+
           <Route path="workout" element={<FounderWorkoutList />} />
           <Route path="workout/create" element={<FounderWorkoutForm />} />
           <Route path="profile" element={<Profile />} />
