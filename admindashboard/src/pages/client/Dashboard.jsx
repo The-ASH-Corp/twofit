@@ -29,17 +29,12 @@ export default function Dashboard() {
   const clientUser = useAppSelector(selectSelectedClient);
   const dispatch = useDispatch();
 
-  // const user = useAppSelector(selectUser);
-
   useEffect(() => {
   if (user?._id) {
     dispatch(getClient({ id: user._id }));
   }
 }, [user?._id, dispatch]);
 
-
-  console.log("USER:", clientUser);
-  console.log("THERAPY TYPE:", clientUser?.therapyType);
 
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -68,8 +63,7 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?._id, user?.programType]);
 
-const therapyDays =
-  clientUser?.therapyType?.weeks?.[0]?.days || [];
+
    return (
     <>
       <div className="w-full grid lg:grid-cols-[1fr_350px] grid-cols-1 gap-8 lg:p-2 p-4 lg:pb-2 pb-24">
@@ -101,10 +95,11 @@ const therapyDays =
               />
               <KpiCard
                 title="Active Streak"
-                value="12 Days"
+                value={`${complianceData?.streaks?.activeStreak || 0} Days`}
                 icon={assets.website}
                 bg="#F4DBC7"
               />
+           
             </div>
           </div>
 
@@ -140,7 +135,11 @@ const therapyDays =
           {/* Bottom Section: My Tasks */}
           <div className="lg:order-3 order-2">
             <h2 className="text-[#0A4F48] font-bold text-lg">My Tasks</h2>
-            <TaskList plans={program?.plan} therapyDays={therapyDays}/>
+            <TaskList 
+              plans={program?.plan} 
+              therapyPlan={clientUser?.therapyType}
+              programTitle={program?.title}
+            />
           </div>
 
           {/* Mobile Only: Measurements */}

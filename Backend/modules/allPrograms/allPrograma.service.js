@@ -113,7 +113,6 @@ export const deleteProgram = async (id) => {
 };
 
 export const getAllProgramByCategory = async (category, page, limit) => {
-  console.log(category, page, limit);
   const totalProgram = await programModel.countDocuments({ category });
   const data = await programModel
     .find({ category })
@@ -121,7 +120,6 @@ export const getAllProgramByCategory = async (category, page, limit) => {
     .skip((page - 1) * limit)
     .limit(limit)
     .lean();
-  console.log(data);
   return { program: data, totalProgram };
 };
 

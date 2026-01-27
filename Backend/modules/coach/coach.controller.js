@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 
 export const createCoach = async (req, res) => {
   try {
-    console.log(req.body);
 
     // Handle file uploads
     if (req.files) {
@@ -25,7 +24,6 @@ export const createCoach = async (req, res) => {
       });
 
   } catch (err) {
-    console.log(err)
     res.status(400).json({ success: false, message: err.message });
   }
 };

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TaskModal from "./TaskModal";
 import WorkoutTasksModal from "./WorkoutTasksModal";
+import TherapyTasksModal from "./TherapyTasksModal";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
@@ -13,7 +14,7 @@ import { useEffect } from "react";
 import { socket } from "@/utils/socket";
 import { selectToken } from "@/redux/features/auth/auth.selectores";
 
-export default function TaskList({ plans, therapyDays }) {
+export default function TaskList({ plans, therapyPlan, programTitle }) {
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
   const token = useAppSelector(selectToken);
@@ -23,6 +24,8 @@ export default function TaskList({ plans, therapyDays }) {
   const [selectedTask, setSelectedTask] = useState(null);
   const [isWorkoutModalOpen, setIsWorkoutModalOpen] = useState(false);
   const [workoutTasks, setWorkoutTasks] = useState([]);
+  const [isTherapyModalOpen, setIsTherapyModalOpen] = useState(false);
+  const [therapyModalTasks, setTherapyModalTasks] = useState([]);
   const [skipConfirmation, setSkipConfirmation] = useState({
     isOpen: false,
     task: null,
@@ -61,7 +64,7 @@ export default function TaskList({ plans, therapyDays }) {
         socket.disconnect();
       };
     }
-  }, [dispatch, user?._id, token]);
+  }, [dispatch, user?._id, token, user?.role]);
 
   const days =
     plans?.weeks?.flatMap((week, weekIndex) =>
@@ -96,7 +99,11 @@ export default function TaskList({ plans, therapyDays }) {
       };
     }) || [];
 
-  const mealTasks = ["Meal 1", "Meal 2", "Meal 3", "Meal 4"].map(
+  const isWeightLoss = programTitle?.toLowerCase().includes("weight loss");
+  const numberOfMeals = isWeightLoss ? 5 : 6;
+  const mealNames = Array.from({ length: numberOfMeals }, (_, i) => `Meal ${i + 1}`);
+
+  const mealTasks = mealNames.map(
     (mealName, index) => {
       const mealIndex = 100 + index; // Use a high index range for static meals to avoid collisions
       const submission = tasks?.find(
@@ -119,8 +126,21 @@ export default function TaskList({ plans, therapyDays }) {
       };
     },
   );
-  const todayTherapy =
-    therapyDays?.find((day) => day.name === `Day ${currentGlobalDay}`) || null;
+
+  const therapyDays =
+    therapyPlan?.weeks?.flatMap((week, weekIndex) =>
+      week.days.map((day, dayIndex) => ({
+        ...day,
+        weekIndex: weekIndex + 1,
+        dayIndex: dayIndex + 1,
+        globalIndex: weekIndex * 7 + dayIndex + 1,
+      })),
+    ) || [];
+
+  const todayTherapy = therapyDays.find(
+    (day) => day.globalIndex === currentGlobalDay,
+  );
+
   const therapyTasks =
     todayTherapy?.therapies?.map((therapy, index) => {
       const submission = tasks?.find(
@@ -131,13 +151,14 @@ export default function TaskList({ plans, therapyDays }) {
       );
 
       return {
-        name: therapy.type,
+        name: therapy.type || "Therapy Task",
         type: "Therapy",
         notes: therapy.notes,
         mediaUrl: therapy.url,
         mediaName: therapy.mediaName,
-        weekIndex: 1,
-        dayIndex: currentGlobalDay,
+        programId: plans?.program,
+        weekIndex: todayTherapy.weekIndex,
+        dayIndex: todayTherapy.dayIndex,
         globalDayIndex: currentGlobalDay,
         exerciseIndex: index,
         status: submission?.status || "todo",
@@ -182,9 +203,37 @@ export default function TaskList({ plans, therapyDays }) {
     });
   }
 
+  // Group therapy tasks into a single item
+  if (therapyTasks.length > 0) {
+    const getTherapyOverallStatus = () => {
+      const allVerified = therapyTasks.every((t) => t.status === "verified");
+      const anyPending = therapyTasks.some((t) => t.status === "pending");
+      const anyRejected = therapyTasks.some((t) => t.status === "rejected");
+
+      if (allVerified) return "verified";
+      if (anyPending) return "pending";
+      if (anyRejected) return "rejected";
+      return "todo";
+    };
+
+    const therapyOverallStatus = getTherapyOverallStatus();
+    const therapySubmission = therapyTasks.find((t) => t.submission);
+
+    groupedTasks.push({
+      name: "Therapy",
+      type: "TherapyGroup",
+      notes: `${therapyTasks.length} tasks`,
+      status: therapyOverallStatus,
+      submission: therapySubmission?.submission,
+      therapyTasks: therapyTasks,
+      weekIndex: therapyTasks[0].weekIndex,
+      dayIndex: therapyTasks[0].dayIndex,
+      globalDayIndex: therapyTasks[0].globalDayIndex,
+    });
+  }
+
   // Add meal tasks individually
   groupedTasks.push(...mealTasks);
-  groupedTasks.push(...therapyTasks);
 
 
   const handleSkipTask = (task) => {
@@ -223,7 +272,7 @@ export default function TaskList({ plans, therapyDays }) {
           key={index}
           className="flex items-center gap-4 bg-white p-2 rounded-2xl shadow-sm border border-gray-50 hover:shadow-md transition-shadow"
         >
-          <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+          <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0">
             <img
               src={"src/assets/Workout.png"}
               alt={item.type}
@@ -258,9 +307,7 @@ export default function TaskList({ plans, therapyDays }) {
 
           <div className="flex gap-2">
             {item.type === "Meal" &&
-              (!item.submission ||
-                item.submission.status === "pending" ||
-                item.submission.status === "todo") && (
+              (!item.submission || item.submission.status === "todo") && (
                 <button
                   onClick={() => handleSkipTask(item)}
                   className="bg-gray-50 px-6 py-2 rounded-lg text-[13px] font-bold text-gray-400 hover:bg-gray-100 transition-colors"
@@ -273,6 +320,9 @@ export default function TaskList({ plans, therapyDays }) {
                 if (item.type === "WorkoutGroup") {
                   setWorkoutTasks(item.workoutTasks);
                   setIsWorkoutModalOpen(true);
+                } else if (item.type === "TherapyGroup") {
+                  setTherapyModalTasks(item.therapyTasks);
+                  setIsTherapyModalOpen(true);
                 } else {
                   setSelectedTask(item);
                   setIsOpen(true);
@@ -298,6 +348,14 @@ export default function TaskList({ plans, therapyDays }) {
         <WorkoutTasksModal
           workoutTasks={workoutTasks}
           onClose={() => setIsWorkoutModalOpen(false)}
+          onSuccess={() => dispatch(getUserTaskStatus())}
+        />
+      )}
+
+      {isTherapyModalOpen && (
+        <TherapyTasksModal
+          therapyTasks={therapyModalTasks}
+          onClose={() => setIsTherapyModalOpen(false)}
           onSuccess={() => dispatch(getUserTaskStatus())}
         />
       )}

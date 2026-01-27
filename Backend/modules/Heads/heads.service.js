@@ -37,7 +37,6 @@ export const getAllHeads = async (page, limit) => {
 
   const totalCount = await HeadsModel.countDocuments();
   const head = await HeadsModel.find().skip(skip).limit(limit);
-  console.log(head)
   return {
     head,
     totalCount,

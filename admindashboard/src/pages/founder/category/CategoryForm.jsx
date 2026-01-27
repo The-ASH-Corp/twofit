@@ -34,7 +34,6 @@ export default function CategoryForm() {
 
   const handelSubmit = async (value) => {
     try {
-      // console.log(value);
       const category = await dispatch(createCategory(value)).unwrap();
       if (category.success) {
         toast.success("Category created successfully");

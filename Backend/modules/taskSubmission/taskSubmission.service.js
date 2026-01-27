@@ -30,9 +30,14 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
 
     if (!currentDayConfig) return false;
 
-    // Total exercises = workout exercises from plan + 4 static meal tasks
-    // NOTE: This assumes 4 meal tasks per day constant.
-    const totalExercises = currentDayConfig.exercises.length + 4;
+    // Determine meal count based on program title
+    const programTitle = user.programType.title || "";
+    const isWeightLoss = programTitle.toLowerCase().includes("weight loss");
+    const mealCount = isWeightLoss ? 5 : 6;
+
+    // Total exercises = workout exercises from plan + mealCount static meal tasks
+    // NOTE: This assumes meal tasks are static and defined by program type
+    const totalExercises = currentDayConfig.exercises.length + mealCount;
 
     // Count total VERIFIED/SKIPPED exercises for this userId and globalDayIndex
     const userSubmission = await TaskSubmission.findOne({ userId });
@@ -267,7 +272,7 @@ export const createTaskSubmission = async (submissionData) => {
             });
         } else {
             // Find the exercise
-            let exercise = day.exercises.find(e => e.exerciseIndex === eIndex);
+            let exercise = day.exercises.find(e => e.exerciseIndex === eIndex && e.taskType === taskType);
 
             if (exercise) {
                 if (exercise.status === 'verified') {
@@ -371,16 +376,16 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
             });
         } else {
             // Update or add each exercise
+            const targetTaskType = taskType || "Workout";
             for (const eIndex of exerciseIndices) {
                 const exerciseIndex = Number(eIndex);
-                let exercise = day.exercises.find(e => e.exerciseIndex === exerciseIndex);
-
+                let exercise = day.exercises.find(e => e.exerciseIndex === exerciseIndex && e.taskType === targetTaskType);
                 if (exercise) {
                     if (exercise.status === 'verified') {
                         throw new Error("One or more tasks already verified");
                     }
                     exercise.status = 'pending';
-                    exercise.taskType = taskType || "Workout";
+                    exercise.taskType = targetTaskType;
                     exercise.file = file || exercise.file;
                     exercise.notes = notes || exercise.notes;
                     exercise.adminComment = "";

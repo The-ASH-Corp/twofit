@@ -47,7 +47,6 @@ export const allEmployees = async (page, limit) => {
   );
   const totalIncentive = experts.reduce((sum, emp) => sum + emp.incentives, 0);
 
-  // console.log(unifiedData)
   return {
     employeeCount: unifiedData.length,
     totalSalary,

@@ -9,7 +9,6 @@ import { useAppSelector } from "@/redux/store/hooks";
 import { useNavigate } from "react-router-dom";
 
 export const ProgramListColumns = [
-  // ... existing columns ...
   {
     id: "select",
     header: ({ table }) => (
@@ -64,7 +63,7 @@ const ActionCell = ({ row }) => {
   const localRole = localStorage.getItem("role");
   
   // Don't render button if local role is expert and user role is dietician
-  if (localRole === "expert" && user?.role === "Dietician") {
+  if (localRole.toLowerCase() === "expert" && user?.role.toLowerCase() === "dietician") {
     return null;
   }
   const hasPlans = row.original.plans?.length > 0;

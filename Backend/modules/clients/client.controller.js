@@ -1,6 +1,7 @@
 import * as service from "./client.services.js";
-import { getUserComplianceStats } from "../../utils/complianceCalculator.js";
+import { getUserComplianceStats, calculateUserStreaks } from "../../utils/complianceCalculator.js";
 import { getSingleProgram } from "../allPrograms/allPrograma.service.js";
+import { getTherapyById } from "../therapy/therapy.service.js";
 import { attemptDayAdvancement } from "../taskSubmission/taskSubmission.service.js";
 
 export const getAllClients = async (req, res) => {
@@ -128,10 +129,20 @@ export const updateMeasurements = async (req, res) => {
 export const getAllFeedbacks = async (req, res) => {
   try {
     const { userId } = req.params;
-    const feedbacks = await service.getAllFeedbacksService(userId);
+    const { page = 1, limit = 10 } = req.query;
+
+    const { feedbacks, totalCount } = await service.getAllFeedbacksService(
+      userId,
+      parseInt(page),
+      parseInt(limit)
+    );
+
     res.status(200).json({
       success: true,
       data: feedbacks,
+      total: totalCount,
+      page: parseInt(page),
+      totalPages: Math.ceil(totalCount / limit),
     });
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -141,7 +152,6 @@ export const getAllFeedbacks = async (req, res) => {
 
 
 export const getWeightHistoryOnly = async (req, res) => {
-  console.log("req.user:", req.user);
 
   try {
     const userId = req.user.id;
@@ -235,9 +245,25 @@ export const getComplianceStats = async (req, res) => {
     const programId = typeof user.programType === 'object' ? user.programType._id : user.programType;
     const program = await getSingleProgram(programId);
 
-    const complianceData = await getUserComplianceStats(userId, program?.plan);
+    const therapyId = typeof user.therapyType === 'object' 
+        ? user.therapyType._id 
+        : user.therapyType;
+    
+    let therapyPlan = null;
+    if (therapyId) {
+        therapyPlan = await getTherapyById(therapyId);
+    }
 
-    res.status(200).json({ success: true, data: complianceData });
+    const complianceData = await getUserComplianceStats(userId, program?.plan, therapyPlan, program?.title);
+    const streakData = await calculateUserStreaks(userId);
+
+    res.status(200).json({ 
+        success: true, 
+        data: {
+            ...complianceData,
+            streaks: streakData
+        } 
+    });
   } catch (error) {
     console.error("Compliance stats error:", error);
     res.status(500).json({ success: false, message: error.message });

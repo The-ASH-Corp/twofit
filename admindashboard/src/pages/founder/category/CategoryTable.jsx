@@ -28,11 +28,9 @@ export default function CategoryTable() {
     const error = useAppSelector(selectCategoryError);
 
     const [ categories, setCategories] = useState([]);
-    // console.log(data)
 
     useEffect(()=>{
       setCategories(data);
-      console.log(data)
     },[data])
 
   const searchInputHandler = (e) => {

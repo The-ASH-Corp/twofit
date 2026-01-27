@@ -19,13 +19,11 @@ export default function AdminForm() {
       getAllProgramsByCategory({category: user.programCategory, page: 1, limit: 1000})
     ).unwrap();
     setPrograms(response.data);
-    console.log(response)
   };
   
   useEffect(() => {
     fetchPrograms();
   }, []);
-  console.log(programs);
 
   const fields = [
     {
@@ -71,10 +69,8 @@ export default function AdminForm() {
               {label:"astma",value:"astma"},
               {label:"diabetes",value:"diabetes"},
               {label:"hypertension",value:"hypertension"},
-              {label:"obesity",value:"obesity"},
-              {label:"osteoporosis",value:"osteoporosis"},
-              {label:"polycystic ovarian syndrome",value:"polycystic ovarian syndrome"},
             ],
+            allowCustom: true,
         },
         { name: "experience", label: "Experience", type: "text" },
         { name: "qualification", label: "Qualification", type: "text" },

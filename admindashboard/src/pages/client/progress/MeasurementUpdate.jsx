@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { toast } from "react-toastify";
+import { refreshProfile } from "@/redux/features/auth/auth.thunk";
 
 export default function MeasurementUpdate({ onClose }) {
   const [chest, setChest] = useState("");
@@ -39,6 +40,8 @@ export default function MeasurementUpdate({ onClose }) {
     } catch (err) {
       console.error(err);
       toast.error("Failed to update measurements");
+    }finally{
+      dispatch(refreshProfile({id: user._id, role: user.role})) 
     }
   };
 

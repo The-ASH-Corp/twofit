@@ -30,7 +30,6 @@ export default function FinanceTable() {
 
   useEffect(() => {
     setEmployees(data);
-    //  console.log(data);
   }, [data]);
 
   const searchInputHandler = (e) => {

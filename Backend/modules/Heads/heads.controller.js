@@ -9,7 +9,6 @@ export const createHead = async (req, res) => {
       total: totalCount,
     });
   } catch (error) {
-    console.log(error);
     
     res.status(400).json({ success: false, message: error.message });
   }

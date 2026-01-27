@@ -4,8 +4,9 @@ import { X } from "lucide-react";
 export default function DailyTaskDrawer({
   selectedDate,
   tasks,
+  allMissed,
   onClose,
-  onSkip,
+  // onSkip,
   onTaskClick,
 }) {
   if (!selectedDate) return null;
@@ -56,7 +57,11 @@ export default function DailyTaskDrawer({
         </div>
 
         <div className="flex-1 overflow-y-auto p-5 lg:p-6 space-y-2.5 lg:space-y-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          {tasks && tasks.length > 0 ? (
+          {allMissed ? (
+             <div className="text-center py-12 text-gray-500">
+               <p className="text-[14px]">You were not logged in that day</p>
+             </div>
+          ) : tasks && tasks.length > 0 ? (
             tasks.map((task, index) => (
               <div
                 key={index}

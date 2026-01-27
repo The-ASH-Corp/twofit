@@ -21,7 +21,6 @@ export const createClient = createAsyncThunk(
 
       return data;
     } catch (error) {
-      console.log(error);
       return rejectWithValue(
         error.response?.data?.message || "Failed to create client",
       );
@@ -44,6 +43,14 @@ export const logout = createAsyncThunk(
 export const refreshProfile = createAsyncThunk(
   "auth/refreshProfile",
   async ({ id, role }, { rejectWithValue }) => {
+
+    if (
+      role.toLowerCase() == "trainer" ||
+      role.toLowerCase() == "dietician" ||
+      role.toLowerCase() == "therapist"
+    ) {
+      role = "expert";
+    }
     try {
       let endpoint;
 
@@ -119,7 +126,6 @@ export const resetPassword = createAsyncThunk(
     }
   },
 );
-
 
 export const editProfile = createAsyncThunk(
   "auth/editProfile",

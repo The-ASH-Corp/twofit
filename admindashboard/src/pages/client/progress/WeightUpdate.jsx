@@ -23,17 +23,15 @@ export default function WeightUpdate({ onClose }) {
     }
 
     try {
-      const res = await dispatch(
+      await dispatch(
         updateWeightOfClient({
           id: user._id,
           currentWeight: Number(weight),
         })
       ).unwrap();
-      console.log("Updated client:", res);
       toast.success("Weight updated successfully");
       if (onClose) onClose();
     } catch (err) {
-      console.log(err);
       toast.error("Failed to update weight");
     }
   };

@@ -34,11 +34,7 @@ const TherapyTable = () => {
       <BaseTable
         data={plans}
         columns={therapyColumns}
-        actionLabel="Add Therapy"
-        actionPath="/founder/therapy/create"
         meta={{ navigate }}
-        
-        // profilePath= {profilePath}
         pageLabel={"Therapies"}
       />
     </div>

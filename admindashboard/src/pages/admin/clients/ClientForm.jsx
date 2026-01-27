@@ -74,9 +74,7 @@ export default function ClientForm() {
     fetchTherapy();
   }, []);
 
-  useEffect(() => {
-    console.log("Therapy dropdown data:", therapy);
-  }, [therapy]);
+
 
   const setProgramId = (programId) => {
     const selectedProgram = program?.find((p) => p._id === programId);
@@ -156,9 +154,9 @@ export default function ClientForm() {
             { label: "Hypertension", value: "hypertension" },
             { label: "Asthma", value: "asthma" },
             { label: "Heart Disease", value: "heart_disease" },
-            { label: "Obesity", value: "obesity" },
             { label: "None", value: "none" },
           ],
+          allowCustom: true,
         },
         {
           name: "allergy",
@@ -168,6 +166,7 @@ export default function ClientForm() {
             { label: "Peanuts", value: "peanuts" },
             { label: "Seafood", value: "seafood" },
           ],
+          allowCustom: true,
         },
         {
           name: "foodPreference",
@@ -177,6 +176,7 @@ export default function ClientForm() {
             { label: "Vegetarian", value: "vegetarian" },
             { label: "Non-Vegetarian", value: "non_vegetarian" },
           ],
+          allowCustom: true,
         },
         {
           name: "fitnessGoal",
@@ -186,6 +186,7 @@ export default function ClientForm() {
             { label: "Weight Loss", value: "weight_loss" },
             { label: "Muscle Gain", value: "muscle_gain" },
           ],
+          allowCustom: true,
         },
         { name: "currentWeight", label: "Current Weight", type: "text" },
         { name: "targetWeight", label: "Target Weight", type: "text" },

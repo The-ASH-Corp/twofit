@@ -21,7 +21,6 @@ export default function HoldPlan({ onClose }) {
       return;
     }
 
-    console.log({ reason, notes });
     toast.success("Plan held successfully");
     onClose();
   };

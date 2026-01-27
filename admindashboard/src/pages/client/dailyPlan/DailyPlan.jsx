@@ -3,16 +3,19 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import DailyTaskDrawer from "./DailyTaskDrawer";
 import MobileBottomNav from "../components/MobileBottomNav";
 import { useDispatch } from "react-redux";
-import { getUserTaskStatus } from "@/redux/features/tasks/task.thunk";
+import { getUserTaskStatus, uploadTask } from "@/redux/features/tasks/task.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { getProgramById } from "@/redux/features/program/program.thunk";
+import { getClient } from "@/redux/features/client/client.thunk";
+import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function DailyPlan() {
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
+  const clientUser = useAppSelector(selectSelectedClient);
   const { tasks } = useAppSelector((state) => state.tasks);
 
   const [selectedStatus, setSelectedStatus] = useState("All Status");
@@ -21,12 +24,15 @@ export default function DailyPlan() {
   const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth()); // Current month (0-based)
   const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
   const [program, setProgram] = useState(null);
+  const [therapyPlan, setTherapyPlan] = useState(null);
   const [calendarData, setCalendarData] = useState({});
 
-  // Fetch program and tasks on mount
+  // Fetch program, therapy plan and tasks on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
+        await dispatch(getClient({ id: user._id }));
+
         if (user?.programType) {
           const programId =
             typeof user.programType === "object"
@@ -37,6 +43,7 @@ export default function DailyPlan() {
           ).unwrap();
           setProgram(programData);
         }
+
         await dispatch(getUserTaskStatus()).unwrap();
       } catch (error) {
         console.error("Error fetching daily plan data:", error);
@@ -48,18 +55,50 @@ export default function DailyPlan() {
     }
   }, [dispatch, user?._id, user?.programType]);
 
+  // Set therapy plan when clientUser is populated
+  useEffect(() => {
+    if (clientUser?.therapyType && typeof clientUser.therapyType === 'object') {
+       if (clientUser.therapyType.weeks) {
+         setTherapyPlan(clientUser.therapyType);
+       }
+    }
+  }, [clientUser]);
+
   // Calculate calendar data based on tasks and program
   useEffect(() => {
     if (!program || !tasks) return;
 
     const newCalendarData = {};
-    const programStartDate = user?.programStartDate
-      ? new Date(user.programStartDate)
+    const programStartDateStr = user?.programStartDate
+      ? user.programStartDate
       : new Date();
+    
+    // Normalize start date to midnight
+    let iteratorDate = new Date(programStartDateStr);
+    iteratorDate.setHours(0, 0, 0, 0);
 
-    // Get all days from the program
-    const days =
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const getDateKey = (d) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+        d.getDate(),
+      ).padStart(2, "0")}`;
+
+    // Flatten and sort program days
+    const sortedDays =
       program?.plan?.weeks?.flatMap((week, weekIndex) =>
+        week.days.map((day, dayIndex) => ({
+          ...day,
+          weekIndex: weekIndex + 1,
+          dayIndex: dayIndex + 1,
+          globalIndex: weekIndex * 7 + dayIndex + 1,
+        })),
+      ).sort((a, b) => a.globalIndex - b.globalIndex) || [];
+
+    // Flatten therapy days if available
+    const sortedTherapyDays =
+      therapyPlan?.weeks?.flatMap((week, weekIndex) =>
         week.days.map((day, dayIndex) => ({
           ...day,
           weekIndex: weekIndex + 1,
@@ -68,107 +107,153 @@ export default function DailyPlan() {
         })),
       ) || [];
 
-    // Process each day
-    days.forEach((day) => {
-      const dayDate = new Date(programStartDate);
-      dayDate.setDate(programStartDate.getDate() + (day.globalIndex - 1));
-      const dateKey = `${dayDate.getFullYear()}-${String(dayDate.getMonth() + 1).padStart(2, "0")}-${String(dayDate.getDate()).padStart(2, "0")}`;
+    let programIndex = 0;
+    const MAX_DAYS = 1000;
+    let loopCount = 0;
 
-      // Get tasks for this day
+    // Iterate through calendar days mapping program days to them
+    while (programIndex < sortedDays.length && loopCount < MAX_DAYS) {
+      loopCount++;
+      const currentPDay = sortedDays[programIndex];
+      const currentTherapyDay = sortedTherapyDays.find(d => d.globalIndex === currentPDay.globalIndex);
+      
+      const dateKey = getDateKey(iteratorDate);
+      const isBeforeToday = iteratorDate < today;
+
+      // Get all submissions for this specific program day
       const dayTasks = tasks.filter(
-        (t) => t.globalDayIndex === day.globalIndex,
+        (t) => t.globalDayIndex === currentPDay.globalIndex,
       );
 
-      // Calculate expected task count
-      const workoutCount = day.exercises?.length || 0;
-      const mealCount = 4; // Always 4 meals
-      const totalExpected = workoutCount + mealCount;
+      // Check if user has ANY activity for this Program Day on this Calendar Date
 
-      // Check if day has passed (missed) or is today/future (skipped = not done yet)
-      const isBeforeToday = dayDate < new Date(new Date().setHours(0, 0, 0, 0));
-
-      // Build task list with status
-      const taskList = [];
-
-      // Add workout tasks
-      day.exercises?.forEach((ex, idx) => {
-        const submission = dayTasks.find(
-          (t) => t.exerciseIndex === idx && t.taskType === "Workout",
-        );
-        let status = submission ? submission.status : "todo";
-        if (status === "todo" && isBeforeToday) {
-          status = "missed";
-        }
-
-        taskList.push({
-          name: ex.name || `Exercise ${idx + 1}`,
-          status: status,
-          type: "Workout",
-          // Metadata for skipping/verifying
-          globalDayIndex: day.globalIndex,
-          weekIndex: day.weekIndex,
-          dayIndex: day.dayIndex,
-          exerciseIndex: idx,
-          programId: program._id,
-        });
+      const hasActivityOnDate = dayTasks.some((t) => {
+        if (t.status === "todo") return false;
+        const tDate = new Date(t.updatedAt);
+        tDate.setHours(0, 0, 0, 0);
+        return tDate.getTime() === iteratorDate.getTime();
       });
 
-      // Add meal tasks
-      for (let i = 0; i < 4; i++) {
-        const submission = dayTasks.find(
-          (t) => t.exerciseIndex === 100 + i && t.taskType === "Meal",
-        );
-        let status = submission ? submission.status : "todo";
-        if (status === "todo" && isBeforeToday) {
-          status = "missed";
-        }
+      let mapDayToDate = false;
 
-        taskList.push({
-          name: `Meal ${i + 1}`,
-          status: status,
-          type: "Meal",
-          // Metadata
-          globalDayIndex: day.globalIndex,
-          weekIndex: day.weekIndex,
-          dayIndex: day.dayIndex,
-          exerciseIndex: 100 + i,
-          programId: program._id,
-        });
+      if (isBeforeToday) {
+        // In the past, we only map the program day if the user actually did it then.
+        if (hasActivityOnDate) {
+          mapDayToDate = true;
+        } else {
+
+          mapDayToDate = false;
+        }
+      } else {
+        mapDayToDate = true;
       }
 
-      // Calculate summary
-      const verified = taskList.filter((t) => t.status === "verified").length;
-      const pending = taskList.filter((t) => t.status === "pending").length;
-      const rejected = taskList.filter((t) => t.status === "rejected").length;
-      const skipped = taskList.filter((t) => t.status === "skipped").length;
-      const missed = taskList.filter((t) => t.status === "missed").length;
-      const todo = taskList.filter((t) => t.status === "todo").length;
+      if (mapDayToDate) {
+        // Build the task list for this day
+        const taskList = [];
+        const isWeightLoss = program?.title?.toLowerCase().includes("weight loss");
+        const mealCount = isWeightLoss ? 5 : 6;
 
-      // Determine if tasks were skipped or missed
-      const summary = [];
+        const workoutCount = currentPDay.exercises?.length || 0;
+        const therapyCount = currentTherapyDay?.therapies?.length || 0;
+        const totalExpected = workoutCount + mealCount + therapyCount;
 
-      if (rejected > 0) summary.push({ type: "rejected", count: rejected });
-      if (pending > 0) summary.push({ type: "pending", count: pending });
-      if (skipped > 0) summary.push({ type: "skipped", count: skipped });
-      if (missed > 0) summary.push({ type: "missed", count: missed });
-      if (todo > 0) summary.push({ type: "todo", count: todo }); // Optional: explicit todo summary if needed, but usually we just want exceptions.
- 
+        // Helper to process individual task items
+        const processItem = (idx, type, name, meta = {}) => {
+          const submission = dayTasks.find(
+            (t) =>
+              t.exerciseIndex === idx &&
+              t.taskType === type,
+          );
+          
+          let status = submission ? submission.status : "todo";
+          
+    
+          
+          taskList.push({
+            name: name,
+            status: status,
+            type: type,
+            globalDayIndex: currentPDay.globalIndex,
+            weekIndex: currentPDay.weekIndex,
+            dayIndex: currentPDay.dayIndex,
+            exerciseIndex: idx,
+            programId: program._id,
+            ...meta
+          });
+        };
 
-      newCalendarData[dateKey] = {
-        summary,
-        tasks: taskList,
-        verified,
-        pending,
-        rejected,
-        skipped,
-        missed,
-        todo,
-        totalExpected,
-      };
-    });
+        currentPDay.exercises?.forEach((ex, idx) => {
+          processItem(idx, "Workout", ex.name || `Exercise ${idx + 1}`);
+        });
 
+        for (let i = 0; i < mealCount; i++) {
+          processItem(100 + i, "Meal", `Meal ${i + 1}`);
+        }
+        
+        // Process Therapy Tasks
+        if (currentTherapyDay && currentTherapyDay.therapies) {
+           currentTherapyDay.therapies.forEach((therapy, idx) => {
+              processItem(idx, "Therapy", therapy.type || "Therapy Task", {
+                  notes: therapy.notes,
+                  mediaUrl: therapy.url
+              });
+           });
+        }
+
+        // Calculate stats
+        const verified = taskList.filter((t) => t.status === "verified").length;
+        const pending = taskList.filter((t) => t.status === "pending").length;
+        const rejected = taskList.filter((t) => t.status === "rejected").length;
+        const skipped = taskList.filter((t) => t.status === "skipped").length;
+        const missed = taskList.filter((t) => t.status === "missed").length;
+        const todo = taskList.filter((t) => t.status === "todo").length;
+
+        const summary = [];
+        if (rejected > 0) summary.push({ type: "rejected", count: rejected });
+        if (pending > 0) summary.push({ type: "pending", count: pending });
+        if (skipped > 0) summary.push({ type: "skipped", count: skipped });
+        if (missed > 0) summary.push({ type: "missed", count: missed });
+        if (todo > 0) summary.push({ type: "todo", count: todo });
+        if (verified > 0) summary.push({ type: "verified", count: verified });
+
+        newCalendarData[dateKey] = {
+          summary,
+          tasks: taskList,
+          verified,
+          pending,
+          rejected,
+          skipped,
+          missed,
+          todo,
+          totalExpected,
+          allMissed: false,
+        };
+        // Advance to next Program Day
+        programIndex++;
+      } else {
+        // This calendar date was missed/skipped
+        newCalendarData[dateKey] = {
+          summary: [{ type: "not_logged_in", count: 1 }],
+          tasks: [],
+          verified: 0,
+          pending: 0,
+          rejected: 0,
+          skipped: 0,
+          missed: 0,
+          todo: 0,
+          totalExpected: 0,
+          allMissed: true,
+        };
+        // Do NOT advance programIndex (try again next date)
+      }
+
+      // Always advance calendar date
+      iteratorDate.setDate(iteratorDate.getDate() + 1);
+    }
+    
     setCalendarData(newCalendarData);
-  }, [program, tasks, user?.programStartDate]);
+  }, [program, therapyPlan, tasks, user?.programStartDate]);
 
   const handleSkipTask = async (task) => {
     if (task.type !== "Meal") return;
@@ -384,6 +469,9 @@ export default function DailyPlan() {
                       } else if (task.type === "skipped") {
                         badgeClasses =
                           "bg-orange-50 border-orange-200 text-orange-700";
+                      } else if (task.type === "not_logged_in") {
+                         badgeClasses =
+                          "bg-red-50 border-red-200 text-red-700";
                       }
 
                       return (
@@ -392,14 +480,10 @@ export default function DailyPlan() {
                           className={`text-[9px] lg:text-[11px] font-medium px-1.5 lg:px-2 py-0.5 lg:py-1 rounded border truncate ${badgeClasses}`}
                         >
                           <span className="hidden lg:inline">
-                            {task.count} Task -{" "}
-                            {task.type.charAt(0).toUpperCase() +
-                              task.type.slice(1)}
+                            {task.type === "not_logged_in" ? "You were not logged in" : `${task.count} Task - ${task.type.charAt(0).toUpperCase() + task.type.slice(1)}`}
                           </span>
                           <span className="lg:hidden">
-                            {task.type.charAt(0).toUpperCase() +
-                              task.type.slice(1).substring(0, 5)}
-                            ...
+                             {task.type === "not_logged_in" ? "Not Logged In" : `${task.type.charAt(0).toUpperCase() + task.type.slice(1).substring(0, 5)}...`}
                           </span>
                         </div>
                       );
@@ -415,6 +499,7 @@ export default function DailyPlan() {
       <DailyTaskDrawer
         selectedDate={selectedDate}
         tasks={selectedDate ? calendarData[selectedDate]?.tasks : null}
+        allMissed={selectedDate ? calendarData[selectedDate]?.allMissed : false}
         onClose={() => setSelectedDate(null)}
         onSkip={handleSkipTask}
       />

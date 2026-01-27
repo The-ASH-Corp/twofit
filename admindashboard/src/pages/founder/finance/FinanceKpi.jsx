@@ -6,7 +6,6 @@ import { useAppSelector } from "@/redux/store/hooks";
 import { selectEmployeeCount, selectTotalBaseSalary, selectTotalIncentive, selectTotalSalary } from "@/redux/features/finance/finance.selector";
 
 export default function FinanceKpi() {
-  // console.log(data)
   const [payrollOpen, setPayrollOpen] = useState(false);
   const count = useAppSelector(selectEmployeeCount);
   const totalPayroll = useAppSelector(selectTotalSalary);

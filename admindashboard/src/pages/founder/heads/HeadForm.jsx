@@ -28,8 +28,6 @@ const HeadForm = () => {
           setCategories(data.data)
         },[data])
 
-        console.log(categories)
-
     const fields = [
       {
         section: "Personal Information",
@@ -88,16 +86,9 @@ const HeadForm = () => {
             options: [
               { label: "pcod", value: "pcod" },
               { label: "thyroid", value: "thyroid" },
-              { label: "astma", value: "astma" },
               { label: "diabetes", value: "diabetes" },
-              { label: "hypertension", value: "hypertension" },
-              { label: "obesity", value: "obesity" },
-              { label: "osteoporosis", value: "osteoporosis" },
-              {
-                label: "polycystic ovarian syndrome",
-                value: "polycystic ovarian syndrome",
-              },
             ],
+            allowCustom: true,
           },
           {
             name: "experience",
@@ -159,7 +150,6 @@ const HeadForm = () => {
   const handelSubmit = async (value) => {
     try {
       const result = await dispatch(createHead(value)).unwrap();
-       console.log(result)
       if (result.success) {
         toast.success("Head created successfully");
         navigate("/founder/heads");

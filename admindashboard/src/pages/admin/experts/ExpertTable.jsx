@@ -22,7 +22,6 @@ export default function ExpertTable() {
     const coachesData = response;
     const totalCount = response.length;
 
-    console.log(totalCount);
     const formattedCoaches = coachesData?.map((coach) => ({
       ...coach,
       clients: coach.assignedUsers ? coach.assignedUsers.length : 0,

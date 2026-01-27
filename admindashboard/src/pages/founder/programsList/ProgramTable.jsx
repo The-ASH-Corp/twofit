@@ -20,7 +20,6 @@ export default function ProgramTable() {
 
   const data = useAppSelector(selectFounderPrograms);
   const totalCount = useAppSelector(selectTotalProgramCount);
-  // console.log(`data`);
   const status = useAppSelector(selectProgramStatus);
   const error = useAppSelector(selectProgramError);
 
@@ -28,10 +27,8 @@ export default function ProgramTable() {
 
   useEffect(()=>{
     setProgram(data)
-    // console.log(`data`);
   },[data])
 
-  console.log(programs)
 
     const searchInputHandler = (e) => {
       const value = e.target.value.toLowerCase();

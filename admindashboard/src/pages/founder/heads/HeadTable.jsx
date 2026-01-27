@@ -52,12 +52,10 @@ const HeadTable = () => {
   // const error = useSelector(selectHeadError);
 
   const [heads, setHeads] = useState([]);
-  // console.log(data)
-  // console.log(totalCount)
+ 
 
   useEffect(() => {
     setHeads(data);
-    // console.log(data);
   }, [data]);
 
   const searchInputHandler = (e) => {
@@ -75,7 +73,6 @@ const HeadTable = () => {
     setHeads(filtered);
   };
 
-  // console.log(heads)
 
   if (status === "loading")
     return (
