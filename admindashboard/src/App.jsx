@@ -52,6 +52,8 @@ import HeadExpertProfile from "./pages/head/experts/ExpertProfile";
 import HeadAdminProfile from "./pages/head/admin/AdminProfile";
 import HeadClientProfile from "./pages/head/clients/ClientProfile";
 import HeadProgramTable from "./pages/head/programsList/ProgramTable";
+import HeadTherapyList from "./pages/head/therapy/TherapyTable";
+import HeadTherapyPlan from "./pages/head/therapy/TherapyViewPlan";
 
 //Admin Pages Imports
 import AppLayout from "./pages/admin/layout/AppLayout";
@@ -198,6 +200,8 @@ function App() {
           />
           <Route path="programs" element={<HeadProgramTable />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="therapy" element={<HeadTherapyList />} />
+          <Route path="therapy/plan/:id" element={<HeadTherapyPlan />} />
         </Route>
 
         {/* ADMIN */}
