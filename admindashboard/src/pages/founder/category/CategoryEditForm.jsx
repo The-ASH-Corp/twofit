@@ -31,6 +31,7 @@ const CategoryEditForm = () => {
 
   const dispatch = useDispatch();
   const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
       if (id) {
