@@ -75,6 +75,8 @@ import ExpertPrograms from "./pages/expert/programsList/ProgramTable";
 import ExpertPlanDetails from "./pages/expert/programsList/PlanDetailsView";
 import ExpertFinance from "./pages/expert/finance/FinanceTable";
 import ExpertClientProfile from "./pages/expert/clients/ClientProfile";
+import ExpertTherapyList from "./pages/expert/therapy/TherapyTable";
+import ExpertTherapyPlanDetails from "./pages/expert/therapy/TherapyViewPlan";
 // Client Pages Import
 import ClientLayout from "./pages/client/layout/ClientLayout";
 import ClientDashboard from "./pages/client/Dashboard";
@@ -222,7 +224,7 @@ function App() {
           <Route path="therapy" element={<TherapyList />} />
           <Route path="therapy/create" element={<TherapyForm />} />
           <Route path="profile" element={<Profile />} />
-          {/* <Route path="therapy/plans" element={<TherapyDetails/>}/> */}
+          <Route path="therapy/plans" element={<TherapyDetails/>}/>
         </Route>
 
         {/* EXPERT */}
@@ -242,6 +244,8 @@ function App() {
           <Route path="programs/viewPlan" element={<ExpertPlanDetails />} />
           <Route path="profile" element={<Profile />} />
           <Route path="finance" element={<ExpertFinance />} />
+          <Route path="therapy" element={<ExpertTherapyList/>}/>
+          <Route path="therapy/plan/:id" element={<ExpertTherapyPlanDetails/>}/>
         </Route>
 
         {/* CLIENT */}
