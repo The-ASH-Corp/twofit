@@ -70,6 +70,7 @@ export default function BaseForm({
                             label={field.label ?? "just text"}
                             name={field.name}
                             options={field.options}
+                            allowCustom={field.allowCustom}
                           />
                         );
                       } else if (field.type === "file") {
@@ -167,6 +168,7 @@ export default function BaseForm({
                             label={field.label ?? "just text"}
                             name={field.name}
                             options={field.options}
+                            allowCustom={field.allowCustom}
                           />
                         );
                       }

@@ -9,11 +9,16 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { fetchTherapyPlans } from "@/redux/features/therapy/therapy.thunk";
 
 export default function ExpertForm() {
   const dispatch = useDispatch();
   const user = useSelector(selectUser);
   const [program, setProgram] = useState(null);
+  const [therapy, setTherapy] = useState(null);
+  const [selectedRole, setSelectedRole] = useState("");
+
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,6 +27,9 @@ export default function ExpertForm() {
     ).then((res) => {
       setProgram(res.payload.data);
     });
+    dispatch(fetchTherapyPlans()).then((res) => {
+      setTherapy(res.payload.data);
+    })
   }, [dispatch]);
 
   const fields = [
@@ -67,6 +75,10 @@ export default function ExpertForm() {
             { label: "Dietician", value: "Dietician" },
             { label: "Therapist", value: "Therapist" },
           ],
+          onChange: (e, form) => {
+            setSelectedRole(e.target.value);
+            form.setFieldValue("chooseProgram", []);
+          },
         },
         {
           name: "specialization",
@@ -76,6 +88,7 @@ export default function ExpertForm() {
             label: spec,
             value: spec,
           })),
+          allowCustom: true,
         },
         { name: "experience", label: "Experience", type: "text" },
         { name: "qualification", label: "Qualification", type: "text" },
@@ -95,6 +108,7 @@ export default function ExpertForm() {
             { label: "Tamil", value: "tamil" },
             { label: "Hindi", value: "hindi" },
           ],
+          allowCustom: true,
         },
       ],
     },
@@ -102,15 +116,25 @@ export default function ExpertForm() {
       section: "Program Assignment",
       position: "left",
       fields: [
-        {
-          name: "chooseProgram",
-          label: "Choose Program",
-          type: "multiple",
-          options: program?.map((prog) => ({
-            label: prog.title,
-            value: prog._id,
-          }))
-        }
+        selectedRole === "Therapist"
+          ? {
+              name: "chooseProgram",
+              label: "Choose Therapy",
+              type: "multiple",
+              options: therapy?.map((thr) => ({
+                label: thr.name,
+                value: thr._id,
+              })),
+            }
+          : {
+              name: "chooseProgram",
+              label: "Choose Program",
+              type: "multiple",
+              options: program?.map((prog) => ({
+                label: prog.title,
+                value: prog._id,
+              })),
+            },
       ],
     },
     {
@@ -154,23 +178,6 @@ export default function ExpertForm() {
       position: "right",
       fields: [{ name: "baseSalary", label: "Base Salary", type: "text" }],
     },
-    // {
-    //   section: "Enable Incentives",
-    //   position: "right",
-    //   fields: [
-    //     { name: "ratingIncentive", label: "Rating Incentives", type: "toggle" },
-    //     {
-    //       name: "responseTimeIncentive",
-    //       label: "Response Time Incentives",
-    //       type: "toggle",
-    //     },
-    //     {
-    //       name: "complianceIncentive",
-    //       label: "Compliance Incentives",
-    //       type: "toggle",
-    //     },
-    //   ],
-    // },
     {
       section: "Account Setup",
       position: "right",

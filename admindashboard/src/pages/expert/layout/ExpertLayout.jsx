@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 export default function AppLayout() {
     useEffect(() => {
-    document.title = "Expect Dashboard | Twofit";
+    document.title = "Expert Dashboard | Twofit";
   }, []);
   return (
     <div className="flex min-h-screen bg-gray-50">

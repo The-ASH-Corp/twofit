@@ -2,7 +2,14 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { assets } from "../../../assets/asset";
 import { useDispatch } from "react-redux";
 import { logout } from "@/redux/features/auth/auth.thunk";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 
+
+export default function Sidebar() {
+  const user =useAppSelector(selectUser)
+
+  
 const menuItems = [
   {
     label: "Dashboard",
@@ -10,16 +17,26 @@ const menuItems = [
     path: "/expert",
   },
   { label: "Clients", icon: assets.clients, path: "/expert/clients" },
-  {
-    label: "Programs",
-    icon: assets.programs,
-    path: "/expert/programs",
-  },
+  ...(user?.role?.toLowerCase() !== "therapist"
+    ? [
+        {
+          label: "Programs",
+          icon: assets.programs,
+          path: "/expert/programs",
+        },
+      ]
+    : [
+        {
+          label: "Therapy",
+          icon: assets.programs,
+          path: "/expert/therapy",
+        },
+      ]),
   { label: "Finance", icon: assets.finance, path: "/expert/finance" },
   { label: "Chats", icon: assets.chats, path: "/expert/chats" },
 ];
 
-export default function Sidebar() {
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
