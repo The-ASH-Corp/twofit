@@ -86,16 +86,9 @@ const HeadForm = () => {
             options: [
               { label: "pcod", value: "pcod" },
               { label: "thyroid", value: "thyroid" },
-              { label: "astma", value: "astma" },
               { label: "diabetes", value: "diabetes" },
-              { label: "hypertension", value: "hypertension" },
-              { label: "obesity", value: "obesity" },
-              { label: "osteoporosis", value: "osteoporosis" },
-              {
-                label: "polycystic ovarian syndrome",
-                value: "polycystic ovarian syndrome",
-              },
             ],
+            allowCustom: true,
           },
           {
             name: "experience",
