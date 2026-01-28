@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Users, FileText, TrendingUp, Activity } from "lucide-react";
+import { Users, FileText, TrendingUp, Activity, MoreHorizontal } from "lucide-react";
 import { Bar, Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -218,25 +218,6 @@ export default function Dashboard() {
     },
   };
 
-  // Performance Doughnut Data
-  const performanceData = {
-    datasets: [
-      {
-        data: [22, 18, 14],
-        backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
-        borderWidth: 0,
-        circumference: 180,
-        rotation: 270,
-        cutout: "80%",
-        hoverOffset: 1,
-        spacing: 3,
-        borderRadius: 6,
-      },
-    ],
-  };
-
-
-
   // Activity Log Data
   const activityLog = [
     {
@@ -346,7 +327,61 @@ export default function Dashboard() {
     }
   }, [dispatch, user?._id, token]);
 
-  console.log(user?.role.toLowerCase())
+  
+  // Performance Doughnut Data
+  const performanceData = {
+    labels: ["Task Completion", "Client Load", "Rating"],
+    datasets: [
+      {
+        data: [
+          dashboardStats?.totalCompliance,
+          dashboardStats?.clientLoad,
+          dashboardStats?.avarageRating,
+        ],
+        backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
+        borderWidth: 0,
+        circumference: 360,
+        rotation: -90,
+        cutout: "75%",
+        hoverOffset: 4,
+        spacing: 3,
+        borderRadius: 20,
+      },
+    ],
+    options: {
+                    plugins: {
+                      legend: { display: false },
+                      tooltip: {
+                        callbacks: {
+                          label: function (context) {
+                            let label = context.label || "";
+                            if (label) {
+                              label += ": ";
+                            }
+                            if (
+                              context.raw !== null &&
+                              context.raw !== undefined
+                            ) {
+                              label += context.raw;
+                              if (
+                                context.label === "Task Completion" ||
+                                context.label === "Client Load"
+                              ) {
+                                label += "%";
+                              }
+                            }
+                            return label;
+                          },
+                        },
+                      },
+                    },
+                    maintainAspectRatio: false,
+                    cutout: "75%",
+                  }
+  };
+
+
+
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA] h-[calc(100vh-120px)] overflow-auto no-scrollbar">
       {/* Top Metrics */}
@@ -531,61 +566,41 @@ export default function Dashboard() {
         {/* Right Section - My Performance & Daily Activity */}
         <div className="space-y-6">
           {/* My Performance Card */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h2 className="text-[16px] font-bold text-gray-900 mb-6">
-              My Performance
-            </h2>
-
+          <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col border border-gray-50 h-[500px] overflow-hidden">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-base font-bold text-[#0A4F48]">
+                My Performance
+              </h3>
+            </div>
+                  
             {/* Circular Progress Chart */}
-            <div className="flex justify-center items-center mb-6 pt-4">
-              <div className="relative w-48 h-28">
+            <div className="flex-1 relative flex items-center justify-center -mt-4">
+              <div className="w-50 h-50">
                 <Doughnut
                   data={performanceData}
-                  options={{
-                    plugins: { legend: { display: false } },
-                    maintainAspectRatio: false,
-                    cutout: "80%",
-                  }}
+                  options={performanceData.options }
                 />
-                <div
-                  className="absolute inset-0 flex items-center justify-center"
-                  style={{ top: "10px" }}
-                >
-                  <div className="text-center">
-                    <p className="text-[32px] font-bold text-gray-900">50%</p>
-                  </div>
-                </div>
               </div>
             </div>
 
-            {/* Performance Metrics */}
-            <div className="space-y-4">
-              <div className="flex justify-between items-center pb-4 border-b border-gray-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-[#0A4F48]"></div>
-                  <span className="text-[13px] text-gray-600">
-                    Task Completion
-                  </span>
-                </div>
-                <span className="text-[15px] font-bold text-gray-900">50%</span>
+            {/* Performance Metrics List */}
+            <div className="flex flex-col gap-3 mt-4">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-[#F8F9FA] relative overflow-hidden">
+                 <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#0A4F48] rounded-l-lg"></div>
+                 <span className="ml-3 text-[13px] font-medium text-gray-700">Task Completion</span>
+                 <span className="text-[14px] font-bold text-[#0A4F48]">{dashboardStats?.totalCompliance || 0}%</span>
               </div>
 
-              <div className="flex justify-between items-center pb-4 border-b border-gray-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-[#F4DBC7]"></div>
-                  <span className="text-[13px] text-gray-600">Rating</span>
-                </div>
-                <span className="text-[15px] font-bold text-gray-900">
-                  {dashboardStats?.avarageRating || 0}
-                </span>
+               <div className="flex items-center justify-between p-3 rounded-lg bg-[#F8F9FA] relative overflow-hidden">
+                 <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#F4DBC7] rounded-l-lg"></div>
+                 <span className="ml-3 text-[13px] font-medium text-gray-700">Rating</span>
+                 <span className="text-[14px] font-bold text-[#0A4F48]">{dashboardStats?.avarageRating || 0}</span>
               </div>
 
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-3">
-                  <div className="w-3 h-3 rounded-full bg-[#EBF3F2]"></div>
-                  <span className="text-[13px] text-gray-600">Client Load</span>
-                </div>
-                <span className="text-[15px] font-bold text-gray-900">73%</span>
+              <div className="flex items-center justify-between p-3 rounded-lg bg-[#F8F9FA] relative overflow-hidden">
+                 <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#EBF3F2] rounded-l-lg"></div>
+                 <span className="ml-3 text-[13px] font-medium text-gray-700">Client Load</span>
+                 <span className="text-[14px] font-bold text-[#0A4F48]">{dashboardStats?.clientLoad || 0}%</span>
               </div>
             </div>
           </div>
