@@ -75,8 +75,8 @@ export const createCoach = async (coach) => {
     qualification: coach.qualification,
     certifications: coach.certifications,
     languages: coach.languages,
-    assignedPrograms: coach.chooseProgram ??  null,
-    assignedTherapy:coach.chooseTherapy ?? null,
+    assignedPrograms: coach.chooseProgram ?? null,
+    assignedTherapy: coach.chooseTherapy ?? null,
     maxClient: coach.clientLimit,
     workingDays: coach.workingdays,
     workingHours: coach.workingHours,
@@ -86,7 +86,7 @@ export const createCoach = async (coach) => {
     salary: coach.baseSalary,
     status: "Active",
   });
- 
+
   await AdminModel.findByIdAndUpdate(
     coach.adminId,
     { $addToSet: { experts: coachCreated._id } },
@@ -207,7 +207,7 @@ export const createFeedback = async (expertId, userId, rating, feedback) => {
 
 export const getCoachDashboardStats = async (coachId) => {
   const coach = await CoachModel.findById(coachId).select(
-    "avgRating adminId assignedPrograms role",
+    "avgRating adminId assignedPrograms role assignedTherapy maxClient assignedUsers",
   );
   if (!coach) {
     throw new Error("Coach not found");
@@ -228,6 +228,8 @@ export const getCoachDashboardStats = async (coachId) => {
 
   // Count programs: Start with what is assigned directly to the coach
   let totalPrograms = coach.assignedPrograms?.length || 0;
+
+  let therapyCount = coach.assignedTherapy?.length || 0;
 
   // If direct assignments are 0, fallback to checking their associated admin's program list
   if (totalPrograms === 0 && coach.adminId) {
@@ -250,7 +252,6 @@ export const getCoachDashboardStats = async (coachId) => {
       );
     }),
   ).then((compliances) => {
-    console.log(compliances);
     const totalCompliance = compliances.reduce(
       (sum, comp) => sum + comp[roleMap[coach.role.toLowerCase()]],
       0,
@@ -262,11 +263,14 @@ export const getCoachDashboardStats = async (coachId) => {
 
   const avarageRating = coach.avgRating || 0;
 
+  const clientLoad =( coach.assignedUsers.length / (coach.maxClient || 1) ) * 100;
   return {
     totalCompliance: totalClientComplience,
     totalClients: totalClients.length,
-    totalPrograms,
+    totalPrograms:
+      coach.role.toLowerCase() === "therapist" ? therapyCount : totalPrograms,
     avarageRating,
+    clientLoad: clientLoad.toFixed(2),
   };
 };
 
