@@ -50,8 +50,50 @@ export const getHeadById = async (id) => {
   });
 };
 
-export const updateHead = async (id, updatedData) => {
-  return await HeadsModel.findByIdAndUpdate(id, updatedData);
+export const updateHead = async (id, data) => {
+   try {
+      if (!data?.name || !data?.email || !data?.phone) {
+        throw new Error("Name, email, and phone are required");
+      }
+  
+      const duplicate = await HeadsModel.findOne({
+        _id: { $ne: id },
+        $or: [
+          { name: data.name.trim() },
+          { email: data.email?.trim() },
+          { phone: data.phone?.trim() },
+        ],
+      });
+
+      if (duplicate) {
+        throw new Error("Head already exists with same name, email, or phone");
+      }
+  
+      const updated = await HeadsModel.findByIdAndUpdate(
+        id,
+        {
+          name: data.name.trim(),
+          dob: data.dob,
+          gender: data.gender,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          specialization: data.specialization,
+          experience: data.experience,
+          qualification: data.qualification,
+          salary: data.salary,
+        },
+        { new: true, runValidators: true },
+      );
+  
+      if (!updated) {
+        throw new Error("Head not found");
+      }
+  
+      return updated;
+    } catch (error) {
+      throw error;
+    }
 };
 
 export const deleteHead = async (id) => {

@@ -167,7 +167,7 @@ const HeadForm = () => {
       <BaseForm
         fields={fields}
         initialValues={initialValues}
-        heading = {"Head"}
+        heading = {"Add Head"}
         onSubmit={(value) => handelSubmit(value)}
       />
     </div>
