@@ -77,7 +77,7 @@ const userSchema = new mongoose.Schema(
     therapyType:{
       type:mongoose.Schema.Types.ObjectId,
       ref:"Therapy",
-      require:true,
+      required:true,
     },
 
     duration: { type: Number, required: true },
