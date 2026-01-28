@@ -84,14 +84,14 @@ export const deleteProgram = async (id) => {
       usersUsingProgram.length
     ) {
       const adminNames = adminsUsingProgram.map((a) => a.name).join(", ");
-      const coachNames = coachesUsingProgram.map((c) => c.name).join(", ");
-      const userNames = usersUsingProgram.map((u) => u.name).join(", ");
+      const coachNames = coachesUsingProgram.map((e) => e.name).join(", ");
+      const userNames = usersUsingProgram.map((c) => c.name).join(", ");
 
       let message = "Cannot delete program.this program";
 
-      if (adminNames) message += ` Assigned to admins: ${adminNames}.`;
-      if (coachNames) message += ` Assigned to expert: ${coachNames}.`;
-      if (userNames) message += ` Assigned to client: ${userNames}.`;
+      if (adminNames) message += ` Assigned to admins: ${adminNames},`;
+      if (coachNames) message += ` Assigned to experts: ${coachNames},`;
+      if (userNames) message += ` Assigned to clients: ${userNames},`;
 
       return {
         canDelete: false,
