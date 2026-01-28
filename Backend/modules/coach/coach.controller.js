@@ -15,6 +15,7 @@ export const createCoach = async (req, res) => {
     }
 
     const coach = await coachService.createCoach(req.body);
+     
     res
       .status(201)
       .json({

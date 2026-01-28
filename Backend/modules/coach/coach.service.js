@@ -14,6 +14,7 @@ export const createCoach = async (coach) => {
     "workingdays",
     "specialization",
     "chooseProgram",
+    "chooseTherapy",
     "languages",
   ];
   const booleanFields = [
@@ -74,7 +75,8 @@ export const createCoach = async (coach) => {
     qualification: coach.qualification,
     certifications: coach.certifications,
     languages: coach.languages,
-    assignedPrograms: coach.chooseProgram,
+    assignedPrograms: coach.chooseProgram ??  null,
+    assignedTherapy:coach.chooseTherapy ?? null,
     maxClient: coach.clientLimit,
     workingDays: coach.workingdays,
     workingHours: coach.workingHours,
@@ -84,7 +86,7 @@ export const createCoach = async (coach) => {
     salary: coach.baseSalary,
     status: "Active",
   });
-
+ 
   await AdminModel.findByIdAndUpdate(
     coach.adminId,
     { $addToSet: { experts: coachCreated._id } },

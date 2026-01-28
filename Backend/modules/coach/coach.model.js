@@ -35,6 +35,7 @@ const coachSchema = new mongoose.Schema(
         required: true,
       },
     ],
+    assignedTherapy: [{ type: mongoose.Schema.Types.ObjectId, ref: "Therapy" }],
 
     image: { type: String },
 
@@ -113,7 +114,7 @@ const coachSchema = new mongoose.Schema(
     incentives: { type: Number, default: 0 }, // total
     adminId: { type: mongoose.Schema.Types.ObjectId, ref: "Admin" },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export const CoachModel = mongoose.model("Coach", coachSchema);

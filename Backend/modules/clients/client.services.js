@@ -16,6 +16,7 @@ export const getSingleClient = async (id) => {
   const client = await User.findById(id)
     .select("-password")
     .populate("programType")
+    .populate("therapyType")
     .populate("trainer")
     .populate("dietition")
     .populate("therapist")
