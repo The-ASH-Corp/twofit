@@ -45,6 +45,20 @@ export const getHead = createAsyncThunk(
   },
 );
 
+export const updateHead = createAsyncThunk(
+  "head/update",
+  async ({ id, updatedData }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.put(`/heads/update/${id}`, updatedData);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update head",
+      );
+    }
+  },
+);
+
 export const getDashboardData = createAsyncThunk(
   "head/get-dashboard-data",
   async (headId, { rejectWithValue }) => {

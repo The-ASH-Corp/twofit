@@ -26,7 +26,7 @@ const adminSchema = new mongoose.Schema(
     automatedReminder: { type: Boolean, default: false },
     status: { type: String, default: "Active" },
     headId: { type: mongoose.Schema.Types.ObjectId, ref: "Heads" },
-    experience: { type: String, required: true },
+    experience: { type: String, required: true },  
     qualification: { type: String, required: true },
   },
   { timestamps: true }

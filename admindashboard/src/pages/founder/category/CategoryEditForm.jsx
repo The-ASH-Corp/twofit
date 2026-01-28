@@ -65,7 +65,7 @@ const CategoryEditForm = () => {
         toast.success("Category updated successfully");
         navigate("/founder/categories");
       } else {
-        toast.error("Failed to create category");
+        toast.error("Failed to update category");
       }
     } catch (error) {
       // console.log(error)

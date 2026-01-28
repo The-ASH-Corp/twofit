@@ -1,7 +1,7 @@
 import BaseForm from '@/components/form/BaseForm';
 import { selectCategoryError, selectCategoryStatus } from '@/redux/features/category/category.selector';
 import { selectHead } from '@/redux/features/head/head.selectors';
-import { getHead } from '@/redux/features/head/head.thunk';
+import { getHead, updateHead } from '@/redux/features/head/head.thunk';
 import { useAppSelector } from '@/redux/store/hooks';
 import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux';
@@ -136,20 +136,22 @@ const HeadEditForm = () => {
     salary: data.salary,
   };
 
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handelSubmit = async (value) => {
-    // try {
-    //   const result = await dispatch(createHead(value)).unwrap();
-    //   if (result.success) {
-    //     toast.success("Head created successfully");
-    //     navigate("/founder/heads");
-    //   } else {
-    //     toast.error("Failed to create head");
-    //   }
-    // } catch (error) {
-    //   toast.error(error || "Failed to create head");
-    // }
+    try {
+          const head = await dispatch(
+            updateHead({ id, updatedData: value }),
+          ).unwrap();
+          if (head.success) {
+            toast.success("Head updated successfully");
+            navigate("/founder/heads");
+          } else {
+            toast.error("Failed to update head");
+          }
+        } catch (error) {
+          toast.error(`Head updating failed: ${error}`);
+        }
   };
 
   if (status === "loading")
@@ -166,7 +168,7 @@ const HeadEditForm = () => {
         fields={fields}
         initialValues={initialValues}
         enableReinitialize
-        heading={"Head"}
+        heading={"Update Head"}
         onSubmit={(value) => handelSubmit(value)}
       />
     </div>

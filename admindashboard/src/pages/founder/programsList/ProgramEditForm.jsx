@@ -109,7 +109,7 @@ const ProgramEditForm = () => {
           fields={fields}
           initialValues={initialValues}
           enableReinitialize
-          heading={"Program"}
+          heading={"Update Program"}
           onSubmit={(values) => {
             handleProgramCreation(values);
           }}
