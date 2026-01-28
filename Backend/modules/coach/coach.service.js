@@ -263,7 +263,8 @@ export const getCoachDashboardStats = async (coachId) => {
 
   const avarageRating = coach.avgRating || 0;
 
-  const clientLoad =( coach.assignedUsers.length / (coach.maxClient || 1) ) * 100;
+  const clientLoad =
+    (coach.assignedUsers.length / (coach.maxClient || 1)) * 100;
   return {
     totalCompliance: totalClientComplience,
     totalClients: totalClients.length,
@@ -356,4 +357,84 @@ export const founderCoachList = async (page, limit) => {
   } catch (error) {
     throw error;
   }
+};
+
+export const getClientComplianceGraphData = async (coachId, duration) => {
+  const coach = await CoachModel.findById(coachId).select("assignedUsers role");
+  if (!coach) {
+    throw new Error("Coach not found");
+  }
+  const coachObjectId = new mongoose.Types.ObjectId(coachId);
+
+  // Dynamically get assigned clients from User model
+  const totalClients = await User.find({
+    $or: [
+      { trainer: coachObjectId },
+      { dietition: coachObjectId },
+      { therapist: coachObjectId },
+    ],
+  })
+    .populate({ path: "programType", populate: { path: "plan" } })
+    .populate("therapyType");
+    
+  const complianceData = await Promise.all(
+    totalClients.map((user) => {
+      // duration is only for Monthwise data generation inside the function
+      return getUserComplianceStats(
+        user._id,
+        user?.programType.plan,
+        user?.therapyType,
+        user?.programType?.title,
+        duration,
+      );
+    }),
+  );
+
+  const monthMap = {};
+
+  complianceData.forEach((comp) => {
+    const roleKey = coach.role.toLowerCase();
+
+    comp.monthwiseData.forEach((m) => {
+      const month = m.month;
+
+      // IMPORTANT: use month compliance, not overall
+      const complianceValue = m.compliance;
+
+      if (!monthMap[month]) {
+        monthMap[month] = {
+          High: 0,
+          Medium: 0,
+          Low: 0,
+          total: 0,
+        };
+      }
+
+      if (complianceValue >= 80) {
+        monthMap[month].High++;
+      } else if (complianceValue >= 50) {
+        monthMap[month].Medium++;
+      } else {
+        monthMap[month].Low++;
+      }
+
+      monthMap[month].total++;
+    });
+  });
+
+  const monthwiseComplianceGraph = Object.entries(monthMap).map(
+    ([month, data]) => ({
+      month,
+      High: Math.round((data.High / data.total) * 100),
+      Medium: Math.round((data.Medium / data.total) * 100),
+      Low: Math.round((data.Low / data.total) * 100),
+    }),
+  );
+  console.log(monthwiseComplianceGraph);
+
+  return {
+    duration,
+    totalClients: totalClients.length,
+    monthwiseCompliance: monthwiseComplianceGraph,
+  };
 };

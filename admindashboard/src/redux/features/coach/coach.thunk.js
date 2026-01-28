@@ -121,3 +121,20 @@ export const getFounderAllCoaches = createAsyncThunk(
     }
   },
 );
+
+export const getClientComplianceGraphData = createAsyncThunk(
+  "coach/getClientComplianceGraphData",
+  async (duration, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/coach/client-compliance-graph/${duration}`,
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          "Failed to get client compliance graph data",
+      );
+    }
+  },
+);

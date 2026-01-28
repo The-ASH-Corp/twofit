@@ -1,5 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Users, FileText, TrendingUp, Activity, MoreHorizontal } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  Users,
+  FileText,
+  TrendingUp,
+  Activity,
+  MoreHorizontal,
+} from "lucide-react";
 import { Bar, Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -15,7 +21,10 @@ import ReviewDrawer from "./components/ReviewDrawer";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { getCoachDashboardStats } from "@/redux/features/coach/coach.thunk";
+import {
+  getClientComplianceGraphData,
+  getCoachDashboardStats,
+} from "@/redux/features/coach/coach.thunk";
 import { getPendingSubmissions } from "@/redux/features/tasks/task.thunk";
 import { socket } from "@/utils/socket";
 import { selectToken } from "@/redux/features/auth/auth.selectores";
@@ -32,6 +41,86 @@ ChartJS.register(
 
 export default function Dashboard() {
   const [selectedReview, setSelectedReview] = useState(null);
+  const dispatch = useDispatch();
+  const user = useAppSelector(selectUser);
+  const token = useAppSelector(selectToken);
+  const { pendingTasks } = useAppSelector((state) => state.tasks);
+  const [dashboardStats, setDashboardStats] = useState(null);
+  const [clientComplianceGraphData, setClientComplianceGraphData] = useState(null);
+  const [complianceDuration, setComplianceDuration] = useState("12");
+
+  console.log("Client Compliance Graph Data:", clientComplianceGraphData);
+  
+  // Group pending tasks by user and day
+  const groupedPendingTasks = useMemo(() => {
+    if (!pendingTasks || pendingTasks.length === 0) return [];
+
+    const groups = {};
+
+    pendingTasks.forEach((task) => {
+      const key = `${task.userId?._id}-${task.globalDayIndex}`;
+      if (!groups[key]) {
+        groups[key] = {
+          userId: task.userId,
+          programId: task.programId,
+          globalDayIndex: task.globalDayIndex,
+          weekIndex: task.weekIndex,
+          dayIndex: task.dayIndex,
+          tasks: [],
+          createdAt: task.createdAt,
+        };
+      }
+      groups[key].tasks.push(task);
+    });
+
+    return Object.values(groups);
+  }, [pendingTasks]);
+
+  const fetchData = async () => {
+    dispatch(getCoachDashboardStats(user._id)).then((res) => {
+      if (res.meta?.requestStatus === "fulfilled") {
+        setDashboardStats(res.payload);
+      }
+    });
+    dispatch(getClientComplianceGraphData(complianceDuration)).then((res) => {
+      if (res.meta?.requestStatus === "fulfilled") {
+        setClientComplianceGraphData(res.payload);
+      }
+    });
+    dispatch(getPendingSubmissions());
+  };
+
+  useEffect(() => {
+    if (user?._id && token) {
+      fetchData();
+
+      // Socket.IO Setup
+      socket.auth = { userId: user._id, token: token };
+      socket.connect();
+
+      socket.on("connect", () => {
+        console.log("Dashboard socket connected");
+        socket.emit("join_task_rooms", { role: user.role });
+      });
+
+      socket.on("new_task_submission", (data) => {
+        console.log("New task submission received via socket:", data);
+        fetchData(); // Refresh data in real-time
+      });
+
+      socket.on("task_updated", (data) => {
+        console.log("Task updated via socket:", data);
+        fetchData(); // Refresh data in real-time
+      });
+
+      return () => {
+        socket.off("connect");
+        socket.off("new_task_submission");
+        socket.off("task_updated");
+        socket.disconnect();
+      };
+    }
+  }, [dispatch, user?._id, token,complianceDuration]);
 
   // Compliance Chart Data
   const complianceData = {
@@ -254,80 +343,7 @@ export default function Dashboard() {
     };
     return statusMap[status] || "bg-gray-50 text-gray-700";
   };
-  const dispatch = useDispatch();
-  const user = useAppSelector(selectUser);
-  const token = useAppSelector(selectToken);
-  const { pendingTasks } = useAppSelector((state) => state.tasks);
-  const [dashboardStats, setDashboardStats] = useState(null);
 
-  // Group pending tasks by user and day
-  const groupedPendingTasks = React.useMemo(() => {
-    if (!pendingTasks || pendingTasks.length === 0) return [];
-    
-    const groups = {};
-    
-    pendingTasks.forEach(task => {
-      const key = `${task.userId?._id}-${task.globalDayIndex}`;
-      if (!groups[key]) {
-        groups[key] = {
-          userId: task.userId,
-          programId: task.programId,
-          globalDayIndex: task.globalDayIndex,
-          weekIndex: task.weekIndex,
-          dayIndex: task.dayIndex,
-          tasks: [],
-          createdAt: task.createdAt
-        };
-      }
-      groups[key].tasks.push(task);
-    });
-    
-    return Object.values(groups);
-  }, [pendingTasks]);
-
-
-  const fetchData = async () => {
-      dispatch(getCoachDashboardStats(user._id)).then((res) => {
-        if (res.meta?.requestStatus === "fulfilled") {
-          setDashboardStats(res.payload);
-        }
-      });
-    dispatch(getPendingSubmissions());
-  };
-
-  useEffect(() => {
-    if (user?._id && token) {
-      fetchData();
-
-      // Socket.IO Setup
-      socket.auth = { userId: user._id, token: token };
-      socket.connect();
-
-      socket.on("connect", () => {
-        console.log("Dashboard socket connected");
-        socket.emit("join_task_rooms", { role: user.role });
-      });
-
-      socket.on("new_task_submission", (data) => {
-        console.log("New task submission received via socket:", data);
-        fetchData(); // Refresh data in real-time
-      });
-
-      socket.on("task_updated", (data) => {
-        console.log("Task updated via socket:", data);
-        fetchData(); // Refresh data in real-time
-      });
-
-      return () => {
-        socket.off("connect");
-        socket.off("new_task_submission");
-        socket.off("task_updated");
-        socket.disconnect();
-      };
-    }
-  }, [dispatch, user?._id, token]);
-
-  
   // Performance Doughnut Data
   const performanceData = {
     labels: ["Task Completion", "Client Load", "Rating"],
@@ -349,38 +365,33 @@ export default function Dashboard() {
       },
     ],
     options: {
-                    plugins: {
-                      legend: { display: false },
-                      tooltip: {
-                        callbacks: {
-                          label: function (context) {
-                            let label = context.label || "";
-                            if (label) {
-                              label += ": ";
-                            }
-                            if (
-                              context.raw !== null &&
-                              context.raw !== undefined
-                            ) {
-                              label += context.raw;
-                              if (
-                                context.label === "Task Completion" ||
-                                context.label === "Client Load"
-                              ) {
-                                label += "%";
-                              }
-                            }
-                            return label;
-                          },
-                        },
-                      },
-                    },
-                    maintainAspectRatio: false,
-                    cutout: "75%",
-                  }
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              let label = context.label || "";
+              if (label) {
+                label += ": ";
+              }
+              if (context.raw !== null && context.raw !== undefined) {
+                label += context.raw;
+                if (
+                  context.label === "Task Completion" ||
+                  context.label === "Client Load"
+                ) {
+                  label += "%";
+                }
+              }
+              return label;
+            },
+          },
+        },
+      },
+      maintainAspectRatio: false,
+      cutout: "75%",
+    },
   };
-
-
 
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA] h-[calc(100vh-120px)] overflow-auto no-scrollbar">
@@ -422,7 +433,9 @@ export default function Dashboard() {
             <p className="text-[13px] text-gray-500 font-medium">
               Client Compliance
             </p>
-            <p className="text-[24px] font-bold text-gray-900">{dashboardStats?.totalCompliance || 0}%</p>
+            <p className="text-[24px] font-bold text-gray-900">
+              {dashboardStats?.totalCompliance || 0}%
+            </p>
           </div>
         </div>
 
@@ -431,7 +444,11 @@ export default function Dashboard() {
             <Activity size={20} className="text-[#45C4A2]" />
           </div>
           <div>
-            <p className="text-[13px] text-gray-500 font-medium">{user?.role.toLowerCase() !== "therapist" ? "Programs" : "Therapy"}</p>
+            <p className="text-[13px] text-gray-500 font-medium">
+              {user?.role.toLowerCase() !== "therapist"
+                ? "Programs"
+                : "Therapy"}
+            </p>
             <p className="text-[24px] font-bold text-gray-900">
               {dashboardStats?.totalPrograms || 0}
             </p>
@@ -451,10 +468,13 @@ export default function Dashboard() {
                 <h2 className="text-[16px] font-bold text-gray-900">
                   Client Compliance
                 </h2>
-                <select className="text-[13px] text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A4F48]">
-                  <option>Last Year</option>
-                  <option>Last 6 Months</option>
-                  <option>Last 3 Months</option>
+                <select
+                  className="text-[13px] text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A4F48]"
+                  onChange={(e) => setComplianceDuration(e.target.value)}
+                >
+                  <option value="12">Last Year</option>
+                  <option value="6">Last 6 Months</option>
+                  <option value="3">Last 3 Months</option>
                 </select>
               </div>
               <div className="h-[260px]">
@@ -532,7 +552,8 @@ export default function Dashboard() {
                           {group.programId?.title || "N/A"}
                         </td>
                         <td className="py-4 text-[13px] text-gray-600">
-                          Day {group.globalDayIndex} ({group.tasks.length} {group.tasks.length === 1 ? 'task' : 'tasks'})
+                          Day {group.globalDayIndex} ({group.tasks.length}{" "}
+                          {group.tasks.length === 1 ? "task" : "tasks"})
                         </td>
                         <td className="py-4 text-[13px] text-gray-600">
                           {new Date(group.createdAt).toLocaleString()}
@@ -572,13 +593,13 @@ export default function Dashboard() {
                 My Performance
               </h3>
             </div>
-                  
+
             {/* Circular Progress Chart */}
             <div className="flex-1 relative flex items-center justify-center -mt-4">
               <div className="w-50 h-50">
                 <Doughnut
                   data={performanceData}
-                  options={performanceData.options }
+                  options={performanceData.options}
                 />
               </div>
             </div>
@@ -586,21 +607,33 @@ export default function Dashboard() {
             {/* Performance Metrics List */}
             <div className="flex flex-col gap-3 mt-4">
               <div className="flex items-center justify-between p-3 rounded-lg bg-[#F8F9FA] relative overflow-hidden">
-                 <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#0A4F48] rounded-l-lg"></div>
-                 <span className="ml-3 text-[13px] font-medium text-gray-700">Task Completion</span>
-                 <span className="text-[14px] font-bold text-[#0A4F48]">{dashboardStats?.totalCompliance || 0}%</span>
-              </div>
-
-               <div className="flex items-center justify-between p-3 rounded-lg bg-[#F8F9FA] relative overflow-hidden">
-                 <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#F4DBC7] rounded-l-lg"></div>
-                 <span className="ml-3 text-[13px] font-medium text-gray-700">Rating</span>
-                 <span className="text-[14px] font-bold text-[#0A4F48]">{dashboardStats?.avarageRating || 0}</span>
+                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#0A4F48] rounded-l-lg"></div>
+                <span className="ml-3 text-[13px] font-medium text-gray-700">
+                  Task Completion
+                </span>
+                <span className="text-[14px] font-bold text-[#0A4F48]">
+                  {dashboardStats?.totalCompliance || 0}%
+                </span>
               </div>
 
               <div className="flex items-center justify-between p-3 rounded-lg bg-[#F8F9FA] relative overflow-hidden">
-                 <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#EBF3F2] rounded-l-lg"></div>
-                 <span className="ml-3 text-[13px] font-medium text-gray-700">Client Load</span>
-                 <span className="text-[14px] font-bold text-[#0A4F48]">{dashboardStats?.clientLoad || 0}%</span>
+                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#F4DBC7] rounded-l-lg"></div>
+                <span className="ml-3 text-[13px] font-medium text-gray-700">
+                  Rating
+                </span>
+                <span className="text-[14px] font-bold text-[#0A4F48]">
+                  {dashboardStats?.avarageRating || 0}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between p-3 rounded-lg bg-[#F8F9FA] relative overflow-hidden">
+                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#EBF3F2] rounded-l-lg"></div>
+                <span className="ml-3 text-[13px] font-medium text-gray-700">
+                  Client Load
+                </span>
+                <span className="text-[14px] font-bold text-[#0A4F48]">
+                  {dashboardStats?.clientLoad || 0}%
+                </span>
               </div>
             </div>
           </div>
