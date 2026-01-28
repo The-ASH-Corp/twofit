@@ -1,13 +1,14 @@
 import BaseForm from '@/components/form/BaseForm';
 import { selectAllCategories } from '@/redux/features/category/category.selector';
 import { getAllCategories } from '@/redux/features/category/category.thunk';
-import { selectProgramById } from '@/redux/features/program/program.selector';
+import { selectProgramById, selectProgramStatus } from '@/redux/features/program/program.selector';
 import { clearSelectedProgram } from '@/redux/features/program/program.slice';
 import { getProgramById, updateProgram } from '@/redux/features/program/program.thunk';
 import { useAppSelector } from '@/redux/store/hooks';
 import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
+import { SyncLoader } from 'react-spinners';
 import { toast } from 'react-toastify';
 
 const ProgramEditForm = () => {
@@ -69,8 +70,7 @@ const ProgramEditForm = () => {
     ];
 
     const program = useAppSelector(selectProgramById);
-    console.log(program)
-
+    const status = useAppSelector(selectProgramStatus);
   
     const initialValues = {
       title: program?.title,
@@ -97,6 +97,12 @@ const ProgramEditForm = () => {
            toast.error(`program updating failed: ${error}`);
          }
     };
+    if (status === "loading")
+      return (
+        <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+          <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+        </div>
+      );
     return (
       <div>
         <BaseForm

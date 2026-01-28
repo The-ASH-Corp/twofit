@@ -86,6 +86,7 @@ const CategoryEditForm = () => {
       <BaseForm
         fields={fields}
         initialValues={initialValues}
+        enableReinitialize
         heading={"Update Category"}
         onSubmit={(value) => handelSubmit(value)}
       />
