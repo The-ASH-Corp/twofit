@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { assets } from "@/assets/asset";
 import React, { useCallback, useEffect, useState } from "react";
 import ProgressChart from "../components/ProgressChart";
@@ -32,18 +33,16 @@ export default function Progress() {
       const program = await dispatch(getProgramById(programId)).unwrap();
       const compliance = await dispatch(fetchClientComplianceStats()).unwrap();
       setComplianceData(compliance);
-      setProgram(program);
+      setProgram(program.data);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, dispatch]);
 
   useEffect(() => {
     if (user?._id && user?.programType) {
       fetchDashboardData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?._id, user?.programType]);
 
   const kpiData = [

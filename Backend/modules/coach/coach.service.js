@@ -179,7 +179,7 @@ export const createFeedback = async (expertId, userId, rating, feedback) => {
   });
 
   if (exists) {
-    throw new Error("You have already submitted a review for this coach"); 
+    throw new Error("You have already submitted a review for this coach");
   }
   // Push feedback
   const coach = await CoachModel.findByIdAndUpdate(
@@ -205,7 +205,7 @@ export const createFeedback = async (expertId, userId, rating, feedback) => {
 
 export const getCoachDashboardStats = async (coachId) => {
   const coach = await CoachModel.findById(coachId).select(
-    "avgRating adminId assignedPrograms",
+    "avgRating adminId assignedPrograms role",
   );
   if (!coach) {
     throw new Error("Coach not found");
@@ -220,7 +220,9 @@ export const getCoachDashboardStats = async (coachId) => {
       { dietition: coachObjectId },
       { therapist: coachObjectId },
     ],
-  }).populate({ path: "programType" ,populate:{path:"plan"}}).populate("therapyType");
+  })
+    .populate({ path: "programType", populate: { path: "plan" } })
+    .populate("therapyType");
 
   // Count programs: Start with what is assigned directly to the coach
   let totalPrograms = coach.assignedPrograms?.length || 0;
@@ -230,15 +232,32 @@ export const getCoachDashboardStats = async (coachId) => {
     const admin = await AdminModel.findById(coach.adminId).select("program");
     totalPrograms = admin?.program?.length || 0;
   }
+  const roleMap = {
+    trainer: "workout",
+    dietician: "diet",
+    therapist: "therapy",
+  };
 
-  
-  const totalClientComplience =await Promise.all(totalClients.map((user)=>{
-    return getUserComplianceStats(user._id, user?.programType.plan, user?.therapyType, user?.programType?.title);
-  })).then((compliances)=>{
-    const totalCompliance = compliances.reduce((sum, comp) => sum + comp.overall, 0);
-    return totalClients.length ? (totalCompliance / totalClients.length).toFixed(2) : 0;
+  const totalClientComplience = await Promise.all(
+    totalClients.map((user) => {
+      return getUserComplianceStats(
+        user._id,
+        user?.programType.plan,
+        user?.therapyType,
+        user?.programType?.title,
+      );
+    }),
+  ).then((compliances) => {
+    console.log(compliances);
+    const totalCompliance = compliances.reduce(
+      (sum, comp) => sum + comp[roleMap[coach.role.toLowerCase()]],
+      0,
+    );
+    return totalClients.length
+      ? (totalCompliance / totalClients.length).toFixed(2)
+      : 0;
   });
-  
+
   const avarageRating = coach.avgRating || 0;
 
   return {
