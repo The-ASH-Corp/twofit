@@ -46,13 +46,50 @@ export const getProgramById = createAsyncThunk(
   async (programId, { rejectWithValue }) => {
     try {
       const data = await axiosInstance.get(`/programs/get/${programId}`);
-      return data.data;
+      return data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to get program by id"
       );
     }
   }
+);
+
+export const updateProgram = createAsyncThunk(
+  "program/update",
+  async ({ id, updatedData }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.put(
+        `/programs/update/${id}`,
+        updatedData,
+      );
+      // console.log(data.data)
+      return data;
+    } catch (error) {
+      // console.log(error.response?.data?.message);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get categories",
+      );
+    }
+  },
+);
+
+export const deleteProgram = createAsyncThunk(
+  "category/list/:id",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.delete(`/programs/delete/${id}`);
+      // console.log(data.data)
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || {
+          success: false,
+          message: "Failed to delete category",
+        },
+      );
+    }
+  },
 );
 
 export const getAllProgramsByCategory = createAsyncThunk(

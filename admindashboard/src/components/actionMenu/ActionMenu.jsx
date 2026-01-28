@@ -67,7 +67,7 @@ const ActionMenu = ({ row, editActionPath, deleteActionPath }) => {
             </button>
             <button
               onClick={() => handelDelete(row.id)}
-              className=" w-full bg-[#EBF3F2] hover:bg-red-400 hover:text-white p-2 rounded-lg"
+              className=" w-full bg-[#EBF3F2] hover:bg-red-600 hover:text-white p-2 rounded-lg"
             >
               Delete
             </button>
