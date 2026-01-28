@@ -12,6 +12,7 @@ import PublicRoutes from "./routes/PublicRoutes";
 import Profile from "./pages/Profile";
 import Unauthorized from "./pages/Unauthorized";
 import ForgotPasswordEmail from "./pages/ForgotPassword";
+
 //Founder Pages Imports
 import FounderLayout from "./pages/founder/layout/FounderLayout";
 import FounderDashboard from "./pages/founder/Dashboard";
@@ -53,6 +54,8 @@ import HeadExpertProfile from "./pages/head/experts/ExpertProfile";
 import HeadAdminProfile from "./pages/head/admin/AdminProfile";
 import HeadClientProfile from "./pages/head/clients/ClientProfile";
 import HeadProgramTable from "./pages/head/programsList/ProgramTable";
+import HeadTherapyList from "./pages/head/therapy/TherapyTable";
+import HeadTherapyPlan from "./pages/head/therapy/TherapyViewPlan";
 
 //Admin Pages Imports
 import AppLayout from "./pages/admin/layout/AppLayout";
@@ -68,6 +71,9 @@ import AdminAddClient from "./pages/admin/clients/ClientForm";
 import AdminProgramTable from "./pages/admin/programsList/ProgramTable";
 import PlanForm from "./pages/admin/programsList/PlanForm";
 import AdminPlanView from "./pages/admin/programsList/PlanDetailsView";
+import AdminTherapyList from"./pages/admin/therapy/TherapyTable";
+import AdminTherapyPlanDetails from"./pages/admin/therapy/TherapyViewPlan";
+
 //Expert Pages Imports
 import ExpertLayout from "./pages/expert/layout/ExpertLayout";
 import ExpertDashboard from "./pages/expert/Dashboard";
@@ -79,6 +85,7 @@ import ExpertFinance from "./pages/expert/finance/FinanceTable";
 import ExpertClientProfile from "./pages/expert/clients/ClientProfile";
 import ExpertTherapyList from "./pages/expert/therapy/TherapyTable";
 import ExpertTherapyPlanDetails from "./pages/expert/therapy/TherapyViewPlan";
+
 // Client Pages Import
 import ClientLayout from "./pages/client/layout/ClientLayout";
 import ClientDashboard from "./pages/client/Dashboard";
@@ -86,9 +93,7 @@ import ClientFeedback from "./pages/client/feedback/Feedback";
 import ClientProgress from "./pages/client/progress/Progress";
 import DailyPlan from "./pages/client/dailyPlan/DailyPlan";
 import ClientChat from "./pages/client/chats/Chats";
-import TherapyList from "./pages/admin/therapy/TherapyTable";
-import TherapyForm from "./pages/admin/therapy/TherapyForm";
-import TherapyDetails from "./pages/admin/therapy/TherapyDetails";
+
 
 function App() {
   return (
@@ -202,6 +207,8 @@ function App() {
           />
           <Route path="programs" element={<HeadProgramTable />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="therapy" element={<HeadTherapyList />} />
+          <Route path="therapy/plan/:id" element={<HeadTherapyPlan />} />
         </Route>
 
         {/* ADMIN */}
@@ -228,10 +235,9 @@ function App() {
           <Route path="programs" element={<AdminProgramTable />} />
           <Route path="programs/create" element={<PlanForm />} />
           <Route path="programs/plans" element={<AdminPlanView />} />
-          <Route path="therapy" element={<TherapyList />} />
-          <Route path="therapy/create" element={<TherapyForm />} />
           <Route path="profile" element={<Profile />} />
-          <Route path="therapy/plans" element={<TherapyDetails/>}/>
+           <Route path="therapy" element={<AdminTherapyList/>}/>
+          <Route path="therapy/plan/:id" element={<AdminTherapyPlanDetails/>}/>
         </Route>
 
         {/* EXPERT */}

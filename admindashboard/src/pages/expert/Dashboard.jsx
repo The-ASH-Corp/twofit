@@ -235,82 +235,7 @@ export default function Dashboard() {
     ],
   };
 
-  const performanceOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: { enabled: false },
-    },
-  };
 
-  // Pending Reviews Data
-  const pendingReviews = [
-    {
-      id: 1,
-      clientName: "Neha Sharma",
-      program: "Weight Loss",
-      mealType: "Breakfast",
-      dateTime: "Today, 10:15 AM",
-      status: "In Review",
-    },
-    {
-      id: 2,
-      clientName: "Neha Sharma",
-      program: "Weight Loss",
-      mealType: "Breakfast",
-      dateTime: "Today, 10:15 AM",
-      status: "In Review",
-    },
-    {
-      id: 3,
-      clientName: "Neha Sharma",
-      program: "Weight Loss",
-      mealType: "Breakfast",
-      dateTime: "Today, 10:15 AM",
-      status: "Skipped",
-    },
-    {
-      id: 4,
-      clientName: "Neha Sharma",
-      program: "Weight Loss",
-      mealType: "Breakfast",
-      dateTime: "Today, 10:15 AM",
-      status: "In Review",
-    },
-    {
-      id: 5,
-      clientName: "Neha Sharma",
-      program: "Weight Loss",
-      mealType: "Breakfast",
-      dateTime: "Today, 10:15 AM",
-      status: "Missed",
-    },
-    {
-      id: 6,
-      clientName: "Neha Sharma",
-      program: "Weight Loss",
-      mealType: "Breakfast",
-      dateTime: "Today, 10:15 AM",
-      status: "In Review",
-    },
-    {
-      id: 7,
-      clientName: "Neha Sharma",
-      program: "Weight Loss",
-      mealType: "Breakfast",
-      dateTime: "Today, 10:15 AM",
-      status: "In Review",
-    },
-    {
-      id: 8,
-      clientName: "Neha Sharma",
-      program: "Weight Loss",
-      mealType: "Breakfast",
-      dateTime: "Today, 10:15 AM",
-      status: "In Review",
-    },
-  ];
 
   // Activity Log Data
   const activityLog = [
@@ -421,6 +346,7 @@ export default function Dashboard() {
     }
   }, [dispatch, user?._id, token]);
 
+  console.log(user?.role.toLowerCase())
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA] h-[calc(100vh-120px)] overflow-auto no-scrollbar">
       {/* Top Metrics */}
@@ -461,7 +387,7 @@ export default function Dashboard() {
             <p className="text-[13px] text-gray-500 font-medium">
               Client Compliance
             </p>
-            <p className="text-[24px] font-bold text-gray-900">73%</p>
+            <p className="text-[24px] font-bold text-gray-900">{dashboardStats?.totalCompliance || 0}%</p>
           </div>
         </div>
 
@@ -470,7 +396,7 @@ export default function Dashboard() {
             <Activity size={20} className="text-[#45C4A2]" />
           </div>
           <div>
-            <p className="text-[13px] text-gray-500 font-medium">Programs</p>
+            <p className="text-[13px] text-gray-500 font-medium">{user?.role.toLowerCase() !== "therapist" ? "Programs" : "Therapy"}</p>
             <p className="text-[24px] font-bold text-gray-900">
               {dashboardStats?.totalPrograms || 0}
             </p>
@@ -613,7 +539,6 @@ export default function Dashboard() {
             {/* Circular Progress Chart */}
             <div className="flex justify-center items-center mb-6 pt-4">
               <div className="relative w-48 h-28">
-                {/* <Doughnut data={performanceData} options={performanceOptions} /> */}
                 <Doughnut
                   data={performanceData}
                   options={{
