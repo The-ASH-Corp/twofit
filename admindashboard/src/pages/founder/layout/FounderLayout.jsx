@@ -15,7 +15,7 @@ export default function AppLayout() {
       <div className="flex-1 px-6 pt-8.5 ">
         <TopBar />
 
-        <div className="mt-8.5 flex-1 overflow-auto no-scrollbar">
+        <div className="mt-6 flex-1 overflow-auto no-scrollbar">
           <Outlet />
         </div>
       </div>

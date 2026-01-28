@@ -1,7 +1,9 @@
+import mongoose from "mongoose";
 import { AdminModel } from "../admin/admin.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import planModel from "../plan/plan.model.js";
 import programModel from "./allPrograma.model.js";
+import User from "../auth/auth.model.js";
 
 export const createProgram = async (data) => {
   return await programModel.create(data);
@@ -27,11 +29,87 @@ export const getSingleProgram = async (id) => {
 };
 
 export const updateProgram = async (id, data) => {
-  return await programModel.findByIdAndDelete(id, data);
+  if (!data?.title) {
+    throw new Error("program name is required");
+  }
+
+  const duplicate = await programModel.findOne({
+    title: data.title.trim(),
+    _id: { $ne: id },
+  });
+
+  if (duplicate) {
+    throw new Error("Program name already exists");
+  }
+
+
+  return await programModel.findByIdAndUpdate(id, data);
 };
 
 export const deleteProgram = async (id) => {
-  return await programModel.findByIdAndDelete(id);
+  try {
+    // Validate ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Error("Invalid program ID");
+    }
+
+    // Check program exists
+    const program = await programModel.findById(id);
+    if (!program) {
+      throw new Error("Program not found");
+    }
+
+    // Check Admin usage
+    const adminsUsingProgram = await AdminModel.find(
+      { program: id },
+      { _id: 1, name: 1 },
+    );
+
+    // Check Coach usage
+    const coachesUsingProgram = await CoachModel.find(
+      { assignedPrograms: id },
+      { _id: 1, name: 1 },
+    );
+
+    // Check User usage
+    const usersUsingProgram = await User.find(
+      { programType: id },
+      { _id: 1, name: 1 },
+    );
+
+    // Block delete if used anywhere
+    if (
+      adminsUsingProgram.length ||
+      coachesUsingProgram.length ||
+      usersUsingProgram.length
+    ) {
+      const adminNames = adminsUsingProgram.map((a) => a.name).join(", ");
+      const coachNames = coachesUsingProgram.map((e) => e.name).join(", ");
+      const userNames = usersUsingProgram.map((c) => c.name).join(", ");
+
+      let message = "Cannot delete program.this program";
+
+      if (adminNames) message += ` Assigned to admins: ${adminNames},`;
+      if (coachNames) message += ` Assigned to experts: ${coachNames},`;
+      if (userNames) message += ` Assigned to clients: ${userNames},`;
+
+      return {
+        canDelete: false,
+        message,
+      };
+    }
+
+    // Safe delete
+    await programModel.findByIdAndDelete(id);
+
+    return {
+      canDelete: true,
+      message: "Program deleted successfully",
+      program,
+    };
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getAllProgramByCategory = async (category, page, limit) => {
@@ -160,6 +238,7 @@ export const founderProgramList = async (page, limit) => {
           _id: 0,
           _id: "$_id",
           programTitle: "$title",
+          programStatus: "$status",
 
           categoryName: {
             $arrayElemAt: ["$category.name", 0],

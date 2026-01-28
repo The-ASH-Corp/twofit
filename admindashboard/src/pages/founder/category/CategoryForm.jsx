@@ -13,6 +13,15 @@ export default function CategoryForm() {
       fields: [
         { name: "name", label: "Category Name", type: "text" },
         { name: "programLimit", label: "Max Program Limit", type: "number" },
+        {
+          name: "status",
+          label: "Status",
+          type: "select",
+          options: [
+            { label: "Draft", value: "Draft" },
+            { label: "Published", value: "Published" },
+          ],
+        },
       ],
     },
   ];

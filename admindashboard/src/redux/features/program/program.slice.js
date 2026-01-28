@@ -17,6 +17,9 @@ const programSlice = createSlice({
     clearProgramError(state) {
       state.error = null;
     },
+    clearSelectedProgram: (state) => {
+      state.selectedProgram = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -43,7 +46,7 @@ const programSlice = createSlice({
       })
       .addCase(createProgram.fulfilled, (state) => {
         state.status = "succeeded";
-        state.selectedProgram = null;
+        // state.selectedProgram = null;
         state.error = null;
       })
       .addCase(createProgram.rejected, (state, action) => {
@@ -56,7 +59,7 @@ const programSlice = createSlice({
       })
       .addCase(getProgramById.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.selectedProgram = action.payload;
+        state.selectedProgram = action.payload.data;
         state.error = null;
       })
       .addCase(getProgramById.rejected, (state, action) => {
@@ -91,9 +94,9 @@ const programSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       });
-      
   },
 });
 
 export const { clearProgramError } = programSlice.actions;
+export const { clearSelectedProgram } = programSlice.actions;
 export default programSlice.reducer;

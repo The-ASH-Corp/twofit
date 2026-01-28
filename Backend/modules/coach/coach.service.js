@@ -4,6 +4,7 @@ import { calculateRatingIncentive } from "../payroll/payroll.service.js";
 import { CoachModel } from "./coach.model.js";
 import User from "../auth/auth.model.js";
 import mongoose from "mongoose";
+import { getUserComplianceStats } from "../../utils/complianceCalculator.js";
 
 export const createCoach = async (coach) => {
   // Parse JSON stringified fields from FormData
@@ -215,13 +216,13 @@ export const getCoachDashboardStats = async (coachId) => {
   const coachObjectId = new mongoose.Types.ObjectId(coachId);
 
   // Dynamically count assigned clients from User model
-  const totalClients = await User.countDocuments({
+  const totalClients = await User.find({
     $or: [
       { trainer: coachObjectId },
       { dietition: coachObjectId },
       { therapist: coachObjectId },
     ],
-  });
+  }).populate({ path: "programType" ,populate:{path:"plan"}}).populate("therapyType");
 
   // Count programs: Start with what is assigned directly to the coach
   let totalPrograms = coach.assignedPrograms?.length || 0;
@@ -232,10 +233,19 @@ export const getCoachDashboardStats = async (coachId) => {
     totalPrograms = admin?.program?.length || 0;
   }
 
+  
+  const totalClientComplience =await Promise.all(totalClients.map((user)=>{
+    return getUserComplianceStats(user._id, user?.programType.plan, user?.therapyType, user?.programType?.title);
+  })).then((compliances)=>{
+    const totalCompliance = compliances.reduce((sum, comp) => sum + comp.overall, 0);
+    return totalClients.length ? (totalCompliance / totalClients.length).toFixed(2) : 0;
+  });
+  
   const avarageRating = coach.avgRating || 0;
 
   return {
-    totalClients,
+    totalCompliance: totalClientComplience,
+    totalClients: totalClients.length,
     totalPrograms,
     avarageRating,
   };

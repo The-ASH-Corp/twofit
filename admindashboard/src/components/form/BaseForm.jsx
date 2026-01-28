@@ -16,6 +16,7 @@ export default function BaseForm({
   onSubmit,
   // submitLabel,
   heading,
+  enableReinitialize = false,
 }) {
   const navigate = useNavigate();
   return (
@@ -23,6 +24,7 @@ export default function BaseForm({
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={onSubmit}
+      enableReinitialize={enableReinitialize}
     >
       {(formik) => (
         <Form className="rounded-2xl grid grid-cols-[2.5fr_1fr] gap-4 h-[80vh]">
