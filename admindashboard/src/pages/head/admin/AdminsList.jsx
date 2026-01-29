@@ -51,7 +51,7 @@ export default function AdminsList() {
     fetchAdminData();
   }, [page, limit]);
   return (
-    <div>
+    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         columns={AdminColumns}
         data={admins}

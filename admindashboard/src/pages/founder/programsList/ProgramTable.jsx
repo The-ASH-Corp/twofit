@@ -39,7 +39,7 @@ export default function ProgramTable() {
       }
 
       const filtered = data.filter((programs) =>
-        programs.title?.toLowerCase().includes(value)
+        programs.programTitle?.toLowerCase().includes(value),
       );
 
       setProgram(filtered);
@@ -51,7 +51,7 @@ export default function ProgramTable() {
   );
   if (error) return <p>{error}</p>;
   return (
-    <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
+    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         columns={ProgramListColumns}
         data={programs}

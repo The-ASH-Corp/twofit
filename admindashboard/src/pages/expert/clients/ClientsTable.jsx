@@ -45,16 +45,18 @@ export default function ClientsTable() {
     navigate(`/expert/clients/profile/${id}`);
   };
   return (
-    <BaseTable
-      columns={ClientColumns}
-      data={clients}
-      pageLabel="My Clients"
-      profilePath={profilePath}
-      handlePageChange={handlePageChange}
-      handleLimitChange={handleLimitChange}
-      page={page}
-      limit={limit}
-      totalCount={clientTotalCount}
-    />
+    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
+      <BaseTable
+        columns={ClientColumns}
+        data={clients}
+        pageLabel="My Clients"
+        profilePath={profilePath}
+        handlePageChange={handlePageChange}
+        handleLimitChange={handleLimitChange}
+        page={page}
+        limit={limit}
+        totalCount={clientTotalCount}
+      />
+    </div>
   );
 }

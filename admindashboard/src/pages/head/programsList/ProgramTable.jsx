@@ -58,7 +58,7 @@ export default function ProgramTable() {
     );
   if (error) return <p>{error}</p>;
   return (
-    <div>
+    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         columns={ProgramListColumns}
         data={programs}
