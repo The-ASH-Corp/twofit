@@ -121,10 +121,8 @@ export const getUserTaskStatus = async (req, res) => {
         let isNextDayLocked = false;
 
         if (user && user.lastDayCompletionTime) {
-            const completionDate = new Date(user.lastDayCompletionTime);
-            const unlockDate = new Date(completionDate);
-            unlockDate.setDate(unlockDate.getDate() + 1);
-            unlockDate.setHours(0, 0, 0, 0);
+            const unlockDate = taskSubmissionService.calculateUnlockDate(user.lastDayCompletionTime);
+
 
             if (new Date() < unlockDate) {
                 isNextDayLocked = true;

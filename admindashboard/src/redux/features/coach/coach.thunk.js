@@ -8,10 +8,10 @@ export const createCoach = createAsyncThunk(
       const config =
         coachDetails instanceof FormData
           ? {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            }
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
           : {};
 
       const data = await axiosInstance.post(
@@ -133,7 +133,22 @@ export const getClientComplianceGraphData = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message ||
-          "Failed to get client compliance graph data",
+        "Failed to get client compliance graph data",
+      );
+    }
+  },
+);
+export const getCoachRatingGraph = createAsyncThunk(
+  "coach/getCoachRatingGraph",
+  async ({ id, duration }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/coach/rating-graph/${id}?duration=${duration}`,
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get coach rating graph",
       );
     }
   },

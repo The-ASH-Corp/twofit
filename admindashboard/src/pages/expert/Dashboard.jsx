@@ -24,6 +24,7 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 import {
   getClientComplianceGraphData,
   getCoachDashboardStats,
+  getCoachRatingGraph,
 } from "@/redux/features/coach/coach.thunk";
 import { getPendingSubmissions } from "@/redux/features/tasks/task.thunk";
 import { socket } from "@/utils/socket";
@@ -46,11 +47,12 @@ export default function Dashboard() {
   const token = useAppSelector(selectToken);
   const { pendingTasks } = useAppSelector((state) => state.tasks);
   const [dashboardStats, setDashboardStats] = useState(null);
-  const [clientComplianceGraphData, setClientComplianceGraphData] = useState(null);
+  const [clientComplianceGraphData, setClientComplianceGraphData] =
+    useState(null);
   const [complianceDuration, setComplianceDuration] = useState("12");
+  const [ratingGraphData, setRatingGraphData] = useState(null);
+  const [ratingDuration, setRatingDuration] = useState("6");
 
-  console.log("Client Compliance Graph Data:", clientComplianceGraphData);
-  
   // Group pending tasks by user and day
   const groupedPendingTasks = useMemo(() => {
     if (!pendingTasks || pendingTasks.length === 0) return [];
@@ -87,6 +89,13 @@ export default function Dashboard() {
         setClientComplianceGraphData(res.payload);
       }
     });
+    dispatch(
+      getCoachRatingGraph({ id: user._id, duration: ratingDuration }),
+    ).then((res) => {
+      if (res.meta?.requestStatus === "fulfilled") {
+        setRatingGraphData(res.payload);
+      }
+    });
     dispatch(getPendingSubmissions());
   };
 
@@ -120,48 +129,50 @@ export default function Dashboard() {
         socket.disconnect();
       };
     }
-  }, [dispatch, user?._id, token,complianceDuration]);
+  }, [dispatch, user?._id, token, complianceDuration, ratingDuration]);
 
   // Compliance Chart Data
-  const complianceData = {
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
-    datasets: [
-      {
-        label: "High",
-        data: [10, 50, 30, 5, 55, 25, 30, 30, 30, 30, 50, 55],
-        backgroundColor: "#0A4F48",
-        borderRadius: 6,
-        barPercentage: 0.6,
-      },
-      {
-        label: "Medium",
-        data: [20, 25, 15, 15, 20, 25, 30, 20, 20, 20, 25, 30],
-        backgroundColor: "#F4DBC7",
-        borderRadius: 6,
-        barPercentage: 0.6,
-      },
-      {
-        label: "Low",
-        data: [45, 0, 30, 55, 0, 25, 15, 25, 25, 25, 0, 0],
-        backgroundColor: "#EBF3F2",
-        borderRadius: 6,
-        barPercentage: 0.6,
-      },
-    ],
-  };
+  const complianceData = useMemo(() => {
+    if (
+      !clientComplianceGraphData ||
+      !clientComplianceGraphData.monthwiseCompliance ||
+      clientComplianceGraphData.monthwiseCompliance.length === 0
+    ) {
+      return null;
+    }
+
+    const { monthwiseCompliance } = clientComplianceGraphData;
+
+    // Define month order to sort correctly if needed, or assume API returns in order
+    // For now assuming API returns sorted or in correct display order
+
+    return {
+      labels: monthwiseCompliance.map((item) => item.month),
+      datasets: [
+        {
+          label: "High",
+          data: monthwiseCompliance.map((item) => item.High),
+          backgroundColor: "#0A4F48",
+          borderRadius: 6,
+          barPercentage: 0.6,
+        },
+        {
+          label: "Medium",
+          data: monthwiseCompliance.map((item) => item.Medium),
+          backgroundColor: "#F4DBC7",
+          borderRadius: 6,
+          barPercentage: 0.6,
+        },
+        {
+          label: "Low",
+          data: monthwiseCompliance.map((item) => item.Low),
+          backgroundColor: "#EBF3F2",
+          borderRadius: 6,
+          barPercentage: 0.6,
+        },
+      ],
+    };
+  }, [clientComplianceGraphData]);
 
   const complianceOptions = {
     responsive: true,
@@ -247,17 +258,29 @@ export default function Dashboard() {
   };
 
   // Rating Score Chart Data
-  const ratingData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
-    datasets: [
-      {
-        data: [3.8, 4.2, 3.5, 4.1, 3.9, 4.0, 4.3, 3.7],
-        backgroundColor: ["#F4DBC7"],
-        borderRadius: 6,
-        barPercentage: 0.5,
-      },
-    ],
-  };
+  const ratingData = useMemo(() => {
+    if (
+      !ratingGraphData ||
+      !ratingGraphData.ratingData ||
+      ratingGraphData.ratingData.length === 0
+    ) {
+      return null;
+    }
+
+    const { ratingData } = ratingGraphData;
+
+    return {
+      labels: ratingData.map((item) => item.month),
+      datasets: [
+        {
+          data: ratingData.map((item) => item.rating),
+          backgroundColor: ["#F4DBC7"],
+          borderRadius: 6,
+          barPercentage: 0.5,
+        },
+      ],
+    };
+  }, [ratingGraphData]);
 
   const ratingOptions = {
     responsive: true,
@@ -477,8 +500,15 @@ export default function Dashboard() {
                   <option value="3">Last 3 Months</option>
                 </select>
               </div>
-              <div className="h-[260px]">
-                <Bar data={complianceData} options={complianceOptions} />
+              <div className="h-[260px] flex items-center justify-center">
+                {complianceData ? (
+                  <Bar data={complianceData} options={complianceOptions} />
+                ) : (
+                  <div className="text-center text-gray-400 text-sm italic">
+                    <p>No compliance data available</p>
+                    <p className="text-xs mt-1">Try changing the duration</p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -488,14 +518,25 @@ export default function Dashboard() {
                 <h2 className="text-[16px] font-bold text-gray-900">
                   Rating Score
                 </h2>
-                <select className="text-[13px] text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A4F48]">
-                  <option>Last 8 Months</option>
-                  <option>Last 6 Months</option>
-                  <option>Last 3 Months</option>
+                <select
+                  className="text-[13px] text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A4F48]"
+                  onChange={(e) => setRatingDuration(e.target.value)}
+                  value={ratingDuration}
+                >
+                  <option value="12">Last Year</option>
+                  <option value="6">Last 6 Months</option>
+                  <option value="3">Last 3 Months</option>
                 </select>
               </div>
-              <div className="h-[260px]">
-                <Bar data={ratingData} options={ratingOptions} />
+              <div className="h-[260px] flex items-center justify-center">
+                {ratingData ? (
+                  <Bar data={ratingData} options={ratingOptions} />
+                ) : (
+                  <div className="text-center text-gray-400 text-sm italic">
+                    <p>No rating data available</p>
+                    <p className="text-xs mt-1">Try changing the duration</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

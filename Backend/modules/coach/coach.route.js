@@ -2,6 +2,7 @@ import express from "express"
 import * as coachController from "./coach.controller.js"
 import { uploader } from "../../middleware/upload.js";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
+import { allowRoles } from "../../middleware/roleMiddleware.js";
 
 
 const router = express.Router();
@@ -21,6 +22,13 @@ router.get("/assigned-users/:coachId/:page/:limit", coachController.getUsersAssi
 
 router.put("/feedback", coachController.createFeedback);
 router.get("/dashboard-stats/:coachId", coachController.getCoachDashboardStats);
-router.get("/client-compliance-graph/:duration",authMiddleware, coachController.getClientComplianceGraphData);
+router.get(
+  "/client-compliance-graph/:duration",
+  authMiddleware,
+  allowRoles("Coach", "Trainer", "Dietician", "Therapist"),
+  coachController.getClientComplianceGraphData,
+);
+
+router.get("/rating-graph/:id", authMiddleware, coachController.getCoachRatingGraph);
 
 export default router
