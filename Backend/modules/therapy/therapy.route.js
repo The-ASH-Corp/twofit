@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post("/", createTherapyController);
 router.post("/upload-media", uploader.single("file"), uploadMedia);
-router.get("/",getAllTherapyController)
+router.get("/:page/:limit",getAllTherapyController)
 
 router.get("/plan/:id", getATherapyController);
  
