@@ -53,13 +53,27 @@ export const updateHead = async (req, res) => {
 
 export const deleteHead = async (req, res) => {
   try {
-    const head = await headService.deleteHead(req.params.id);
-    res.status(200).json({
+    const result = await headService.deleteHead(req.params.id);
+
+    // Head is in use
+    if (!result.canDelete) {
+      return res.status(409).json({
+        success: false,
+        message: result.message,
+      });
+    }
+
+    // Deleted
+    return res.status(200).json({
       success: true,
-      date: head
-    })
+      message: result.message,
+      data: result.head,
+    });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message });
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 

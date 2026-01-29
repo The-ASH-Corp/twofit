@@ -75,7 +75,7 @@ export const updateProgram = createAsyncThunk(
 );
 
 export const deleteProgram = createAsyncThunk(
-  "category/list/:id",
+  "program/delete/:id",
   async ({ id }, { rejectWithValue }) => {
     try {
       const data = await axiosInstance.delete(`/programs/delete/${id}`);
@@ -85,7 +85,7 @@ export const deleteProgram = createAsyncThunk(
       return rejectWithValue(
         error.response?.data || {
           success: false,
-          message: "Failed to delete category",
+          message: "Failed to delete program",
         },
       );
     }
