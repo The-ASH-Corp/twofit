@@ -1,6 +1,6 @@
 
 import { createSlice } from "@reduxjs/toolkit";
-import { createCoach, getAllCoaches, getFounderAllCoaches, getSingleCoach, getUsersAssignedToACoach } from "./coach.thunk";
+import { createCoach, getAllCoaches, getCoachDashboardStats, getFounderAllCoaches, getSingleCoach, getUsersAssignedToACoach } from "./coach.thunk";
 import { getAllCoachesByAdminId } from "../admins/admin.thunk";
 
 const initialState = {
@@ -12,6 +12,7 @@ const initialState = {
   selectedCoach: null,
   error: null,
   status: "idle",
+  dashboardStats: null,
 };
 
 const coachSlice = createSlice({
@@ -113,8 +114,22 @@ const coachSlice = createSlice({
       .addCase(getFounderAllCoaches.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
-      });
+      })
 
+      // Dashboard Stats
+      .addCase(getCoachDashboardStats.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(getCoachDashboardStats.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.dashboardStats = action.payload;
+        state.error = null;
+      })
+      .addCase(getCoachDashboardStats.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      });
 
   },
 });

@@ -7,3 +7,4 @@ export const selectCoachStatus = (state) => state.coach.status;
 
 export const selectAssignedClients = (state) => state.coach.assignedClients;
 export const selectTotalClientsCount = (state) => state.coach.totalClientsCount;
+export const selectCoachDashboardStats = (state) => state.coach.dashboardStats;

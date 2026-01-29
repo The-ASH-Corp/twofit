@@ -1,9 +1,6 @@
-import React, { useEffect } from "react";
-import ProfileLeftSide from "@/components/clients/ProfileLeftSide";
-import ProfileCenterSide from "@/components/clients/ProfileCenterSide";
-import ProfileRightSide from "@/components/clients/ProfileRightSide";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getClient } from "@/redux/features/client/client.thunk";
+import { fetchClientComplianceStats, getClient } from "@/redux/features/client/client.thunk";
 import { useParams } from "react-router-dom";
 import {
   selectSelectedClient,
@@ -11,9 +8,13 @@ import {
   selectClientError,
 } from "@/redux/features/client/client.selectors";
 import { SyncLoader } from "react-spinners";
+import ExpertClientProfileLeftSide from "@/components/clients/ExpertClientProfileLeftSide";
+import ExpertClientProfileCenterSide from "@/components/clients/ExpertClientProfileCenterSide";
+import ExpertClientProfileRightSide from "@/components/clients/ExpertClientProfileRightSide";
 
 const ClientProfile = () => {
   const dispatch = useDispatch();
+  const [clientComplianceStats, setClientComplianceStats] = useState(null);
   const { id } = useParams();
 
   const client = useSelector(selectSelectedClient);
@@ -23,6 +24,9 @@ const ClientProfile = () => {
   useEffect(() => {
     if (id) {
       dispatch(getClient({ id }));
+      dispatch(fetchClientComplianceStats(id)).unwrap().then((res) => {
+        setClientComplianceStats(res)
+      })
     }
   }, [id, dispatch]);
 
@@ -35,10 +39,16 @@ const ClientProfile = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="flex justify-between w-full gap-4 h-[calc(100vh-120px)]">
-      <ProfileLeftSide client={client} />
-      <ProfileCenterSide client={client} />
-      <ProfileRightSide client={client} />
+   <div className="flex flex-col lg:flex-row lg:justify-between w-full gap-4 h-[calc(100vh-120px)] ">
+      <div className="w-full lg:w-[25%] lg:overflow-auto no-scrollbar">
+        <ExpertClientProfileLeftSide client={client} clientComplianceStats={clientComplianceStats} />
+      </div>
+      <div className="w-full lg:w-[50%] lg:overflow-auto no-scrollbar">
+        <ExpertClientProfileCenterSide client={client} clientComplianceStats={clientComplianceStats} />
+      </div>
+      <div className="w-full lg:w-[25%] lg:overflow-auto no-scrollbar">
+        <ExpertClientProfileRightSide client={client} clientComplianceStats={clientComplianceStats} />
+      </div>
     </div>
   );
 };
