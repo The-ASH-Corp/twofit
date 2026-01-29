@@ -107,9 +107,9 @@ export const fetchClientWeightHistory = createAsyncThunk(
 
 export const fetchClientComplianceStats = createAsyncThunk(
   "client/fetchClientComplianceStats",
-  async (_, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get("/clients/compliance-stats");
+      const response = await axiosInstance.get(`/clients/compliance-stats?userId=${id}`);
       return response.data;
     } catch (err) {
       return rejectWithValue(
