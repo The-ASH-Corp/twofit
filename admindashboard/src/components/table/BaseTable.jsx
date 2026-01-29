@@ -94,7 +94,7 @@ export default function BaseTable({
   const paginationRange = getPaginationRange() || [];
 
   return (
-    <div className="bg-white p-3 sm:p-4 md:p-6 rounded-xl flex flex-col overflow-hidden h-full">
+    <div className="bg-white p-3 sm:p-4 md:p-6 rounded-xl flex flex-col  h-fit relative">
       {/* Header Section - Responsive */}
       <div className="mb-4 sm:mb-6 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <h2 className="text-[#0A4F48] font-bold text-[18px] sm:text-[20px] md:text-[22px]">
@@ -146,7 +146,7 @@ export default function BaseTable({
         </div>
       </div>
       {data?.length > 0 ? (
-        <div className="overflow-x-auto overflow-y-auto flex-1 min-h-0 -mx-3 sm:-mx-4 md:mx-0">
+        <div className=" overflow-y-visible flex-1 h-fit -mx-3 sm:-mx-4 md:mx-0">
           <div className="inline-block min-w-full align-middle px-3 sm:px-4 md:px-0">
             <table className="min-w-full text-sm border-collapse">
               <thead className="bg-[#F8F8F8] hidden md:table-header-group">
@@ -234,7 +234,11 @@ export default function BaseTable({
           <div className="relative">
             <select
               value={limit}
-              onChange={(e) => handleLimitChange(Number(e.target.value))}
+              
+              onChange={(e) => {
+                handleLimitChange(Number(e.target.value));
+                handlePageChange(1);
+              }}
               className="appearance-none pl-2 sm:pl-3 pr-7 sm:pr-8 py-1.5 text-xs sm:text-sm bg-white border border-gray-200 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0A4F48] focus:border-transparent"
             >
               <option value={8}>8</option>

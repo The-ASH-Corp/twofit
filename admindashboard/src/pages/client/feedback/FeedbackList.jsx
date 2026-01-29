@@ -11,7 +11,7 @@ export default function FeedbackList({
   onLimitChange,
 }) {
   return (
-    <div>
+    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         columns={feedbackColumns}
         data={feedbackData}
