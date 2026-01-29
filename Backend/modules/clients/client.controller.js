@@ -3,6 +3,8 @@ import { getUserComplianceStats, calculateUserStreaks } from "../../utils/compli
 import { getSingleProgram } from "../allPrograms/allPrograma.service.js";
 import { getTherapyById } from "../therapy/therapy.service.js";
 import { attemptDayAdvancement } from "../taskSubmission/taskSubmission.service.js";
+import mongoose from "mongoose";
+
 
 export const getAllClients = async (req, res) => {
   try {
@@ -226,7 +228,30 @@ export const getFounderClientList = async (req, res) => {
 
 export const getComplianceStats = async (req, res) => {
   try {
-    const userId = req.user._id || req.user.id;
+
+
+    let userId;
+
+    if (
+      req.query.userId &&
+      req.query.userId !== "undefined" &&
+      mongoose.Types.ObjectId.isValid(req.query.userId)
+    ) {
+      userId = req.query.userId;
+    } else if (
+      req.user?._id &&
+      mongoose.Types.ObjectId.isValid(req.user._id)
+    ) {
+      userId = req.user._id;
+    } else if (
+      req.user?.id &&
+      mongoose.Types.ObjectId.isValid(req.user.id)
+    ) {
+      userId = req.user.id;
+    } else {
+      throw new Error("Valid UserId not found");
+    }
+
     const user = await service.getSingleClient(userId);
 
     if (!user || !user.programType) {
@@ -245,24 +270,24 @@ export const getComplianceStats = async (req, res) => {
     const programId = typeof user.programType === 'object' ? user.programType._id : user.programType;
     const program = await getSingleProgram(programId);
 
-    const therapyId = typeof user.therapyType === 'object' 
-        ? user.therapyType._id 
-        : user.therapyType;
-    
+    const therapyId = typeof user.therapyType === 'object'
+      ? user.therapyType._id
+      : user.therapyType;
+
     let therapyPlan = null;
     if (therapyId) {
-        therapyPlan = await getTherapyById(therapyId);
+      therapyPlan = await getTherapyById(therapyId);
     }
 
     const complianceData = await getUserComplianceStats(userId, program?.plan, therapyPlan, program?.title);
     const streakData = await calculateUserStreaks(userId);
 
-    res.status(200).json({ 
-        success: true, 
-        data: {
-            ...complianceData,
-            streaks: streakData
-        } 
+    res.status(200).json({
+      success: true,
+      data: {
+        ...complianceData,
+        streaks: streakData
+      }
     });
   } catch (error) {
     console.error("Compliance stats error:", error);

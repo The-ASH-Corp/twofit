@@ -220,8 +220,8 @@ export default function Progress() {
       },
     },
   };
-  const lastWeightUpdateDate = user.measurementHistory.at(-1)?.date || "";
-  const lastMeasurementUpdateDate = user.weightHistory.at(-1)?.date || "";
+  const lastWeightUpdateDate = user?.measurementHistory?.at(-1)?.date || "";
+  const lastMeasurementUpdateDate = user?.weightHistory?.at(-1)?.date || "";
 
   return (
     <>
