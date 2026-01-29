@@ -50,7 +50,11 @@ export const therapyColumns = () => [
     id: "actions",
     header: "actions",
     cell: ({ row }) => (
-      <ActionMenu row={row} editActionPath="/founder/heads/edit/" />
+      <ActionMenu
+        row={row}
+        editActionPath="/founder/heads/edit/"
+        deleteActionPath="/founder/heads/delete/"
+      />
     ),
   },
 ];

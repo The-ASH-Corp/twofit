@@ -59,6 +59,24 @@ export const updateHead = createAsyncThunk(
   },
 );
 
+export const deleteHead = createAsyncThunk(
+  "head/delete/:id",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.delete(`/heads/delete/${id}`);
+      // console.log(data.data)
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || {
+          success: false,
+          message: "Failed to delete head",
+        },
+      );
+    }
+  },
+);
+
 export const getDashboardData = createAsyncThunk(
   "head/get-dashboard-data",
   async (headId, { rejectWithValue }) => {

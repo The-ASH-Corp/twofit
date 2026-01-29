@@ -32,3 +32,4 @@ const adminSchema = new mongoose.Schema(
   { timestamps: true }
 );
 export const AdminModel = mongoose.model("Admin", adminSchema);
+//  integration
