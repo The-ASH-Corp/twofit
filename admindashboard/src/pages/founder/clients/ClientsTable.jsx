@@ -49,7 +49,7 @@ export default function ClientsTable() {
     }
 
     const filtered = data.filter((client) =>
-      client.name?.toLowerCase().includes(value)
+      client.userName?.toLowerCase().includes(value),
     );
 
     setClient(filtered);
@@ -63,7 +63,7 @@ export default function ClientsTable() {
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
+    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         columns={ClientColumns}
         data={clients}

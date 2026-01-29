@@ -30,7 +30,7 @@ const TherapyTable = () => {
   }, [dispatch]);
 
   return (
-    <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
+    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         data={plans}
         columns={therapyColumns}

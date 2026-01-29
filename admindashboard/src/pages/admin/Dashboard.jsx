@@ -196,18 +196,18 @@ const getDashboardDatas =async () => {
   const hasExperts = trainers > 0 || dietitians > 0 || therapists > 0;
 
   const expertsSummaryData = {
-    labels:hasExperts ? ["Trainers", "Dietitians", "Therapists", ]: ["No Data"],
+    labels: hasExperts ? ["Trainers", "Dietitians", "Therapists"] : ["No Data"],
     datasets: [
       {
-        data:  hasExperts ? [trainers, dietitians, therapists] : [1],
+        data: hasExperts ? [trainers, dietitians, therapists] : [1],
         backgroundColor: hasExperts
-          ? ["#0A4F48", "#45C4A2", "#FFD7A8"]
+          ? ["#0A4F48", "#EBF3F2", "#FAF3E0"]
           : ["#E5E7EB"],
         borderWidth: 0,
         circumference: 180,
         rotation: 270,
         cutout: "80%",
-        hoverOffset:  hasExperts ? 15 : 0,
+        hoverOffset: hasExperts ? 15 : 0,
         spacing: hasExperts ? 1 : 0,
         borderRadius: 8,
       },
@@ -435,7 +435,7 @@ const getDashboardDatas =async () => {
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div
-                      className={`w-2.5 h-2.5 rounded-[2px] ${item.color}`}
+                      className={`w-2.5 h-2.5 rounded-xs ${item.color}`}
                     ></div>
                     <span className="text-xs text-[#66706D] font-medium">
                       {item.label}

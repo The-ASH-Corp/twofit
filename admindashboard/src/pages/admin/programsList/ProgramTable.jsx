@@ -49,7 +49,7 @@ export default function ProgramTable() {
   if (status === "loading") return <p>Loading programs...</p>;
   if (error) return <p>{error}</p>;
   return (
-    <div>
+    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         columns={ProgramListColumns}
         data={userPrograms}
