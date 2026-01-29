@@ -13,7 +13,6 @@ const DeletePopUp = () => {
     
 
       const handleDelete = async () => {
-        // console.log("Delete ID:", row.id);
         try {
           await dispatch(deleteCategory({ id })).unwrap();
           toast.success("Category deleted successfully");

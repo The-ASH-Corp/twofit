@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoMdClose } from "react-icons/io";
-import DeletePopUp from "./DeletePopUp";
 // import { useDispatch } from "react-redux";
 // import { deleteCategory } from "@/redux/features/category/category.thunk";
 // import { toast } from "react-toastify";
@@ -24,7 +23,7 @@ const ActionMenu = ({ row, editActionPath, deleteActionPath }) => {
   const handelDelete = (id) => {
     // console.log(id);
     setActiveRowId(false);
-    if (editActionPath) {
+    if (deleteActionPath) {
       navigate(`${deleteActionPath}${id}`);
     }
   };
