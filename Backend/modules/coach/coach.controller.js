@@ -15,7 +15,7 @@ export const createCoach = async (req, res) => {
     }
 
     const coach = await coachService.createCoach(req.body);
-     
+
     res
       .status(201)
       .json({
@@ -249,7 +249,7 @@ export const getCoachDashboardStats = async (req, res) => {
       data: stats,
     });
   } catch (err) {
-        console.error(err);
+    console.error(err);
 
     res.status(400).json({ success: false, message: err.message });
   }
@@ -273,3 +273,29 @@ export const getFounderCoachList = async (req, res) => {
   }
 };
 
+
+export const getClientComplianceGraphData = async (req, res) => {
+  try {
+    const coachId = req.user._id;
+    const { duration } = req.params;
+    const result = await coachService.getClientComplianceGraphData(
+      coachId,
+      duration,
+    );
+    res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getCoachRatingGraph = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { duration } = req.query; // duration in months
+
+    const result = await coachService.getMonthWiseAverageRating(id, duration);
+    res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

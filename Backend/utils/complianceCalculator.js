@@ -1,7 +1,7 @@
 import TaskSubmission from "../modules/taskSubmission/taskSubmission.model.js";
 import User from "../modules/auth/auth.model.js";
 
-export const getUserComplianceStats = async (userId, programPlan, therapyPlan = null, programTitle = "") => {
+export const getUserComplianceStats = async (userId, programPlan, therapyPlan = null, programTitle = "", durationInMonths = null) => {
     try {
         const userSubmission = await TaskSubmission.findOne({ userId });
         
@@ -11,7 +11,8 @@ export const getUserComplianceStats = async (userId, programPlan, therapyPlan = 
                 workout: 0,
                 diet: 0,
                 therapy: 0,
-                weeklyData: []
+                weeklyData: [],
+                monthwiseData: []
             };
         }
         // Calculate total expected tasks per type
@@ -37,9 +38,12 @@ export const getUserComplianceStats = async (userId, programPlan, therapyPlan = 
         // Count expected tasks
         const isWeightLoss = programTitle?.toLowerCase().includes("weight loss");
         const mealCountPerDay = isWeightLoss ? 5 : 6;
+        
+        // Calculate Total Program Days for overall completion stats
+        const totalProgramDays = parseInt(programPlan.duration.split(" ")[0] || 0);
 
         let expectedWorkouts = 0;
-        let expectedMeals = mealCountPerDay * totalDays;
+        let expectedMeals = mealCountPerDay * totalProgramDays;
         let expectedTherapy = 0;
 
         daysWithPlan.forEach(day => {
@@ -137,12 +141,71 @@ export const getUserComplianceStats = async (userId, programPlan, therapyPlan = 
             });
         }
 
+
+
+        const monthwiseData = [];
+        const monthsToCalc = durationInMonths || 12;
+        
+        for (let m = 0; m < monthsToCalc; m++) {
+            const mEnd = currentGlobalDay - (m * 30);
+            const mStart = Math.max(1, currentGlobalDay - ((m + 1) * 30) + 1);
+            
+            if (mEnd < 1) break;
+
+            let mExpWorkouts = 0, mExpMeals = 0, mExpTherapy = 0;
+            let mCompWorkouts = 0, mCompMeals = 0, mCompTherapy = 0;
+
+            const checkM = (idx) => idx >= mStart && idx <= mEnd;
+
+             daysWithPlan.forEach(day => {
+                if (checkM(day.globalIndex)) {
+                    mExpWorkouts += day.exercises.filter(ex => !ex.type || ex.type === 'Workout').length;
+                    mExpTherapy += day.exercises.filter(ex => ex.type === 'Therapy').length;
+                }
+            });
+             daysWithTherapy.forEach(day => {
+                if (checkM(day.globalIndex)) {
+                    mExpTherapy += day.therapies.length;
+                }
+            });
+            
+            const mDaysCount = Math.max(0, mEnd - mStart + 1);
+            mExpMeals = mDaysCount * mealCountPerDay;
+            
+             userSubmission.dailySubmissions.forEach(day => {
+                if (checkM(day.globalDayIndex)) {
+                    day.exercises.forEach(ex => {
+                        if (ex.status === 'verified') {
+                            if (ex.taskType === 'Workout') mCompWorkouts++;
+                            else if (ex.taskType === 'Meal') mCompMeals++;
+                            else if (ex.taskType === 'Therapy') mCompTherapy++;
+                        }
+                    });
+                }
+            });
+            
+            const mTotalExp = mExpWorkouts + mExpMeals + mExpTherapy;
+            const mTotalComp = mCompWorkouts + mCompMeals + mCompTherapy;
+            const monthComp = mTotalExp > 0 ? Math.round((mTotalComp / mTotalExp) * 100) : 0;
+            
+            const userStartMs = user.createdAt ? new Date(user.createdAt).getTime() : Date.now();
+            const dateOfBlock = new Date(userStartMs + ((mStart - 1) * 24 * 60 * 60 * 1000));
+            const monthName = dateOfBlock.toLocaleString('default', { month: 'short' });
+            
+            monthwiseData.unshift({
+                month: monthName,
+                compliance: monthComp
+            });
+        }
+
+        // Apply monthwiseData to response object before returning
         return {
             overall: overallCompliance,
             workout: workoutCompliance,
             diet: dietCompliance,
             therapy: therapyCompliance,
             weeklyData: last7Days,
+            monthwiseData,
             stats: {
                 completedWorkouts,
                 expectedWorkouts,
@@ -154,6 +217,7 @@ export const getUserComplianceStats = async (userId, programPlan, therapyPlan = 
                 missedCount
             }
         };
+
     } catch (error) {
         console.error("Error calculating compliance:", error);
         return {
