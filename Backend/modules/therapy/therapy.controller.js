@@ -16,7 +16,8 @@ export const createTherapyController = async (req, res) => {
 
 export const getAllTherapyController = async (req, res) => {
   try {
-    const therapy = await therapyService.getAllTherapy();
+    const {page, limit} = req.params
+    const therapy = await therapyService.getAllTherapy(page, limit);
     if (!therapy) {
       return res.status(404).json({ message: "Therapy not found" });
     }
