@@ -4,6 +4,19 @@ import Plan from "../plan/plan.model.js";
 import mongoose from "mongoose";
 import { getIO } from "../../utils/socket.js";
 
+// Helper to calculate unlock date (Strict Next Midnight Rule)
+export const calculateUnlockDate = (completionDate) => {
+    const date = new Date(completionDate);
+
+    // Strict Rule: Next unlock is always the NEXT midnight.
+
+    let unlockDate = new Date(date);
+    unlockDate.setDate(unlockDate.getDate() + 1); // Tomorrow
+    unlockDate.setHours(0, 0, 0, 0); // Midnight
+
+    return unlockDate;
+};
+
 // Helper to determine if we should advance the user's day
 export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
     const user = await User.findById(userId).populate({
@@ -76,9 +89,11 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
                 try {
                     const io = getIO();
                     // Send "day_completed" instead of "day_advanced"
+                    const nextUnlock = calculateUnlockDate(user.lastDayCompletionTime);
+
                     io.to(userId.toString()).emit("day_completed", {
                         completedDay: globalDayIndex,
-                        nextDayUnlockTime: new Date(new Date().setHours(24, 0, 0, 0)) // Midnight next day
+                        nextDayUnlockTime: nextUnlock
                     });
                 } catch (socketError) {
                     console.error("Socket notification for day completion failed:", socketError.message);
@@ -96,11 +111,8 @@ export const attemptDayAdvancement = async (userId) => {
     const user = await User.findById(userId);
     if (!user || !user.lastDayCompletionTime) return user; // No completion recorded or user invalid
 
-    // Check if NOW > Next Midnight of lastDayCompletionTime
-    const completionDate = new Date(user.lastDayCompletionTime);
-    const unlockDate = new Date(completionDate);
-    unlockDate.setDate(unlockDate.getDate() + 1);
-    unlockDate.setHours(0, 0, 0, 0); // 12 AM next day
+    // Check if NOW > Unlock Date
+    const unlockDate = calculateUnlockDate(user.lastDayCompletionTime);
 
     if (new Date() >= unlockDate) {
         // Unlock time passed! Advance the day.
@@ -578,7 +590,7 @@ export const rejectTaskSubmission = async (submissionId, comment) => {
 
                     // If it's a Workout, we must revoke day completion (cooldown) to force resubmission
                     if (ex.taskType === "Workout") {
-                       
+
                         User.findByIdAndUpdate(userSubmission.userId, {
                             $unset: { lastDayCompletionTime: 1 }
                         }).exec();
