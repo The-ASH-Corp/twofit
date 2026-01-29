@@ -41,7 +41,7 @@ export default function DailyPlan() {
           const programData = await dispatch(
             getProgramById(programId),
           ).unwrap();
-          setProgram(programData);
+          setProgram(programData.data);
         }
 
         await dispatch(getUserTaskStatus()).unwrap();

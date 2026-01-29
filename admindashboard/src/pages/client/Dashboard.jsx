@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import React, { useEffect, useState, useCallback } from "react";
 import { assets } from "@/assets/asset";
 import KpiCard from "@/components/cards/KpiCard";
@@ -47,22 +48,19 @@ export default function Dashboard() {
         getAllCoachesByAdmin([user?.trainer, user?.therapist, user?.dietition]),
       ).unwrap();
       const compliance = await dispatch(fetchClientComplianceStats()).unwrap();
-      setProgram(program);
+      setProgram(program.data);
       setCoaches(coaches);
       setComplianceData(compliance);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, dispatch]);
 
   useEffect(() => {
     if (user?._id && user?.programType) {
       fetchDashboardData();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?._id, user?.programType]);
-
 
    return (
     <>
