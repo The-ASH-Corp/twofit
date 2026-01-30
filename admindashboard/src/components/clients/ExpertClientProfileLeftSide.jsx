@@ -1,7 +1,15 @@
 import { assets } from "@/assets/asset";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { useAppSelector } from "@/redux/store/hooks";
 import React from "react";
 
-const ExpertClientProfileLeftSide = ({ client, clientComplianceStats }) => {
+const ExpertClientProfileLeftSide = ({
+  client,
+  clientComplianceStats,
+  dashboardStats,
+}) => {
+  const user = useAppSelector(selectUser);
+
   const [year] = client?.dob?.split("-") || [];
   const today = new Date();
 
@@ -44,6 +52,13 @@ const ExpertClientProfileLeftSide = ({ client, clientComplianceStats }) => {
     },
   ];
 
+  const role = {
+    dietician: "Diet",
+    trainer: "Workout",
+    therapist: "Therapy",
+  };
+
+
   return (
     <div className="flex flex-col items-center gap-4 pb-4">
       {/* Profile Header */}
@@ -65,7 +80,7 @@ const ExpertClientProfileLeftSide = ({ client, clientComplianceStats }) => {
                 {client?.programType?.title || "Program"}
               </span>
               <span className="px-3 py-1 bg-[#F0F0F0] rounded-full text-[#66706D]">
-                {client?.duration} Days
+                {client?.programType?.plan?.duration}
               </span>
               <span className="px-3 py-1 bg-[#45C4A2] rounded-full text-white">
                 {client?.status || "Active"}
@@ -130,7 +145,7 @@ const ExpertClientProfileLeftSide = ({ client, clientComplianceStats }) => {
       <div className="p-6 w-full bg-white rounded-lg flex flex-col items-center gap-4">
         <div className="flex items-center justify-between w-full">
           <h2 className="text-[#0A4F48] font-bold text-[16px]">
-            Therapy Compliance
+            {role[user?.role.toLowerCase()]} Compliance
           </h2>
           <button>
             <img
@@ -143,13 +158,20 @@ const ExpertClientProfileLeftSide = ({ client, clientComplianceStats }) => {
         <div className="w-full bg-[#F8F8F8] rounded-lg p-4 flex flex-col gap-3">
           <div className="flex justify-between items-center w-full">
             <span className="text-[13px] text-[#1E1E1E] font-medium">
-              Therapy Compliance
+              {role[user?.role.toLowerCase()]} Compliance
             </span>
-            <span className="text-[14px] text-[#0A4F48] font-bold">0%</span>
+            <span className="text-[14px] text-[#0A4F48] font-bold">
+              {clientComplianceStats?.[role?.[user?.role.toLowerCase()]?.toLowerCase()]}%
+            </span>
           </div>
           <div className="flex justify-between items-center w-full">
-            <span className="text-[13px] text-[#66706D]">Missed Diet</span>
-            <span className="text-[13px] text-[#1E1E1E] font-medium">0</span>
+            <span className="text-[13px] text-[#66706D]">Missed Count</span>
+            <span className="text-[13px] text-[#1E1E1E] font-medium">
+              {user?.role.toLowerCase() == "dietician"
+                ? clientComplianceStats?.stats?.missedCount +
+                  clientComplianceStats?.stats?.skippedCount
+                : 0}
+            </span>
           </div>
         </div>
       </div>

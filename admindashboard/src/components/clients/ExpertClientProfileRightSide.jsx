@@ -2,10 +2,15 @@ import { assets } from "@/assets/asset";
 import React from "react";
 
 const ExpertClientProfileRightSide = ({ client }) => {
+
+  const beforeMeasurements = client?.measurementHistory[0];
+
+  const currentMeasurements = client?.measurementHistory[client?.measurementHistory.length - 1];
+
   const measurements = [
-    { label: "Chest", before: "98 cm", current: "0 cm", color: "#0A4F48" },
-    { label: "Waist", before: "92 cm", current: "0 cm", color: "#F4DBC7" }, // Using color from image
-    { label: "Hips", before: "101 cm", current: "0 cm", color: "#EBF3F2" },
+    { label: "Chest", before: beforeMeasurements?.chest, current: currentMeasurements?.chest, color: "#0A4F48" },
+    { label: "Waist", before: beforeMeasurements?.waist, current: currentMeasurements?.waist, color: "#F4DBC7" },
+    { label: "Hips", before: beforeMeasurements?.hip, current: currentMeasurements?.hip, color: "#EBF3F2" },
   ];
 
   return (
@@ -23,7 +28,7 @@ const ExpertClientProfileRightSide = ({ client }) => {
         <div className="w-full bg-[#F8F8F8] rounded-lg flex flex-col gap-4 p-4">
           <div className="flex items-center justify-between w-full">
             <span className="text-[13px] text-[#1E1E1E]">Today</span>
-            <span className="text-[14px] font-bold text-[#0A4F48]">0 kg</span>
+            <span className="text-[14px] font-bold text-[#0A4F48]">{client?.weightHistory[client?.weightHistory.length - 1].weight} kg</span>
           </div>
           <div className="flex flex-col w-full gap-3 border-t border-[#DBDEDD] pt-3">
             <div className="flex items-center justify-between w-full">
@@ -35,7 +40,7 @@ const ExpertClientProfileRightSide = ({ client }) => {
             <div className="flex items-center justify-between w-full">
               <span className="text-[13px] text-[#66706D]">Change</span>
               <span className="text-[13px] font-medium text-[#1E1E1E]">
-                0 kg
+                {client?.weightHistory[client?.weightHistory.length - 1]?.weight - client?.weightHistory[0]?.weight} kg
               </span>
             </div>
           </div>
@@ -76,18 +81,6 @@ const ExpertClientProfileRightSide = ({ client }) => {
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Daily Activity Log */}
-      <div className="flex flex-col items-center w-full gap-4 p-4 pt-0">
-        <div className="flex items-center justify-between w-full">
-          <h3 className="text-[16px] font-bold text-[#0A4F48]">
-            Daily Activity Log
-          </h3>
-          <button>
-            <img src={assets.threeDotVector} alt="" className="w-[18px]" />
-          </button>
         </div>
       </div>
     </div>
