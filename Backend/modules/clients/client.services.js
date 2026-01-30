@@ -15,7 +15,7 @@ export const getAllClient = async (page, limit) => {
 export const getSingleClient = async (id) => {
   const client = await User.findById(id)
     .select("-password")
-    .populate("programType")
+    .populate({ path: "programType", populate: { path: "plan" } })
     .populate("therapyType")
     .populate("trainer")
     .populate("dietition")
