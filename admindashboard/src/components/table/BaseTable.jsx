@@ -96,7 +96,7 @@ export default function BaseTable({
   return (
     <div
       className="bg-white p-3 sm:p-4 md:p-6 rounded-xl flex flex-col   relative"
-      style={data.length > 0 ? { height: "fit-content" } : { height: "100%" }}
+      style={data?.length > 0 ? { height: "fit-content" } : { height: "100%" }}
     >
       {/* Header Section - Responsive */}
       <div className="mb-4 sm:mb-6 flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
@@ -230,7 +230,7 @@ export default function BaseTable({
       )}
 
       {/* Pagination - Responsive */}
-      {data.length > 0 && (
+      {data?.length > 0 && (
         <div className="flex flex-col sm:flex-row sm:items-start items-center justify-between gap-4 py-4 mt-auto border-t border-gray-100">
           {/* Results Per Page */}
           <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-[#66706D] font-medium">
