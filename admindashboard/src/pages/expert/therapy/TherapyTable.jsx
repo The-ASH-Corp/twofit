@@ -17,8 +17,8 @@ const TherapyTable = () => {
     const loadPlans = async () => {
       setLoading(true);
       try {
-        const data = await dispatch(fetchTherapyPlans()).unwrap();
-        setPlans(data.data);
+        const data = await dispatch(fetchTherapyPlans({page: 1, limit: 100})).unwrap();
+        setPlans(data.data.therapy);
       } catch (error) {
         console.error(error);
       } finally {
