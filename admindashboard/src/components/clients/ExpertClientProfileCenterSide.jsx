@@ -11,10 +11,11 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
   const [processing, setProcessing] = useState(null); // stores task ID being processed
   const [expandedTaskIndex, setExpandedTaskIndex] = useState(null);
 
-  // Group pending tasks for THIS client by day
-  const relevantPendingTasks = useMemo(() => {
+  // Group tasks for THIS client by day
+  const groupedTasks = useMemo(() => {
     if (!pendingTasks || !client?._id) return [];
 
+    // Filter is technically redundant if backend handles it, but good for safety
     const clientTasks = pendingTasks.filter(
       (task) => task.userId?._id === client._id,
     );
@@ -44,10 +45,21 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
     setExpandedTaskIndex(expandedTaskIndex === index ? null : index);
   };
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "verified": return "bg-green-100 text-green-700";
+      case "rejected": return "bg-red-100 text-red-700";
+      case "pending": return "bg-yellow-100 text-yellow-700";
+      case "skipped": return "bg-gray-100 text-gray-700";
+      default: return "bg-gray-100 text-gray-600";
+    }
+  };
+
   const handleApprove = async (taskGroup) => {
     setProcessing(`approve-${taskGroup.globalDayIndex}`);
     try {
-      for (const task of taskGroup.tasks) {
+      const pendingTasksToVerify = taskGroup.tasks.filter(t => t.status === 'pending');
+      for (const task of pendingTasksToVerify) {
         await dispatch(verifyTask(task._id)).unwrap();
       }
       toast.success("Tasks approved successfully");
@@ -65,7 +77,8 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
     }
     setProcessing(`reject-${taskGroup.globalDayIndex}`);
     try {
-      for (const task of taskGroup.tasks) {
+      const pendingTasksToReject = taskGroup.tasks.filter(t => t.status === 'pending');
+      for (const task of pendingTasksToReject) {
         await dispatch(rejectTask({ id: task._id, comment })).unwrap();
       }
       toast.success("Feedback sent to client");
@@ -131,7 +144,7 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
               <span className="px-2 py-1 bg-[#F0F0F0] text-[11px] text-[#66706D] rounded-md w-max">
                 {item.heading}
               </span>
-              <span className="text-[13px] text-[#0A4F48] font-medium break-words">
+              <span className="text-[13px] text-[#0A4F48] font-medium break-all">
                 {item.data}
               </span>
             </div>
@@ -192,28 +205,30 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
         </div>
       </div>
 
-      {/* Tasks Verification Area */}
+      {/* Task History Area */}
       <div className="w-full flex flex-col items-center gap-4 p-6 bg-white rounded-lg min-h-[200px]">
         <div className="w-full flex justify-between items-center mb-2">
           <h2 className="font-bold text-[16px] text-[#0A4F48]">
-            Pending Verification
+            Task History
           </h2>
           <div className="flex items-center gap-2 bg-[#F8F8F8] px-3 py-1.5 rounded-md cursor-pointer">
             <span className="text-[12px] text-[#1E1E1E] font-medium">
-              {relevantPendingTasks.length} Days Pending
+              {groupedTasks.length} Days Logged
             </span>
           </div>
         </div>
 
-        {relevantPendingTasks.length === 0 ? (
+        {groupedTasks.length === 0 ? (
           <div className="w-full flex flex-col items-center justify-center flex-1 h-full py-8">
             <span className="text-[#66706D] text-[14px]">
-              No Pending Submissions Found
+              No Submissions Found
             </span>
           </div>
         ) : (
           <div className="w-full flex flex-col gap-4">
-            {relevantPendingTasks.map((group, gIndex) => (
+            {groupedTasks.map((group, gIndex) => {
+              const hasPending = group.tasks.some(t => t.status === "pending");
+              return (
               <div
                 key={gIndex}
                 className="border border-gray-100 rounded-xl overflow-hidden bg-[#FBFBFB]"
@@ -223,17 +238,21 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
                   onClick={() => toggleTask(gIndex)}
                   className="w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition-colors border-b border-gray-50"
                 >
-                  <div className="flex flex-col items-start">
+                  <div className="flex flex-col items-start gap-1">
                     <span className="text-[14px] font-bold text-[#0A4F48]">
                       Day {group.globalDayIndex} Submissions
                     </span>
                     <span className="text-[11px] text-[#66706D]">
-                      Submitted on{" "}
                       {new Date(group.createdAt).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="px-2 py-0.5 bg-yellow-50 text-yellow-600 text-[10px] font-bold rounded uppercase">
+                     {hasPending && (
+                        <span className="px-2 py-0.5 bg-yellow-50 text-yellow-600 text-[10px] font-bold rounded uppercase">
+                            Pending Review
+                        </span>
+                     )}
+                    <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-bold rounded uppercase">
                       {group.tasks.length}{" "}
                       {group.tasks.length === 1 ? "Task" : "Tasks"}
                     </span>
@@ -263,17 +282,28 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
                               </span>
                             )}
                           </div>
-                          <span className="text-[10px] text-[#66706D]">
-                            {new Date(task.createdAt).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </span>
+                            <div className="flex flex-col items-end gap-1">
+                                <span className={`text-[10px] px-2 py-0.5 rounded font-medium ${getStatusColor(task.status)}`}>
+                                    {task.status}
+                                </span>
+                                <span className="text-[10px] text-[#66706D]">
+                                    {new Date(task.createdAt).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    })}
+                                </span>
+                            </div>
                         </div>
 
                         {task.notes && (
                           <div className="bg-[#F8F8F8] p-2 rounded text-[12px] text-[#333] mb-3 leading-relaxed italic">
                             "{task.notes}"
+                          </div>
+                        )}
+                        
+                         {task.adminComment && (
+                          <div className="bg-red-50 p-2 rounded text-[12px] text-red-600 mb-3 leading-relaxed border border-red-100">
+                            Feedback: "{task.adminComment}"
                           </div>
                         )}
 
@@ -298,43 +328,45 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
                     ))}
 
                     {/* Feedback and Actions */}
-                    <div className="pt-2 space-y-3">
-                      <div className="flex flex-col gap-1.5">
-                        <label className="text-[12px] font-medium text-[#66706D]">
-                          Coach Feedback
-                        </label>
-                        <textarea
-                          value={comment}
-                          onChange={(e) => setComment(e.target.value)}
-                          placeholder="Provide feedback if revisions are needed..."
-                          className="w-full h-20 text-[13px] border border-gray-200 rounded-lg p-3 focus:outline-none focus:border-[#0A4F48] bg-white"
-                        />
-                      </div>
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => handleImprove(group)}
-                          disabled={!!processing}
-                          className="flex-1 px-4 py-2 border border-[#D4A5A0] text-[#D4A5A0] rounded-lg hover:bg-red-50 transition-colors font-medium text-[13px] disabled:opacity-50"
-                        >
-                          {processing === `reject-${group.globalDayIndex}`
-                            ? "Processing..."
-                            : "Needs Work"}
-                        </button>
-                        <button
-                          onClick={() => handleApprove(group)}
-                          disabled={!!processing}
-                          className="flex-1 px-4 py-2 bg-[#0A4F48] text-white rounded-lg hover:bg-[#083d37] transition-colors font-medium text-[13px] disabled:opacity-50"
-                        >
-                          {processing === `approve-${group.globalDayIndex}`
-                            ? "Processing..."
-                            : "Approve All"}
-                        </button>
-                      </div>
-                    </div>
+                    {hasPending && (
+                        <div className="pt-2 space-y-3">
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-[12px] font-medium text-[#66706D]">
+                            Coach Feedback
+                            </label>
+                            <textarea
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
+                            placeholder="Provide feedback if revisions are needed..."
+                            className="w-full h-20 text-[13px] border border-gray-200 rounded-lg p-3 focus:outline-none focus:border-[#0A4F48] bg-white"
+                            />
+                        </div>
+                        <div className="flex gap-3">
+                            <button
+                            onClick={() => handleImprove(group)}
+                            disabled={!!processing}
+                            className="flex-1 px-4 py-2 border border-[#D4A5A0] text-[#D4A5A0] rounded-lg hover:bg-red-50 transition-colors font-medium text-[13px] disabled:opacity-50"
+                            >
+                            {processing === `reject-${group.globalDayIndex}`
+                                ? "Processing..."
+                                : "Needs Work"}
+                            </button>
+                            <button
+                            onClick={() => handleApprove(group)}
+                            disabled={!!processing}
+                            className="flex-1 px-4 py-2 bg-[#0A4F48] text-white rounded-lg hover:bg-[#083d37] transition-colors font-medium text-[13px] disabled:opacity-50"
+                            >
+                            {processing === `approve-${group.globalDayIndex}`
+                                ? "Processing..."
+                                : "Approve Pending"}
+                            </button>
+                        </div>
+                        </div>
+                    )}
                   </div>
                 )}
               </div>
-            ))}
+            )})}
           </div>
         )}
       </div>

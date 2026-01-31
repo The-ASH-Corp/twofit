@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { uploadTask, getUserTaskStatus, getPendingSubmissions, verifyTask, rejectTask } from "./task.thunk";
+import { uploadTask, getUserTaskStatus, getPendingSubmissions, verifyTask, rejectTask, getAllUserSubmissions } from "./task.thunk";
 
 const initialState = {
     tasks: [], // List of submitted tasks for client
     pendingTasks: [], // For expert review
+    selectedUserTasks: [], // For expert viewing specific client history
     loading: false,
     error: null,
 };
@@ -69,12 +70,29 @@ const taskSlice = createSlice({
                 state.error = action.payload;
                 console.error("Failed to fetch pending submissions:", action.payload);
             })
+            // Get All User Submissions
+            .addCase(getAllUserSubmissions.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(getAllUserSubmissions.fulfilled, (state, action) => {
+                state.loading = false;
+                state.selectedUserTasks = action.payload || [];
+            })
+            .addCase(getAllUserSubmissions.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
             // Verify Task
             .addCase(verifyTask.fulfilled, (state, action) => {
                 // Remove from pendingTasks
                 state.pendingTasks = state.pendingTasks.filter(
                     (t) => t._id !== action.meta.arg
                 );
+                // Update in selectedUserTasks
+                const task = state.selectedUserTasks.find(t => t._id === action.meta.arg);
+                if (task) {
+                    task.status = "verified";
+                }
             })
             // Reject Task
             .addCase(rejectTask.fulfilled, (state, action) => {
@@ -82,6 +100,11 @@ const taskSlice = createSlice({
                 state.pendingTasks = state.pendingTasks.filter(
                     (t) => t._id !== action.meta.arg.id
                 );
+                // Update in selectedUserTasks
+                const task = state.selectedUserTasks.find(t => t._id === action.meta.arg.id);
+                if (task) {
+                    task.status = "rejected";
+                }
             });
     },
 });

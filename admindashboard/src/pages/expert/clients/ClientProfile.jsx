@@ -15,7 +15,7 @@ import ExpertClientProfileLeftSide from "@/components/clients/ExpertClientProfil
 import ExpertClientProfileCenterSide from "@/components/clients/ExpertClientProfileCenterSide";
 import ExpertClientProfileRightSide from "@/components/clients/ExpertClientProfileRightSide";
 import { selectCoachDashboardStats } from "@/redux/features/coach/coach.selector";
-import { getPendingSubmissions } from "@/redux/features/tasks/task.thunk";
+import {  getAllUserSubmissions } from "@/redux/features/tasks/task.thunk";
 
 const ClientProfile = () => {
   const dispatch = useDispatch();
@@ -26,12 +26,13 @@ const ClientProfile = () => {
   const status = useSelector(selectClientStatus);
   const error = useSelector(selectClientError);
   const dashboardStats = useSelector(selectCoachDashboardStats);
-  const { pendingTasks } = useSelector((state) => state.tasks);
+  const { selectedUserTasks } = useSelector((state) => state.tasks);
 
   useEffect(() => {
     if (id) {
       dispatch(getClient({ id }));
-      dispatch(getPendingSubmissions());
+      // dispatch(getPendingSubmissions()); // Optional: if you still want to keep global pending tasks up to date
+      dispatch(getAllUserSubmissions(id));
       dispatch(fetchClientComplianceStats(id))
         .unwrap()
         .then((res) => {
@@ -60,7 +61,7 @@ const ClientProfile = () => {
       <div className="w-full lg:w-[50%] lg:overflow-auto no-scrollbar">
         <ExpertClientProfileCenterSide
           client={client}
-          pendingTasks={pendingTasks}
+          pendingTasks={selectedUserTasks}
         />
       </div>
       <div className="w-full lg:w-[25%] lg:overflow-auto no-scrollbar">
