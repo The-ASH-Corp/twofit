@@ -1,12 +1,14 @@
 import { assets } from "@/assets/asset";
 import React, { useMemo, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { verifyTask, rejectTask } from "@/redux/features/tasks/task.thunk";
 import { toast } from "react-toastify";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
   const dispatch = useDispatch();
+  const user = useSelector(selectUser);
   const [comment, setComment] = useState("");
   const [processing, setProcessing] = useState(null); // stores task ID being processed
   const [expandedTaskIndex, setExpandedTaskIndex] = useState(null);
@@ -15,10 +17,25 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
   const groupedTasks = useMemo(() => {
     if (!pendingTasks || !client?._id) return [];
 
-    // Filter is technically redundant if backend handles it, but good for safety
-    const clientTasks = pendingTasks.filter(
+    let clientTasks = pendingTasks.filter(
       (task) => task.userId?._id === client._id,
     );
+
+    // Filter based on Expert Role
+    if (user?.role) {
+      const lowerRole = user.role.toLowerCase();
+      if (lowerRole.includes("trainer")) {
+        clientTasks = clientTasks.filter((t) => t.taskType === "Workout");
+      } else if (
+        lowerRole.includes("dietician") ||
+        lowerRole.includes("dietitian")
+      ) {
+        clientTasks = clientTasks.filter((t) => t.taskType === "Meal");
+      } else if (lowerRole.includes("therapist")) {
+        clientTasks = clientTasks.filter((t) => t.taskType === "Therapy");
+      }
+    }
+
     if (clientTasks.length === 0) return [];
 
     const groups = {};

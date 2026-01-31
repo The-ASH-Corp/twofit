@@ -431,15 +431,11 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
 };
 
 
+
 export const getAllUserTaskSubmissions = async (expertId, userRole, targetUserId) => {
-    const lowerRole = userRole.toLowerCase();
-
-    // Filter by task type based on expert role
-    let taskTypeFilter = null;
-    if (lowerRole.includes("trainer")) taskTypeFilter = "Workout";
-    else if (lowerRole.includes("dietician") || lowerRole.includes("dietitian")) taskTypeFilter = "Meal";
-    else if (lowerRole.includes("therapist")) taskTypeFilter = "Therapy";
-
+    // We are fetching ALL tasks for the user, regardless of the requester's role.
+    // Filtering will be handled on the frontend if necessary.
+    
     const matchQuery = {
          userId: new mongoose.Types.ObjectId(targetUserId)
     };
@@ -448,11 +444,7 @@ export const getAllUserTaskSubmissions = async (expertId, userRole, targetUserId
         { $match: matchQuery },
         { $unwind: "$dailySubmissions" },
         { $unwind: "$dailySubmissions.exercises" },
-        {
-            $match: {
-                ...(taskTypeFilter ? { "dailySubmissions.exercises.taskType": taskTypeFilter } : {})
-            }
-        },
+        // Removed taskType filter match stage
         {
             $lookup: {
                 from: "users",
