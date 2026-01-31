@@ -135,3 +135,17 @@ export const getUserTaskStatus = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 }
+
+export const getAllUserSubmissions = async (req, res) => {
+    try {
+        const expertId = (req.user._id || req.user.id);
+        const userRole = req.user.role || "";
+        const { userId } = req.params;
+
+        const submissions = await taskSubmissionService.getAllUserTaskSubmissions(expertId, userRole, userId);
+
+        res.status(200).json({ success: true, data: submissions });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};

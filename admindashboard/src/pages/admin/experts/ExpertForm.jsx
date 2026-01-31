@@ -27,8 +27,8 @@ export default function ExpertForm() {
     ).then((res) => {
       setProgram(res.payload.data);
     });
-    dispatch(fetchTherapyPlans()).then((res) => {
-      setTherapy(res.payload.data);
+    dispatch(fetchTherapyPlans({page: 1, limit: 120})).then((res) => {      
+      setTherapy(res.payload.data.therapy);
     })
   }, [dispatch]);
 
