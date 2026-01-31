@@ -31,6 +31,12 @@ const menuItems = [
           icon: assets.programs,
           path: "/expert/therapy",
         },
+        {
+          label:"Habit Tracker",
+          icon:assets.chats,
+          path:"/expert/habit"
+
+        }
       ]),
   { label: "Finance", icon: assets.finance, path: "/expert/finance" },
   { label: "Chats", icon: assets.chats, path: "/expert/chats" },

@@ -4,6 +4,8 @@
 //   Trainer:"bg-[#EBF2FE] text-black"
 // }
 
+import HabitStartButton from "../habit/HabitStartButton";
+
 const statusColors={
   Active:"bg-[#45C4A2] text-white",
   Inactive:"bg-[#66706D] text-white",
@@ -57,7 +59,6 @@ export const ClientColumns = [
 //   },
   {accessorKey:"programStartDate",header:"Start Date"},
   {accessorKey:"programEndDate",header:"End Date"},
-  // {accessorKey:"compliance",header:"Compliance"},
   { accessorKey: "status", header: "Status" ,
     cell:({row})=>{
     
@@ -72,5 +73,7 @@ export const ClientColumns = [
     )
     }
     },
+      {accessorKey:"habitTracker",header:"Add Habit Tracker",cell:({row})=>( <HabitStartButton  clientId={row.original._id}/>)},
+
   { id: "actions", header:"Action", cell: () => "⋯" },
 ];
