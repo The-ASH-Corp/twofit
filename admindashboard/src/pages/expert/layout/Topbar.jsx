@@ -117,7 +117,7 @@ const currentPage =
 
           <div 
             className="flex items-center gap-2 pl-2 border-l border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => navigate('/admin/profile')}
+            onClick={() => navigate('/expert/profile')}
           >
             <div className="hidden md:block text-right">
               <p className="text-sm font-bold text-gray-800 leading-none">
