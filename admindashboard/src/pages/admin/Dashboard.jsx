@@ -57,7 +57,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     getDashboardDatas();
-  }, [user._id]); // Add dependency
+  }, [user?._id]); // Add dependency
 
   const getSlicedData = (array, duration) => {
     if (!array || !Array.isArray(array)) return [];
@@ -348,57 +348,44 @@ export default function Dashboard() {
     },
   };
 
-  const progressReports = [
-    {
-      name: "Neha Sharma",
-      type: "Diet",
-      expert: "Dietitian",
-      submittedBy: "Dietitian Anjali",
-      time: "Today, 10:15 AM",
-    },
-    {
-      name: "Aarav Kumar",
-      type: "Workout",
-      expert: "Trainer",
-      submittedBy: "Trainer Rahul",
-      time: "Today, 9:40 AM",
-    },
-    {
-      name: "Vikram Singh",
-      type: "Therapy",
-      expert: "Therapist",
-      submittedBy: "Dietitian Priya",
-      time: "Yesterday, 7:10 PM",
-    },
-    {
-      name: "Sonali Jain",
-      type: "Measurements",
-      expert: "Trainer",
-      submittedBy: "Dietitian Anjali",
-      time: "Yesterday, 5:20 PM",
-    },
-    {
-      name: "Riya Mehta",
-      type: "Diet",
-      expert: "Dietitian",
-      submittedBy: "Therapist Mira",
-      time: "2 Days Ago",
-    },
-    {
-      name: "Neha Sharma",
-      type: "Weight",
-      expert: "Trainer",
-      submittedBy: "Dietitian Anjali",
-      time: "2 Days Ago",
-    },
-    {
-      name: "Aarav Kumar",
-      type: "Therapy",
-      expert: "Therapist",
-      submittedBy: "Trainer Rahul",
-      time: "3 Days Ago",
-    },
-  ];
+  const formatReportTime = (value) => {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "-";
+    const now = new Date();
+    const startOfToday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
+    const startOfDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    );
+    const diffDays = Math.floor(
+      (startOfToday - startOfDate) / (1000 * 60 * 60 * 24),
+    );
+    const timeString = date.toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+    if (diffDays === 0) return `Today, ${timeString}`;
+    if (diffDays === 1) return `Yesterday, ${timeString}`;
+    if (diffDays > 1) return `${diffDays} Days Ago`;
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const progressReports = (dashboardData?.latestReports || [])
+    .slice(0, 10)
+    .map((report) => ({
+      ...report,
+      time: formatReportTime(report.createdAt),
+    }));
 
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA]">

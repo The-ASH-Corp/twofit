@@ -248,6 +248,94 @@ export const getDashboardData = async (adminId, duration = "12m") => {
   const totalDietitians = await totalExperts[0].experts?.filter((expert) => expert.role.includes("Dietician"))?.length;
   const totalTherapists = await totalExperts[0].experts?.filter((expert) => expert.role.includes("Therapist"))?.length;
 
+  let latestReports = [];
+
+  if (clientIds.length > 0) {
+    const latestSubmissions = await TaskSubmission.aggregate([
+      { $match: { userId: { $in: clientIds } } },
+      { $unwind: "$dailySubmissions" },
+      { $unwind: "$dailySubmissions.exercises" },
+      {
+        $project: {
+          userId: 1,
+          taskType: "$dailySubmissions.exercises.taskType",
+          createdAt: "$dailySubmissions.exercises.createdAt",
+        },
+      },
+      { $sort: { createdAt: -1 } },
+      { $limit: 10 },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "userDetails",
+          pipeline: [
+            {
+              $project: {
+                name: 1,
+                trainer: 1,
+                dietition: 1,
+                therapist: 1,
+              },
+            },
+          ],
+        },
+      },
+      { $unwind: { path: "$userDetails", preserveNullAndEmptyArrays: true } },
+    ]);
+
+    const coachIds = new Set();
+    latestSubmissions.forEach((submission) => {
+      const userDetails = submission.userDetails || {};
+      if (userDetails.trainer) coachIds.add(userDetails.trainer.toString());
+      if (userDetails.dietition) coachIds.add(userDetails.dietition.toString());
+      if (userDetails.therapist) coachIds.add(userDetails.therapist.toString());
+    });
+
+    const coaches = await CoachModel.find({
+      _id: { $in: Array.from(coachIds) },
+    }).select("name role");
+
+    const coachMap = new Map(
+      coaches.map((coach) => [coach._id.toString(), coach]),
+    );
+
+    const getExpertType = (taskType) => {
+      if (taskType === "Meal") return "Dietitian";
+      if (taskType === "Workout") return "Trainer";
+      if (taskType === "Therapy") return "Therapist";
+      return "Expert";
+    };
+
+    const getTaskLabel = (taskType) => {
+      if (taskType === "Meal") return "Diet";
+      return taskType;
+    };
+
+    latestReports = latestSubmissions.map((submission) => {
+      const userDetails = submission.userDetails || {};
+      const expertType = getExpertType(submission.taskType);
+      let coachId = null;
+
+      if (submission.taskType === "Meal") coachId = userDetails.dietition;
+      if (submission.taskType === "Workout") coachId = userDetails.trainer;
+      if (submission.taskType === "Therapy") coachId = userDetails.therapist;
+
+      const coach = coachId ? coachMap.get(coachId.toString()) : null;
+      const coachName = coach?.name;
+      const submittedBy = coachName ? `${expertType} ${coachName}` : expertType;
+
+      return {
+        name: userDetails.name || "Unknown",
+        type: getTaskLabel(submission.taskType),
+        expert: expertType,
+        submittedBy,
+        createdAt: submission.createdAt,
+      };
+    });
+  }
+
   return {
     totalPrograms,
     totalExperts: totalExperts[0].experts?.length,
@@ -256,7 +344,8 @@ export const getDashboardData = async (adminId, duration = "12m") => {
     totalTrainers,
     totalDietitians,
     totalTherapists,
-    graphData
+    graphData,
+    latestReports,
   }
 };
 
