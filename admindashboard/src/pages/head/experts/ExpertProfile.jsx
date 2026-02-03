@@ -34,13 +34,21 @@ const ExpertProfile = () => {
     );
   if (error) return <p className="text-red-500">{error}</p>;
   return (
-    <div className="flex justify-between w-full gap-4 h-[calc(100vh-120px)]">
-      {/* left */}
-      <ExpertLeftSide expert={expert} />
-      {/* center */}
-      <ExpertCenterSide expert={expert} />
-      {/* right */}
-      <ExpertRightSide expert={expert} />
+     <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 w-full h-[calc(100vh-111px)] bg-[#F8F9FA] p-2 sm:p-4 lg:p-2 ">
+      {/* left sidebar - Full width on mobile, fixed width on desktop */}
+      <div className="w-full lg:w-[280px] xl:w-[300px] lg:overflow-auto no-scrollbar">
+        <ExpertLeftSide expert={expert} />
+      </div>
+
+      {/* center content - Full width on mobile, flex-1 on desktop */}
+      <div className="w-full lg:flex-1 lg:overflow-y-auto no-scrollbar">
+        <ExpertCenterSide expert={expert} />
+      </div>
+
+      {/* right sidebar - Full width on mobile, fixed width on desktop */}
+      <div className="w-full lg:w-[300px] xl:w-[320px] lg:overflow-y-auto no-scrollbar">
+        <ExpertRightSide expert={expert} />
+      </div>
     </div>
   );
 };
