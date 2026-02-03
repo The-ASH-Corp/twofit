@@ -3,6 +3,7 @@ import allProgramaModel from "../allPrograms/allPrograma.model.js";
 import User from "../auth/auth.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import { AdminModel } from "./admin.model.js";
+import TaskSubmission from "../taskSubmission/taskSubmission.model.js";
 
 export const getAllAdmins = async (page, limit) => {
   const skip = (page - 1) * limit;
@@ -80,41 +81,186 @@ export const getAllCoachesByAdmin = async ({ adminId, page, limit }) => {
   };
 };
 
-export const getDashboardData = async (adminId) => {
+export const getDashboardData = async (adminId, duration = "12m") => {
 
-  const totalExperts = await AdminModel.find({_id:adminId}).select("experts program").populate("experts program");
+  const totalExperts = await AdminModel.find({ _id: adminId }).select("experts program").populate("experts program");
   const totalPrograms = totalExperts[0].program?.length;
-  
+
+  const expertIds = totalExperts[0]?.experts?.map(exp => exp._id) || [];
+
+  // Calculate total capacity from all experts' maxClient values
+  const totalCapacity = totalExperts[0]?.experts?.reduce((sum, expert) => {
+    return sum + (expert.maxClient || 0);
+  }, 0) || 0;
+
   const query = {
     $or: [
-      { trainer: { $in: totalExperts[0]?.experts } },
-      { dietition: { $in: totalExperts[0]?.experts } },
-      { therapist: { $in: totalExperts[0]?.experts } },
+      { trainer: { $in: expertIds } },
+      { dietition: { $in: expertIds } },
+      { therapist: { $in: expertIds } },
     ],
     role: "user",
   };
 
   const clients = await User.find(query)
 
+  // --- Graph Data Logic ---
+
+  // 1. Calculate Start Date
+  const now = new Date();
+  let startDate = new Date();
+  if (duration === "3m") startDate.setMonth(now.getMonth() - 3);
+  else if (duration === "6m") startDate.setMonth(now.getMonth() - 6);
+  else startDate.setMonth(now.getMonth() - 12); // Default 1y
+
+  // 2. Client Growth Data (Active, Inactive, New) - Convert to Percentages
+  const growthDataLabels = [];
+  const activeData = [];
+  const inactiveData = [];
+  const newData = [];
+
+  const monthsDiff = (now.getFullYear() - startDate.getFullYear()) * 12 + (now.getMonth() - startDate.getMonth());
+
+  // Helper to convert count to percentage
+  const toPercentage = (count) => {
+    if (totalCapacity === 0) return 0;
+    return Math.round((count / totalCapacity) * 100);
+  };
+
+  for (let i = 0; i <= monthsDiff; i++) {
+    const d = new Date(startDate.getFullYear(), startDate.getMonth() + i, 1);
+    const monthName = d.toLocaleString('default', { month: 'short' });
+    growthDataLabels.push(monthName);
+
+    const nextMonth = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+
+    // New Clients: Created in this month
+    const newClientsCount = clients.filter(c => {
+      const cDate = new Date(c.createdAt);
+      return cDate >= d && cDate < nextMonth;
+    }).length;
+    newData.push(toPercentage(newClientsCount));
+
+    // Active/Inactive: Snapshot at end of month
+    const activeCount = clients.filter(c => {
+      const cDate = new Date(c.createdAt);
+      return cDate < nextMonth && c.status === 'Active';
+    }).length;
+    activeData.push(toPercentage(activeCount));
+
+    const inactiveCount = clients.filter(c => {
+      const cDate = new Date(c.createdAt);
+      return cDate < nextMonth && c.status === 'Inactive';
+    }).length;
+    inactiveData.push(toPercentage(inactiveCount));
+  }
+
+  // 3. Client Compliance Data (Therapy, Workout, Diet)
+  const clientIds = clients.map(c => c._id);
+
+  const complianceStats = await TaskSubmission.aggregate([
+    { $match: { userId: { $in: clientIds } } },
+    { $unwind: "$dailySubmissions" },
+    { $unwind: "$dailySubmissions.exercises" },
+    {
+      $match: {
+        "dailySubmissions.exercises.updatedAt": { $gte: startDate }
+      }
+    },
+    {
+      $project: {
+        month: { $month: "$dailySubmissions.exercises.updatedAt" },
+        year: { $year: "$dailySubmissions.exercises.updatedAt" },
+        type: "$dailySubmissions.exercises.taskType",
+        status: "$dailySubmissions.exercises.status"
+      }
+    },
+    {
+      $group: {
+        _id: { month: "$month", year: "$year", type: "$type" },
+        total: { $sum: 1 },
+        completed: {
+          $sum: { $cond: [{ $eq: ["$status", "verified"] }, 1, 0] }
+        }
+      }
+    },
+    { $sort: { "_id.year": 1, "_id.month": 1 } }
+  ]);
+
+  // Construct Compliance Chart Data
+  const therapyData = [];
+  const workoutData = [];
+  const dietData = [];
+  // Reuse growthDataLabels or map complianceStats to them? 
+  // We need to align with growthDataLabels (months).
+
+  // Create a map for easy lookup
+  const complianceMap = {};
+  complianceStats.forEach(stat => {
+    const key = `${stat._id.type}-${stat._id.month}-${stat._id.year}`;
+    complianceMap[key] = stat;
+  });
+
+  for (let i = 0; i <= monthsDiff; i++) {
+    const d = new Date(startDate.getFullYear(), startDate.getMonth() + i, 1);
+    const m = d.getMonth() + 1; // 1-12
+    const y = d.getFullYear();
+
+    // Helper to get %
+    const getPct = (type) => {
+      // TaskType: 'Therapy', 'Workout', 'Meal' -> 'Diet'
+      let dbType = type;
+      if (type === 'Diet') dbType = 'Meal';
+      const entry = complianceMap[`${dbType}-${m}-${y}`];
+      if (!entry || entry.total === 0) return 0;
+      return Math.round((entry.completed / entry.total) * 100);
+    }
+
+    therapyData.push(getPct('Therapy'));
+    workoutData.push(getPct('Workout'));
+    dietData.push(getPct('Diet'));
+  }
+
+  const graphData = {
+    growth: {
+      labels: growthDataLabels,
+      datasets: [
+        { label: "Active", data: activeData },
+        { label: "Inactive", data: inactiveData },
+        { label: "New", data: newData }
+      ]
+    },
+    compliance: {
+      labels: growthDataLabels,
+      datasets: [
+        { label: "Therapy", data: therapyData },
+        { label: "Workout", data: workoutData },
+        { label: "Diet", data: dietData }
+      ]
+    }
+  };
+
+
   const totalClients = clients?.length;
   const totalCoaches = totalExperts[0].experts?.length;
-  
-  const totalTrainers =await totalExperts[0].experts?.filter((expert) => expert.role.includes("Trainer"))?.length;
-  const totalDietitians =await totalExperts[0].experts?.filter((expert) => expert.role.includes("Dietician"))?.length;
-  const totalTherapists =await totalExperts[0].experts?.filter((expert) => expert.role.includes("Therapist"))?.length;
+
+  const totalTrainers = await totalExperts[0].experts?.filter((expert) => expert.role.includes("Trainer"))?.length;
+  const totalDietitians = await totalExperts[0].experts?.filter((expert) => expert.role.includes("Dietician"))?.length;
+  const totalTherapists = await totalExperts[0].experts?.filter((expert) => expert.role.includes("Therapist"))?.length;
 
   return {
     totalPrograms,
-    totalExperts:totalExperts[0].experts?.length,
+    totalExperts: totalExperts[0].experts?.length,
     totalClients,
     totalCoaches,
     totalTrainers,
     totalDietitians,
     totalTherapists,
+    graphData
   }
 };
 
-export const getAdminByHead = async ({headId,page,limit}) => {
+export const getAdminByHead = async ({ headId, page, limit }) => {
   const skip = (page - 1) * limit;
   const totalCount = await AdminModel.countDocuments({ headId });
   const admin = await AdminModel.find({ headId }).select("-password").skip(skip).limit(limit);
