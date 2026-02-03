@@ -61,9 +61,9 @@ export const getAllCoachesByAdminId = createAsyncThunk(
 
 export const getDashboardData = createAsyncThunk(
   "admins/getDashboardData",
-  async (adminId, { rejectWithValue }) => {
+  async ({ adminId, duration }, { rejectWithValue }) => {
     try {
-      const data = await axiosInstance.get(`/admin/dashboard-data/${adminId}`);
+      const data = await axiosInstance.get(`/admin/dashboard-data/${adminId}?duration=${duration || '12m'}`);
       return data.data;
     } catch (error) {
       return rejectWithValue(

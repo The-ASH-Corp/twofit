@@ -58,7 +58,8 @@ export const getAllCoachesByAdmin = async (req, res) => {
 export const getDashboardData = async (req, res) => {
   try {
     const { adminId } = req.params;
-    const result = await service.getDashboardData(adminId);
+    const { duration } = req.query; // Get duration from query params
+    const result = await service.getDashboardData(adminId, duration);
     res.status(200).json({
       success: true,
       data: result,

@@ -103,16 +103,49 @@ export const getAllCoach = async (page, limit) => {
 };
 
 export const getCoachById = async (coachId) => {
-  return await CoachModel.findById(coachId)
+  const coach = await CoachModel.findById(coachId)
     .select("-password")
     .populate({
       path: "assignedUsers",
       select: "-password",
-      populate: {
-        path: "programType",
-      },
+      populate: [
+        {
+          path: "programType",
+          populate: { path: "plan" },
+        },
+        {
+          path: "therapyType",
+        },
+      ],
     })
-    .populate("assignedPrograms");
+    .populate("assignedPrograms")
+    .populate({
+      path: "feedback.userId",
+      select: "name",
+    });
+
+  if (!coach) return coach;
+
+  const coachObj = coach.toObject();
+  const assignedUsers = coachObj.assignedUsers || [];
+
+  const usersWithCompliance = await Promise.all(
+    assignedUsers.map(async (user) => {
+      const stats = await getUserComplianceStats(
+        user._id,
+        user?.programType?.plan,
+        user?.therapyType,
+        user?.programType?.title,
+      );
+      return {
+        ...user,
+        compliance: stats?.overall ?? 0,
+      };
+    }),
+  );
+
+  coachObj.assignedUsers = usersWithCompliance;
+  return coachObj;
 };
 
 export const updateCoachById = async (coachId, updatedData) => {
