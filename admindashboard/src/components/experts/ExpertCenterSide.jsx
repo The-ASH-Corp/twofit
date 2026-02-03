@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   MoreHorizontal,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  MessageSquare,
   Star,
 } from "lucide-react";
 import {
@@ -17,6 +16,8 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
+import { useDispatch } from "react-redux";
+import { getCoachRatingGraph } from "@/redux/features/coach/coach.thunk";
 
 ChartJS.register(
   CategoryScale,
@@ -28,25 +29,54 @@ ChartJS.register(
 );
 
 const ExpertCenterSide = ({ expert }) => {
-  const ratingData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug"],
-    datasets: [
-      {
-        data: [3.8, 4.4, 3.2, 4.8, 4.2, 3.5, 4.3, 2.5],
-        backgroundColor: (context) => {
-          const index = context.dataIndex;
-          const value = context.dataset.data[index];
-          return value === 4.8 ? "#0A4F48" : "#F4DBC7";
+  const dispatch = useDispatch();
+  const [ratingDuration, setRatingDuration] = useState("6");
+  const [ratingGraphData, setRatingGraphData] = useState(null);
+  const [showRatingMenu, setShowRatingMenu] = useState(false);
+  const [hoveredBarIndex, setHoveredBarIndex] = useState(null);
+
+  const ratingData = useMemo(() => {
+    if (!ratingGraphData?.ratingData?.length) {
+      return {
+        labels: [],
+        datasets: [
+          {
+            data: [],
+            backgroundColor: "#F4DBC7",
+            borderRadius: 6,
+            barThickness: 50,
+          },
+        ],
+      };
+    }
+
+    return {
+      labels: ratingGraphData.ratingData.map((item) => item.month),
+      datasets: [
+        {
+          data: ratingGraphData.ratingData.map((item) => item.rating),
+          backgroundColor: (context) => {
+            const index = context.dataIndex;
+            if (index === hoveredBarIndex) return "#0A4F48";
+            return "#F4DBC7";
+          },
+          borderRadius: 6,
+          barThickness: 50,
         },
-        borderRadius: 6,
-        barThickness: 50,
-      },
-    ],
-  };
+      ],
+    };
+  }, [ratingGraphData, hoveredBarIndex]);
 
   const ratingOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    onHover: (_, elements) => {
+      if (elements?.length) {
+        setHoveredBarIndex(elements[0].index);
+      } else {
+        setHoveredBarIndex(null);
+      }
+    },
     plugins: {
       legend: { display: false },
       tooltip: {
@@ -77,65 +107,16 @@ const ExpertCenterSide = ({ expert }) => {
     },
   };
 
-  const feedback = [
-    {
-      name: "Aarav Kumar",
-      rating: 4,
-      text: "Very supportive and clear guidance",
-    },
-    {
-      name: "Lydia Thomas",
-      rating: 4,
-      text: "The meal plans are really easy to follow. The portions, timing, and substitutions are clearly explained, which makes it simple to stay consistent even on busy days",
-    },
-  ];
+  const feedback = (expert?.feedback || [])
+    .slice()
+    .reverse()
+    .map((item) => ({
+      name: item?.userId?.name || "Anonymous",
+      rating: item?.rating || 0,
+      text: item?.feedback || "-",
+    }));
 
-  // const assignedClients = [
-  //   {
-  //     name: "Aarav Kumar",
-  //     program: "Weight Loss",
-  //     compliance: "78%",
-  //     status: "Active",
-  //   },
-  //   {
-  //     name: "Manoj S",
-  //     program: "Thyroid",
-  //     compliance: "82%",
-  //     status: "Inactive",
-  //   },
-  //   {
-  //     name: "Lydia Thomas",
-  //     program: "PCOD",
-  //     compliance: "63%",
-  //     status: "Active",
-  //   },
-  //   {
-  //     name: "George Philip",
-  //     program: "Weight Gain",
-  //     compliance: "71%",
-  //     status: "Active",
-  //   },
-  //   {
-  //     name: "Neha Sugathan",
-  //     program: "Postpartum",
-  //     compliance: "59%",
-  //     status: "Inactive",
-  //   },
-  //   {
-  //     name: "Aarav Kumar",
-  //     program: "Weight Loss",
-  //     compliance: "78%",
-  //     status: "Active",
-  //   },
-  //   {
-  //     name: "Aarav Kumar",
-  //     program: "Weight Loss",
-  //     compliance: "78%",
-  //     status: "Active",
-  //   },
-  // ];
-
-  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isLimitOpen, setIsLimitOpen] = useState(false);
@@ -162,16 +143,58 @@ const ExpertCenterSide = ({ expert }) => {
     setIsLimitOpen(false);
   };
 
+  useEffect(() => {
+    if (!expert?._id) return;
+    dispatch(
+      getCoachRatingGraph({ id: expert._id, duration: ratingDuration }),
+    ).then((res) => {
+      if (res.meta?.requestStatus === "fulfilled") {
+        setRatingGraphData(res.payload?.data ?? res.payload);
+      }
+    });
+  }, [dispatch, expert?._id, ratingDuration]);
+
   return (
     <div className="w-full flex flex-col gap-4 sm:gap-6  pb-4 sm:pb-6 px-0 sm:px-1">
       {/* Rating Score Card */}
       <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
-          <h3 className="text-sm sm:text-base font-bold text-[#0A4F48]">
-            Rating Score
-          </h3>
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D] w-fit">
-            Last 8 Months <ChevronDown size={14} />
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm sm:text-base font-bold text-[#0A4F48]">
+              Rating Score
+            </h3>
+            <div className="flex items-center gap-1 text-xs font-semibold text-[#0A4F48]">
+              <Star size={14} className="text-[#0A4F48]" />
+              {(expert?.avgRating || 0).toFixed(1)}
+            </div>
+          </div>
+          <div className="relative w-fit">
+            <button
+              className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D]"
+              onClick={() => setShowRatingMenu((prev) => !prev)}
+            >
+              Last {ratingDuration} Months <ChevronDown size={14} />
+            </button>
+            {showRatingMenu && (
+              <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-100 rounded-lg shadow-md z-10">
+                {["3", "6", "12"].map((option) => (
+                  <button
+                    key={option}
+                    onClick={() => {
+                      setRatingDuration(option);
+                      setShowRatingMenu(false);
+                    }}
+                    className={`w-full text-left px-3 py-2 text-xs font-medium hover:bg-[#F8F9FA] ${
+                      ratingDuration === option
+                        ? "text-[#0A4F48]"
+                        : "text-[#66706D]"
+                    }`}
+                  >
+                    Last {option} Months
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
         <div className="h-40 sm:h-48 relative">
@@ -198,6 +221,11 @@ const ExpertCenterSide = ({ expert }) => {
           </div>
           {isFeedbackOpen && (
             <div className="space-y-4 sm:space-y-6">
+              {feedback.length === 0 && (
+                <p className="text-xs text-[#66706D]">
+                  No feedback yet.
+                </p>
+              )}
               {feedback.map((item, i) => (
                 <div
                   key={i}

@@ -112,7 +112,11 @@ export const getCoachById = async (coachId) => {
         path: "programType",
       },
     })
-    .populate("assignedPrograms");
+    .populate("assignedPrograms")
+    .populate({
+      path: "feedback.userId",
+      select: "name",
+    });
 };
 
 export const updateCoachById = async (coachId, updatedData) => {
