@@ -44,6 +44,8 @@ export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState(null);
   const [growthDuration, setGrowthDuration] = useState(6);
   const [complianceDuration, setComplianceDuration] = useState(12);
+  const [reportCategory, setReportCategory] = useState("All Categories");
+  const [showCategoryMenu, setShowCategoryMenu] = useState(false);
 
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
@@ -387,6 +389,13 @@ export default function Dashboard() {
       time: formatReportTime(report.createdAt),
     }));
 
+  const filteredProgressReports =
+    reportCategory === "All Categories"
+      ? progressReports
+      : progressReports.filter(
+          (report) => report.expert === reportCategory,
+        );
+
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA]">
       <div className="flex gap-6 lg:flex-row flex-col">
@@ -489,9 +498,39 @@ export default function Dashboard() {
               <h3 className="text-lg font-bold text-[#0A4F48]">
                 Latest Progress Reports
               </h3>
-              <button className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D]">
-                All Categories <ChevronDown size={14} />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setShowCategoryMenu((prev) => !prev)}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D]"
+                >
+                  {reportCategory} <ChevronDown size={14} />
+                </button>
+                {showCategoryMenu && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-lg shadow-md z-10">
+                    {[
+                      "All Categories",
+                      "Trainer",
+                      "Dietitian",
+                      "Therapist",
+                    ].map((option) => (
+                      <button
+                        key={option}
+                        onClick={() => {
+                          setReportCategory(option);
+                          setShowCategoryMenu(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 text-xs font-medium hover:bg-[#F8F9FA] ${
+                          reportCategory === option
+                            ? "text-[#0A4F48]"
+                            : "text-[#66706D]"
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -505,7 +544,7 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {progressReports.map((report, i) => (
+                  {filteredProgressReports.map((report, i) => (
                     <tr key={i} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 text-sm font-medium text-[#0A4F48]">
                         {report.name}
