@@ -58,31 +58,63 @@ const Dashboard = () => {
   const status = useAppSelector(selectFounderStatus);
 
   const [founder, setFounder] = useState();
+  const [growthDuration, setGrowthDuration] = useState(6);
+  const [complianceDuration, setComplianceDuration] = useState(12);
 
   useEffect(() => {
     setFounder(data);
   }, [data]);
-  // Mock Data for Charts
+
+  const getSlicedData = (array, duration) => {
+    if (!array || !Array.isArray(array)) return [];
+    const start = Math.max(0, array.length - duration);
+    return array.slice(start);
+  };
+
+  const toggleDuration = (current, setter) => {
+    if (current === 3) setter(6);
+    else if (current === 6) setter(12);
+    else setter(3);
+  };
+
+  const getDatasetByLabel = (datasets, label) => {
+    const ds = datasets?.find(
+      (d) => d.label?.toLowerCase() === label.toLowerCase(),
+    );
+    return ds?.data || [];
+  };
+  const growthDataRaw = founder?.data?.graphData?.growth;
+  const complianceDataRaw = founder?.data?.graphData?.compliance;
+
   const growthData = {
-    labels: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    labels: getSlicedData(growthDataRaw?.labels, growthDuration),
     datasets: [
       {
         label: "Active",
-        data: [40, 45, 42, 48, 45, 50],
+        data: getSlicedData(
+          getDatasetByLabel(growthDataRaw?.datasets, "Active"),
+          growthDuration,
+        ),
         backgroundColor: "#F4DBC7",
         borderRadius: 4,
         barThickness: 12,
       },
       {
         label: "Inactive",
-        data: [50, 55, 52, 58, 55, 54],
+        data: getSlicedData(
+          getDatasetByLabel(growthDataRaw?.datasets, "Inactive"),
+          growthDuration,
+        ),
         backgroundColor: "#EBF3F2",
         borderRadius: 4,
         barThickness: 12,
       },
       {
         label: "New",
-        data: [30, 35, 32, 38, 35, 30],
+        data: getSlicedData(
+          getDatasetByLabel(growthDataRaw?.datasets, "New"),
+          growthDuration,
+        ),
         backgroundColor: "#0A4F48",
         borderRadius: 4,
         barThickness: 12,
@@ -91,40 +123,33 @@ const Dashboard = () => {
   };
 
   const complianceData = {
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
-    datasets: [
-      {
-        label: "Diet",
-        data: [30, 35, 70, 68, 72, 75, 74, 76, 78, 80, 79, 82],
-        backgroundColor: "#0A4F48",
-        borderRadius: 4,
-      },
-      {
-        label: "Workout",
-        data: [40, 45, 50, 48, 52, 55, 63, 65, 67, 69, 68, 70],
-        backgroundColor: "#F4DBC7",
-        borderRadius: 4,
-      },
-      {
-        label: "Therapy",
-        data: [30, 35, 40, 38, 42, 45, 52, 54, 56, 58, 57, 60],
-        backgroundColor: "#EBF3F2",
-        borderRadius: 4,
-      },
-    ],
+    labels: getSlicedData(complianceDataRaw?.labels, complianceDuration),
+    datasets: ["Workout", "Therapy", "Diet"].map((label) => {
+      const dataset =
+        (complianceDataRaw?.datasets || []).find((ds) => ds.label === label) || {
+          data: [],
+        };
+      const color =
+        label === "Workout"
+          ? "#F4DBC7"
+          : label === "Therapy"
+            ? "#0A4F48"
+            : "#EBF3F2";
+      return {
+        ...dataset,
+        label,
+        data: getSlicedData(dataset.data || [], complianceDuration).map(
+          (v) => v / 3,
+        ),
+        backgroundColor: color,
+        borderRadius: 8,
+        borderSkipped: false,
+        barThickness: 30,
+        maxBarThickness: 30,
+        borderWidth: 2,
+        borderColor: "#FFFFFF",
+      };
+    }),
   };
 
   
@@ -182,7 +207,18 @@ const Dashboard = () => {
     ],
   };
 
-  const chartOptions = {
+  const growthMaxValue = Math.max(
+    0,
+    ...growthData.datasets.flatMap((ds) => ds.data || []),
+  );
+  const growthYAxisMax =
+    growthMaxValue === 0
+      ? 10
+      : growthMaxValue % 10 === 0
+        ? growthMaxValue + 10
+        : Math.ceil(growthMaxValue / 10) * 10;
+
+  const growthOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -198,6 +234,18 @@ const Dashboard = () => {
         padding: 10,
         displayColors: true,
         usePointStyle: true,
+        callbacks: {
+          label: (context) => {
+            let label = context.dataset.label || "";
+            if (label) {
+              label += ": ";
+            }
+            if (context.parsed.y !== null) {
+              label += context.parsed.y;
+            }
+            return label;
+          },
+        },
       },
     },
     scales: {
@@ -214,18 +262,61 @@ const Dashboard = () => {
       },
       y: {
         beginAtZero: true,
-        max: 100,
+        max: growthYAxisMax,
         ticks: {
-          stepSize: 25,
           font: {
             size: 11,
           },
           color: "#66706D",
-          callback: (value) => value + "%",
         },
         grid: {
           color: "#f0f0f0",
         },
+      },
+    },
+  };
+
+  const stackedOptions = {
+    ...growthOptions,
+    layout: { padding: { top: 8 } },
+    plugins: {
+      ...growthOptions.plugins,
+      tooltip: {
+        ...growthOptions.plugins.tooltip,
+        callbacks: {
+          label: (context) => {
+            let label = context.dataset.label || "";
+            if (label) {
+              label += ": ";
+            }
+            if (context.raw !== null) {
+              label += Math.round(context.raw * 3) + "%";
+            }
+            return label;
+          },
+        },
+      },
+    },
+    scales: {
+      x: {
+        ...growthOptions.scales.x,
+        stacked: true,
+        grid: { display: false },
+        ticks: { font: { size: 11 }, color: "#94A3B8" },
+        categoryPercentage: 0.55,
+        barPercentage: 0.8,
+      },
+      y: {
+        ...growthOptions.scales.y,
+        stacked: true,
+        max: 100,
+        ticks: {
+          stepSize: 25,
+          font: { size: 11 },
+          color: "#94A3B8",
+          callback: (value) => value + "%",
+        },
+        grid: { color: "#E9EEF5" },
       },
     },
   };
@@ -341,35 +432,35 @@ const Dashboard = () => {
           </div>
           {/* Row 2: Client Growth & Client Compliance */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <DashboardCard title="Client Growth" subTitle="Last 6 Months">
+            <DashboardCard
+              title="Client Growth"
+              subTitle={`Last ${growthDuration} Months`}
+              onToggle={() => toggleDuration(growthDuration, setGrowthDuration)}
+            >
               <div className="flex items-center gap-4 mb-4">
                 <LegendItem color="#F4DBC7" label="Active" />
                 <LegendItem color="#DBDEDD" label="Inactive" />
                 <LegendItem color="#0A4F48" label="New" />
               </div>
               <div className="h-64 relative">
-                <Bar data={growthData} options={chartOptions} />
+                <Bar data={growthData} options={growthOptions} />
               </div>
             </DashboardCard>
 
-            <DashboardCard title="Client Compliance" subTitle="Last Year">
+            <DashboardCard
+              title="Client Compliance"
+              subTitle={`Last ${complianceDuration} Months`}
+              onToggle={() =>
+                toggleDuration(complianceDuration, setComplianceDuration)
+              }
+            >
               <div className="flex items-center gap-4 mb-4">
-                <LegendItem color="#0A4F48" label="Diet" />
+                <LegendItem color="#EBF3F2" label="Diet" />
                 <LegendItem color="#F4DBC7" label="Workout" />
-                <LegendItem color="#EBF3F2" label="Therapy" />
+                <LegendItem color="#0A4F48" label="Therapy" />
               </div>
               <div className="h-64">
-                <Bar
-                  data={complianceData}
-                  options={{
-                    ...chartOptions,
-                    scales: {
-                      ...chartOptions.scales,
-                      x: { ...chartOptions.scales.x, stacked: true },
-                      y: { ...chartOptions.scales.y, stacked: true },
-                    },
-                  }}
-                />
+                <Bar data={complianceData} options={stackedOptions} />
               </div>
             </DashboardCard>
           </div>
@@ -385,10 +476,7 @@ const Dashboard = () => {
                     maintainAspectRatio: false,
                   }}
                 />
-                {/* <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span className="text-2xl font-bold text-[#0A4F48]">4.6</span>
-                  <span className="text-xs text-[#66706D]">Avg Rating</span>
-                </div> */}
+              
               </div>
               <div className="flex justify-between mt-4">
                 <div className="flex items-center gap-2">
@@ -424,10 +512,7 @@ const Dashboard = () => {
                     maintainAspectRatio: false,
                   }}
                 />
-                {/* <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                  <span className="text-2xl font-bold text-[#0A4F48]">4.6</span>
-                  <span className="text-xs text-[#66706D]">Avg Rating</span>
-                </div> */}
+                  
               </div>
               <div className="flex justify-between mt-4">
                 <div className="flex items-center gap-2">
@@ -639,11 +724,15 @@ const Dashboard = () => {
   );
 };
 
-const DashboardCard = ({ title, subTitle, children }) => (
+const DashboardCard = ({ title, subTitle, children, onToggle }) => (
   <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col">
     <div className="flex items-center justify-between mb-6">
       <h3 className="text-base font-bold text-[#0A4F48]">{title}</h3>
-      <button className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-[10px] font-semibold text-[#66706D] uppercase tracking-wider">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-[10px] font-semibold text-[#66706D] uppercase tracking-wider"
+      >
         {subTitle} <ChevronDown size={14} />
       </button>
     </div>
