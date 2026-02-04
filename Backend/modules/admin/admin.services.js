@@ -57,7 +57,7 @@ export const addNewAdmin = async (adminData) => {
 };
 
 export const getAdminById = async (id) => {
-  const admin = await AdminModel.findById(id).select("-password");
+  const admin = await AdminModel.findById(id).select("-password").populate("program")
   return admin;
 };
 

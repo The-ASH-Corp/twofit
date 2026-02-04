@@ -13,9 +13,9 @@ router.get("/my-status", authMiddleware, getUserTaskStatus);
 
 // Expert/Admin routes
 // Assuming 'coach' and 'admin' can verify
-router.get("/user/:userId/all", authMiddleware, allowRoles("admin", "expert","coach", "Trainer", "Dietician", "Therapist"), getAllUserSubmissions);
-router.get("/pending", authMiddleware, allowRoles("admin", "expert","coach", "Trainer", "Dietician", "Therapist"), getPendingSubmissions);
-router.patch("/:id/verify", authMiddleware, allowRoles("admin", "expert","coach", "Trainer", "Dietician", "Therapist"), verifyTask);
-router.patch("/:id/reject", authMiddleware, allowRoles("admin", "expert","coach", "Trainer", "Dietician", "Therapist"), rejectTask);
+router.get("/user/:userId/all", authMiddleware, getAllUserSubmissions);
+router.get("/pending", authMiddleware, getPendingSubmissions);
+router.patch("/:id/verify", authMiddleware, allowRoles( "expert","coach", "Trainer", "Dietician", "Therapist"), verifyTask);
+router.patch("/:id/reject", authMiddleware, allowRoles( "expert","coach", "Trainer", "Dietician", "Therapist"), rejectTask);
 
 export default router;

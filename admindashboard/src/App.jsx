@@ -205,7 +205,7 @@ function App() {
           />
           <Route path="admins/profile/:id" element={<HeadAdminProfile />} />
           <Route
-            path="clients/profile/:clientId"
+            path="clients/profile/:Id"
             element={<HeadClientProfile />}
           />
           <Route path="programs" element={<HeadProgramTable />} />
