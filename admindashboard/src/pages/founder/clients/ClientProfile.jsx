@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ProfileLeftSide from "@/components/clients/ProfileLeftSide";
 import ProfileCenterSide from "@/components/clients/ProfileCenterSide";
 import ProfileRightSide from "@/components/clients/ProfileRightSide";
 import { useDispatch, useSelector } from "react-redux";
-import { getClient } from "@/redux/features/client/client.thunk";
+import { fetchClientComplianceStats, getClient } from "@/redux/features/client/client.thunk";
 import { useParams } from "react-router-dom";
 import {
   selectSelectedClient,
@@ -13,6 +13,8 @@ import {
 import { SyncLoader } from "react-spinners";
 
 const ClientProfile = () => {
+    const [complianceStats, setComplianceStats] = useState(null);
+  
   const dispatch = useDispatch();
   const { id } = useParams();
 
@@ -20,10 +22,14 @@ const ClientProfile = () => {
   const status = useSelector(selectClientStatus);
   const error = useSelector(selectClientError);
 
+  const fetchData =async() => {
+    dispatch(getClient({ id: id }));
+    const compliance = await dispatch(fetchClientComplianceStats(id)).unwrap();
+    setComplianceStats(compliance);
+  }
+  
   useEffect(() => {
-    if (id) {
-      dispatch(getClient({ id: id }));
-    }
+     fetchData();   
   }, [id, dispatch]);
 
   if (status === "loading")
@@ -37,7 +43,7 @@ const ClientProfile = () => {
   return (
     <div className="flex flex-col lg:flex-row lg:justify-between w-full gap-4 h-[calc(100vh-120px)] ">
       <div className="w-full lg:w-[25%] lg:overflow-auto no-scrollbar">
-        <ProfileLeftSide client={client} />
+        <ProfileLeftSide client={client} complianceStats={complianceStats} />
       </div>
       <div className="w-full lg:w-[50%] lg:overflow-auto no-scrollbar">
         <ProfileCenterSide client={client} />
