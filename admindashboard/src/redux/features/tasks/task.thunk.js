@@ -85,3 +85,18 @@ export const rejectTask = createAsyncThunk(
     }
 );
 
+export const getAllUserSubmissions = createAsyncThunk(
+    "tasks/getAllUserSubmissions",
+    async (userId, { rejectWithValue }) => {
+        try {
+            const body = await axiosInstance.get(`/tasks/user/${userId}/all`);
+            return body.data;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to fetch user submissions"
+            );
+        }
+    }
+);
+
+

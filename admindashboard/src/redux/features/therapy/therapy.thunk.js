@@ -14,8 +14,8 @@ export const createNewPlan = createAsyncThunk("therapy/createNewPlan", async (pl
 
 
 export const getTherapyPlanById = createAsyncThunk("therapy/getPlanById", async (planId, { rejectWithValue }) => {
-    try {
-        const data = await axiosInstance.get(`/therapy/plan/${planId}`, { rejectWithValue })
+    try {        
+        const data = await axiosInstance.get(`/therapy/plan/${planId}`)        
         return data.data
     } catch (error) {
         

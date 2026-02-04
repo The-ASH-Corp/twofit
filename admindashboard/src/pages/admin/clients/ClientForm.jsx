@@ -63,9 +63,9 @@ export default function ClientForm() {
   };
 
   const fetchTherapy = async () => {
-    const res = await dispatch(fetchTherapyPlans());
+    const res = await dispatch(fetchTherapyPlans({page:1, limit:100}));
     if (res.payload?.data) {
-      setTherapy(res.payload.data);
+      setTherapy(res.payload.data.therapy);
     }
   };
 

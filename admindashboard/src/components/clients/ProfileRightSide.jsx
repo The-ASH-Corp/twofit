@@ -1,114 +1,33 @@
 import { assets } from '@/assets/asset';
-import React, { useState } from 'react'
-import { Calendar } from '../ui/calendar';
+import React from 'react'
 
-const missedTasks = [
-  {
-    date: "March 2",
-    missedItems: "Breakfast skipped",
-  },
-  {
-    date: "March 5",
-    missedItems: "No tasks completed",
-  },
-  {
-    date: "March 28",
-    missedItems: "Some tasks missed",
-  },
-];
+const ProfileRightSide = ({ client }) => {
 
-const dailyActivityLog = [
-  {
-    title: "Meal Uploaded (Lunch: Paneer Salad)",
-    date: "10:40 AM",
-  },
-  {
-    title: "Workout Completed (20 mins HIIT)",
-    date: "8:15 AM",
-  },
-  {
-    title: "Meal Skipped (Dinner)",
-    date: "Yesterday, 6:05 PM",
-  },
-  {
-    title: "Therapy Task Completed",
-    date: "2 Days Ago, 2:30 PM",
-  },
-];
-
-const compliance = [
+  const compliance = [
   {
     title: "Chest",
-    Before: "98 cm",
-    after: "96 cm",
+    Before: client?.measurementHistory[0]?.chest ?? 0 + " cm",
+    after:  client?.measurementHistory[client?.measurementHistory.length - 1]?.chest ?? 0 + " cm",
     color: "#0A4F48",
   },
   {
     title: "Waist",
-    Before: "98 cm",
-    after: "96 cm",
+    Before: client?.measurementHistory[0]?.waist ?? 0 + " cm",
+    after:  client?.measurementHistory[client?.measurementHistory.length - 1]?.waist ?? 0 + " cm",
     color: "#EBF3F2",
   },
   {
     title: "Hips",
-    Before: "98 cm",
-    after: "96 cm",
+    Before: client?.measurementHistory[0]?.hip ?? 0 + " cm",
+    after:  client?.measurementHistory[client?.measurementHistory.length - 1]?.hip ?? 0 + " cm",
     color: "#F4DBC7",
   },
 ];
-
-const ProfileRightSide = ({ client }) => {
-  const [date, setDate] = useState(new Date(2025, 5, 12));
-  const [taskOpen, setTaskOpen] = useState(false);
   return (
     <div className=" flex flex-col items-center gap-4 pb-4">
       {/* calender */}
       <div className="flex flex-col items-center w-full bg-white rounded-lg">
-        <Calendar
-          mode="single"
-          selected={date}
-          onSelect={setDate}
-          className="rounded-lg px-2 py-4 bg-[#EBF3F2] [--cell-size:37px] w-[320px] lg:w-full "
-          buttonVariant="ghost"
-        />
-        <div className="w-full flex flex-col items-center gap-4 p-4">
-          <div
-            className="flex items-center justify-between w-full"
-            onClick={() => setTaskOpen(!taskOpen)}
-          >
-            <h3 className="text-[16px] font-bold text-[#0A4F48]">
-              Missed Tasks
-            </h3>
-            <button onClick={() => setTaskOpen(!taskOpen)}>
-              <img
-                src={assets.downVector}
-                alt="down vector"
-                className={`w-3 transition-transform duration-400 ${
-                  !taskOpen ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-          </div>
-          <div
-            className={`flex flex-col items-center gap-4 w-full overflow-hidden transition-all duration-400 ease-in-out ${
-              taskOpen ? "max-h-[5000px] opacity-100" : "max-h-0 opacity-0"
-            }`}
-          >
-            {missedTasks.map((items, i) => (
-              <div
-                key={i}
-                className="bg-[#F8F8F8] w-full rounded-lg p-4 flex flex-col items-start"
-              >
-                <span className="text-[12px] text-[#66706D]">{items.date}</span>
-                <div>
-                  <span className="text-[14px] text-[#0A4F48] font-bold">
-                    {items.missedItems}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        
       </div>
       {/* Weight Progress */}
       <div className="flex flex-col items-center w-full p-4 bg-white rounded-lg gap-4">
@@ -124,17 +43,17 @@ const ProfileRightSide = ({ client }) => {
           <div className="flex items-center justify-between w-full ">
             <span className="text-[12px] ">Today</span>
             <span className="text-[14px] font-bold text-[#0A4F48]">
-              78.5 kg
+              {client?.weightHistory[client?.weightHistory.length - 1].weight} kg
             </span>
           </div>
           <div className="flex flex-col items-center w-full gap-2">
             <div className="flex items-center justify-between w-full ">
               <span className="text-[12px] text-[#66706D]">Start</span>
-              <span className="text-[12px]">{client?.currentWeight} kg</span>
+              <span className="text-[12px]">{client?.weightHistory[0].weight} kg</span>
             </div>
             <div className="flex items-center justify-between w-full">
               <span className="text-[12px] text-[#66706D]">Change</span>
-              <span className="text-[12px]">1.7 kg</span>
+              <span className="text-[12px]">{client?.weightHistory[client?.weightHistory.length - 1].weight - client?.weightHistory[0].weight} kg</span>
             </div>
           </div>
         </div>
@@ -176,7 +95,7 @@ const ProfileRightSide = ({ client }) => {
         </div>
       </div>
       {/* Daily Activity Log */}
-      <div className="flex flex-col items-center w-full gap-4">
+      {/* <div className="flex flex-col items-center w-full gap-4">
         <div className="flex items-center justify-between w-full">
           <h3 className="text-[16px] font-bold text-[#0A4F48]">
             Daily Activity Log
@@ -221,7 +140,7 @@ const ProfileRightSide = ({ client }) => {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

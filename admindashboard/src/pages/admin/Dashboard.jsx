@@ -38,80 +38,155 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
 );
 export default function Dashboard() {
-const [dashboardData, setDashboardData] = useState(null);
-const dispatch = useDispatch();
-const user =useAppSelector(selectUser)
+  const [dashboardData, setDashboardData] = useState(null);
+  const [growthDuration, setGrowthDuration] = useState(6);
+  const [complianceDuration, setComplianceDuration] = useState(12);
+  const [reportCategory, setReportCategory] = useState("All Categories");
+  const [showCategoryMenu, setShowCategoryMenu] = useState(false);
 
-const getDashboardDatas =async () => {
- const data =await dispatch(getDashboardData(user._id))
- setDashboardData(data.payload)
-};
+  const dispatch = useDispatch();
+  const user = useAppSelector(selectUser);
+
+  const getDashboardDatas = async () => {
+    const data = await dispatch(
+      getDashboardData({ adminId: user._id, duration: "12m" }),
+    );
+    setDashboardData(data.payload);
+  };
 
   useEffect(() => {
     getDashboardDatas();
-  }, []);
+  }, [user?._id]); // Add dependency
 
+  const getSlicedData = (array, duration) => {
+    if (!array || !Array.isArray(array)) return [];
+    const start = Math.max(0, array.length - duration);
+    return array.slice(start);
+  };
+
+  // Helper to toggle duration
+  const toggleDuration = (current, setter) => {
+    if (current === 3) setter(6);
+    else if (current === 6) setter(12);
+    else setter(3);
+  };
+
+  // Helper to safely get dataset by label
+  const getDatasetByLabel = (datasets, label) => {
+    const ds = datasets?.find(
+      (d) => d.label?.toLowerCase() === label.toLowerCase(),
+    );
+    return ds?.data || [];
+  };
+
+  const hasGraphData = (data) => {
+    return (
+      data &&
+      data.labels &&
+      data.labels.length > 0 &&
+      data.datasets?.some((ds) => ds.data?.some((val) => val > 0))
+    );
+  };
+
+  // --- Expert Performance Data Calculation ---
+  const totalPrograms = dashboardData?.totalPrograms || 0;
+  const totalExp = dashboardData?.totalExperts || 0;
+  const totalCli = dashboardData?.totalClients || 0;
+
+  const totalEntities = totalPrograms + totalExp + totalCli; // Total for percentage calculation
+
+  const getPercent = (val) => {
+    if (totalEntities === 0) return 0;
+    return Math.round((val / totalEntities) * 100);
+  };
+
+  const progPct = getPercent(totalPrograms);
+  const expPct = getPercent(totalExp);
+  const cliPct = getPercent(totalCli);
+
+  const hasPerformanceData = totalEntities > 0;
   const performanceData = {
-    labels: ["Programs", "Experts", "Clients"],
+    labels: hasPerformanceData
+      ? ["Programs", "Experts", "Clients"]
+      : ["No Data"],
     datasets: [
       {
-        data: [50, 20, 30],
-        backgroundColor: ["#0A4F48", "#E6EFEE", "#FFD7A8"],
+        data: hasPerformanceData ? [totalPrograms, totalExp, totalCli] : [1],
+        backgroundColor: hasPerformanceData
+          ? ["#0A4F48", "#E6EFEE", "#FFD7A8"]
+          : ["#E5E7EB"],
         borderWidth: 0,
         rotation: 270,
         cutout: "80%",
-        hoverOffset: 15,
-        spacing: 1,
+        hoverOffset: hasPerformanceData ? 15 : 0,
+        spacing: hasPerformanceData ? 1 : 0,
         borderRadius: 8,
       },
     ],
   };
+
   const complianceData = {
-    labels: [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ],
+    labels: getSlicedData(
+      dashboardData?.graphData?.compliance?.labels,
+      complianceDuration,
+    ),
     datasets: [
-      {
-        label: "Therapy",
-        data: [15, 25, 30, 10, 60, 22, 28, 62, 25, 45, 28, 50],
-        backgroundColor: "#0A4F48",
-        borderRadius: 10,
-        borderWidth: 4,
+       {
+        label: "Workout",
+        data: getSlicedData(
+          getDatasetByLabel(
+            dashboardData?.graphData?.compliance?.datasets,
+            "Workout",
+          ),
+          complianceDuration,
+        ).map((v) => v / 3),
+        backgroundColor: "#F4DBC7",
+        borderRadius: 8,
+        borderSkipped: false,
+        barThickness: 30,
+        maxBarThickness: 30,
+        borderWidth: 2,
         borderColor: "#FFFFFF",
-        barThickness: 24,
       },
       {
-        label: "Workout",
-        data: [62, 22, 42, 45, 12, 32, 45, 18, 50, 48, 45, 22],
-        backgroundColor: "#F4DBC7",
-        borderRadius: 10,
-        borderWidth: 4,
+        label: "Therapy",
+        data: getSlicedData(
+          getDatasetByLabel(
+            dashboardData?.graphData?.compliance?.datasets,
+            "Therapy",
+          ),
+          complianceDuration,
+        ).map((v) => v / 3),
+        backgroundColor: "#0A4F48",
+        borderRadius: 8,
+        borderSkipped: false,
+        barThickness: 30,
+        maxBarThickness: 30,
+        borderWidth: 2,
         borderColor: "#FFFFFF",
-        barThickness: 24,
       },
       {
         label: "Diet",
-        data: [23, 53, 28, 45, 28, 46, 27, 20, 25, 7, 27, 28],
+        data: getSlicedData(
+          getDatasetByLabel(
+            dashboardData?.graphData?.compliance?.datasets,
+            "Diet",
+          ),
+          complianceDuration,
+        ).map((v) => v / 3),
         backgroundColor: "#EBF3F2",
-        borderRadius: 10,
-        borderWidth: 4,
+        borderRadius: 8,
+        borderSkipped: false,
+        barThickness: 30,
+        maxBarThickness: 30,
+        borderWidth: 2,
         borderColor: "#FFFFFF",
-        barThickness: 24,
       },
+     
+      
     ],
   };
 
@@ -165,28 +240,46 @@ const getDashboardDatas =async () => {
     },
   };
   const growthData = {
-    labels: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    labels: getSlicedData(
+      dashboardData?.graphData?.growth?.labels,
+      growthDuration,
+    ),
     datasets: [
       {
         label: "Active",
-        data: [75, 80, 78, 85, 82, 90],
+        data: getSlicedData(
+          getDatasetByLabel(
+            dashboardData?.graphData?.growth?.datasets,
+            "Active",
+          ),
+          growthDuration,
+        ),
         backgroundColor: "#F4DBC7",
         borderRadius: 4,
-        barThickness: 12,
+        barThickness: 16,
       },
       {
         label: "Inactive",
-        data: [40, 45, 42, 48, 45, 50],
+        data: getSlicedData(
+          getDatasetByLabel(
+            dashboardData?.graphData?.growth?.datasets,
+            "Inactive",
+          ),
+          growthDuration,
+        ),
         backgroundColor: "#EBF3F2",
         borderRadius: 4,
-        barThickness: 12,
+        barThickness: 16,
       },
       {
         label: "New",
-        data: [60, 70, 65, 80, 75, 85],
+        data: getSlicedData(
+          getDatasetByLabel(dashboardData?.graphData?.growth?.datasets, "New"),
+          growthDuration,
+        ),
         backgroundColor: "#0A4F48",
         borderRadius: 4,
-        barThickness: 12,
+        barThickness: 16,
       },
     ],
   };
@@ -215,64 +308,94 @@ const getDashboardDatas =async () => {
   };
   const stackedOptions = {
     ...chartOptions,
+    layout: { padding: { top: 8 } },
+    plugins: {
+      ...chartOptions.plugins,
+      tooltip: {
+        ...chartOptions.plugins.tooltip,
+        callbacks: {
+          label: (context) => {
+            let label = context.dataset.label || "";
+            if (label) {
+              label += ": ";
+            }
+            if (context.raw !== null) {
+              label += Math.round(context.raw * 3) + "%";
+            }
+            return label;
+          },
+        },
+      },
+    },
     scales: {
-      x: { ...chartOptions.scales.x, stacked: true },
-      y: { ...chartOptions.scales.y, stacked: true },
+      x: {
+        ...chartOptions.scales.x,
+        stacked: true,
+        grid: { display: false },
+        ticks: { font: { size: 11 }, color: "#94A3B8" },
+        categoryPercentage: 0.55,
+        barPercentage: 0.8,
+      },
+      y: {
+        ...chartOptions.scales.y,
+        stacked: true,
+        ticks: {
+          stepSize: 25,
+          font: { size: 11 },
+          color: "#94A3B8",
+          callback: (value) => value + "%",
+        },
+        grid: { color: "#E9EEF5", drawBorder: false },
+      },
     },
   };
 
-  const progressReports = [
-    {
-      name: "Neha Sharma",
-      type: "Diet",
-      expert: "Dietitian",
-      submittedBy: "Dietitian Anjali",
-      time: "Today, 10:15 AM",
-    },
-    {
-      name: "Aarav Kumar",
-      type: "Workout",
-      expert: "Trainer",
-      submittedBy: "Trainer Rahul",
-      time: "Today, 9:40 AM",
-    },
-    {
-      name: "Vikram Singh",
-      type: "Therapy",
-      expert: "Therapist",
-      submittedBy: "Dietitian Priya",
-      time: "Yesterday, 7:10 PM",
-    },
-    {
-      name: "Sonali Jain",
-      type: "Measurements",
-      expert: "Trainer",
-      submittedBy: "Dietitian Anjali",
-      time: "Yesterday, 5:20 PM",
-    },
-    {
-      name: "Riya Mehta",
-      type: "Diet",
-      expert: "Dietitian",
-      submittedBy: "Therapist Mira",
-      time: "2 Days Ago",
-    },
-    {
-      name: "Neha Sharma",
-      type: "Weight",
-      expert: "Trainer",
-      submittedBy: "Dietitian Anjali",
-      time: "2 Days Ago",
-    },
-    {
-      name: "Aarav Kumar",
-      type: "Therapy",
-      expert: "Therapist",
-      submittedBy: "Trainer Rahul",
-      time: "3 Days Ago",
-    },
-  ];
-  
+  const formatReportTime = (value) => {
+    if (!value) return "-";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "-";
+    const now = new Date();
+    const startOfToday = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+    );
+    const startOfDate = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+    );
+    const diffDays = Math.floor(
+      (startOfToday - startOfDate) / (1000 * 60 * 60 * 24),
+    );
+    const timeString = date.toLocaleTimeString([], {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+    if (diffDays === 0) return `Today, ${timeString}`;
+    if (diffDays === 1) return `Yesterday, ${timeString}`;
+    if (diffDays > 1) return `${diffDays} Days Ago`;
+    return date.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const progressReports = (dashboardData?.latestReports || [])
+    .slice(0, 10)
+    .map((report) => ({
+      ...report,
+      time: formatReportTime(report.createdAt),
+    }));
+
+  const filteredProgressReports =
+    reportCategory === "All Categories"
+      ? progressReports
+      : progressReports.filter(
+          (report) => report.expert === reportCategory,
+        );
+
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA]">
       <div className="flex gap-6 lg:flex-row flex-col">
@@ -283,19 +406,19 @@ const getDashboardDatas =async () => {
             {[
               {
                 label: "Clients",
-                value: dashboardData?.totalClients||0,
+                value: dashboardData?.totalClients || 0,
                 icon: <GraduationCap size={22} className="text-white" />,
                 bg: "bg-[#0A4F48]",
               },
               {
                 label: "Total Programs",
-                value: dashboardData?.totalPrograms||0,
+                value: dashboardData?.totalPrograms || 0,
                 icon: <BookOpen size={22} className="text-[#0A4F48]" />,
                 bg: "bg-[#FAF3E0]",
               },
               {
                 label: "Experts",
-                value: dashboardData?.totalExperts||0,
+                value: dashboardData?.totalExperts || 0,
                 icon: <UserCircle size={22} className="text-white" />,
                 bg: "bg-[#0A4F48]",
               },
@@ -320,25 +443,51 @@ const getDashboardDatas =async () => {
           </div>
           {/* Row 2: Sub Admin & Expert Performance */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <DashboardCard title="Client Growth" subTitle="Last 6 Months">
+            <DashboardCard
+              title="Client Growth"
+              subTitle={`Last ${growthDuration} Months`}
+              onToggle={() => toggleDuration(growthDuration, setGrowthDuration)}
+            >
               <div className="flex gap-4 mb-4">
-                <LegendItem color="#F2F2F2" label="Active" />
-                <LegendItem color="#E6EFEE" label="Inactive" />
+                <LegendItem color="#F4DBC7" label="Active" />
+                <LegendItem color="#EBF3F2" label="Inactive" />
                 <LegendItem color="#0A4F48" label="New" />
               </div>
-              <div className="h-64">
-                <Bar data={growthData} options={chartOptions} />
+              <div className="h-64 relative">
+                {hasGraphData(growthData) ? (
+                  <Bar data={growthData} options={chartOptions} />
+                ) : (
+                  <div className="flex items-center justify-center h-full bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                    <span className="text-sm text-gray-400">
+                      No data for this period
+                    </span>
+                  </div>
+                )}
               </div>
             </DashboardCard>
 
-            <DashboardCard title="Client Compliance" subTitle="Last Year">
+            <DashboardCard
+              title="Client Compliance"
+              subTitle={`Last ${complianceDuration} Months`}
+              onToggle={() =>
+                toggleDuration(complianceDuration, setComplianceDuration)
+              }
+            >
               <div className="flex gap-4 mb-4">
                 <LegendItem color="#EBF3F2" label="Diet" />
                 <LegendItem color="#F4DBC7" label="Workout" />
                 <LegendItem color="#0A4F48" label="Therapy" />
               </div>
-              <div className="h-64">
-                <Bar data={complianceData} options={stackedOptions} />
+              <div className="h-64 relative">
+                {hasGraphData(complianceData) ? (
+                  <Bar data={complianceData} options={stackedOptions} />
+                ) : (
+                  <div className="flex items-center justify-center h-full bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                    <span className="text-sm text-gray-400">
+                      No data for this period
+                    </span>
+                  </div>
+                )}
               </div>
             </DashboardCard>
           </div>
@@ -349,9 +498,39 @@ const getDashboardDatas =async () => {
               <h3 className="text-lg font-bold text-[#0A4F48]">
                 Latest Progress Reports
               </h3>
-              <button className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D]">
-                All Categories <ChevronDown size={14} />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setShowCategoryMenu((prev) => !prev)}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D]"
+                >
+                  {reportCategory} <ChevronDown size={14} />
+                </button>
+                {showCategoryMenu && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-lg shadow-md z-10">
+                    {[
+                      "All Categories",
+                      "Trainer",
+                      "Dietitian",
+                      "Therapist",
+                    ].map((option) => (
+                      <button
+                        key={option}
+                        onClick={() => {
+                          setReportCategory(option);
+                          setShowCategoryMenu(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 text-xs font-medium hover:bg-[#F8F9FA] ${
+                          reportCategory === option
+                            ? "text-[#0A4F48]"
+                            : "text-[#66706D]"
+                        }`}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -365,7 +544,7 @@ const getDashboardDatas =async () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {progressReports.map((report, i) => (
+                  {filteredProgressReports.map((report, i) => (
                     <tr key={i} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 text-sm font-medium text-[#0A4F48]">
                         {report.name}
@@ -379,8 +558,8 @@ const getDashboardDatas =async () => {
                             report.expert === "Dietitian"
                               ? "bg-[#FAF3E0] text-[#DAA520]"
                               : report.expert === "Trainer"
-                              ? "bg-[#EBF3F2] text-[#0A4F48]"
-                              : "bg-[#F0FDF4] text-[#15803D]"
+                                ? "bg-[#EBF3F2] text-[#0A4F48]"
+                                : "bg-[#F0FDF4] text-[#15803D]"
                           }`}
                         >
                           {report.expert}
@@ -423,14 +602,28 @@ const getDashboardDatas =async () => {
                 <span className="text-[10px] text-[#66706D] font-medium">
                   Total Experts
                 </span>
-                <span className="text-3xl font-bold text-[#0A4F48]">{dashboardData?.totalExperts||0}</span>
+                <span className="text-3xl font-bold text-[#0A4F48]">
+                  {dashboardData?.totalExperts || 0}
+                </span>
               </div>
             </div>
             <div className="flex flex-col gap-4 mt-2">
               {[
-                { label: "Trainers", count: dashboardData?.totalTrainers||0, color: "bg-[#0A4F48]" },
-                { label: "Dietitians", count: dashboardData?.totalDietitians||0, color: "bg-[#EBF3F2]" },
-                { label: "Therapists", count: dashboardData?.totalTherapists||0, color: "bg-[#FAF3E0]" },
+                {
+                  label: "Trainers",
+                  count: dashboardData?.totalTrainers || 0,
+                  color: "bg-[#0A4F48]",
+                },
+                {
+                  label: "Dietitians",
+                  count: dashboardData?.totalDietitians || 0,
+                  color: "bg-[#EBF3F2]",
+                },
+                {
+                  label: "Therapists",
+                  count: dashboardData?.totalTherapists || 0,
+                  color: "bg-[#FAF3E0]",
+                },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -466,17 +659,17 @@ const getDashboardDatas =async () => {
               <PerformanceRow
                 color="bg-[#0A4F48]"
                 label="Programs"
-                value="50%"
+                value={`${progPct}%`}
               />
               <PerformanceRow
                 color="bg-[#E6EFEE]"
                 label="Experts"
-                value="20%"
+                value={`${expPct}%`}
               />
               <PerformanceRow
                 color="bg-[#FFD7A8]"
                 label="Clients"
-                value="30%"
+                value={`${cliPct}%`}
               />
             </div>
           </div>
@@ -539,11 +732,14 @@ const getDashboardDatas =async () => {
   );
 }
 
-const DashboardCard = ({ title, subTitle, children }) => (
+const DashboardCard = ({ title, subTitle, onToggle, children }) => (
   <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col">
     <div className="flex items-center justify-between mb-6">
       <h3 className="text-base font-bold text-[#0A4F48]">{title}</h3>
-      <button className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-[10px] font-semibold text-[#66706D] uppercase tracking-wider">
+      <button
+        onClick={onToggle}
+        className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-[10px] font-semibold text-[#66706D] uppercase tracking-wider cursor-pointer hover:bg-gray-100 active:scale-95 transition-all"
+      >
         {subTitle} <ChevronDown size={14} />
       </button>
     </div>

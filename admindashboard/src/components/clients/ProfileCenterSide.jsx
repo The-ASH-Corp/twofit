@@ -1,10 +1,16 @@
+/* eslint-disable react-hooks/preserve-manual-memoization */
 import { assets } from '@/assets/asset';
-import React from 'react'
-
-
+import React, { useEffect, useMemo } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllUserSubmissions } from "@/redux/features/tasks/task.thunk";
 
 const statusStyles = {
   Completed: {
+    bg: "#E6F4F1",
+    textsColor: "#137528",
+    border: "#B7DFBA",
+  },
+  Verified: {
     bg: "#E6F4F1",
     textsColor: "#137528",
     border: "#B7DFBA",
@@ -19,6 +25,11 @@ const statusStyles = {
     textsColor: "#B13116",
     border: "#FAC6BD",
   },
+  Rejected: {
+    bg: "#FFF0ED",
+    textsColor: "#B13116",
+    border: "#FAC6BD",
+  },
   Pending: {
     bg: "#F2F3F5",
     textsColor: "#54595D",
@@ -27,47 +38,39 @@ const statusStyles = {
 };
 
 const ProfileCenterSide = ({ client }) => {
+  const dispatch = useDispatch();
+  const { selectedUserTasks } = useSelector((state) => state.tasks);
 
-  
+  useEffect(() => {
+    if (client?._id) {
+      dispatch(getAllUserSubmissions(client._id));
+    }
+  }, [client?._id, dispatch]);
 
-const assignedExperts = [
-  {
-    img: assets.tickVector,
-    heading: "Breakfast",
-    contend: "Overnight Oats with Apple Cinnamon...",
-    status: "Completed",
-  },
-  {
-    img: assets.tickVector,
-    heading: "Breakfast",
-    contend: "Overnight Oats with Apple Cinnamon...",
-    status: "Pending",
-  },
-  {
-    img: assets.tickVector,
-    heading: "Breakfast",
-    contend: "Overnight Oats with Apple Cinnamon...",
-    status: "Missed",
-  },
-  {
-    img: assets.tickVector,
-    heading: "Breakfast",
-    contend: "Overnight Oats with Apple Cinnamon...",
-    status: "Pending",
-  },
-  {
-    img: assets.tickVector,
-    heading: "Breakfast",
-    contend: "Overnight Oats with Apple Cinnamon...",
-    status: "Completed",
-  },
-  {
-    img: assets.tickVector,
-    heading: "Breakfast",
-    contend: "Overnight Oats with Apple Cinnamon...",
-    status: "Skipped",
-  },
-];
+  const todaysTasks = useMemo(() => {
+    if (!selectedUserTasks || !client) return [];
+    
+    // Filter for current global day
+    const currentDayTasks = selectedUserTasks.filter(
+        task => task.globalDayIndex === client.currentGlobalDay
+    );
+
+    return currentDayTasks.map(task => {
+        let status = "Pending";
+        if (task.status === "verified") status = "Completed";
+        else if (task.status === "skipped") status = "Skipped";
+        else if (task.status === "rejected") status = "Missed"; // Or Rejected
+        else if (task.status === "missed") status = "Missed";
+        
+        return {
+            img: assets.tickVector, // specific icon per type?
+            heading: task.taskType || "Task",
+            contend: task.notes || (task.exerciseIndex !== undefined ? `Exercise ${task.exerciseIndex + 1}` : "No details"),
+            status: status
+        };
+    });
+  }, [selectedUserTasks, client?.currentGlobalDay]);
+
   const healthDetails = [
     {
       heading: "Medical Conditions",
@@ -142,29 +145,24 @@ const assignedExperts = [
             </span>
           </div>
         </div>
-        <div className="p-4 bg-white rounded-2xl w-[50%]">
-          <div className="flex flex-col items-start gap-1 ">
-            <span className="text-[11px] text-[#66706D]">Plan Version</span>
-            <span className="font-bold text-[12px]">V2</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-6 p-4 bg-white rounded-2xl w-full">
+      
+        <div className="flex items-center gap-6 p-4 bg-white rounded-2xl w-[50%]">
           <div className="flex flex-col items-start gap-1 w-full">
             <span className="text-[11px] text-[#66706D]">Plan Duration</span>
             <span className="font-bold text-[12px]">
-              {client?.duration} Days
+              {client?.programType?.plan?.duration}
             </span>
           </div>
           <div className="flex flex-col items-end gap-1 w-full">
             <p className="text-[12px] text-[#66706D]">
-              <span className="text-[#0A4F48] font-bold">40%</span> / 100%
+              <span className="text-[#0A4F48] font-bold">{((client?.currentGlobalDay/client?.programType?.plan?.duration.split(" ")[0])*100).toFixed(0)}%</span> / 100%
             </p>
             <div className="relative w-25 bg-gray-200 rounded-full h-2 overflow-visible">
               <div
                 className="h-full bg-[#F4DBC7] transition-all duration-500 ease-out rounded-l-full"
-                style={{ width: `40%` }}
+                style={{ width:(client?.currentGlobalDay/client?.programType?.plan?.duration.split(" ")[0])*100 }}
               />
-              <span className="absolute left-[40%] -top-0.5 w-0.5 h-3 bg-[#0A4F48]"></span>
+              <span className={`absolute  -top-0.5 w-0.5 h-3 bg-[#0A4F48]`} style={{ left: `${((client?.currentGlobalDay/client?.programType?.plan?.duration.split(" ")[0])*100)}%` }}></span>
             </div>
           </div>
         </div>
@@ -178,7 +176,12 @@ const assignedExperts = [
           </button>
         </div>
         <div className="w-full flex flex-col items-center">
-          {assignedExperts.map((items, i) => {
+          {todaysTasks.length === 0 ? (
+            <div className="py-4 text-center w-full">
+              <span className="text-[13px] text-[#66706D]">No tasks logged for today yet.</span>
+            </div>
+          ) : (
+            todaysTasks.map((items, i) => {
             const styles = statusStyles[items.status] || statusStyles.Pending;
             return (
               <div
@@ -215,7 +218,7 @@ const assignedExperts = [
                 </div>
               </div>
             );
-          })}
+          }))}
         </div>
       </div>
     </div>

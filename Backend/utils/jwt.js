@@ -35,8 +35,8 @@ export const refreshAccessToken = async (req, res) => {
 
     // Ensure Redis is connected
     if (!redisClient.isOpen) {
-      console.error("Redis client is not connected");
-      return null;
+      console.log("Redis client disconnected, attempting to reconnet...");
+      await redisClient.connect();
     }
 
     // Get stored token from Redis
@@ -52,12 +52,28 @@ export const refreshAccessToken = async (req, res) => {
       return null;
     }
 
-    // Generate new access token
-    const newAccessToken = generateAccessToken(decoded);
+    const userPayload = { id: decoded.id, role: decoded.role, email: decoded.email };
+
+    // Like strict rotation: Generate NEW tokens
+    const newAccessToken = generateAccessToken(userPayload);
+    const newRefreshToken = generateRefreshToken(userPayload);
+
+    // Update Redis
+    await redisClient.set(`refresh:${decoded.id}`, newRefreshToken, {
+      EX: 7 * 24 * 60 * 60, // 7 days
+    });
+
+    // Set new Cookie
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
+    });
 
     res.setHeader("x-access-token", newAccessToken);
 
-    return decoded; // Return the decoded payload so authMiddleware can fetch the user
+    return userPayload; // Return the decoded payload so authMiddleware can fetch the user
   } catch (err) {
     console.error("Refresh token error:", err.message);
     return null;
