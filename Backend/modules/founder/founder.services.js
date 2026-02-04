@@ -167,6 +167,95 @@ export const getDashboardData = async() => {
       },
     };
 
+    // --- Latest Progress Reports ---
+    const latestReports = await TaskSubmission.aggregate([
+      {
+        $match: {
+          userId: { $in: clientIds },
+          "dailySubmissions.exercises": { $exists: true, $ne: [] },
+        },
+      },
+      { $unwind: "$dailySubmissions" },
+      { $unwind: "$dailySubmissions.exercises" },
+      {
+        $sort: {
+          "dailySubmissions.exercises.updatedAt": -1,
+          "dailySubmissions.exercises.status": -1,
+        },
+      },
+      { $limit: 10 },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+      {
+        $lookup: {
+          from: "coaches",
+          localField: "user.trainer",
+          foreignField: "_id",
+          as: "trainer",
+        },
+      },
+      {
+        $lookup: {
+          from: "coaches",
+          localField: "user.dietition",
+          foreignField: "_id",
+          as: "dietitian",
+        },
+      },
+      {
+        $lookup: {
+          from: "coaches",
+          localField: "user.therapist",
+          foreignField: "_id",
+          as: "therapist",
+        },
+      },
+      {
+        $project: {
+          clientName: "$user.name",
+          taskType: "$dailySubmissions.exercises.taskType",
+          status: "$dailySubmissions.exercises.status",
+          updatedAt: "$dailySubmissions.exercises.updatedAt",
+          trainerName: { $arrayElemAt: ["$trainer.name", 0] },
+          dietitianName: { $arrayElemAt: ["$dietitian.name", 0] },
+          therapistName: { $arrayElemAt: ["$therapist.name", 0] },
+        },
+      },
+    ]);
+
+    const formattedReports = latestReports.map((report) => {
+      let expertName = "N/A";
+      let expertType = "N/A";
+
+      if (report.taskType === "Workout") {
+        expertName = report.trainerName;
+        expertType = "Trainer";
+      } else if (report.taskType === "Meal" || report.taskType === "Diet") {
+        expertName = report.dietitianName;
+        expertType = "Dietitian";
+      } else if (report.taskType === "Therapy") {
+        expertName = report.therapistName;
+        expertType = "Therapist";
+      }
+
+      return {
+        name: report.clientName,
+        type: report.taskType === "Meal" ? "Diet" : report.taskType,
+        expert: expertType,
+        submittedBy: expertName
+          ? `${expertType} ${expertName.split(" ")[0]}`
+          : "Client",
+        time: report.updatedAt,
+      };
+    });
+
     return {
       totalClient,
       totalHeads,
@@ -177,6 +266,7 @@ export const getDashboardData = async() => {
       Dietitians,
       Therapists,
       graphData,
+      latestReports: formattedReports,
     };
 } 
 

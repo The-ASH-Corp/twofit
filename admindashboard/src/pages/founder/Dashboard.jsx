@@ -60,6 +60,8 @@ const Dashboard = () => {
   const [founder, setFounder] = useState();
   const [growthDuration, setGrowthDuration] = useState(6);
   const [complianceDuration, setComplianceDuration] = useState(12);
+  const [filterCategory, setFilterCategory] = useState("All Categories");
+  const [showFilter, setShowFilter] = useState(false);
 
   useEffect(() => {
     setFounder(data);
@@ -183,6 +185,37 @@ const Dashboard = () => {
       },
     ],
   };
+
+  const calculateTimeAgo = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+
+    if (diffInDays === 0) {
+      if (diffInHours === 0) {
+         if(diffInMinutes < 5) return "Just now";
+         return `${diffInMinutes} mins ago`;
+      }
+      return `Today, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    } else if (diffInDays === 1) {
+      return `Yesterday, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    } else {
+      return `${diffInDays} Days Ago`;
+    }
+  };
+
+  const progressReportsRaw = founder?.data?.latestReports?.map(report => ({
+      ...report,
+      time: calculateTimeAgo(report.time)
+  })) || [];
+
+  const progressReports = filterCategory === "All Categories"
+    ? progressReportsRaw
+    : progressReportsRaw.filter(report => report.type === filterCategory);
 
   const trainers = founder?.data?.Trainers || 0;
   const dietitians = founder?.data?.Dietitians || 0;
@@ -320,58 +353,6 @@ const Dashboard = () => {
       },
     },
   };
-
-  const progressReports = [
-    {
-      name: "Neha Sharma",
-      type: "Diet",
-      expert: "Dietitian",
-      submittedBy: "Dietitian Anjali",
-      time: "Today, 10:15 AM",
-    },
-    {
-      name: "Aarav Kumar",
-      type: "Workout",
-      expert: "Trainer",
-      submittedBy: "Trainer Rahul",
-      time: "Today, 9:40 AM",
-    },
-    {
-      name: "Vikram Singh",
-      type: "Therapy",
-      expert: "Therapist",
-      submittedBy: "Dietitian Priya",
-      time: "Yesterday, 7:10 PM",
-    },
-    {
-      name: "Sonali Jain",
-      type: "Measurements",
-      expert: "Trainer",
-      submittedBy: "Dietitian Anjali",
-      time: "Yesterday, 5:20 PM",
-    },
-    {
-      name: "Riya Mehta",
-      type: "Diet",
-      expert: "Dietitian",
-      submittedBy: "Therapist Mira",
-      time: "2 Days Ago",
-    },
-    {
-      name: "Neha Sharma",
-      type: "Weight",
-      expert: "Trainer",
-      submittedBy: "Dietitian Anjali",
-      time: "2 Days Ago",
-    },
-    {
-      name: "Aarav Kumar",
-      type: "Therapy",
-      expert: "Therapist",
-      submittedBy: "Trainer Rahul",
-      time: "3 Days Ago",
-    },
-  ];
 
   if (status === "loading")
     return (
@@ -543,14 +524,37 @@ const Dashboard = () => {
           </div>
 
           {/* Row 4: Latest Progress Reports */}
-          <div className="bg-white rounded-2xl shadow-sm flex flex-col">
+          <div className="bg-white rounded-2xl shadow-sm flex flex-col min-h-[400px]">
             <div className="p-6 border-b border-gray-50 flex items-center justify-between">
               <h3 className="text-lg font-bold text-[#0A4F48]">
                 Latest Progress Reports
               </h3>
-              <button className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D]">
-                All Categories <ChevronDown size={14} />
-              </button>
+              <div className="relative">
+                <button
+                   onClick={() => setShowFilter(!showFilter)}
+                   className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D]"
+                 >
+                   {filterCategory} <ChevronDown size={14} />
+                 </button>
+                 {showFilter && (
+                   <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-lg shadow-lg z-10 py-1">
+                     {["All Categories", "Diet", "Workout", "Therapy"].map(
+                       (cat) => (
+                         <button
+                           key={cat}
+                           onClick={() => {
+                             setFilterCategory(cat);
+                             setShowFilter(false);
+                           }}
+                           className="w-full text-left px-4 py-2 text-xs hover:bg-gray-50 text-[#66706D]"
+                         >
+                           {cat}
+                         </button>
+                       )
+                     )}
+                   </div>
+                 )}
+               </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -561,43 +565,43 @@ const Dashboard = () => {
                     <th className="px-6 py-4">Expert</th>
                     <th className="px-6 py-4">Submitted By</th>
                     <th className="px-6 py-4">Date & Time</th>
-                    <th className="px-6 py-4">Action</th>
+                    {/* <th className="px-6 py-4">Action</th> */}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {progressReports.map((report, i) => (
+                   {progressReports.map((report, i) => (
                     <tr key={i} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-gray-800">
+                      <td className="px-6 py-4 text-sm font-medium text-[#0A4F48]">
                         {report.name}
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#66706D]">
+                      <td className="px-6 py-4 text-sm text-[#011412]">
                         {report.type}
                       </td>
                       <td className="px-6 py-4 text-sm">
                         <span
-                          className={`px-2.5 py-1 rounded-md text-[10px] font-bold ${
+                          className={`px-3 py-1 rounded-md text-[10px] font-bold ${
                             report.expert === "Dietitian"
                               ? "bg-[#FAF3E0] text-[#DAA520]"
                               : report.expert === "Trainer"
-                                ? "bg-[#EBF3F2] text-[#0A4F48]"
-                                : "bg-[#F0FDF4] text-[#15803D]"
+                              ? "bg-[#EBF3F2] text-[#0A4F48]"
+                              : "bg-[#F0FDF4] text-[#15803D]"
                           }`}
                         >
                           {report.expert}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#66706D]">
+                      <td className="px-6 py-4 text-sm text-[#011412]">
                         {report.submittedBy}
                       </td>
                       <td className="px-6 py-4 text-sm text-[#66706D]">
                         {report.time}
                       </td>
-                      <td className="px-6 py-4 text-sm text-[#66706D]">
+                      {/* <td className="px-6 py-4 text-sm text-[#66706D]">
                         <MoreHorizontal
                           size={18}
                           className="cursor-pointer hover:text-gray-900"
                         />
-                      </td>
+                      </td> */}
                     </tr>
                   ))}
                 </tbody>
