@@ -1,10 +1,11 @@
 import React from "react";
 
 const AdminLeftSide = ({ admin }) => {
+  console.log("Admin data in AdminLeftSide:", admin?.program);
   const profileDetails = [
     {
       title: "Programs",
-      content: admin?.chooseProgram?.map((p) => p.title).join(" | ") || "N/A",
+      content: admin?.program?.map((p) => p.title).join(" | ") || "N/A",
     },
     {
       title: "Base Salary",
@@ -16,7 +17,11 @@ const AdminLeftSide = ({ admin }) => {
     },
     {
       title: "Experience",
-      content: `${admin?.experience || "0"} Years`,
+      content: admin?.experience
+        ? /\byears?\b/i.test(admin.experience)
+          ? admin.experience
+          : `${admin.experience} Years`
+        : "0 Years",
     },
     {
       title: "Certifications",
@@ -32,7 +37,8 @@ const AdminLeftSide = ({ admin }) => {
           <h2 className="font-bold text-xl text-gray-800">{admin?.name}</h2>
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 bg-[#F0F0F0] rounded-full text-[11px] font-medium text-gray-600">
-              {admin?.role === "admin" ? "Sub Admin" : admin?.role}
+              {admin?.role?.charAt(0)?.toUpperCase() + admin?.role?.slice(1) ||
+                "Sub Admin"}
             </span>
             <span className="px-3 py-1 bg-[#45C4A2] rounded-full text-[11px] font-medium text-white">
               {admin?.status}

@@ -1,13 +1,13 @@
 import AdminCenterSide from "@/components/admin/AdminCenterSide";
 import AdminLeftSide from "@/components/admin/AdminLeftSide";
 import AdminRightSide from "@/components/admin/AdminRightSide";
-import { getAdminProfile } from "@/redux/features/admins/admin.thunk";
+import { getAdminProfile, getDashboardData } from "@/redux/features/admins/admin.thunk";
 import {
   getAdminError,
   getAdminStatus,
   getSelectedAdmin,
 } from "@/redux/features/admins/admins.selecters";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
@@ -19,10 +19,16 @@ const AdminProfile = () => {
   const admin = useSelector(getSelectedAdmin);
   const status = useSelector(getAdminStatus);
   const error = useSelector(getAdminError);
+  const [dashboardData, setDashboardData] = useState(null);
 
   useEffect(() => {
     if (id) {
       dispatch(getAdminProfile(id));
+      dispatch(getDashboardData({ adminId: id, duration: "12m" })).then(
+        (res) => {
+          setDashboardData(res.payload);
+        },
+      );
     }
   }, [id, dispatch]);
 
@@ -44,14 +50,20 @@ const AdminProfile = () => {
         </button>
       </div>
 
-      <div className="flex flex-1 justify-between w-full gap-4 overflow-auto no-scrollbar pb-6">
-        {/* left */}
+    <div className="flex flex-col lg:flex-row flex-1 justify-between w-full gap-4 h-[calc(100vh-110px)] overflow-auto no-scrollbar pb-6">
+      {/* left */}
+      <div className="w-full lg:w-[38%]">
         <AdminLeftSide admin={admin} />
-        {/* center */}
-        <AdminCenterSide admin={admin} />
-        {/* right */}
-        <AdminRightSide admin={admin} />
       </div>
+      {/* center */}
+      <div className="w-full lg:w-[38%]">
+        <AdminCenterSide admin={admin} />
+      </div>
+      {/* right */}
+      <div className="w-full lg:w-[24%]">
+        <AdminRightSide admin={admin} dashboardData={dashboardData} />
+      </div>
+    </div>
     </div>
   );
 };

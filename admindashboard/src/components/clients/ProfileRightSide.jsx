@@ -1,29 +1,8 @@
 import { assets } from '@/assets/asset';
 import React from 'react'
 
-// const dailyActivityLog = [
-//   {
-//     title: "Meal Uploaded (Lunch: Paneer Salad)",
-//     date: "10:40 AM",
-//   },
-//   {
-//     title: "Workout Completed (20 mins HIIT)",
-//     date: "8:15 AM",
-//   },
-//   {
-//     title: "Meal Skipped (Dinner)",
-//     date: "Yesterday, 6:05 PM",
-//   },
-//   {
-//     title: "Therapy Task Completed",
-//     date: "2 Days Ago, 2:30 PM",
-//   },
-// ];
-
-
-
 const ProfileRightSide = ({ client }) => {
-  console.log(client?.measurementHistory)
+
   const compliance = [
   {
     title: "Chest",

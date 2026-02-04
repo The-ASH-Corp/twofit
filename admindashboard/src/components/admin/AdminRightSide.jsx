@@ -1,19 +1,37 @@
-import React from "react";
+import React, { useMemo } from "react";
 import DonutChart from "./AdminChart";
 
-const AdminRightSide = ({ admin }) => {
-  // Mock performance data matching the design
-  const performanceData = {
-    programs: 50,
-    experts: 20,
-    clients: 30,
-    average: 73, // Center text value from design usually represents an average or total
-  };
+const AdminRightSide = ({ admin, dashboardData }) => {
+  const totals = useMemo(() => {
+    const programs = dashboardData?.totalPrograms ?? admin?.program?.length ?? 0;
+    const experts = dashboardData?.totalExperts ?? admin?.experts?.length ?? 0;
+    const clients = dashboardData?.totalClients ?? 0;
+    return { programs, experts, clients };
+  }, [dashboardData, admin]);
+
+  const totalEntities = totals.programs + totals.experts + totals.clients;
+  const toPercent = (value) =>
+    totalEntities > 0 ? Math.round((value / totalEntities) * 100) : 0;
+
+  const programsPct = toPercent(totals.programs);
+  const expertsPct = toPercent(totals.experts);
+  const clientsPct = toPercent(totals.clients);
+
+  const avgCompliance = useMemo(() => {
+    const datasets = dashboardData?.graphData?.compliance?.datasets || [];
+    const values = datasets.flatMap((ds) =>
+      Array.isArray(ds?.data) ? ds.data : [],
+    );
+    const numeric = values.filter((v) => Number.isFinite(v));
+    if (numeric.length === 0) return 0;
+    const sum = numeric.reduce((acc, val) => acc + val, 0);
+    return Math.round(sum / numeric.length);
+  }, [dashboardData]);
 
   const metrics = [
-    { label: "Programs", value: "50%", color: "bg-[#0A4F48]" },
-    { label: "Experts", value: "20%", color: "bg-[#EBF3F2]" },
-    { label: "Clients", value: "30%", color: "bg-[#F4DBC7]" },
+    { label: "Programs", value: `${programsPct}%`, color: "bg-[#0A4F48]" },
+    { label: "Experts", value: `${expertsPct}%`, color: "bg-[#EBF3F2]" },
+    { label: "Clients", value: `${clientsPct}%`, color: "bg-[#F4DBC7]" },
   ];
 
   return (
@@ -28,10 +46,10 @@ const AdminRightSide = ({ admin }) => {
         <div className="flex flex-col items-center gap-0">
           <div className="">
             <DonutChart
-              percentage={performanceData.average}
-              high={performanceData.programs}
-              medium={performanceData.experts}
-              low={performanceData.clients}
+              percentage={avgCompliance}
+              high={programsPct}
+              medium={expertsPct}
+              low={clientsPct}
               size={180}
             />
           </div>
