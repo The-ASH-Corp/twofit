@@ -2,6 +2,7 @@ import { categoryModel } from "./category.model.js";
 import { HeadsModel } from "../Heads/heads.modal.js";
 import ProgramModel from "../allPrograms/allPrograma.model.js";
 import mongoose from "mongoose";
+import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 
 export const createCategory = async (data) => {
   try {
@@ -66,7 +67,11 @@ export const updateCategory = async (id, data) => {
 
     const updated = await categoryModel.findByIdAndUpdate(
       id,
-      { name: data.name.trim(),programLimit:data.programLimit, status: data.status },
+      {
+        name: capitalizeFirst(data.name.trim()),
+        programLimit: data.programLimit,
+        status: data.status,
+      },
       { new: true, runValidators: true },
     );
 
@@ -146,6 +151,7 @@ export const founderCategoryList = async (page, limit) => {
     const totalCount = await categoryModel.countDocuments();
 
     const data = await categoryModel.aggregate([
+      { $sort: { createdAt: 1 } },
       { $skip: skip },
       { $limit: limit },
 
@@ -202,18 +208,23 @@ export const founderCategoryList = async (page, limit) => {
       // ===== Final Shape =====
       {
         $project: {
-          _id: 0,
           _id: "$_id",
           categoryName: "$name",
           categoryStatus: "$status",
 
           programsCount: { $size: "$programs" },
           headNames: {
-            $map: {
-              input: "$heads",
-              as: "head",
-              in: "$$head.name",
-            },
+            $cond: [
+              { $gt: [{ $size: "$heads" }, 0] },
+              {
+                $map: {
+                  input: "$heads",
+                  as: "head",
+                  in: "$$head.name",
+                },
+              },
+              [],
+            ],
           },
           adminsCount: { $size: "$admins" },
           expertCount: { $size: "$coaches" },
@@ -222,11 +233,9 @@ export const founderCategoryList = async (page, limit) => {
       },
     ]);
 
-    return {
-      data,
-      totalCount,
-    };
+    return { data, totalCount };
   } catch (error) {
     throw error;
   }
 };
+

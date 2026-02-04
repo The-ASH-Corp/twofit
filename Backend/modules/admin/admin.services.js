@@ -1,3 +1,4 @@
+import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 import { generatePassword, hashPassword } from "../../utils/password.js";
 import allProgramaModel from "../allPrograms/allPrograma.model.js";
 import User from "../auth/auth.model.js";
@@ -36,7 +37,7 @@ export const addNewAdmin = async (adminData) => {
   }
 
   const newAdmin = await AdminModel.create({
-    name: adminData.fullname,
+    name: capitalizeFirst(adminData.fullname),
     email: adminData.email,
     phone: adminData.phone,
     address: adminData.address,

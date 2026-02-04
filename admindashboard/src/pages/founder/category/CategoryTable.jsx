@@ -54,7 +54,7 @@ export default function CategoryTable() {
       <SyncLoader color="#0A4F48" loading margin={2} size={20} />
     </div>
   );
-  if (error) return <p>{error}</p>;
+  if (error) return <p className="text-red-500">{error}!</p>;
   return (
     <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable

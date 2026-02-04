@@ -9,71 +9,77 @@ import { CoachModel } from "../coach/coach.model.js";
 import { FounderModel } from "../../seeds/createAdmin.js";
 import { calculateExtraClientIncentive } from "../payroll/payroll.service.js";
 import { sendEmail } from "../../utils/email.js";
+import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 
 export const adminCreateUser = async (userData) => {
-  const exists = await User.findOne({ email: userData.email });
-  if (exists) throw new Error("Email already exists");
-  const password = generatePassword();
-  console.log("Generated Password for User:", password);
-  const hashed = await bcrypt.hash(password, 10);
+ try {
+   const exists = await User.findOne({ email: userData.email });
+   if (exists) throw new Error("Email already exists");
+   const password = generatePassword();
+   console.log("Generated Password for User:", password);
+   const hashed = await bcrypt.hash(password, 10);
 
-  const initialWeight = userData.currentWeight;
-  const user = await User.create({
-    name: userData.fullname,
-    email: userData.email,
-    password: hashed,
-    role: "user",
-    status: "Active",
-    dob: userData.dob,
-    gender: userData.gender,
-    phone: userData.phone,
-    address: userData.address,
-    currentWeight: initialWeight,
-    targetWeight: userData.targetWeight,
-    weightHistory: initialWeight
-      ? [
-          {
-            weight: initialWeight,
-            date: new Date(),
-            isInitial: true,
-          },
-        ]
-      : [],
-    medicalConditions: userData.medicalconditions,
-    allergies: userData.allergy,
-    goals: userData.fitnessGoal,
-    foodPreferences: userData.foodPreference,
-    profileImage: userData?.profileImage || "",
-    programType: userData.programType,
-    therapyType:userData.therapyType,
-    duration: userData.duration,
-    programEndDate: userData.endDate,
-    programStartDate: userData.startDate,
-    dietition: userData.dietician || null,
-    trainer: userData.trainer || null,
-    therapist: userData.therapist || null,
-    autoSendGuide: userData.autoSendGuide || false,
-    automatedReminder: userData.automatedReminder || false,
-    autoSendWelcome: userData.autoSendWelcome || false,
-  });
-  const coaches = [
-    userData.dietician,
-    userData.trainer,
-    userData.therapist,
-  ].filter(Boolean);
+   const initialWeight = userData.currentWeight;
+   const user = await User.create({
+     name: capitalizeFirst(userData.fullname),
+     email: userData.email,
+     password: hashed,
+     role: "user",
+     status: "Active",
+     dob: userData.dob,
+     gender: userData.gender,
+     phone: userData.phone,
+     address: userData.address,
+     currentWeight: initialWeight,
+     targetWeight: userData.targetWeight,
+     weightHistory: initialWeight
+       ? [
+           {
+             weight: initialWeight,
+             date: new Date(),
+             isInitial: true,
+           },
+         ]
+       : [],
+     medicalConditions: userData.medicalconditions,
+     allergies: userData.allergy,
+     goals: userData.fitnessGoal,
+     foodPreferences: userData.foodPreference,
+     profileImage: userData?.profileImage || "",
+     programType: userData.programType,
+     therapyType: userData.therapyType || null,
+     duration: userData.duration,
+     programEndDate: userData.endDate,
+     programStartDate: userData.startDate,
+     dietition: userData.dietician || null,
+     trainer: userData.trainer || null,
+     therapist: userData.therapist || null,
+     autoSendGuide: userData.autoSendGuide || false,
+     automatedReminder: userData.automatedReminder || false,
+     autoSendWelcome: userData.autoSendWelcome || false,
+   });
+   const coaches = [
+     userData.dietician,
+     userData.trainer,
+     userData.therapist,
+   ].filter(Boolean);
 
-  for (const coachId of coaches) {
-    await CoachModel.findByIdAndUpdate(
-      coachId,
-      { $addToSet: { assignedUsers: user._id } },
-      { new: true },
-    );
+   for (const coachId of coaches) {
+     await CoachModel.findByIdAndUpdate(
+       coachId,
+       { $addToSet: { assignedUsers: user._id } },
+       { new: true },
+     );
 
-    // Recalculate extra client incentive
-    await calculateExtraClientIncentive(coachId);
-  }
+     // Recalculate extra client incentive
+     await calculateExtraClientIncentive(coachId);
+   }
 
-  return user;
+   return user;
+ } catch (error) {
+  console.log(error)
+   throw error;
+ }
 };
 
 export const loginUser = async ({ email, password }) => {

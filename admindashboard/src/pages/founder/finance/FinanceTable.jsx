@@ -29,6 +29,7 @@ export default function FinanceTable() {
   const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
+    console.log(data)
     setEmployees(data);
   }, [data]);
 
@@ -56,17 +57,19 @@ export default function FinanceTable() {
   return (
     <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <FinanceKpi />
-      <BaseTable
-        columns={FinanceColumns}
-        data={employees}
-        pageLabel={"Finance List"}
-        onSearchInputChange={searchInputHandler}
-        handlePageChange={setPage}
-        handleLimitChange={setLimit}
-        page={page}
-        limit={limit}
-        totalCount={count}
-      />
+      {employees.length > 0 && (
+        <BaseTable
+          columns={FinanceColumns}
+          data={employees}
+          pageLabel={"Finance List"}
+          onSearchInputChange={searchInputHandler}
+          handlePageChange={setPage}
+          handleLimitChange={setLimit}
+          page={page}
+          limit={limit}
+          totalCount={count}
+        />
+      )}
     </div>
   );
 }

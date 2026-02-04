@@ -5,6 +5,7 @@ import ProgramModel from "../allPrograms/allPrograma.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import { HeadsModel } from "./heads.modal.js";
 import TaskSubmission from "../taskSubmission/taskSubmission.model.js";
+import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 
 export const createHead = async (head) => {
   let hashedPassword;
@@ -74,7 +75,7 @@ export const updateHead = async (id, data) => {
       const updated = await HeadsModel.findByIdAndUpdate(
         id,
         {
-          name: data.name.trim(),
+          name: capitalizeFirst(data.name.trim()),
           dob: data.dob,
           gender: data.gender,
           email: data.email,
