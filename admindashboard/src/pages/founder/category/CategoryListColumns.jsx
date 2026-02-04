@@ -7,12 +7,25 @@ const statusColors = {
 
 export const CategoryListColumns = () => [
   { accessorKey: "categoryName", header: "Category Name" },
-  { accessorKey: "headNames", header: "Head Name" },
+  {
+    accessorKey: "headNames",
+    header: "Head Name",
+    cell: ({ row }) => {
+      const heads = row.original.headNames;
+
+      if (!heads?.length) return "N/A";
+
+      return heads.join(", ");
+    },
+  },
   { accessorKey: "adminsCount", header: "Sub Admins" },
   { accessorKey: "programsCount", header: "Programs" },
   { accessorKey: "expertCount", header: "Experts" },
   { accessorKey: "clientCount", header: "Clients" },
-  { accessorKey: "categoryStatus", header: "Status",  cell: ({ row }) => {
+  {
+    accessorKey: "categoryStatus",
+    header: "Status",
+    cell: ({ row }) => {
       const status = row.original.categoryStatus;
       const colorClass = statusColors[status] || "bg-gray-200 text-gray-700";
 
@@ -21,7 +34,8 @@ export const CategoryListColumns = () => [
           {status}
         </span>
       );
-    },},
+    },
+  },
 
   {
     id: "_id",

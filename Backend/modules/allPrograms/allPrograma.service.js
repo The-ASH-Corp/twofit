@@ -4,6 +4,7 @@ import { CoachModel } from "../coach/coach.model.js";
 import planModel from "../plan/plan.model.js";
 import programModel from "./allPrograma.model.js";
 import User from "../auth/auth.model.js";
+import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 
 export const createProgram = async (data) => {
   return await programModel.create(data);
@@ -43,7 +44,14 @@ export const updateProgram = async (id, data) => {
   }
 
 
-  return await programModel.findByIdAndUpdate(id, data);
+  return await programModel.findByIdAndUpdate(
+    id,
+    {
+      ...data,
+      title: capitalizeFirst(data.title),
+    },
+    { new: true, runValidators: true },
+  );
 };
 
 export const deleteProgram = async (id) => {

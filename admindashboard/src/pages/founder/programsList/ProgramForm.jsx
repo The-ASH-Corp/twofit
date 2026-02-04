@@ -19,7 +19,13 @@ export default function ProgramForm() {
 
   const data = useAppSelector(selectAllCategories);
 
-
+  useEffect(() => {
+    console.log(data)
+    if (data?.data?.length === 0) {
+      toast.error("Add category");
+      navigate(-1);
+    }
+  }, [data, navigate]);
 
   const fields = [
     {
@@ -37,7 +43,7 @@ export default function ProgramForm() {
           name: "category",
           label: "Choose Your Category",
           type: "select",
-          options:data?.data?.map((items) => ({
+          options: data?.data?.map((items) => ({
             label: items.name,
             value: items._id,
           })),
@@ -100,7 +106,7 @@ export default function ProgramForm() {
         toast.error("Failed to create program");
       }
     } catch (error) {
-      console.error("Program creation failed:", error);
+      toast.error("Program creation failed:", error);
     }
   };
   return (

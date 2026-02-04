@@ -1,4 +1,7 @@
 import mongoose from 'mongoose';
+import { capitalizeFirst } from '../../middleware/capitalizeFirst.js';
+
+
 
 const headsSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -15,6 +18,18 @@ const headsSchema = new mongoose.Schema({
   password: { type: String, required: true },
   role:{type:String,enum:["head"],default:"head"},
   status:{type:String,enum:["Active","Inactive"],default:"Active"}
+});
+
+headsSchema.pre("save", function (next) {
+  if (this.isModified("name")) {
+    this.name = capitalizeFirst(this.name);
+  }
+
+  if (this.isModified("status")) {
+    this.status = capitalizeFirst(this.status);
+  }
+
+  next();
 });
 
 export const HeadsModel = mongoose.model('Heads', headsSchema);

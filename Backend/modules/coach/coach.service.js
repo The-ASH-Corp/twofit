@@ -5,6 +5,7 @@ import { CoachModel } from "./coach.model.js";
 import User from "../auth/auth.model.js";
 import mongoose from "mongoose";
 import { getUserComplianceStats } from "../../utils/complianceCalculator.js";
+import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 
 export const createCoach = async (coach) => {
   // Parse JSON stringified fields from FormData
@@ -55,7 +56,7 @@ export const createCoach = async (coach) => {
   };
 
   const coachCreated = await CoachModel.create({
-    name: coach.fullname,
+    name: capitalizeFirst(coach.fullname),
     dob: coach.dob,
     gender: coach.gender,
     password: await password(coach.password),
