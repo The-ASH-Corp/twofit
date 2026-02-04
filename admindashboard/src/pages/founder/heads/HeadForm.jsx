@@ -3,7 +3,7 @@ import { selectAllCategories } from '@/redux/features/category/category.selector
 import { getAllCategories } from '@/redux/features/category/category.thunk';
 import { createHead } from '@/redux/features/head/head.thunk';
 import { useAppSelector } from '@/redux/store/hooks';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -20,13 +20,15 @@ const HeadForm = () => {
     // const status = useAppSelector(selectCategoryStatus);
     // const error = useAppSelector(selectCategoryError);
 
-    
+     const navigate = useNavigate();
 
-    const [ categories, setCategories] = useState([]);
     
-        useEffect(()=>{
-          setCategories(data.data)
-        },[data])
+        useEffect(() => {
+          if (data?.data?.length === 0) {
+            toast.error("Add category");
+            navigate(-1);
+          }
+        }, [data, navigate]);
 
     const fields = [
       {
@@ -110,7 +112,7 @@ const HeadForm = () => {
             name: "programCategory",
             label: "Program Category",
             type: "select",
-            options: categories?.map((items) => ({
+            options: data?.data?.map((items) => ({
               label: items?.name,
               value: items?._id,
             })),
@@ -144,7 +146,7 @@ const HeadForm = () => {
       name: "",
     };
 
-  const navigate = useNavigate();
+ 
   
 
   const handelSubmit = async (value) => {
