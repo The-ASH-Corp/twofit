@@ -12,6 +12,7 @@ const menuItems = [
     path: "/client",
   },
   { label: "Daily Plan", icon: assets.clients, path: "/client/daily-plan" },
+  {label:"Habit Tracker",icon:assets.website,path:"/client/habit-tracker"},
   { label: "Progress", icon: assets.experts, path: "/client/progress" },
   { label: "Messages", icon: assets.chats, path: "/client/chats" },
   { label: "Feedback", icon: assets.website, path: "/client/feedback" },

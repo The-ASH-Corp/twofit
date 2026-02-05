@@ -6,8 +6,9 @@ export default function HabitStartButton({ clientId }) {
   return (
     <div>
       <button
-        onClick={() => {
-          navigate(`therapy/add-habit/${clientId}`);
+        onClick={(e) => {
+           e.stopPropagation()
+          navigate(`add-habit/${clientId}`);
         }}
         className="bg-green-800 px-2 py-2 text-white rounded-md"
       >
