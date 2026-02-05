@@ -26,12 +26,12 @@ const programSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Plan",
     },
-
-    status: {
-      type: String,
-      enum: ["Draft", "Published"],
-      default: "Published",
-    },
+    
+    status:{
+      type:String,
+      enum:["Draft","Published"],
+      default:"Draft"
+    }
   },
   {
     timestamps: true,
