@@ -2,7 +2,7 @@ import * as service from "./client.services.js";
 import { getUserComplianceStats, calculateUserStreaks } from "../../utils/complianceCalculator.js";
 import { getSingleProgram } from "../allPrograms/allPrograma.service.js";
 import { getTherapyById } from "../therapy/therapy.service.js";
-import { attemptDayAdvancement } from "../taskSubmission/taskSubmission.service.js";
+import { attemptDayAdvancement, syncMissedDaysForUser } from "../taskSubmission/taskSubmission.service.js";
 import mongoose from "mongoose";
 
 
@@ -23,6 +23,9 @@ export const getAllClients = async (req, res) => {
 export const getSingleClient = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Sync missed (no-submission) days and extend program end date if needed
+    await syncMissedDaysForUser(id);
 
     // Attempt to advance day if cooldown has expired
     await attemptDayAdvancement(id);

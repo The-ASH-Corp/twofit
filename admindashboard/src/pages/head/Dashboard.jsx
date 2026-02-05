@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Users,
-  UserCheck,
-  FileText,
-  Layout,
   MoreHorizontal,
   Bell,
   ChevronDown,
@@ -26,7 +22,7 @@ import {
   Legend,
   Filler,
 } from "chart.js";
-import { Bar, Line, Doughnut } from "react-chartjs-2";
+import { Doughnut } from "react-chartjs-2";
 import { getDashboardData } from "@/redux/features/head/head.thunk";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
@@ -46,6 +42,8 @@ ChartJS.register(
 );
 export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState({});
+  const [filterCategory, setFilterCategory] = useState("All Categories");
+  const [showFilter, setShowFilter] = useState(false);
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
   useEffect(() => {
@@ -77,87 +75,99 @@ export default function Dashboard() {
     ],
   };
 
+  const adminPerf = {
+    programs: dashboardData?.adminPerformance?.programs || 0,
+    experts: dashboardData?.adminPerformance?.experts || 0,
+    clients: dashboardData?.adminPerformance?.clients || 0,
+  };
+  const expertPerf = {
+    taskCompletion: dashboardData?.expertPerformance?.taskCompletion || 0,
+    rating: dashboardData?.expertPerformance?.rating || 0,
+    clientsAssigned: dashboardData?.expertPerformance?.clientsAssigned || 0,
+  };
+
+  const hasAdminData =
+    adminPerf.programs > 0 || adminPerf.experts > 0 || adminPerf.clients > 0;
   const subAdminPerformanceData = {
-    labels: ["Programs", "Experts", "Clients"],
+    labels: hasAdminData
+      ? ["Programs", "Experts", "Clients"]
+      : ["No Data"],
     datasets: [
       {
-        data: [50, 20, 30],
-        backgroundColor: ["#0A4F48", "#45C4A2", "#FFD7A8"],
+        data: hasAdminData
+          ? [adminPerf.programs, adminPerf.experts, adminPerf.clients]
+          : [1],
+        backgroundColor: hasAdminData
+          ? ["#0A4F48", "#45C4A2", "#FFD7A8"]
+          : ["#E5E7EB"],
         borderWidth: 0,
         cutout: "75%",
-        hoverOffset: 15,
-        spacing: 1,
+        hoverOffset: hasAdminData ? 15 : 0,
+        spacing: hasAdminData ? 1 : 0,
         borderRadius: 8,
       },
     ],
   };
 
+  const calculateTimeAgo = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+
+    if (diffInDays === 0) {
+      if (diffInHours === 0) {
+         if(diffInMinutes < 5) return "Just now";
+         return `${diffInMinutes} mins ago`;
+      }
+      return `Today, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    } else if (diffInDays === 1) {
+      return `Yesterday, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    } else {
+      return `${diffInDays} Days Ago`;
+    }
+  };
+
+  const hasExpertPerfData =
+    expertPerf.taskCompletion > 0 ||
+    expertPerf.rating > 0 ||
+    expertPerf.clientsAssigned > 0;
   const expertPerformanceChartData = {
-    labels: ["Task Completion", "Rating", "Clients Assigned"],
+    labels: hasExpertPerfData
+      ? ["Task Completion", "Rating", "Clients Assigned"]
+      : ["No Data"],
     datasets: [
       {
-        data: [58, 20, 22],
-        backgroundColor: ["#0A4F48", "#45C4A2", "#FFD7A8"],
+        data: hasExpertPerfData
+          ? [
+              expertPerf.taskCompletion,
+              (expertPerf.rating / 5) * 100,
+              expertPerf.clientsAssigned,
+            ]
+          : [1],
+        backgroundColor: hasExpertPerfData
+          ? ["#0A4F48", "#45C4A2", "#FFD7A8"]
+          : ["#E5E7EB"],
         borderWidth: 0,
         cutout: "75%",
-        hoverOffset: 15,
-        spacing: 1,
+        hoverOffset: hasExpertPerfData ? 15 : 0,
+        spacing: hasExpertPerfData ? 1 : 0,
         borderRadius: 8,
       },
     ],
   };
 
-  const progressReports = [
-    {
-      name: "Neha Sharma",
-      type: "Diet",
-      expert: "Dietitian",
-      submittedBy: "Dietitian Anjali",
-      time: "Today, 10:15 AM",
-    },
-    {
-      name: "Aarav Kumar",
-      type: "Workout",
-      expert: "Trainer",
-      submittedBy: "Trainer Rahul",
-      time: "Today, 9:40 AM",
-    },
-    {
-      name: "Vikram Singh",
-      type: "Therapy",
-      expert: "Therapist",
-      submittedBy: "Dietitian Priya",
-      time: "Yesterday, 7:10 PM",
-    },
-    {
-      name: "Sonali Jain",
-      type: "Measurements",
-      expert: "Trainer",
-      submittedBy: "Dietitian Anjali",
-      time: "Yesterday, 5:20 PM",
-    },
-    {
-      name: "Riya Mehta",
-      type: "Diet",
-      expert: "Dietitian",
-      submittedBy: "Therapist Mira",
-      time: "2 Days Ago",
-    },
-    {
-      name: "Neha Sharma",
-      type: "Weight",
-      expert: "Trainer",
-      submittedBy: "Dietitian Anjali",
-      time: "2 Days Ago",
-    },
-    {
-      name: "Aarav Kumar",
-      type: "Therapy",
-      expert: "Therapist",
-      submittedBy: "Trainer Rahul",
-      time: "3 Days Ago",
-    },
-  ];
+  const progressReportsRaw = dashboardData?.latestReports?.map(report => ({
+      ...report,
+      time: calculateTimeAgo(report.time)
+  })) || [];
+
+  const progressReports = filterCategory === "All Categories"
+    ? progressReportsRaw
+    : progressReportsRaw.filter(report => report.type === filterCategory);
 
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA]">
@@ -175,13 +185,13 @@ export default function Dashboard() {
               },
               {
                 label: "Total Programs",
-                value: dashboardData?.totalPrograms,
+                value: dashboardData?.totalPrograms || 0,
                 icon: <BookOpen size={22} className="text-[#0A4F48]" />,
                 bg: "bg-[#FAF3E0]",
               },
               {
                 label: "Admins",
-                value: dashboardData?.totalAdmins,
+                value: dashboardData?.totalAdmins || 0,
                 icon: <UserCircle size={22} className="text-white" />,
                 bg: "bg-[#0A4F48]",
               },
@@ -206,7 +216,7 @@ export default function Dashboard() {
           </div>
           {/* Row 2: Sub Admin & Expert Performance */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <DashboardCard title="Sub Admin Performance" subTitle="Last Months">
+            <DashboardCard title="Admin Performance" subTitle="Last Months">
               <div className="h-48 relative flex items-center justify-center">
                 <Doughnut
                   data={subAdminPerformanceData}
@@ -218,9 +228,21 @@ export default function Dashboard() {
                 />
               </div>
               <div className="flex justify-between mt-4">
-                <LegendItem color="#0A4F48" label="Programs" value="50%" />
-                <LegendItem color="#45C4A2" label="Experts" value="20%" />
-                <LegendItem color="#FFD7A8" label="Clients" value="30%" />
+                <LegendItem
+                  color="#0A4F48"
+                  label="Programs"
+                  value={adminPerf.programs}
+                />
+                <LegendItem
+                  color="#45C4A2"
+                  label="Experts"
+                  value={adminPerf.experts}
+                />
+                <LegendItem
+                  color="#FFD7A8"
+                  label="Clients"
+                  value={adminPerf.clients}
+                />
               </div>
             </DashboardCard>
 
@@ -239,27 +261,54 @@ export default function Dashboard() {
                 <LegendItem
                   color="#0A4F48"
                   label="Task Completion"
-                  value="58%"
+                  value={`${expertPerf.taskCompletion}%`}
                 />
-                <LegendItem color="#45C4A2" label="Rating" value="4.6" />
+                <LegendItem
+                  color="#45C4A2"
+                  label="Rating"
+                  value={expertPerf.rating}
+                />
                 <LegendItem
                   color="#FFD7A8"
                   label="Clients Assigned"
-                  value="73%"
+                  value={`${expertPerf.clientsAssigned}%`}
                 />
               </div>
             </DashboardCard>
           </div>
 
           {/* Row 4: Latest Progress Reports */}
-          <div className="bg-white rounded-2xl shadow-sm flex flex-col">
+          <div className="bg-white rounded-2xl shadow-sm flex flex-col min-h-[400px]">
             <div className="p-6 border-b border-gray-50 flex items-center justify-between">
               <h3 className="text-lg font-bold text-[#0A4F48]">
                 Latest Progress Reports
               </h3>
-              <button className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D]">
-                All Categories <ChevronDown size={14} />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setShowFilter(!showFilter)}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D]"
+                >
+                  {filterCategory} <ChevronDown size={14} />
+                </button>
+                {showFilter && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-lg shadow-lg z-10 py-1">
+                    {["All Categories", "Diet", "Workout", "Therapy"].map(
+                      (cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => {
+                            setFilterCategory(cat);
+                            setShowFilter(false);
+                          }}
+                          className="w-full text-left px-4 py-2 text-xs hover:bg-gray-50 text-[#66706D]"
+                        >
+                          {cat}
+                        </button>
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -273,35 +322,49 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {progressReports.map((report, i) => (
-                    <tr key={i} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-[#0A4F48]">
-                        {report.name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#011412]">
-                        {report.type}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <span
-                          className={`px-3 py-1 rounded-md text-[10px] font-bold ${
-                            report.expert === "Dietitian"
-                              ? "bg-[#FAF3E0] text-[#DAA520]"
-                              : report.expert === "Trainer"
-                              ? "bg-[#EBF3F2] text-[#0A4F48]"
-                              : "bg-[#F0FDF4] text-[#15803D]"
-                          }`}
-                        >
-                          {report.expert}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#011412]">
-                        {report.submittedBy}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#66706D]">
-                        {report.time}
+                  {progressReports.length > 0 ? (
+                    progressReports.map((report, i) => (
+                      <tr
+                        key={i}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-6 py-4 text-sm font-medium text-[#0A4F48]">
+                          {report.name}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#011412]">
+                          {report.type}
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          <span
+                            className={`px-3 py-1 rounded-md text-[10px] font-bold ${
+                              report.expert === "Dietitian"
+                                ? "bg-[#FAF3E0] text-[#DAA520]"
+                                : report.expert === "Trainer"
+                                ? "bg-[#EBF3F2] text-[#0A4F48]"
+                                : "bg-[#F0FDF4] text-[#15803D]"
+                            }`}
+                          >
+                            {report.expert}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#011412]">
+                          {report.submittedBy}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#66706D]">
+                          {report.time}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        className="px-6 py-8 text-center text-sm text-[#66706D]"
+                      >
+                        No progress reports found matching your criteria
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -332,7 +395,7 @@ export default function Dashboard() {
                   Total Experts
                 </span>
                 <span className="text-3xl font-bold text-[#0A4F48]">
-                  {dashboardData?.totalExperts}
+                  {dashboardData?.totalExperts || 0}
                 </span>
               </div>
             </div>
@@ -340,17 +403,17 @@ export default function Dashboard() {
               {[
                 {
                   label: "Trainers",
-                  count: dashboardData?.totalTrainers,
+                  count: dashboardData?.totalTrainers || 0,
                   color: "bg-[#0A4F48]",
                 },
                 {
                   label: "Dietitians",
-                  count: dashboardData?.totalDietitians,
+                  count: dashboardData?.totalDietitians || 0,
                   color: "bg-[#EBF3F2]",
                 },
                 {
                   label: "Therapists",
-                  count: dashboardData?.totalTherapists,
+                  count: dashboardData?.totalTherapists || 0,
                   color: "bg-[#FAF3E0]",
                 },
               ].map((item, i) => (

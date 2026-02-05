@@ -1,18 +1,32 @@
 import sgMail from "@sendgrid/mail";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+let initialized = false;
 
-export const sendEmail = async ({ to, subject, html }) => {
-  try {
-    await sgMail.send({
-      from: `TwoFit App <${process.env.SENDGRID_FROM_EMAIL}>`,
-      to,
-      subject,
-      html,
-    });
-    console.log("Email sent successfully");
-  } catch (err) {
-    console.log("EMAIL ERROR:", err);
-    throw new Error("Email sending failed");
+function initSendGrid() {
+  if (initialized) return;
+
+  const apiKey = process.env.SENDGRID_API_KEY;
+  const from = process.env.SENDGRID_FROM_EMAIL;
+
+  if (!apiKey || !apiKey.startsWith("SG.")) {
+    throw new Error("SENDGRID_API_KEY missing or invalid");
   }
-};
+
+  if (!from) {
+    throw new Error("SENDGRID_FROM_EMAIL missing");
+  }
+
+  sgMail.setApiKey(apiKey);
+  initialized = true;
+}
+
+export async function sendEmail({ to, subject, html }) {
+  initSendGrid();
+
+  return sgMail.send({
+    from: `TwoFit App <${process.env.SENDGRID_FROM_EMAIL}>`,
+    to,
+    subject,
+    html,
+  });
+}

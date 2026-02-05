@@ -1,6 +1,7 @@
+
 import React, { useEffect, useState } from "react";
 import BaseTable from "../../../components/table/BaseTable";
-import { ClientColumns } from "./ClientColumns";
+import { getClientColumns } from "./ClientColumns";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import {
@@ -44,19 +45,24 @@ export default function ClientsTable() {
   const profilePath = (id) => {
     navigate(`/expert/clients/profile/${id}`);
   };
+    const role = coachId?.role?.toLowerCase();
+
+  const columns = getClientColumns(role,navigate);
+
   return (
     <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
-      <BaseTable
-        columns={ClientColumns}
-        data={clients}
-        pageLabel="My Clients"
-        profilePath={profilePath}
-        handlePageChange={handlePageChange}
-        handleLimitChange={handleLimitChange}
-        page={page}
-        limit={limit}
-        totalCount={clientTotalCount}
-      />
+     <BaseTable
+  columns={columns}
+  data={clients}
+  pageLabel="My Clients"
+  profilePath={profilePath}
+  handlePageChange={handlePageChange}
+  handleLimitChange={handleLimitChange}
+  page={page}
+  limit={limit}
+  totalCount={clientTotalCount}
+/>
+
     </div>
   );
 }

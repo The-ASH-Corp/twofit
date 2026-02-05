@@ -5,6 +5,7 @@ import User from "../auth/auth.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import { AdminModel } from "./admin.model.js";
 import TaskSubmission from "../taskSubmission/taskSubmission.model.js";
+import { sendEmail } from "../../utils/email.js";
 
 export const getAllAdmins = async (page, limit) => {
   const skip = (page - 1) * limit;
@@ -28,12 +29,14 @@ export const getAllAdmins = async (page, limit) => {
 };
 
 export const addNewAdmin = async (adminData) => {
+  let plainPassword;
   if (adminData.password) {
+    plainPassword = adminData.password;
     adminData.password = await hashPassword(adminData.password);
   } else {
-    const password = generatePassword();
-    console.log(password);
-    adminData.password = await hashPassword(password);
+    plainPassword = generatePassword();
+    console.log(plainPassword);
+    adminData.password = await hashPassword(plainPassword);
   }
 
   const newAdmin = await AdminModel.create({
@@ -54,6 +57,53 @@ export const addNewAdmin = async (adminData) => {
     experience: adminData.experience,
     qualification: adminData.qualification,
   });
+
+  await sendEmail({
+    to: adminData.email,
+    subject: "Welcome to TwoFit - Your Login Credentials",
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #0A4F48; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+          .credentials-box { background-color: white; border-left: 5px solid #0A4F48; padding: 20px; margin: 20px 0; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+          .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Welcome to TwoFit!</h1>
+          </div>
+          <div class="content">
+            <p>Hello <strong>${adminData.fullname}</strong>,</p>
+            <p>Your Admin account has been successfully created. Here are your login credentials:</p>
+            
+            <div class="credentials-box">
+              <p style="margin: 5px 0;"><strong>Email:</strong> ${adminData.email}</p>
+              <p style="margin: 5px 0;"><strong>Password:</strong> ${plainPassword}</p>
+            </div>
+            
+            <p>Please log in and change your password immediately for security purposes.</p>
+            
+            <div style="text-align: center; margin-top: 30px;">
+              <a href="http://localhost:5173/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
+            </div>
+          </div>
+          <div class="footer">
+            <p>&copy; ${new Date().getFullYear()} TwoFit. All rights reserved.</p>
+            <p>This email was sent to ${adminData.email}</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+
   return newAdmin;
 };
 
