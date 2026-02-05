@@ -11,3 +11,17 @@ export const createBroadcast = async (data) => {
         throw error;
     }
 }
+
+export const getAllBroadcast = async (page, limit) => {
+    try {
+        const skip = (page - 1) * limit;
+        const totalCount = await broadcastModel.countDocuments();
+        const broadcast = await broadcastModel.find().skip(skip).limit(limit);
+        return {
+            totalCount,
+            broadcast,
+        }
+    } catch (error) {
+        throw error;
+    }
+}
