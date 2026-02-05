@@ -69,5 +69,5 @@ export const FinanceColumns = [
     accessorKey: "months",
     header: "Months",
   },
-  { id: "actions", header: "Action", cell: () => "⋯" },
+  // { id: "actions", header: "Action", cell: () => "⋯" },
 ];
