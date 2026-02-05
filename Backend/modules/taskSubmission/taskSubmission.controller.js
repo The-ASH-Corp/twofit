@@ -108,6 +108,9 @@ export const getUserTaskStatus = async (req, res) => {
         const userId = req.user._id || req.user.id;
         const { globalDayIndex } = req.query;
 
+        // Sync missed (no-submission) days and extend program end date if needed
+        await taskSubmissionService.syncMissedDaysForUser(userId);
+
         // Attempt to advance day if cooldown has expired
         await taskSubmissionService.attemptDayAdvancement(userId);
 
