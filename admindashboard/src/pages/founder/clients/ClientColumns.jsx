@@ -71,5 +71,5 @@ export const ClientColumns = [
       );
     },
   },
-  { id: "actions", header: "Action", cell: () => "⋯" },
+  // { id: "actions", header: "Action", cell: () => "⋯" },
 ];

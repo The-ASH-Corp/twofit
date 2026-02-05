@@ -33,6 +33,7 @@ import pdfVector from "./pdfVector.svg"
 import totalEmploy from "./totalExpert.svg"
 import totalPayroll from "./totalPayroll.svg"
 import pendingPayroll from "./pendingPayroll.svg"
+import broadCast from "./BroadcastVector.svg";
 
 export const assets = {
   menu,
@@ -70,5 +71,6 @@ export const assets = {
   totalEmploy,
   totalPayroll,
   pendingPayroll,
+  broadCast,
 };
 

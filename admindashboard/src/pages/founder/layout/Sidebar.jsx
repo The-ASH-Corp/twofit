@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { logout } from "@/redux/features/auth/auth.thunk";
 import { useState } from "react";
 import { X } from "lucide-react";
+import { LuSend } from "react-icons/lu";
 
 const menuItems = [
   {
@@ -31,7 +32,24 @@ const menuItems = [
   },
   { label: "Therapy", icon: assets.clients, path: "/founder/therapy" },
   { label: "Finance", icon: assets.website, path: "/founder/finance" },
- 
+  {
+    label: "Broadcast",
+    icon: assets.broadCast,
+    children: [
+      {
+        label: "Templates",
+        path: "/founder/broadcast/template",
+      },
+      {
+        label: "Add New",
+        path: "/founder/broadcast/add-Template",
+      },
+      {
+        label: "Auto Reminders",
+        path: "/founder/broadcast/auto-remainder",
+      },
+    ],
+  },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {

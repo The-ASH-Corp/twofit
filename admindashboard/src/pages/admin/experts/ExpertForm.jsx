@@ -23,14 +23,15 @@ export default function ExpertForm() {
 
   useEffect(() => {
     dispatch(
-      getAllProgramsByAdmin({ adminId: user._id, page: 1, limit: 120 })
+      getAllProgramsByAdmin({ adminId: user._id, page: 1, limit: 120 }),
     ).then((res) => {
       setProgram(res.payload.data);
     });
-    dispatch(fetchTherapyPlans({page: 1, limit: 120})).then((res) => {      
+    dispatch(fetchTherapyPlans({ page: 1, limit: 120 })).then((res) => {
       setTherapy(res.payload.data.therapy);
-    })
-  }, [dispatch]);
+    });
+  }, [dispatch, user._id]);
+  console.log(therapy)
 
   const fields = [
     {

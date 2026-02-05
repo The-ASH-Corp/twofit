@@ -14,24 +14,31 @@ export const allEmployees = async (page, limit) => {
     "_id name salary email role status incentives",
   ).lean();
 
+  const getCurrentMonthName = () => {
+    return new Date("03-03-2020").toLocaleString("en-IN", { month: "long" });
+  };
+
   const unifiedData = [
     ...heads.map((h) => ({
       ...h,
       role: "Head",
       netSalary: h.salary,
       incentives: "N/A",
+      months: getCurrentMonthName(),
     })),
     ...admins.map((a) => ({
       ...a,
       role: "Admin",
       netSalary: a.salary,
       incentives: "N/A",
+      months: getCurrentMonthName(),
     })),
     ...experts.map((c) => ({
       ...c,
       role: "Expert",
-      incentives:`₹ ${c.incentives.toLocaleString("en-IN")}`,
+      incentives: `₹ ${c.incentives.toLocaleString("en-IN")}`,
       netSalary: Number(c.salary || 0) + Number(c.incentives || 0),
+      months: getCurrentMonthName(),
     })),
   ];
 
