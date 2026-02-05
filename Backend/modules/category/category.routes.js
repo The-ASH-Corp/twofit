@@ -8,15 +8,16 @@ import express from 'express'
    updateCategoryController,
    gatFounderCategoryList,
  } from "./category.controller.js";
+ import { authMiddleware } from "../../middleware/authMiddleware.js";
  const router=express.Router()
 
-router.post('/create',createCategoryController)
+router.post('/create', authMiddleware, createCategoryController)
 router.get('/list/:page/:limit',getAllCategoryController)
 router.get('/list/:id',getSingleCategoryController)
-router.get("/founder/list/:page/:limit", gatFounderCategoryList);
-router.put('/update/:id',updateCategoryController)
-router.delete('/delete/:id',deleteSingleCategoryController)
-router.delete('/delete',deleteAllCategoriesController)
+router.get("/founder/list/:page/:limit", authMiddleware, gatFounderCategoryList);
+router.put('/update/:id', authMiddleware, updateCategoryController)
+router.delete('/delete/:id', authMiddleware, deleteSingleCategoryController)
+router.delete('/delete', authMiddleware, deleteAllCategoriesController)
 
 
 
