@@ -40,33 +40,58 @@ const joinHandler = (io, socket) => {
 
 // message Handlers
 const messageHandler = (io, socket) => {
-  socket.on("send_message", async ({ roomId, text, reciever }, ack) => {
-    if (!text?.trim()) return;
+  socket.on("send_message", async (payload = {}, ack) => {
+    const {
+      roomId,
+      text = "",
+      reciever,
+      receiver,
+      messageType = "text",
+      mediaUrl = "",
+      mediaMeta = {},
+    } = payload;
+
+    const receiverId = reciever || receiver;
+    const trimmedText = typeof text === "string" ? text.trim() : "";
+    const hasMedia = Boolean(mediaUrl);
+
+    if (!roomId || !receiverId || (!trimmedText && !hasMedia)) {
+      ack?.({ ok: false, error: "Invalid message payload" });
+      return;
+    }
 
     const msg = {
       roomId,
       sender: socket.userId,
-      reciever,
-      message: text,
+      reciever: receiverId,
+      message: trimmedText,
+      messageType: hasMedia ? messageType : "text",
+      mediaUrl: hasMedia ? mediaUrl : "",
+      mediaMeta: mediaMeta || {},
       time: new Date(),
     };
 
-
-    await ChatModel.updateOne(
-      { roomId },
-      {
-        $setOnInsert: {
-          roomId,
-          participants: [socket.userId, reciever],
+    try {
+      await ChatModel.updateOne(
+        { roomId },
+        {
+          $setOnInsert: {
+            roomId,
+            participants: [socket.userId, receiverId],
+          },
+          $push: { messages: msg },
         },
-        $push: { messages: msg },
-      },
-      { upsert: true }
-    );
+        { upsert: true }
+      );
 
-    io.to(roomId).emit("new_message", msg);
+      // Every user socket joins a personal room on connect, so emit there.
+      io.to(socket.userId).to(receiverId).emit("new_message", msg);
 
-    ack?.({ ok: true });
+      ack?.({ ok: true });
+    } catch (error) {
+      console.error("send_message error:", error);
+      ack?.({ ok: false, error: "Message failed" });
+    }
   });
 };
 
