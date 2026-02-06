@@ -37,10 +37,11 @@ import FounderProgramsEditForm from "./pages/founder/programsList/ProgramEditFor
 import FounderProgramsDelete from "./pages/founder/programsList/ProgramDeletePopUp";
 import FounderTherapyList from "./pages/founder/therapy/TherapyTable";
 import FounderTherapyForm from "./pages/founder/therapy/TherapyForm";
-import FounderWorkoutList from "./pages/founder/workout/WorkoutList";
-import FounderWorkoutForm from "./pages/founder/workout/WorkoutForm";
 import FounderFinanceList from "./pages/founder/finance/FinanceTable";
 import FounderTherapyPlanView from "./pages/founder/therapy/TherapyViewPlan"
+import FounderBroadcastTemplates from "./pages/founder/broadcast/Templates";
+import FounderBroadcastCreate from "./pages/founder/broadcast/CreateBroadcast";
+import FounderBroadcastAutoReminder from "./pages/founder/broadcast/AutoReminders";
 
 //Head Pages Imports
 import HeadLayout from "./pages/head/layout/HeadLayout";
@@ -178,9 +179,18 @@ function App() {
           <Route path="therapy" element={<FounderTherapyList />} />
           <Route path="therapy/create" element={<FounderTherapyForm />} />
           <Route path="therapy/plan/:id" element={<FounderTherapyPlanView />} />
-
-          <Route path="workout" element={<FounderWorkoutList />} />
-          <Route path="workout/create" element={<FounderWorkoutForm />} />
+          <Route
+            path="broadcast/template"
+            element={<FounderBroadcastTemplates />}
+          />
+          <Route
+            path="broadcast/add-Template"
+            element={<FounderBroadcastCreate />}
+          />
+          <Route
+            path="broadcast/auto-remainder"
+            element={<FounderBroadcastAutoReminder />}
+          />
           <Route path="profile" element={<Profile />} />
         </Route>
 
@@ -205,10 +215,7 @@ function App() {
             element={<HeadExpertProfile />}
           />
           <Route path="admins/profile/:id" element={<HeadAdminProfile />} />
-          <Route
-            path="clients/profile/:Id"
-            element={<HeadClientProfile />}
-          />
+          <Route path="clients/profile/:Id" element={<HeadClientProfile />} />
           <Route path="programs" element={<HeadProgramTable />} />
           <Route path="profile" element={<Profile />} />
           <Route path="therapy" element={<HeadTherapyList />} />
@@ -264,9 +271,12 @@ function App() {
           <Route path="programs/viewPlan" element={<ExpertPlanDetails />} />
           <Route path="profile" element={<Profile />} />
           <Route path="finance" element={<ExpertFinance />} />
-         
-          <Route path="therapy" element={<ExpertTherapyList/>}/>
-          <Route path="therapy/plan/:id" element={<ExpertTherapyPlanDetails/>}/>
+
+          <Route path="therapy" element={<ExpertTherapyList />} />
+          <Route
+            path="therapy/plan/:id"
+            element={<ExpertTherapyPlanDetails />}
+          />
           {/* <Route path="habit" element={<Habit/>}/> */}
           <Route path="clients/add-habit/:id" element={<Habit/>}/>
 

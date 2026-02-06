@@ -1,5 +1,5 @@
 const expertColors = {
-  Dietitian: "bg-[#FFF5ED] text-black",
+  Dietician: "bg-[#FFF5ED] text-black",
   Therapist: "bg-[#E7F9F4] text-black",
   Trainer: "bg-[#EBF2FE] text-black",
 };
@@ -41,7 +41,7 @@ export const ExpertColumns = [
       const expertColor = expertColors[role] || "bg-gray-200 text-gray-700";
 
       return (
-        <span className={`px-2 py-1 text-[11px] rounded-xl ${expertColor}`}>
+        <span className={`px-2 py-1 text-[11px] rounded-md ${expertColor}`}>
           {role}
         </span>
       );
@@ -67,5 +67,5 @@ export const ExpertColumns = [
       );
     },
   },
-  { id: "actions", header: "Action", cell: () => "⋯" },
+  // { id: "actions", header: "Action", cell: () => "⋯" },
 ];
