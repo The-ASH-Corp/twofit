@@ -124,16 +124,16 @@ const HeadEditForm = () => {
    
   ];
   const initialValues = {
-    name: data.name,
-    dob: data.dob,
-    gender: data.gender,
-    email: data.email,
-    phone: data.phone,
-    address: data.address,
-    specialization: data.specialization,
-    experience: data.experience,
-    qualification: data.qualification,
-    salary: data.salary,
+    name: data?.name,
+    dob: data?.dob,
+    gender: data?.gender,
+    email: data?.email,
+    phone: data?.phone,
+    address: data?.address,
+    specialization: data?.specialization,
+    experience: data?.experience,
+    qualification: data?.qualification,
+    salary: data?.salary,
   };
 
   const navigate = useNavigate();
@@ -145,7 +145,7 @@ const HeadEditForm = () => {
           ).unwrap();
           if (head.success) {
             toast.success("Head updated successfully");
-            navigate("/founder/heads");
+            navigate(-1);
           } else {
             toast.error("Failed to update head");
           }

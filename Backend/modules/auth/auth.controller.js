@@ -24,6 +24,7 @@ export const loginController = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     delete data.refreshToken;
@@ -43,6 +44,7 @@ export const adminLoginController = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
     delete data.refreshToken;
@@ -96,11 +98,11 @@ export const verifyOTPController = async (req, res) => {
 export const resetPasswordController = async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
-    
+
     if (!email || !otp || !newPassword) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Email, OTP, and new password are required" 
+      return res.status(400).json({
+        success: false,
+        message: "Email, OTP, and new password are required"
       });
     }
 
@@ -121,7 +123,7 @@ export const editProfileController = async (req, res) => {
     res.json({ success: true, message: "Profile updated successfully", data: updatedUser });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
-  } 
+  }
 };
 
 export const editPasswordController = async (req, res) => {

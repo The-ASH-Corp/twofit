@@ -263,7 +263,8 @@ export const getCoachDashboardStats = async (coachId) => {
 
   const avarageRating = coach.avgRating || 0;
 
-  const clientLoad =( coach.assignedUsers.length / (coach.maxClient || 1) ) * 100;
+  const clientLoad =
+    (coach.assignedUsers.length / (coach.maxClient || 1)) * 100;
   return {
     totalCompliance: totalClientComplience,
     totalClients: totalClients.length,
@@ -356,4 +357,155 @@ export const founderCoachList = async (page, limit) => {
   } catch (error) {
     throw error;
   }
+};
+
+export const getClientComplianceGraphData = async (coachId, duration) => {
+  const coach = await CoachModel.findById(coachId).select("assignedUsers role");
+  if (!coach) {
+    throw new Error("Coach not found");
+  }
+  const coachObjectId = new mongoose.Types.ObjectId(coachId);
+
+  // Dynamically get assigned clients from User model
+  const totalClients = await User.find({
+    $or: [
+      { trainer: coachObjectId },
+      { dietition: coachObjectId },
+      { therapist: coachObjectId },
+    ],
+  })
+    .populate({ path: "programType", populate: { path: "plan" } })
+    .populate("therapyType");
+
+  const complianceData = await Promise.all(
+    totalClients.map((user) => {
+      // duration is only for Monthwise data generation inside the function
+      return getUserComplianceStats(
+        user._id,
+        user?.programType.plan,
+        user?.therapyType,
+        user?.programType?.title,
+        duration,
+      );
+    }),
+  );
+
+  const monthsInput = Number(duration) || 12;
+  const monthMap = {};
+
+  // Pre-fill month map with ordered months for the duration
+  // Logic: "Last X months" ending now.
+  const orderedMonths = [];
+  for (let i = monthsInput - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const monthKey = d.toLocaleString("default", { month: "short" });
+    orderedMonths.push(monthKey);
+
+    monthMap[monthKey] = {
+      High: 0,
+      Medium: 0,
+      Low: 0,
+      total: 0
+    };
+  }
+
+  complianceData.forEach((comp) => {
+    // const roleKey = coach.role.toLowerCase(); // Unused?
+
+    comp.monthwiseData.forEach((m) => {
+      const month = m.month;
+
+      // Only process if this month is within our desired range
+      if (monthMap[month]) {
+        const complianceValue = m.compliance;
+
+        if (complianceValue >= 80) {
+          monthMap[month].High++;
+        } else if (complianceValue >= 50) {
+          monthMap[month].Medium++;
+        } else {
+          monthMap[month].Low++;
+        }
+        monthMap[month].total++;
+      }
+    });
+  });
+
+  // Map result using the ordered list to ensure order
+  const monthwiseComplianceGraph = orderedMonths.map(month => {
+    const data = monthMap[month];
+    const total = data.total || 1; // Avoid division by zero, though if total is 0, numerators are 0.
+    return {
+      month,
+      High: data.total ? Math.round((data.High / data.total) * 100) : 0,
+      Medium: data.total ? Math.round((data.Medium / data.total) * 100) : 0,
+      Low: data.total ? Math.round((data.Low / data.total) * 100) : 0
+    };
+  });
+
+  return {
+    duration,
+    totalClients: totalClients.length,
+    monthwiseCompliance: monthwiseComplianceGraph,
+  };
+};
+
+export const getMonthWiseAverageRating = async (coachId, duration) => {
+  const coach = await CoachModel.findById(coachId).select("feedback");
+  if (!coach) {
+    throw new Error("Coach not found");
+  }
+
+  const months = Number(duration) || 12;
+  const now = new Date();
+  const startDate = new Date();
+  startDate.setMonth(now.getMonth() - months);
+
+  // Initialize map for all months in range
+  const monthMap = {};
+  for (let i = 0; i < months; i++) {
+    const d = new Date(startDate);
+    d.setMonth(startDate.getMonth() + i + 1); // Start from next month to include current month at end? Or aligned with duration?
+    // Let's use a standard "Last X Months" approach ending at current month
+    const dateCalc = new Date();
+    dateCalc.setMonth(dateCalc.getMonth() - i);
+    const monthKey = dateCalc.toLocaleString("default", { month: "short" });
+    monthMap[monthKey] = { totalRating: 0, count: 0 };
+  }
+
+  // Filter and aggregate feedback
+  coach.feedback.forEach((f) => {
+    const feedbackDate = new Date(f.createdAt);
+    if (feedbackDate >= startDate && feedbackDate <= now) {
+      const monthKey = feedbackDate.toLocaleString("default", { month: "short" });
+      if (monthMap[monthKey]) {
+        monthMap[monthKey].totalRating += f.rating;
+        monthMap[monthKey].count += 1;
+      } else {
+        // Handle edge case if map generation didn't cover strict dates or sorting
+        // But for "Last X months" graph, we usually just want the keys we generated
+      }
+    }
+  });
+
+  // Convert to array and ensure chronological order (naive approach: assume API consumer handles sorting or we return in order)
+  // Re-generating keys in chronological order for result
+  const result = [];
+  for (let i = months - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setMonth(d.getMonth() - i);
+    const monthKey = d.toLocaleString("default", { month: "short" });
+
+    const data = monthMap[monthKey];
+    result.push({
+      month: monthKey,
+      rating: data && data.count > 0 ? Number((data.totalRating / data.count).toFixed(1)) : 0
+    });
+  }
+
+  return {
+    duration,
+    ratingData: result
+  };
 };

@@ -22,6 +22,7 @@ import FounderHeadsList from "./pages/founder/heads/HeadTable";
 import FounderHeadsProfile from "./pages/founder/heads/HeadProfile";
 import FounderHeadForm from "./pages/founder/heads/HeadForm";
 import FounderHeadEditForm from "./pages/founder/heads/HeadEditForm";
+import FounderHeadDelete from "./pages/founder/heads/HeadDeletePopUp";
 import FounderCategoryList from "./pages/founder/category/CategoryTable";
 import FounderCategoryForm from "./pages/founder/category/CategoryForm";
 import FounderCategoryEditForm from "./pages/founder/category/CategoryEditForm";
@@ -132,6 +133,7 @@ function App() {
           <Route path="heads" element={<FounderHeadsList />} />
           <Route path="heads/profile/:id" element={<FounderHeadsProfile />} />
           <Route path="heads/edit/:id" element={<FounderHeadEditForm />} />
+          <Route path="heads/delete/:id" element={<FounderHeadDelete />} />
           <Route path="heads/add-head" element={<FounderHeadForm />} />
           <Route path="admins" element={<FounderAdminList />} />
           <Route path="admins/profile/:id" element={<FounderAdminProfile />} />
@@ -237,8 +239,11 @@ function App() {
           <Route path="programs/create" element={<PlanForm />} />
           <Route path="programs/plans" element={<AdminPlanView />} />
           <Route path="profile" element={<Profile />} />
-           <Route path="therapy" element={<AdminTherapyList/>}/>
-          <Route path="therapy/plan/:id" element={<AdminTherapyPlanDetails/>}/>
+          <Route path="therapy" element={<AdminTherapyList />} />
+          <Route
+            path="therapy/plan/:id"
+            element={<AdminTherapyPlanDetails />}
+          />
         </Route>
 
         {/* EXPERT */}
@@ -261,7 +266,7 @@ function App() {
           <Route path="therapy" element={<ExpertTherapyList/>}/>
           <Route path="therapy/plan/:id" element={<ExpertTherapyPlanDetails/>}/>
           {/* <Route path="habit" element={<Habit/>}/> */}
-          <Route path="therapy/add-habit/:id" element={<Habit/>}/>
+          <Route path="clients/add-habit/:id" element={<Habit/>}/>
 
 
         </Route>

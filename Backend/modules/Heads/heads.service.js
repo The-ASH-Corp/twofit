@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { generatePassword, hashPassword } from "../../utils/password.js";
 import { AdminModel } from "../admin/admin.model.js";
 import ProgramModel from "../allPrograms/allPrograma.model.js";
@@ -97,7 +98,45 @@ export const updateHead = async (id, data) => {
 };
 
 export const deleteHead = async (id) => {
-  return await HeadsModel.findByIdAndDelete(id);
+  try {
+    // Validate ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Error("Invalid head ID");
+    }
+
+    // Check head exists
+    const head = await HeadsModel.findById(id);
+    if (!head) {
+      throw new Error("Head not found");
+    }
+
+    // Check admins using this head
+    const adminsUsingHead = await AdminModel.find(
+      { headId: id },
+      { _id: 1, name: 1 },
+    );
+
+    // Block delete if head is in use
+    if (adminsUsingHead.length > 0) {
+      const adminNames = adminsUsingHead.map((a) => a.name).join(", ");
+
+      return {
+        canDelete: false,
+        message: `Cannot delete head.This head assigned to admins: ${adminNames}.`,
+      };
+    }
+
+    // Safe delete
+    await HeadsModel.findByIdAndDelete(id);
+
+    return {
+      canDelete: true,
+      message: "Head deleted successfully",
+      head,
+    };
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getDashboardData = async (id) => {
