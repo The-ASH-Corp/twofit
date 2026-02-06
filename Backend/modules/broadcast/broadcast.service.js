@@ -12,16 +12,27 @@ export const createBroadcast = async (data) => {
     }
 }
 
-export const getAllBroadcast = async (page, limit) => {
-    try {
-        const skip = (page - 1) * limit;
-        const totalCount = await broadcastModel.countDocuments();
-        const broadcast = await broadcastModel.find().skip(skip).limit(limit);
-        return {
-            totalCount,
-            broadcast,
-        }
-    } catch (error) {
-        throw error;
+export const getAllBroadcast = async (page, limit, type) => {
+  try {
+    const skip = (page - 1) * limit;
+
+    const filter = {};
+    if (type && type !== "All") {
+      filter.type = type;
     }
-}
+
+    const totalCount = await broadcastModel.countDocuments(filter);
+    const broadcast = await broadcastModel
+      .find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    return {
+      totalCount,
+      broadcast,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
