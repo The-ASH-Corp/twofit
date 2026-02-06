@@ -86,7 +86,7 @@ export default function Chats() {
         chatId: getPrivateRoomId(user._id, client._id),
       })
     );
-  }, [client, user._id, dispatch]);
+  }, [client, user?._id, dispatch]);
 
   useEffect(() => {
     if (chats?.messages) {

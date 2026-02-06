@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { assets } from "@/assets/asset";
 import KpiCard from "@/components/cards/KpiCard";
 import HeroCard from "./components/HeroCard";
@@ -62,7 +62,22 @@ export default function Dashboard() {
     }
   }, [user?._id, user?.programType]);
 
-   return (
+  const isProgramStarted = useMemo(() => {
+    // Check both user (auth) and clientUser (fetched) for the start date
+    // The field name in DB is programStartDate
+    const startDate = clientUser?.programStartDate || user?.programStartDate;
+    
+    if (!startDate) return true; // Fallback if no date found (should ideally be false, but keeping existing behavior for undefined)
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    
+    return today >= start;
+  }, [user?.programStartDate, clientUser?.programStartDate]);
+
+  return (
     <>
       <div className="w-full grid lg:grid-cols-[1fr_350px] grid-cols-1 gap-8 lg:p-2 p-4 lg:pb-2 pb-24">
         {/* Main Content Area */}
@@ -73,7 +88,13 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 gap-4">
               <KpiCard
                 title="Program Days"
-                value={`${user?.currentGlobalDay || 1}/ ${program?.plan?.duration || 0}`}
+                value={
+                  !isProgramStarted
+                    ? "Not Started"
+                    : `${user?.currentGlobalDay || 1}/ ${
+                        program?.plan?.duration || 0
+                      }`
+                }
                 icon={assets.website}
                 bg="#0A4F48"
                 iconColor="white"
@@ -97,13 +118,17 @@ export default function Dashboard() {
                 icon={assets.website}
                 bg="#F4DBC7"
               />
-           
             </div>
           </div>
 
           {/* Mobile Only: Diet Plan Card */}
           <div className="lg:hidden">
-            <DietPlanCard />
+            <DietPlanCard
+              isProgramStarted={isProgramStarted}
+              startDate={
+                clientUser?.programStartDate || user?.programStartDate
+              }
+            />
           </div>
 
           {/* Middle Section: Charts */}
@@ -133,10 +158,11 @@ export default function Dashboard() {
           {/* Bottom Section: My Tasks */}
           <div className="lg:order-3 order-2">
             <h2 className="text-[#0A4F48] font-bold text-lg">My Tasks</h2>
-            <TaskList 
-              plans={program?.plan} 
+            <TaskList
+              plans={program?.plan}
               therapyPlan={clientUser?.therapyType}
               programTitle={program?.title}
+              isProgramStarted={isProgramStarted}
             />
           </div>
 
@@ -148,7 +174,10 @@ export default function Dashboard() {
 
         {/* Right Sidebar Area - Desktop Only */}
         <div className="space-y-4 hidden lg:block">
-          <DietPlanCard />
+          <DietPlanCard
+            isProgramStarted={isProgramStarted}
+            startDate={clientUser?.programStartDate || user?.programStartDate}
+          />
           <ExpertsList expert={coaches} />
           <Measeurement />
           <NotificationsList />

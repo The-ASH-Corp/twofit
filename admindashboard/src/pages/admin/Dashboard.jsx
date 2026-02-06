@@ -544,35 +544,46 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {filteredProgressReports.map((report, i) => (
-                    <tr key={i} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-[#0A4F48]">
-                        {report.name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#011412]">
-                        {report.type}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <span
-                          className={`px-3 py-1 rounded-md text-[10px] font-bold ${
-                            report.expert === "Dietitian"
-                              ? "bg-[#FAF3E0] text-[#DAA520]"
-                              : report.expert === "Trainer"
+                  {filteredProgressReports.length > 0 ? (
+                    filteredProgressReports.map((report, i) => (
+                      <tr key={i} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 text-sm font-medium text-[#0A4F48]">
+                          {report.name}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#011412]">
+                          {report.type}
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          <span
+                            className={`px-3 py-1 rounded-md text-[10px] font-bold ${
+                              report.expert === "Dietitian"
+                                ? "bg-[#FAF3E0] text-[#DAA520]"
+                                : report.expert === "Trainer"
                                 ? "bg-[#EBF3F2] text-[#0A4F48]"
                                 : "bg-[#F0FDF4] text-[#15803D]"
-                          }`}
-                        >
-                          {report.expert}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#011412]">
-                        {report.submittedBy}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#66706D]">
-                        {report.time}
+                            }`}
+                          >
+                            {report.expert}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#011412]">
+                          {report.submittedBy}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#66706D]">
+                          {report.time}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        className="px-6 py-8 text-center text-sm text-[#66706D]"
+                      >
+                        No progress reports found matching your criteria
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
