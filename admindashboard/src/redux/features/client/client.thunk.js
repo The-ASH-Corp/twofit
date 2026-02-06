@@ -107,9 +107,9 @@ export const fetchClientWeightHistory = createAsyncThunk(
 
 export const fetchClientComplianceStats = createAsyncThunk(
   "client/fetchClientComplianceStats",
-  async (_, { rejectWithValue }) => {
+  async (id, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get("/clients/compliance-stats");
+      const response = await axiosInstance.get(`/clients/compliance-stats?userId=${id}`);
       return response.data;
     } catch (err) {
       return rejectWithValue(
@@ -148,4 +148,22 @@ export const getFounderAllClients = createAsyncThunk(
       );
     }
   },
+);
+
+
+
+export const getClientsWithHabitPlanThunk = createAsyncThunk(
+  "clients/getWithHabitPlan",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.get("/clients/clients");
+       
+      return res.data; 
+      
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch clients"
+      );
+    }
+  }
 );

@@ -9,71 +9,123 @@ import { CoachModel } from "../coach/coach.model.js";
 import { FounderModel } from "../../seeds/createAdmin.js";
 import { calculateExtraClientIncentive } from "../payroll/payroll.service.js";
 import { sendEmail } from "../../utils/email.js";
+import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 
 export const adminCreateUser = async (userData) => {
-  const exists = await User.findOne({ email: userData.email });
-  if (exists) throw new Error("Email already exists");
-  const password = generatePassword();
-  console.log("Generated Password for User:", password);
-  const hashed = await bcrypt.hash(password, 10);
+ try {
+   const exists = await User.findOne({ email: userData.email });
+   if (exists) throw new Error("Email already exists");
+   const password = generatePassword();
+   console.log("Generated Password for User:", password);
+   const hashed = await bcrypt.hash(password, 10);
 
-  const initialWeight = userData.currentWeight;
-  const user = await User.create({
-    name: userData.fullname,
-    email: userData.email,
-    password: hashed,
-    role: "user",
-    status: "Active",
-    dob: userData.dob,
-    gender: userData.gender,
-    phone: userData.phone,
-    address: userData.address,
-    currentWeight: initialWeight,
-    targetWeight: userData.targetWeight,
-    weightHistory: initialWeight
-      ? [
-          {
-            weight: initialWeight,
-            date: new Date(),
-            isInitial: true,
-          },
-        ]
-      : [],
-    medicalConditions: userData.medicalconditions,
-    allergies: userData.allergy,
-    goals: userData.fitnessGoal,
-    foodPreferences: userData.foodPreference,
-    profileImage: userData?.profileImage || "",
-    programType: userData.programType,
-    therapyType:userData.therapyType,
-    duration: userData.duration,
-    programEndDate: userData.endDate,
-    programStartDate: userData.startDate,
-    dietition: userData.dietician || null,
-    trainer: userData.trainer || null,
-    therapist: userData.therapist || null,
-    autoSendGuide: userData.autoSendGuide || false,
-    automatedReminder: userData.automatedReminder || false,
-    autoSendWelcome: userData.autoSendWelcome || false,
-  });
-  const coaches = [
-    userData.dietician,
-    userData.trainer,
-    userData.therapist,
-  ].filter(Boolean);
+   const initialWeight = userData.currentWeight;
+   const user = await User.create({
+     name: capitalizeFirst(userData.fullname),
+     email: userData.email,
+     password: hashed,
+     role: "user",
+     status: "Active",
+     dob: userData.dob,
+     gender: userData.gender,
+     phone: userData.phone,
+     address: userData.address,
+     currentWeight: initialWeight,
+     targetWeight: userData.targetWeight,
+     weightHistory: initialWeight
+       ? [
+           {
+             weight: initialWeight,
+             date: new Date(),
+             isInitial: true,
+           },
+         ]
+       : [],
+     medicalConditions: userData.medicalconditions,
+     allergies: userData.allergy,
+     goals: userData.fitnessGoal,
+     foodPreferences: userData.foodPreference,
+     profileImage: userData?.profileImage || "",
+     programType: userData.programType,
+     therapyType: userData.therapyType || null,
+     duration: userData.duration,
+     programEndDate: userData.endDate,
+     programStartDate: userData.startDate,
+     dietition: userData.dietician || null,
+     trainer: userData.trainer || null,
+     therapist: userData.therapist || null,
+     autoSendGuide: userData.autoSendGuide || false,
+     automatedReminder: userData.automatedReminder || false,
+     autoSendWelcome: userData.autoSendWelcome || false,
+   });
+   const coaches = [
+     userData.dietician,
+     userData.trainer,
+     userData.therapist,
+   ].filter(Boolean);
 
-  for (const coachId of coaches) {
-    await CoachModel.findByIdAndUpdate(
-      coachId,
-      { $addToSet: { assignedUsers: user._id } },
-      { new: true },
-    );
+   for (const coachId of coaches) {
+     await CoachModel.findByIdAndUpdate(
+       coachId,
+       { $addToSet: { assignedUsers: user._id } },
+       { new: true },
+     );
 
-    // Recalculate extra client incentive
-    await calculateExtraClientIncentive(coachId);
-  }
+     // Recalculate extra client incentive
+     await calculateExtraClientIncentive(coachId);
+   }
 
-  return user;
+   await sendEmail({
+    to: userData.email,
+    subject: "Welcome to TwoFit - Your Login Credentials",
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #0A4F48; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+          .credentials-box { background-color: white; border-left: 5px solid #0A4F48; padding: 20px; margin: 20px 0; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+          .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Welcome to TwoFit!</h1>
+          </div>
+          <div class="content">
+            <p>Hello <strong>\${userData.fullname}</strong>,</p>
+            <p>Your User account has been successfully created. Here are your login credentials:</p>
+            
+            <div class="credentials-box">
+              <p style="margin: 5px 0;"><strong>Email:</strong> \${userData.email}</p>
+              <p style="margin: 5px 0;"><strong>Password:</strong> \${password}</p>
+            </div>
+            
+            <p>Please log in and change your password immediately for security purposes.</p>
+            
+            <div style="text-align: center; margin-top: 30px;">
+              <a href="https://twofit.com/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
+            </div>
+          </div>
+          <div class="footer">
+            <p>&copy; \${new Date().getFullYear()} TwoFit. All rights reserved.</p>
+            <p>This email was sent to \${userData.email}</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+   });
+
+   return user;
+ } catch (error) {
+  console.log(error)
+   throw error;
+ }
 };
 
 export const loginUser = async ({ email, password }) => {

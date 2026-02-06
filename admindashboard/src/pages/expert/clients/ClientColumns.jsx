@@ -1,9 +1,3 @@
-// const expertColors={
-//   Dietitian:"bg-[#FFF5ED] text-black",
-//   Therapist:"bg-[#E7F9F4] text-black",
-//   Trainer:"bg-[#EBF2FE] text-black"
-// }
-
 import HabitStartButton from "../habit/HabitStartButton";
 
 const statusColors={
@@ -12,68 +6,82 @@ const statusColors={
   Suspended:"bg-[#FB5858] text-white"
 }
 
-
-export const ClientColumns = [
-
-  {
-    id: "select",
-    header: ({ table }) => (
-      <input
-        type="checkbox"
-        checked={table.getIsAllRowsSelected()}
-        onChange={table.getToggleAllRowsSelectedHandler()}
-        className="w-3 h-3 cursor-pointer"
-      />
-    ),
-    cell: ({ row }) => (
-      <input
-        type="checkbox"
-        checked={row.getIsSelected()}
-        onChange={row.getToggleSelectedHandler()}
-        className="w-3 h-3 cursor-pointer"
-      />
-    ),
-  },
-  { accessorKey: "name", header: "Client Name" },
-  // { accessorKey: "program", header: "Program" },
-  { accessorKey: "duration", header: "Duration" },
-//   {
-//     accessorKey: "experts",
-//     header: "Experts",
-//     cell: ({ row }) => (
-//       <div className="flex gap-2 flex-wrap">
-//         {row.original.experts.map((exp) => {
-//            const colorClass =
-//           expertColors[exp] || "bg-gray-100 text-gray-700 border";
-
-//           return(
-//           <span
-//             key={exp} 
-//             className={`px-2 py-1 text-[11px] rounded-sm ${colorClass}`}
-//           >
-//             {exp}
-//           </span>
-// )  })}
-//       </div>
-//     ),
-//   },
-  {accessorKey:"programStartDate",header:"Start Date"},
-  {accessorKey:"programEndDate",header:"End Date"},
-  { accessorKey: "status", header: "Status" ,
-    cell:({row})=>{
-    
-         const status = row.original.status;
-           const colorClass =
-      statusColors[status] || "bg-gray-200 text-gray-700";
-
-    return (
-      <span className={`px-2 py-1 text-[11px] rounded-xl ${colorClass}`}>
-        {status}
-      </span>
-    )
-    }
+export const getClientColumns = (role, navigate) => {
+  const columns = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <input
+          type="checkbox"
+          checked={table.getIsAllRowsSelected()}
+          onChange={table.getToggleAllRowsSelectedHandler()}
+          className="w-3 h-3 cursor-pointer"
+        />
+      ),
+      cell: ({ row }) => (
+        <input
+          type="checkbox"
+          checked={row.getIsSelected()}
+          onChange={row.getToggleSelectedHandler()}
+          className="w-3 h-3 cursor-pointer"
+        />
+      ),
     },
-      {accessorKey:"habitTracker",header:"Add Habit Tracker",cell:({row})=>( <HabitStartButton  clientId={row.original._id}/>)},
+    { accessorKey: "name", header: "Client Name" },
+    { accessorKey: "duration", header: "Duration" },
+    { accessorKey: "programStartDate", header: "Start Date" },
+    { accessorKey: "programEndDate", header: "End Date" },
+    {
+      accessorKey: "status",
+      header: "Status",
+      cell: ({ row }) => {
+        const status = row.original.status;
+        const colorClass =
+          statusColors[status] || "bg-gray-200 text-gray-700";
 
-  { id: "actions", header:"Action", cell: () => "⋯" },
-];
+        return (
+          <span className={`px-2 py-1 text-[11px] rounded-xl ${colorClass}`}>
+            {status}
+          </span>
+        );
+      },
+    },
+  ];
+
+   if (role === "therapist") {
+    columns.push({
+      accessorKey: "habitTracker",
+      header: "Habit Plan",
+      cell: ({ row }) => {
+        const client = row.original;
+
+        const hasPlan =
+          !!client.habitPlan ||
+          (Array.isArray(client.habits) && client.habits.length > 0);
+
+        if (hasPlan) {
+          return (
+            <button
+              onClick={() =>
+                navigate(`/therapist/habits/edit/${client._id}`)
+              }
+              className="px-3 py-1 text-[11px] rounded-full bg-blue-100 text-blue-700"
+            >
+              View / Edit Plan
+            </button>
+          );
+        }
+
+        return <HabitStartButton clientId={client._id} />;
+      },
+    });
+  }
+
+  columns.push({
+    id: "actions",
+    header: "Action",
+    cell: () => "⋯",
+  });
+
+  return columns;
+};

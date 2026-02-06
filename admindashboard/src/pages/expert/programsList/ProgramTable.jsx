@@ -40,7 +40,7 @@ export default function ProgramTable() {
   };
 
   return (
-    <div>
+    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         columns={ProgramListColumns}
         data={filteredPrograms}

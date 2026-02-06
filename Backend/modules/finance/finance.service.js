@@ -35,7 +35,10 @@ export const allEmployees = async (page, limit) => {
     })),
   ];
 
+  page = Number(page);
+  limit = Number(limit);
   const skip = (page - 1) * limit;
+  
   const employees = unifiedData.slice(skip, skip + limit);
   const totalSalary = unifiedData.reduce(
     (sum, emp) => sum + Number(emp.netSalary),

@@ -444,7 +444,7 @@ const TherapyForm = () => {
           <div className="flex items-center justify-between w-full text-[12px] font-semibold">
             <button className="text-[#011412]">Save as Draft</button>
             <div className="flex gap-2">
-              <button className="bg-[#EBF3F2] rounded-md p-2 min-w-[80px]">
+              <button className="bg-[#EBF3F2] rounded-md p-2 min-w-20">
                 Cancel
               </button>
               <button

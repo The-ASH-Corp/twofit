@@ -7,6 +7,7 @@ import {
 const initialState = {
   plans: [],        // all therapy plans (for dropdown, listing)
   plan: null,       // single therapy plan (for client dashboard)
+  plansCount: 0,
   loading: false,
   error: null,
 };
@@ -24,12 +25,13 @@ const therapySlice = createSlice({
 
       
       .addCase(fetchTherapyPlans.pending, (state) => {
-        state.loading = true;
+        state.loading = "loading";
         state.error = null;
       })
       .addCase(fetchTherapyPlans.fulfilled, (state, action) => {
-        state.loading = false;
-        state.plans = action.payload?.data || [];
+        state.loading = null;
+        state.plans = action.payload?.data?.therapy || [];
+        state.plansCount = action.payload?.data.totalTherapy;
       })
       .addCase(fetchTherapyPlans.rejected, (state, action) => {
         state.loading = false;

@@ -14,8 +14,8 @@ export const createNewPlan = createAsyncThunk("therapy/createNewPlan", async (pl
 
 
 export const getTherapyPlanById = createAsyncThunk("therapy/getPlanById", async (planId, { rejectWithValue }) => {
-    try {
-        const data = await axiosInstance.get(`/therapy/plan/${planId}`, { rejectWithValue })
+    try {        
+        const data = await axiosInstance.get(`/therapy/plan/${planId}`)        
         return data.data
     } catch (error) {
         
@@ -46,11 +46,9 @@ export const uploadPlanMedia = createAsyncThunk(
 
 export const fetchTherapyPlans = createAsyncThunk(
   "therapy/fetchPlans",
-  async (_, { rejectWithValue }) => {
+  async ({page, limit}, { rejectWithValue }) => {
     try {
-      const data = await axiosInstance.get(
-        "/therapy"
-      );
+      const data = await axiosInstance.get(`/therapy/${page}/${limit}`);
       return data;
     } catch (error) {
       return rejectWithValue(

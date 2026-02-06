@@ -15,6 +15,7 @@ import payrollReducer from "../features/payroll/payroll.slice"
 import founderReducer from "../features/founder/founder.slice"
 import financeReducer from "../features/finance/finance.slice"
 import taskReducer from "../features/tasks/task.slice";
+import habitReducer from "../features/habit/habit.slice"
 
 export default combineReducers({
   auth: authReducer,
@@ -31,4 +32,5 @@ export default combineReducers({
   founder: founderReducer,
   finance: financeReducer,
   tasks: taskReducer,
+  habit:habitReducer
 });

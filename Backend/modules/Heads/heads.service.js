@@ -4,19 +4,24 @@ import { AdminModel } from "../admin/admin.model.js";
 import ProgramModel from "../allPrograms/allPrograma.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import { HeadsModel } from "./heads.modal.js";
+import TaskSubmission from "../taskSubmission/taskSubmission.model.js";
+import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
+import { sendEmail } from "../../utils/email.js";
 
 export const createHead = async (head) => {
   let hashedPassword;
+  let plainPassword;
 
   if (head.password) {
+    plainPassword = head.password;
     hashedPassword = await hashPassword(head.password);
   } else {
-    const newPassword = generatePassword();
-    console.log("Generated Password for head:", newPassword);
-    hashedPassword = await hashPassword(newPassword);
+    plainPassword = generatePassword();
+    console.log("Generated Password for head:", plainPassword);
+    hashedPassword = await hashPassword(plainPassword);
   }
 
-  return await HeadsModel.create({
+  const newHead = await HeadsModel.create({
     name: head.name,
     dob: head.dob,
     gender: head.gender,
@@ -31,6 +36,54 @@ export const createHead = async (head) => {
     programCategory: head.programCategory,
     salary: head.salary,
   });
+
+  await sendEmail({
+    to: head.email,
+    subject: "Welcome to TwoFit - Your Login Credentials",
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #0A4F48; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+          .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+          .credentials-box { background-color: white; border-left: 5px solid #0A4F48; padding: 20px; margin: 20px 0; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+          .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Welcome to TwoFit!</h1>
+          </div>
+          <div class="content">
+            <p>Hello <strong>\${head.name}</strong>,</p>
+            <p>Your Head account has been successfully created. Here are your login credentials:</p>
+            
+            <div class="credentials-box">
+              <p style="margin: 5px 0;"><strong>Email:</strong> \${head.email}</p>
+              <p style="margin: 5px 0;"><strong>Password:</strong> \${plainPassword}</p>
+            </div>
+            
+            <p>Please log in and change your password immediately for security purposes.</p>
+            
+            <div style="text-align: center; margin-top: 30px;">
+              <a href="https://twofit.com/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
+            </div>
+          </div>
+          <div class="footer">
+            <p>&copy; \${new Date().getFullYear()} TwoFit. All rights reserved.</p>
+            <p>This email was sent to \${head.email}</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `,
+  });
+
+  return newHead;
 };
 
 export const getAllHeads = async (page, limit) => {
@@ -73,7 +126,7 @@ export const updateHead = async (id, data) => {
       const updated = await HeadsModel.findByIdAndUpdate(
         id,
         {
-          name: data.name.trim(),
+          name: capitalizeFirst(data.name.trim()),
           dob: data.dob,
           gender: data.gender,
           email: data.email,
@@ -144,41 +197,166 @@ export const getDashboardData = async (id) => {
   const head = await HeadsModel.find({ _id: id }).populate("programCategory")
   const totalAdmins = await AdminModel.find({ headId: id });
 
-  const totalExperts = await Promise.all(totalAdmins.map(async (admin) => {
-    return await CoachModel.find({ adminId: admin._id });
+  const totalExpertsResults = await Promise.all(totalAdmins.map(async (admin) => {
+    return await CoachModel.find({ adminId: admin._id }).populate("assignedUsers");
   }));
+  const totalExperts = totalExpertsResults.flat();
 
-  const uniqueClients = new Set();
-  totalExperts.flat().forEach(expert => {
+
+  const uniqueClientIds = new Set();
+  totalExperts.forEach(expert => {
     if (expert.assignedUsers && expert.assignedUsers.length > 0) {
-      expert.assignedUsers.forEach(userId => uniqueClients.add(userId.toString()));
+      expert.assignedUsers.forEach(user => uniqueClientIds.add(user._id ? user._id.toString() : user.toString()));
     }
   });
 
-  const totalClients = uniqueClients.size;
+  const clientIds = Array.from(uniqueClientIds);
+  const totalClients = clientIds.length;
+
 
   const totalPrograms = await ProgramModel.countDocuments({ category: head[0].programCategory._id });
 
-  const totalTrainers = await totalExperts.filter(expertArray =>
-    expertArray.some(expert => expert.role == "Trainer")
-  ).reduce((acc, expertArray) => acc + expertArray.filter(expert => expert.role == "Trainer").length, 0);
+  const totalTrainers = totalExperts.filter(expert => expert.role === "Trainer").length;
+  
+  const totalDietitians = totalExperts.filter(expert => expert.role === "Dietician").length;
 
-  const totalDietitians = await totalExperts.filter(expertArray =>
-    expertArray.some(expert => expert.role == "Dietician")
-  ).reduce((acc, expertArray) => acc + expertArray.filter(expert => expert.role == "Dietician").length, 0);
+  const totalTherapists = totalExperts.filter(expert => expert.role === "Therapist").length;
 
-  const totalTherapists = await totalExperts.filter(expertArray =>
-    expertArray.some(expert => expert.role == "Therapist")
-  ).reduce((acc, expertArray) => acc + expertArray.filter(expert => expert.role == "Therapist").length, 0);
+
+  // --- Expert Performance Metrics ---
+
+  // 1. Task Completion Rate
+  // Aggregate submissions for all clients
+  const submissionStats = await TaskSubmission.aggregate([
+    { $match: { userId: { $in: clientIds.map(id => new mongoose.Types.ObjectId(id)) } } },
+    { $unwind: "$dailySubmissions" },
+    { $unwind: "$dailySubmissions.exercises" },
+    {
+      $group: {
+        _id: null,
+        totalTasks: { $sum: 1 },
+        verifiedTasks: {
+            $sum: { $cond: [{ $eq: ["$dailySubmissions.exercises.status", "verified"] }, 1, 0] }
+        }
+      }
+    }
+  ]);
+
+  const taskCompletionRate = submissionStats.length > 0 && submissionStats[0].totalTasks > 0
+    ? Math.round((submissionStats[0].verifiedTasks / submissionStats[0].totalTasks) * 100)
+    : 0;
+
+  // 2. Average Rating
+   let totalRating = 0;
+   let ratingCount = 0;
+   totalExperts.forEach(expert => {
+       if (expert.feedback && expert.feedback.length > 0) {
+           expert.feedback.forEach(f => {
+               if (f.rating) {
+                   totalRating += f.rating;
+                   ratingCount++;
+               }
+           });
+       }
+   });
+   const averageRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : 0;
+
+   // 3. Clients Assigned Rate (% of experts who have clients)
+   const activeExpertsCount = totalExperts.filter(e => e.assignedUsers && e.assignedUsers.length > 0).length;
+   const activeExpertsRate = totalExperts.length > 0 
+    ? Math.round((activeExpertsCount / totalExperts.length) * 100) 
+    : 0;
+
+    // --- Latest Progress Reports ---
+    const latestReports = await TaskSubmission.aggregate([
+        { 
+            $match: { 
+                userId: { $in: clientIds.map(id => new mongoose.Types.ObjectId(id)) },
+                // ensure exercises exist and have been updated/acted upon (optional check)
+                "dailySubmissions.exercises": { $exists: true, $ne: [] }
+            } 
+        },
+        { $unwind: "$dailySubmissions" },
+        { $unwind: "$dailySubmissions.exercises" },
+        // Filter out items without timestamp if necessary, or just sort
+        // Assuming 'updatedAt' exists per admin functionality
+        { $sort: { "dailySubmissions.exercises.updatedAt": -1, "dailySubmissions.exercises.status": -1 } }, 
+        { $limit: 10 },
+        {
+           $lookup: {
+             from: "users",
+             localField: "userId",
+             foreignField: "_id",
+             as: "user"
+           }
+        },
+        { $unwind: "$user" },
+        {
+            $lookup: { from: "coaches", localField: "user.trainer", foreignField: "_id", as: "trainer" }
+        },
+        {
+            $lookup: { from: "coaches", localField: "user.dietition", foreignField: "_id", as: "dietitian" }
+        },
+        {
+             $lookup: { from: "coaches", localField: "user.therapist", foreignField: "_id", as: "therapist" }
+        },
+        {
+            $project: {
+                clientName: "$user.name",
+                taskType: "$dailySubmissions.exercises.taskType",
+                status: "$dailySubmissions.exercises.status",
+                updatedAt: "$dailySubmissions.exercises.updatedAt",
+                trainerName: { $arrayElemAt: ["$trainer.name", 0] },
+                dietitianName: { $arrayElemAt: ["$dietitian.name", 0] },
+                therapistName: { $arrayElemAt: ["$therapist.name", 0] }
+            }
+        }
+    ]);
+
+    // Format for frontend
+    const formattedReports = latestReports.map(report => {
+        let expertName = "N/A";
+        let expertType = "N/A";
+        
+        if (report.taskType === 'Workout') {
+            expertName = report.trainerName;
+            expertType = "Trainer";
+        } else if (report.taskType === 'Meal' || report.taskType === 'Diet') {
+            expertName = report.dietitianName;
+            expertType = "Dietitian";
+        } else if (report.taskType === 'Therapy') {
+            expertName = report.therapistName;
+            expertType = "Therapist";
+        }
+
+        return {
+            name: report.clientName,
+            type: report.taskType === 'Meal' ? 'Diet' : report.taskType,
+            expert: expertType,
+            submittedBy: expertName ? `${expertType} ${expertName.split(' ')[0]}` : "Client",
+            time: report.updatedAt
+        };
+    });
 
   return {
     totalClients,
     totalPrograms,
     totalAdmins: totalAdmins.length,
-    totalExperts: totalExperts.reduce((acc, expert) => acc + expert.length, 0),
+    totalExperts: totalExperts.length,
     totalTrainers,
     totalDietitians,
     totalTherapists,
+    adminPerformance: {
+        programs: totalPrograms,
+        experts: totalExperts.length,
+        clients: totalClients
+    },
+    expertPerformance: {
+        taskCompletion: taskCompletionRate,
+        rating: averageRating,
+        clientsAssigned: activeExpertsRate
+    },
+    latestReports: formattedReports
   };
 };
 

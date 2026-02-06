@@ -7,30 +7,30 @@ import { fetchTherapyPlans } from "@/redux/features/therapy/therapy.thunk";
 
 const TherapyTable = () => {
   const navigate = useNavigate();
-
+  
   const dispatch = useDispatch();
-
+  
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const loadPlans = async () => {
+   const loadPlans = async () => {
       setLoading(true);
       try {
-        const data = await dispatch(fetchTherapyPlans()).unwrap();
-        setPlans(data.data);
+        const data = await dispatch(fetchTherapyPlans({page:1,limit:10})).unwrap();        
+        setPlans(data.data.therapy);
       } catch (error) {
         console.error(error);
       } finally {
         setLoading(false);
       }
     };
-
+    
+  useEffect(() => {
     loadPlans();
   }, [dispatch]);
 
   return (
-    <div className="h-[calc(100vh-120px)] overflow-y-auto  no-scrollbar">
+    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         data={plans}
         columns={therapyColumns}

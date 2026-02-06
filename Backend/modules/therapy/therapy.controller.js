@@ -1,4 +1,4 @@
-import * as therapyService from './therapy.service.js'; ;
+import * as therapyService from './therapy.service.js';
 
 export const createTherapyController = async (req, res) => {
   try {
@@ -16,7 +16,8 @@ export const createTherapyController = async (req, res) => {
 
 export const getAllTherapyController = async (req, res) => {
   try {
-    const therapy = await therapyService.getAllTherapy();
+    const {page, limit} = req.params
+    const therapy = await therapyService.getAllTherapy(page, limit);
     if (!therapy) {
       return res.status(404).json({ message: "Therapy not found" });
     }
@@ -44,7 +45,7 @@ export const getATherapyController = async (req, res) => {
       return res.status(404).json({ message: "Therapy not found" });
     }
     res.status(200).json({ success: true, data: therapy });
-  } catch (error) {
+  } catch (error) {    
     res.status(500).json({ success: false, message: error.message });
   }
 };

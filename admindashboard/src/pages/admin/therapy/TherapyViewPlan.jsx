@@ -7,21 +7,21 @@ import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
 export default function TherapyViewPlan() {
   
   const dispatch = useDispatch();
-
   const { id } = useParams();
- 
+  
   const [weeks, setWeeks] = useState([]);
   const [programDetails, setProgramDetails] = useState(null);
-
+  
   const fetchPlanById = async () => {
     try {
       const res = await dispatch(getTherapyPlanById(id));
-      if (!res.payload) return;
-
+      
+      if (!res.payload || !res.payload.weeks) return;
+      
       const plan = res.payload;
-
+      
       const allMedia = new Map();
-
+      
       plan.weeks?.forEach((week) => {
         week.days?.forEach((day) => {
           day.therapies?.forEach((th) => {
@@ -37,7 +37,7 @@ export default function TherapyViewPlan() {
           });
         });
       });
-
+      
       setProgramDetails({
         name: plan.name,
         planMedia: Array.from(allMedia.values()),

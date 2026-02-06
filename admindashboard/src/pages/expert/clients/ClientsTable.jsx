@@ -1,17 +1,22 @@
 import React, { useEffect, useState } from "react";
 import BaseTable from "../../../components/table/BaseTable";
-import { ClientColumns } from "./ClientColumns";
+import { getClientColumns } from "./ClientColumns";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import {
   selectClientStatus,
   selectClientError,
+  selectClientsWithHabitPlan,
 } from "@/redux/features/client/client.selectors";
 import { useNavigate } from "react-router-dom";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { selectAssignedClients, selectTotalClientsCount } from "@/redux/features/coach/coach.selector";
+import {
+  selectAssignedClients,
+  selectTotalClientsCount,
+} from "@/redux/features/coach/coach.selector";
 import { getUsersAssignedToACoach } from "@/redux/features/coach/coach.thunk";
-
+import { getClientsWithHabitPlanThunk } from "@/redux/features/client/client.thunk";
+ 
 export default function ClientsTable() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -25,7 +30,29 @@ export default function ClientsTable() {
     }
   }, [dispatch, coachId, page, limit]);
 
-  const clients = useAppSelector(selectAssignedClients);
+  
+
+ const assignedClients = useAppSelector(selectAssignedClients) || [];
+const habitClients = useAppSelector(selectClientsWithHabitPlan) || [];
+useEffect(() => {
+  dispatch(getClientsWithHabitPlanThunk());
+}, [dispatch]);
+
+
+  console.log("Assigned Clients:", assignedClients);
+  console.log("Habit Clients:", habitClients);
+const mergedClients = assignedClients.map((client) => {
+  const habitInfo = habitClients?.find(
+    (h) => h._id === client._id
+  );
+
+  return {
+    ...client,
+    hasHabitPlan: habitInfo?.hasHabitPlan ?? false,
+    habitId: habitInfo?.habitId ?? null,
+  };
+});
+  console.log("Merged Clients:", mergedClients);
   const clientTotalCount = useAppSelector(selectTotalClientsCount);
   const status = useAppSelector(selectClientStatus);
   const error = useAppSelector(selectClientError);
@@ -44,17 +71,23 @@ export default function ClientsTable() {
   const profilePath = (id) => {
     navigate(`/expert/clients/profile/${id}`);
   };
+  const role = coachId?.role?.toLowerCase();
+
+  const columns = getClientColumns(role, navigate);
+
   return (
-    <BaseTable
-      columns={ClientColumns}
-      data={clients}
-      pageLabel="My Clients"
-      profilePath={profilePath}
-      handlePageChange={handlePageChange}
-      handleLimitChange={handleLimitChange}
-      page={page}
-      limit={limit}
-      totalCount={clientTotalCount}
-    />
+    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
+      <BaseTable
+        columns={columns}
+        data={mergedClients}
+        pageLabel="My Clients"
+        profilePath={profilePath}
+        handlePageChange={handlePageChange}
+        handleLimitChange={handleLimitChange}
+        page={page}
+        limit={limit}
+        totalCount={clientTotalCount}
+      />
+    </div>
   );
 }

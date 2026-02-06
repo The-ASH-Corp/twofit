@@ -95,6 +95,7 @@ import ClientProgress from "./pages/client/progress/Progress";
 import DailyPlan from "./pages/client/dailyPlan/DailyPlan";
 import ClientChat from "./pages/client/chats/Chats";
 import Habit from "./pages/expert/habit/Habit";
+import HabitTracker from "./pages/client/habit/HabitTracker";
 
 
 function App() {
@@ -205,7 +206,7 @@ function App() {
           />
           <Route path="admins/profile/:id" element={<HeadAdminProfile />} />
           <Route
-            path="clients/profile/:clientId"
+            path="clients/profile/:Id"
             element={<HeadClientProfile />}
           />
           <Route path="programs" element={<HeadProgramTable />} />
@@ -263,6 +264,7 @@ function App() {
           <Route path="programs/viewPlan" element={<ExpertPlanDetails />} />
           <Route path="profile" element={<Profile />} />
           <Route path="finance" element={<ExpertFinance />} />
+         
           <Route path="therapy" element={<ExpertTherapyList/>}/>
           <Route path="therapy/plan/:id" element={<ExpertTherapyPlanDetails/>}/>
           {/* <Route path="habit" element={<Habit/>}/> */}
@@ -286,6 +288,7 @@ function App() {
           <Route path="progress" element={<ClientProgress />} />
           <Route path="profile" element={<Profile />} />
           <Route path="daily-plan" element={<DailyPlan />} />
+          <Route path="habit-tracker" element={<HabitTracker />} />
           <Route path="chats" element={<ClientChat />} />
         </Route>
 

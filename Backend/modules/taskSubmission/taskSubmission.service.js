@@ -430,6 +430,71 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
     return { success: true, message: "All workout tasks submitted successfully" };
 };
 
+
+
+export const getAllUserTaskSubmissions = async (expertId, userRole, targetUserId) => {
+    // We are fetching ALL tasks for the user, regardless of the requester's role.
+    // Filtering will be handled on the frontend if necessary.
+    
+    const matchQuery = {
+         userId: new mongoose.Types.ObjectId(targetUserId)
+    };
+
+    const submissions = await TaskSubmission.aggregate([
+        { $match: matchQuery },
+        { $unwind: "$dailySubmissions" },
+        { $unwind: "$dailySubmissions.exercises" },
+        // Removed taskType filter match stage
+        {
+            $lookup: {
+                from: "users",
+                localField: "userId",
+                foreignField: "_id",
+                as: "userDetails"
+            }
+        },
+        { $unwind: "$userDetails" },
+        {
+            $lookup: {
+                from: "programslists",
+                localField: "programId",
+                foreignField: "_id",
+                as: "programDetails"
+            }
+        },
+        { $unwind: { path: "$programDetails", preserveNullAndEmptyArrays: true } },
+        {
+            $project: {
+                _id: "$dailySubmissions.exercises._id",
+                parentSubmissionId: "$_id",
+                userId: {
+                    _id: "$userDetails._id",
+                    name: "$userDetails.name",
+                    email: "$userDetails.email",
+                    profileImage: "$userDetails.profileImage"
+                },
+                programId: {
+                    _id: "$programDetails._id",
+                    title: "$programDetails.title"
+                },
+                weekIndex: "$dailySubmissions.weekIndex",
+                dayIndex: "$dailySubmissions.dayIndex",
+                globalDayIndex: "$dailySubmissions.globalDayIndex",
+                exerciseIndex: "$dailySubmissions.exercises.exerciseIndex",
+                status: "$dailySubmissions.exercises.status",
+                taskType: "$dailySubmissions.exercises.taskType",
+                file: "$dailySubmissions.exercises.file",
+                notes: "$dailySubmissions.exercises.notes",
+                createdAt: "$dailySubmissions.exercises.createdAt",
+                adminComment: "$dailySubmissions.exercises.adminComment"
+            }
+        },
+        { $sort: { createdAt: -1 } }
+    ]);
+
+    return submissions;
+};
+
 export const getPendingTaskSubmissions = async (expertId, userRole) => {
     const lowerRole = userRole.toLowerCase();
 
