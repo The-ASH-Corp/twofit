@@ -29,7 +29,6 @@ export default function FinanceTable() {
   const [employees, setEmployees] = useState([]);
 
   useEffect(() => {
-    console.log(data)
     setEmployees(data);
   }, [data]);
 
