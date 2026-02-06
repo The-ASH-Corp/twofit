@@ -19,18 +19,18 @@ import { authMiddleware } from "../../middleware/authMiddleware.js";
 
 const router = express.Router()
 
-router.get("/all-clients/:page/:limit", getAllClients)
-router.get("/founder/list/:page/:limit", getFounderClientList);
-router.get("/all-clients/:page/:limit", getAllClients);
-router.get("/get-client/:id", getSingleClient)
-router.post("/update-client/:id", updateClient)
-router.delete("/delete-client/:id", deleteClient)
+router.get("/all-clients/:page/:limit", authMiddleware, getAllClients)
+router.get("/founder/list/:page/:limit", authMiddleware, getFounderClientList);
+router.get("/all-clients/:page/:limit", authMiddleware, getAllClients);
+router.get("/get-client/:id", authMiddleware, getSingleClient)
+router.post("/update-client/:id", authMiddleware, updateClient)
+router.delete("/delete-client/:id", authMiddleware, deleteClient)
 
-router.post("/get-all-users-based-on-coach-for-admin", getClientsBasedOnCoach)
+router.post("/get-all-users-based-on-coach-for-admin", authMiddleware, getClientsBasedOnCoach)
 
-router.put("/:userId/weight", updateWeight);
-router.put("/:userId/measurements", updateMeasurements);
-router.get("/get-all-feedbacks/:userId", getAllFeedbacks)
+router.put("/:userId/weight", authMiddleware, updateWeight);
+router.put("/:userId/measurements", authMiddleware, updateMeasurements);
+router.get("/get-all-feedbacks/:userId", authMiddleware, getAllFeedbacks)
 router.get("/weight-history",authMiddleware, getWeightHistoryOnly);
 router.get("/measurement-history",authMiddleware, getMeasurementHistoryOnly);
 router.get("/compliance-stats",authMiddleware, getComplianceStats);

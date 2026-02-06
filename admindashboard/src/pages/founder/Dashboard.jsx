@@ -372,25 +372,25 @@ const Dashboard = () => {
             {[
               {
                 label: "Total Clients",
-                value: founder?.data?.totalClient,
+                value: founder?.data?.totalClient || 0,
                 icon: <Users size={20} className="text-[#0A4F48]" />,
                 bg: "bg-[#EBF3F2]",
               },
               {
                 label: "Headers",
-                value: founder?.data?.totalHeads,
+                value: founder?.data?.totalHeads || 0,
                 icon: <UserCheck size={20} className="text-[#DAA520]" />,
                 bg: "bg-[#FAF3E0]",
               },
               {
                 label: "Sub Admins",
-                value: founder?.data?.totalAdmins,
+                value: founder?.data?.totalAdmins || 0,
                 icon: <FileText size={20} className="text-[#0A4F48]" />,
                 bg: "bg-[#EBF3F2]",
               },
               {
                 label: "Total Programs",
-                value: founder?.data?.totalPrograms,
+                value: founder?.data?.totalPrograms || 0,
                 icon: <Layout size={20} className="text-[#DAA520]" />,
                 bg: "bg-[#FAF3E0]",
               },
@@ -424,7 +424,13 @@ const Dashboard = () => {
                 <LegendItem color="#0A4F48" label="New" />
               </div>
               <div className="h-64 relative">
-                <Bar data={growthData} options={growthOptions} />
+                {growthData?.labels?.length > 0 ? (
+                  <Bar data={growthData} options={growthOptions} />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                    No data available
+                  </div>
+                )}
               </div>
             </DashboardCard>
 
@@ -441,7 +447,13 @@ const Dashboard = () => {
                 <LegendItem color="#0A4F48" label="Therapy" />
               </div>
               <div className="h-64">
-                <Bar data={complianceData} options={stackedOptions} />
+                {complianceData?.labels?.length > 0 ? (
+                  <Bar data={complianceData} options={stackedOptions} />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                    No data available
+                  </div>
+                )}
               </div>
             </DashboardCard>
           </div>
@@ -569,41 +581,55 @@ const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                   {progressReports.map((report, i) => (
-                    <tr key={i} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-[#0A4F48]">
-                        {report.name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#011412]">
-                        {report.type}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <span
-                          className={`px-3 py-1 rounded-md text-[10px] font-bold ${
-                            report.expert === "Dietitian"
-                              ? "bg-[#FAF3E0] text-[#DAA520]"
-                              : report.expert === "Trainer"
-                              ? "bg-[#EBF3F2] text-[#0A4F48]"
-                              : "bg-[#F0FDF4] text-[#15803D]"
-                          }`}
-                        >
-                          {report.expert}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#011412]">
-                        {report.submittedBy}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#66706D]">
-                        {report.time}
-                      </td>
-                      {/* <td className="px-6 py-4 text-sm text-[#66706D]">
+                  {progressReports.length > 0 ? (
+                    progressReports.map((report, i) => (
+                      <tr
+                        key={i}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-6 py-4 text-sm font-medium text-[#0A4F48]">
+                          {report.name}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#011412]">
+                          {report.type}
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          <span
+                            className={`px-3 py-1 rounded-md text-[10px] font-bold ${
+                              report.expert === "Dietitian"
+                                ? "bg-[#FAF3E0] text-[#DAA520]"
+                                : report.expert === "Trainer"
+                                ? "bg-[#EBF3F2] text-[#0A4F48]"
+                                : "bg-[#F0FDF4] text-[#15803D]"
+                            }`}
+                          >
+                            {report.expert}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#011412]">
+                          {report.submittedBy}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#66706D]">
+                          {report.time}
+                        </td>
+                        {/* <td className="px-6 py-4 text-sm text-[#66706D]">
                         <MoreHorizontal
                           size={18}
                           className="cursor-pointer hover:text-gray-900"
                         />
                       </td> */}
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        className="px-6 py-4 text-center text-sm text-[#66706D]"
+                      >
+                         No progress reports found.
+                      </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -632,7 +658,7 @@ const Dashboard = () => {
                   Total Experts
                 </span>
                 <span className="text-3xl font-bold text-[#0A4F48]">
-                  {founder?.data?.totalExperts}
+                  {founder?.data?.totalExperts || 0}
                 </span>
               </div>
             </div>
@@ -640,17 +666,17 @@ const Dashboard = () => {
               {[
                 {
                   label: "Trainers",
-                  count: founder?.data?.Trainers,
+                  count: founder?.data?.Trainers || 0,
                   color: "bg-[#0A4F48]",
                 },
                 {
                   label: "Dietitians",
-                  count: founder?.data?.Dietitians,
+                  count: founder?.data?.Dietitians || 0,
                   color: "bg-[#EBF3F2]",
                 },
                 {
                   label: "Therapists",
-                  count: founder?.data?.Therapists,
+                  count: founder?.data?.Therapists || 0,
                   color: "bg-[#FFD7A8]",
                 },
               ].map((item, i) => (

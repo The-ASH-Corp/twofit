@@ -35,6 +35,13 @@ export const authMiddleware = async (req, res, next) => {
         const refreshedDecoded = await refreshAccessToken(req, res);
         if (!refreshedDecoded) {
           console.log("Refresh failed - no refresh token or invalid");
+          
+          res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+          });
+
           return res.status(401).json({ message: "Token expired and refresh failed" });
         }
         console.log("Token refreshed successfully for user:", refreshedDecoded.id);

@@ -4,6 +4,18 @@ import Plan from "../plan/plan.model.js";
 import mongoose from "mongoose";
 import { getIO } from "../../utils/socket.js";
 
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+const toUtcDateOnly = (dateLike) => {
+    const d = new Date(dateLike);
+    if (isNaN(d.getTime())) return null;
+    return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+};
+
+const addDaysUtc = (date, days) => new Date(date.getTime() + days * MS_PER_DAY);
+
+const formatDateYYYYMMDD = (date) => date.toISOString().split("T")[0];
+
 // Helper to calculate unlock date (Strict Next Midnight Rule)
 export const calculateUnlockDate = (completionDate) => {
     const date = new Date(completionDate);
@@ -15,6 +27,57 @@ export const calculateUnlockDate = (completionDate) => {
     unlockDate.setHours(0, 0, 0, 0); // Midnight
 
     return unlockDate;
+};
+
+// Sync missed (no-submission) days and extend program end date
+export const syncMissedDaysForUser = async (userId) => {
+    const user = await User.findById(userId).select(
+        "programStartDate programEndDate lastTaskSubmissionDate lastMissedSyncDate"
+    );
+
+    if (!user) return { missedDaysApplied: 0 };
+
+    const todayUtc = toUtcDateOnly(new Date());
+    if (!todayUtc) return { missedDaysApplied: 0 };
+
+    const startDateUtc = toUtcDateOnly(user.programStartDate);
+    if (!startDateUtc) return { missedDaysApplied: 0 };
+
+    let baseDateUtc;
+    if (user.lastTaskSubmissionDate) {
+        baseDateUtc = toUtcDateOnly(user.lastTaskSubmissionDate);
+    } else {
+        // No submissions yet: count from program start date
+        baseDateUtc = addDaysUtc(startDateUtc, -1);
+    }
+
+    if (!baseDateUtc) return { missedDaysApplied: 0 };
+
+    if (user.lastMissedSyncDate) {
+        const lastSyncUtc = toUtcDateOnly(user.lastMissedSyncDate);
+        if (lastSyncUtc && lastSyncUtc > baseDateUtc) {
+            baseDateUtc = lastSyncUtc;
+        }
+    }
+
+    const diffDays = Math.floor((todayUtc.getTime() - baseDateUtc.getTime()) / MS_PER_DAY);
+    // Exclude today (a day counts as "not logged in" only after it fully passes)
+    const missedDays = Math.max(diffDays - 1, 0);
+
+    if (missedDays <= 0) return { missedDaysApplied: 0 };
+
+    const endDateUtc = toUtcDateOnly(user.programEndDate);
+    if (!endDateUtc) return { missedDaysApplied: 0 };
+
+    const newEndDateUtc = addDaysUtc(endDateUtc, missedDays);
+    user.programEndDate = formatDateYYYYMMDD(newEndDateUtc);
+
+    // Mark missed days processed up to yesterday
+    user.lastMissedSyncDate = addDaysUtc(todayUtc, -1);
+
+    await user.save();
+
+    return { missedDaysApplied: missedDays, newProgramEndDate: user.programEndDate };
 };
 
 // Helper to determine if we should advance the user's day
@@ -314,6 +377,9 @@ export const createTaskSubmission = async (submissionData) => {
         await userSubmission.save();
     }
 
+    // Update last task submission date for inactivity tracking
+    await User.findByIdAndUpdate(userId, { $set: { lastTaskSubmissionDate: new Date() } }).exec();
+
     // Check if we can complete the day (regardless of status: skipped, verified, or pending)
     await checkAndAdvanceDay(userId, gIndex);
 
@@ -420,6 +486,9 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
         }
         await userSubmission.save();
     }
+
+    // Update last task submission date for inactivity tracking
+    await User.findByIdAndUpdate(userId, { $set: { lastTaskSubmissionDate: new Date() } }).exec();
 
     // Notify Experts and Admins via Socket
     await notifyExpertsAndAdmins(userId, userSubmission._id, "new_task_submission");

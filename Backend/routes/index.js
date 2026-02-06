@@ -13,6 +13,7 @@ import planRoutes from "../modules/plan/plan.route.js"
 import founderRoutes from "../modules/founder/founder.routes.js"
 import financeRoutes from "../modules/finance/finance.route.js"
 import taskSubmissionRoutes from "../modules/taskSubmission/taskSubmission.routes.js";
+import broadcastRoutes from "../modules/broadcast/broadcast.routes.js"
 import habitRoutes from "../modules/habit/habit.routes.js"
 
 const router = express.Router();
@@ -31,6 +32,7 @@ router.use("/plans", planRoutes)
 router.use("/founder", founderRoutes)
 router.use("/finance", financeRoutes)
 router.use("/tasks", taskSubmissionRoutes);
+router.use("/broadcast", broadcastRoutes);
 router.use("/habits",habitRoutes)
 
 

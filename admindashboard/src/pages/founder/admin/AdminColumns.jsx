@@ -65,5 +65,5 @@ export const AdminColumns = [
       );
     },
   },
-  { id: "actions", header: "Action", cell: () => "⋯" },
+  // { id: "actions", header: "Action", cell: () => "⋯" },
 ];

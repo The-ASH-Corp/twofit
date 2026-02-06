@@ -1,4 +1,4 @@
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
@@ -101,6 +101,10 @@ const userSchema = new mongoose.Schema(
     currentGlobalDay: { type: Number, default: 1 },
 
     lastDayCompletionTime: { type: Date },
+
+    lastTaskSubmissionDate: { type: Date },
+
+    lastMissedSyncDate: { type: Date },
 
   },
   { timestamps: true }

@@ -117,23 +117,23 @@ export const createCoach = async (coach) => {
             <h1>Welcome to TwoFit!</h1>
           </div>
           <div class="content">
-            <p>Hello <strong>\${coach.fullname}</strong>,</p>
+            <p>Hello <strong>${coach.fullname}</strong>,</p>
             <p>Your Expert account has been successfully created. Here are your login credentials:</p>
             
             <div class="credentials-box">
-              <p style="margin: 5px 0;"><strong>Email:</strong> \${coach.email}</p>
-              <p style="margin: 5px 0;"><strong>Password:</strong> \${plainPassword}</p>
+              <p style="margin: 5px 0;"><strong>Email:</strong> ${coach.email}</p>
+              <p style="margin: 5px 0;"><strong>Password:</strong> ${plainPassword}</p>
             </div>
             
             <p>Please log in and change your password immediately for security purposes.</p>
             
             <div style="text-align: center; margin-top: 30px;">
-              <a href="https://twofit.com/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
+              <a href="http://localhost:5173/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
             </div>
           </div>
           <div class="footer">
-            <p>&copy; \${new Date().getFullYear()} TwoFit. All rights reserved.</p>
-            <p>This email was sent to \${coach.email}</p>
+            <p>&copy; ${new Date().getFullYear()} TwoFit. All rights reserved.</p>
+            <p>This email was sent to ${coach.email}</p>
           </div>
         </div>
       </body>

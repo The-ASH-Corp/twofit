@@ -75,15 +75,15 @@ export default function Dashboard() {
     ],
   };
 
-  const adminPerf = dashboardData?.adminPerformance || {
-    programs: 0,
-    experts: 0,
-    clients: 0,
+  const adminPerf = {
+    programs: dashboardData?.adminPerformance?.programs || 0,
+    experts: dashboardData?.adminPerformance?.experts || 0,
+    clients: dashboardData?.adminPerformance?.clients || 0,
   };
-  const expertPerf = dashboardData?.expertPerformance || {
-    taskCompletion: 0,
-    rating: 0,
-    clientsAssigned: 0,
+  const expertPerf = {
+    taskCompletion: dashboardData?.expertPerformance?.taskCompletion || 0,
+    rating: dashboardData?.expertPerformance?.rating || 0,
+    clientsAssigned: dashboardData?.expertPerformance?.clientsAssigned || 0,
   };
 
   const hasAdminData =
@@ -185,13 +185,13 @@ export default function Dashboard() {
               },
               {
                 label: "Total Programs",
-                value: dashboardData?.totalPrograms,
+                value: dashboardData?.totalPrograms || 0,
                 icon: <BookOpen size={22} className="text-[#0A4F48]" />,
                 bg: "bg-[#FAF3E0]",
               },
               {
                 label: "Admins",
-                value: dashboardData?.totalAdmins,
+                value: dashboardData?.totalAdmins || 0,
                 icon: <UserCircle size={22} className="text-white" />,
                 bg: "bg-[#0A4F48]",
               },
@@ -322,35 +322,49 @@ export default function Dashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
-                  {progressReports.map((report, i) => (
-                    <tr key={i} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 text-sm font-medium text-[#0A4F48]">
-                        {report.name}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#011412]">
-                        {report.type}
-                      </td>
-                      <td className="px-6 py-4 text-sm">
-                        <span
-                          className={`px-3 py-1 rounded-md text-[10px] font-bold ${
-                            report.expert === "Dietitian"
-                              ? "bg-[#FAF3E0] text-[#DAA520]"
-                              : report.expert === "Trainer"
-                              ? "bg-[#EBF3F2] text-[#0A4F48]"
-                              : "bg-[#F0FDF4] text-[#15803D]"
-                          }`}
-                        >
-                          {report.expert}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#011412]">
-                        {report.submittedBy}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-[#66706D]">
-                        {report.time}
+                  {progressReports.length > 0 ? (
+                    progressReports.map((report, i) => (
+                      <tr
+                        key={i}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
+                        <td className="px-6 py-4 text-sm font-medium text-[#0A4F48]">
+                          {report.name}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#011412]">
+                          {report.type}
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          <span
+                            className={`px-3 py-1 rounded-md text-[10px] font-bold ${
+                              report.expert === "Dietitian"
+                                ? "bg-[#FAF3E0] text-[#DAA520]"
+                                : report.expert === "Trainer"
+                                ? "bg-[#EBF3F2] text-[#0A4F48]"
+                                : "bg-[#F0FDF4] text-[#15803D]"
+                            }`}
+                          >
+                            {report.expert}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#011412]">
+                          {report.submittedBy}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-[#66706D]">
+                          {report.time}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="5"
+                        className="px-6 py-8 text-center text-sm text-[#66706D]"
+                      >
+                        No progress reports found matching your criteria
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
@@ -381,7 +395,7 @@ export default function Dashboard() {
                   Total Experts
                 </span>
                 <span className="text-3xl font-bold text-[#0A4F48]">
-                  {dashboardData?.totalExperts}
+                  {dashboardData?.totalExperts || 0}
                 </span>
               </div>
             </div>
@@ -389,17 +403,17 @@ export default function Dashboard() {
               {[
                 {
                   label: "Trainers",
-                  count: dashboardData?.totalTrainers,
+                  count: dashboardData?.totalTrainers || 0,
                   color: "bg-[#0A4F48]",
                 },
                 {
                   label: "Dietitians",
-                  count: dashboardData?.totalDietitians,
+                  count: dashboardData?.totalDietitians || 0,
                   color: "bg-[#EBF3F2]",
                 },
                 {
                   label: "Therapists",
-                  count: dashboardData?.totalTherapists,
+                  count: dashboardData?.totalTherapists || 0,
                   color: "bg-[#FAF3E0]",
                 },
               ].map((item, i) => (

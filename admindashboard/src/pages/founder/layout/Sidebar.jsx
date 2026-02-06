@@ -3,6 +3,8 @@ import { assets } from "../../../assets/asset";
 import { useDispatch } from "react-redux";
 import { logout } from "@/redux/features/auth/auth.thunk";
 import { useState } from "react";
+import { X } from "lucide-react";
+import { LuSend } from "react-icons/lu";
 
 const menuItems = [
   {
@@ -30,11 +32,27 @@ const menuItems = [
   },
   { label: "Therapy", icon: assets.clients, path: "/founder/therapy" },
   { label: "Finance", icon: assets.website, path: "/founder/finance" },
-  // { label: "Therapy", icon: assets.website, path: "/founder/therapy" },
-  // { label: "Workout", icon: assets.website, path: "/founder/workout" },
+  {
+    label: "Broadcast",
+    icon: assets.broadCast,
+    children: [
+      {
+        label: "Templates",
+        path: "/founder/broadcast/template",
+      },
+      {
+        label: "Add New",
+        path: "/founder/broadcast/add-Template",
+      },
+      {
+        label: "Auto Reminders",
+        path: "/founder/broadcast/auto-remainder",
+      },
+    ],
+  },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -47,99 +65,139 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-[225px] bg-white py-6 px-5 flex flex-col h-screen">
-      {/* Logo */}
-      <div className="flex justify-center mb-8">
-        <img src={assets.logo} alt="logo" />
-      </div>
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={onClose}
+        />
+      )}
 
-      {/* Navigation */}
-      <nav className="space-y-2">
-        {menuItems.map((item) => {
-          const isOpen = openMenu === item.label;
+      {/* Sidebar aside */}
+      <aside
+        className={`
+    fixed lg:static inset-y-0 left-0 z-50
+    w-[225px] bg-white py-6 px-5 flex flex-col h-screen
+    transform transition-transform duration-300 ease-in-out
+    ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+    border-r lg:border-none
+  `}
+      >
+        {/* Logo and Mobile Close */}
+        <div className="flex items-center justify-between lg:justify-center mb-8 px-2">
+          <div className="flex justify-center">
+            <img src={assets.logo} alt="logo" className="h-8" />
+          </div>
+          {/* Close button for mobile */}
+          <button
+            onClick={onClose}
+            className="p-1 lg:hidden text-gray-500 hover:bg-gray-100 rounded-lg"
+          >
+            <X size={24} />
+          </button>
+        </div>
 
-          return (
-            <div key={item.label}>
-              {/* Parent Menu */}
-              {item.children ? (
-                <button
-                  onClick={() => setOpenMenu(isOpen ? null : item.label)}
-                  className={`flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-300 text-[#66706D] hover:bg-gray-100
+        {/* Navigation */}
+        <nav className="space-y-2 flex-1 overflow-y-auto no-scrollbar">
+          {menuItems.map((item) => {
+            const isOpen = openMenu === item.label;
+
+            return (
+              <div key={item.label}>
+                {/* Parent Menu */}
+                {item.children ? (
+                  <button
+                    onClick={() => setOpenMenu(isOpen ? null : item.label)}
+                    className={`flex items-center justify-between w-full px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-300 text-[#66706D] hover:bg-gray-100
                     ${isOpen && "bg-gray-100"}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <img src={item.icon} className="w-5 h-5" />
-                    {item.label}
-                  </div>
+                  >
+                    <div className="flex items-center gap-3">
+                      <img src={item.icon} className="w-5 h-5" />
+                      {item.label}
+                    </div>
 
-                  <img
-                    src={assets.downVector}
-                    className={`w-3 transition-transform duration-300 ${
-                      !isOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
-              ) : (
-                <NavLink
-                  to={item.path}
-                  end={item.path === "/founder"}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 w-full px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-300 
+                    <img
+                      src={assets.downVector}
+                      className={`w-3 transition-transform duration-300 ${
+                        !isOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
+                ) : (
+                  <NavLink
+                    to={item.path}
+                    end={item.path === "/founder"}
+                    onClick={() => {
+                        if (window.innerWidth < 1024) onClose();
+                      }}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 w-full px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-300 
                     ${
                       isActive
                         ? "bg-[#0A4F48] text-white"
                         : "text-[#66706D] hover:bg-gray-100"
                     }`
-                  }
-                >
-                  <img src={item.icon} className="w-5 h-5" />
-                  {item.label}
-                </NavLink>
-              )}
+                    }
+                  >
+                   {({ isActive }) => (
+                    <>
+                    <img src={item.icon} className={`w-5 h-5 object-contain transition-all ${
+                      isActive ? "brightness-0 invert" : ""
+                    }`} />
+                    {item.label}
+                    </>
+                    )}
+                  </NavLink>
+                )}
 
-              {/* Children Menu with Transition */}
-              {item.children && (
-                <div
-                  className={`ml-6 pl-2 border-l border-l-[#DBDEDD] overflow-hidden transition-all duration-400 ease-in-out
+                {/* Children Menu with Transition */}
+                {item.children && (
+                  <div
+                    className={`ml-6 pl-2 border-l border-l-[#DBDEDD] overflow-hidden transition-all duration-400 ease-in-out
                     ${
-                      isOpen ? "max-h-40 opacity-100 mt-2" : "max-h-0 opacity-0"
+                      isOpen
+                        ? "max-h-40 opacity-100 mt-2"
+                        : "max-h-0 opacity-0"
                     }`}
-                >
-                  <div className="flex flex-col gap-2 ">
-                    {item.children.map((child) => (
-                      <NavLink
-                        key={child.label}
-                        to={child.path}
-                        className={({ isActive }) =>
-                          `px-4 py-3 rounded-lg text-sm transition-colors duration-200 text-[14px] font-semibold
+                  >
+                    <div className="flex flex-col gap-2 ">
+                      {item.children.map((child) => (
+                        <NavLink
+                          key={child.label}
+                          to={child.path}
+                          onClick={() => {
+                            if (window.innerWidth < 1024) onClose();
+                          }}
+                          className={({ isActive }) =>
+                            `px-4 py-3 rounded-lg text-sm transition-colors duration-200 text-[14px] font-semibold
                           ${
                             isActive
                               ? "bg-[#0A4F48] text-white"
                               : "text-[#66706D] hover:bg-gray-100"
                           }`
-                        }
-                      >
-                        {child.label}
-                      </NavLink>
-                    ))}
+                          }
+                        >
+                          {child.label}
+                        </NavLink>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </nav>
+                )}
+              </div>
+            );
+          })}
+        </nav>
 
-      {/* Logout */}
-      <button
-        onClick={handleLogout}
-        className="flex items-center gap-3 mt-auto px-4 py-3 text-[#66706D] font-medium hover:text-red-500"
-      >
-        <img src={assets.signout} />
-        Logout
-      </button>
-    </aside>
+        {/* Logout */}
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-3 mt-auto px-4 py-3 text-[#66706D] font-medium hover:text-red-500 rounded-xl hover:bg-red-50 transition"
+        >
+          <img src={assets.signout} className="w-5 h-5" />
+          Logout
+        </button>
+      </aside>
+    </>
   );
 }
-
-// ml-6 mt-2 pl-2 flex flex-col gap-2 border-l border-l-[#DBDEDD] 
