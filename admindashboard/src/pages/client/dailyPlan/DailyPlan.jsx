@@ -164,7 +164,8 @@ export default function DailyPlan() {
         // Build the task list for this day
         const taskList = [];
         const isWeightLoss = program?.title?.toLowerCase().includes("weight loss");
-        const mealCount = isWeightLoss ? 5 : 6;
+        const defaultMealCount = isWeightLoss ? 5 : 6;
+        const mealCount = clientUser?.dietPlanMealCount || user?.dietPlanMealCount || defaultMealCount;
 
         const workoutCount = currentPDay.exercises?.length || 0;
         const therapyCount = currentTherapyDay?.therapies?.length || 0;

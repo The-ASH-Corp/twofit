@@ -19,6 +19,7 @@ export default function TaskList({
   therapyPlan,
   programTitle,
   isProgramStarted = true,
+  mealCount,
 }) {
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
@@ -105,7 +106,8 @@ export default function TaskList({
     }) || [];
 
   const isWeightLoss = programTitle?.toLowerCase().includes("weight loss");
-  const numberOfMeals = isWeightLoss ? 5 : 6;
+  const defaultMealCount = isWeightLoss ? 5 : 6;
+  const numberOfMeals = mealCount || defaultMealCount;
   const mealNames = Array.from({ length: numberOfMeals }, (_, i) => `Meal ${i + 1}`);
 
   const mealTasks = mealNames.map(

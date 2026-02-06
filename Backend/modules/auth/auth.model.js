@@ -106,6 +106,10 @@ const userSchema = new mongoose.Schema(
 
     lastMissedSyncDate: { type: Date },
 
+    dietPlanPdf: { type: String },
+
+    dietPlanMealCount: { type: Number, default: 6 },
+
   },
   { timestamps: true }
 );
