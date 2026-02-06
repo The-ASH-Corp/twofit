@@ -69,6 +69,31 @@ export const updateClient = async (req, res) => {
   }
 }
 
+export const assignDietPlan = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { mealCount } = req.body;
+    let dietPlanPdf = null;
+
+    if (req.file) {
+      dietPlanPdf = `/uploads/${req.file.filename}`;
+    }
+
+    const updatedClient = await service.assignDietPlanService(id, {
+      dietPlanPdf,
+      dietPlanMealCount: mealCount,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Diet plan assigned successfully",
+      data: updatedClient,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
 export const deleteClient = async (req, res) => {
   try {
     const { id } = req.params

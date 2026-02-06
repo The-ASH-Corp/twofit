@@ -125,9 +125,8 @@ export default function Dashboard() {
           <div className="lg:hidden">
             <DietPlanCard
               isProgramStarted={isProgramStarted}
-              startDate={
-                clientUser?.programStartDate || user?.programStartDate
-              }
+              startDate={clientUser?.programStartDate || user?.programStartDate}
+              dietPlanPdf={clientUser?.dietPlanPdf || user?.dietPlanPdf}
             />
           </div>
 
@@ -163,6 +162,7 @@ export default function Dashboard() {
               therapyPlan={clientUser?.therapyType}
               programTitle={program?.title}
               isProgramStarted={isProgramStarted}
+              mealCount={clientUser?.dietPlanMealCount || user?.dietPlanMealCount}
             />
           </div>
 
@@ -177,6 +177,7 @@ export default function Dashboard() {
           <DietPlanCard
             isProgramStarted={isProgramStarted}
             startDate={clientUser?.programStartDate || user?.programStartDate}
+            dietPlanPdf={clientUser?.dietPlanPdf || user?.dietPlanPdf}
           />
           <ExpertsList expert={coaches} />
           <Measeurement />

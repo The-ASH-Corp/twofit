@@ -100,6 +100,25 @@ export const updateWeightService = async (userId, currentWeight) => {
   return user;
 };
 
+export const assignDietPlanService = async (userId, dietPlanData) => {
+  const user = await User.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        dietPlanPdf: dietPlanData.dietPlanPdf,
+        dietPlanMealCount: dietPlanData.dietPlanMealCount,
+      },
+    },
+    { new: true },
+  );
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+};
+
 export const updateMeasurementsService = async (
   userId,
   { chest, waist, hip },

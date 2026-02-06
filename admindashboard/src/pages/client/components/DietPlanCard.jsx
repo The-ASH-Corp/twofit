@@ -1,7 +1,11 @@
 import React from "react";
 import { assets } from "@/assets/asset";
 
-export default function DietPlanCard({ isProgramStarted = true, startDate }) {
+export default function DietPlanCard({
+  isProgramStarted = true,
+  startDate,
+  dietPlanPdf,
+}) {
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -10,6 +14,13 @@ export default function DietPlanCard({ isProgramStarted = true, startDate }) {
       day: "numeric",
       year: "numeric",
     });
+  };
+
+  const handleViewPdf = () => {
+    if (dietPlanPdf) {
+      const fullUrl = `${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}${dietPlanPdf}`;
+      window.open(fullUrl, "_blank");
+    }
   };
 
   return (
@@ -29,24 +40,31 @@ export default function DietPlanCard({ isProgramStarted = true, startDate }) {
             Your daily plan will appear here once the program begins.
           </p>
         </div>
-      ) : (
+      ) : dietPlanPdf ? (
         <div className="flex items-center justify-between bg-[#FDF8F3] p-4 rounded-[20px] border border-[#FBEAD9]/50">
           <div className="flex items-center gap-4">
             <div className="w-11 h-11 bg-[#FBEAD9] flex items-center justify-center rounded-xl shadow-sm">
               <img src={assets.pdfVector} alt="pdf" className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[14px] font-bold text-gray-800 leading-none mb-1.5">
-                Breakfast-oats.pdf
+              <p className="text-[14px] font-bold text-gray-800 leading-none mb-1.5 max-w-[150px] truncate">
+                {dietPlanPdf.split("/").pop()}
               </p>
               <p className="text-[11px] text-gray-400 font-bold uppercase tracking-tight">
-                PDF • 2.4 MB
+                PDF
               </p>
             </div>
           </div>
-          <button className="bg-white text-[12px] font-bold px-4 py-2 rounded-xl border border-gray-100 shadow-sm text-gray-600 hover:bg-gray-50 transition-colors">
+          <button
+            onClick={handleViewPdf}
+            className="bg-white text-[12px] font-bold px-4 py-2 rounded-xl border border-gray-100 shadow-sm text-gray-600 hover:bg-gray-50 transition-colors"
+          >
             View
           </button>
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center p-4 text-center border-dashed border-2 border-gray-100 rounded-2xl">
+          <p className="text-gray-400 text-sm">No diet plan assigned yet</p>
         </div>
       )}
     </div>
