@@ -296,3 +296,23 @@ export const getComplianceStats = async (req, res) => {
 };
 
 
+ 
+export const getClientsWithHabitPlan = async (req, res) => {
+  try {
+    const clients = await service.fetchClientsWithHabitPlan();
+
+    res.status(200).json({
+      success: true,
+      data: clients,
+    });
+  } catch (error) {
+    console.error("Error fetching clients:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch clients",
+    });
+  }
+};
+
+

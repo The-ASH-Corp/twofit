@@ -1,6 +1,7 @@
 import User from "../auth/auth.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import mongoose from "mongoose";
+import HabitModel from "../habit/habit.model.js";
 
 export const getAllClient = async (page, limit) => {
   const skip = (page - 1) * limit;
@@ -306,4 +307,24 @@ export const founderClientList = async (page, limit) => {
   } catch (error) {
     throw error;
   }
+};
+
+
+export const fetchClientsWithHabitPlan = async () => {
+   const clients = await User.find({ role: "user" });
+
+   const clientsWithHabit = await Promise.all(
+    clients.map(async (client) => {
+      const habit = await HabitModel.findOne({ clientId: client._id });
+      console.log("Habit for client", client._id, ":", habit);
+
+      return {
+        ...client.toObject(),
+        hasHabitPlan: Boolean(habit),
+        habitId: habit ? habit._id : null,
+      };
+    })
+  );
+
+  return clientsWithHabit;
 };

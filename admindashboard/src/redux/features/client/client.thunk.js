@@ -149,3 +149,21 @@ export const getFounderAllClients = createAsyncThunk(
     }
   },
 );
+
+
+
+export const getClientsWithHabitPlanThunk = createAsyncThunk(
+  "clients/getWithHabitPlan",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.get("/clients/clients");
+       
+      return res.data; 
+      
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch clients"
+      );
+    }
+  }
+);
