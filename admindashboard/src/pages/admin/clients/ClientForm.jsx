@@ -47,6 +47,7 @@ export default function ClientForm() {
   const [program, setProgram] = useState(null);
   const [coachesOfAdmin, setCoachesOfAdmin] = useState([]);
   const [selectedProgram, setSelectedProgram] = useState(null);
+  const [selectedTherapyType, setSelectedTherapyType] = useState("");
   const [therapy, setTherapy] = useState([]);
   const dispatch = useDispatch();
 
@@ -252,6 +253,7 @@ export default function ClientForm() {
                 value: t._id,
               }))
             : [],
+          onChange: (e) => setSelectedTherapyType(e.target.value),
         },
       ],
     },
@@ -279,16 +281,23 @@ export default function ClientForm() {
                 ?.map((coach) => ({ label: coach.name, value: coach?._id }))
             : [],
         },
-        {
-          name: "therapist",
-          label: "Therapist",
-          type: "select",
-          options: coachesOfAdmin
-            ? coachesOfAdmin
-                ?.filter((coach) => coach?.role === "Therapist")
-                ?.map((coach) => ({ label: coach.name, value: coach._id }))
-            : [],
-        },
+        ...(selectedTherapyType
+          ? [
+              {
+                name: "therapist",
+                label: "Therapist",
+                type: "select",
+                options: coachesOfAdmin
+                  ? coachesOfAdmin
+                      ?.filter((coach) => coach?.role === "Therapist")
+                      ?.map((coach) => ({
+                        label: coach.name,
+                        value: coach._id,
+                      }))
+                  : [],
+              },
+            ]
+          : []),
       ],
     },
     {

@@ -9,6 +9,7 @@ import cookieParser from "cookie-parser";
 import http from "http";
 import { Server } from "socket.io";
 import initSocket from "./utils/socket.js";
+import { startImageCleanupTask } from "./utils/cronJobs.js";
 
 
 
@@ -54,7 +55,11 @@ initSocket(io);
 await connectRedis()
 mongoose
   .connect(process.env.MONGOURI)
-  .then(() => console.log("connected"))
+  .then(() => {
+    console.log("connected");
+    // Start the cleanup scheduler after DB connection
+    startImageCleanupTask();
+  })
   .catch(() => console.log("not connected"));
 
 server.listen(process.env.PORT, () =>
