@@ -77,7 +77,7 @@ const AutoReminders = () => {
   const therapySettings = [{ label: "Daily Reminder", time: "8:00 PM" }];
 
   return (
-    <div className="flex-1 bg-[#F8F9FA] p-6 overflow-auto no-scrollbar h-[calc(100vh-120px)]">
+    <div className="flex-1 bg-[#F8F9FA] p-6 overflow-auto no-scrollbar h-[calc(100vh-130px)]">
       <div className="flex flex-col md:flex-row gap-6 w-full mx-auto">
         <ReminderCard
           title="Meal Reminders"

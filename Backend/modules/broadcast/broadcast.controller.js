@@ -17,8 +17,12 @@ export const createBroadcast = async (req, res) => {
 
 export const getAllBroadcast = async (req, res) => {
     try {
-        const {page, limit} = req.params;
-        const broadcasts = await broadcastService.getAllBroadcast(page, limit)
+        const {page, limit, type} = req.params;
+        const broadcasts = await broadcastService.getAllBroadcast(
+          page,
+          limit,
+          type,
+        );
         res.status(200).json({
           success: true,
           data: broadcasts,

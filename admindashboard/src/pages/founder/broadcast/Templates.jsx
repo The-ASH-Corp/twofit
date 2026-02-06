@@ -58,7 +58,7 @@ const Templates = () => {
   ];
 
   return (
-    <div className="flex-1 flex flex-col gap-6 overflow-auto no-scrollbar h-[calc(100vh-120px)]">
+    <div className="flex-1 flex flex-col gap-6 overflow-auto no-scrollbar h-[calc(100vh-130px)]">
       {/* Header & Filters */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-8">
