@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   MoreHorizontal,
   Star,
@@ -8,10 +8,96 @@ import {
   Mail,
   Phone,
   MapPin,
+  X,
 } from "lucide-react";
 import { useMatch } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { getChats } from "@/redux/features/chat/chat.thunk";
+
+const getPrivateRoomId = (u1, u2) =>
+  `private:${[String(u1), String(u2)].sort().join("_")}`;
+
+const getMessageType = (msg) => {
+  if (msg?.messageType) return msg.messageType;
+  if (!msg?.mediaUrl) return "text";
+
+  const mimeType = msg?.mediaMeta?.mimeType || "";
+  if (mimeType.startsWith("image/")) return "image";
+  if (mimeType.startsWith("audio/")) return "voice";
+  if (/\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(msg.mediaUrl)) return "image";
+  return "voice";
+};
 
 const ExpertLeftSide = ({ expert }) => {
+  const dispatch = useDispatch();
+  const [isChatMonitorOpen, setIsChatMonitorOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [monitorMessages, setMonitorMessages] = useState([]);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [chatError, setChatError] = useState("");
+
+  const assignedClients = useMemo(
+    () =>
+      Array.isArray(expert?.assignedUsers)
+        ? expert.assignedUsers.filter((client) => client?._id)
+        : [],
+    [expert?.assignedUsers],
+  );
+
+  useEffect(() => {
+    if (!isChatMonitorOpen) return;
+    if (!selectedClient && assignedClients.length > 0) {
+      setSelectedClient(assignedClients[0]);
+    }
+  }, [isChatMonitorOpen, selectedClient, assignedClients]);
+
+  useEffect(() => {
+    if (!isChatMonitorOpen || !expert?._id || !selectedClient?._id) {
+      setMonitorMessages([]);
+      return;
+    }
+
+    let isMounted = true;
+
+    const fetchMessages = async () => {
+      setIsLoadingMessages(true);
+      setChatError("");
+
+      try {
+        const roomId = getPrivateRoomId(expert._id, selectedClient._id);
+        const response = await dispatch(
+          getChats({ page: 1, limit: 300, chatId: roomId }),
+        ).unwrap();
+
+        if (!isMounted) return;
+        setMonitorMessages(Array.isArray(response?.messages) ? response.messages : []);
+      } catch (error) {
+        if (!isMounted) return;
+        setMonitorMessages([]);
+        setChatError(
+          typeof error === "string" ? error : "Failed to load chat messages",
+        );
+      } finally {
+        if (isMounted) {
+          setIsLoadingMessages(false);
+        }
+      }
+    };
+
+    fetchMessages();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [dispatch, isChatMonitorOpen, expert?._id, selectedClient?._id]);
+
+  const closeMonitor = () => {
+    setIsChatMonitorOpen(false);
+    setSelectedClient(null);
+    setMonitorMessages([]);
+    setChatError("");
+  };
+
   const profileDetails = [
     {
       label: "Joined Date",
@@ -146,9 +232,139 @@ const ExpertLeftSide = ({ expert }) => {
           <p className="text-[10px] text-[#66706D] mb-3 sm:mb-4">
             Monitor expert-client chats
           </p>
-          <button className="w-full py-2.5 bg-[#0A4F48] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#083a35] transition-colors">
+          <button
+            onClick={() => setIsChatMonitorOpen(true)}
+            className="w-full py-2.5 bg-[#0A4F48] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#083a35] transition-colors"
+          >
             <MessageSquare size={16} /> View Chat
           </button>
+        </div>
+      )}
+
+      {isChatMonitorOpen && (
+        <div className="fixed inset-0 z-50 bg-black/40 p-4 sm:p-8 flex items-center justify-center">
+          <div className="w-full max-w-5xl h-[85vh] bg-white rounded-2xl shadow-xl overflow-hidden">
+            <div className="h-full min-h-0 grid grid-rows-[220px_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[260px_minmax(0,1fr)]">
+              <div className="border-b md:border-b-0 md:border-r border-gray-100 min-h-0 overflow-y-auto">
+                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-bold text-[#0A4F48]">
+                      Chat Monitoring
+                    </h4>
+                    <p className="text-[11px] text-gray-500">
+                      {expert?.name || "Expert"}
+                    </p>
+                  </div>
+                  <button
+                    onClick={closeMonitor}
+                    className="p-1 rounded-md hover:bg-gray-100 text-gray-500"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+
+                {assignedClients.length === 0 ? (
+                  <p className="p-4 text-xs text-gray-500">
+                    No assigned clients found for this expert.
+                  </p>
+                ) : (
+                  <div className="p-2 space-y-1">
+                    {assignedClients.map((client) => {
+                      const isActive = selectedClient?._id === client._id;
+                      return (
+                        <button
+                          key={client._id}
+                          onClick={() => setSelectedClient(client)}
+                          className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
+                            isActive
+                              ? "bg-[#EBF3F2] text-[#0A4F48]"
+                              : "hover:bg-gray-50 text-gray-700"
+                          }`}
+                        >
+                          <p className="text-xs font-semibold truncate">{client.name}</p>
+                          <p className="text-[11px] text-gray-500 truncate">
+                            {client.email || client.role || "Client"}
+                          </p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              <div className="min-h-0 flex flex-col bg-[#F8FAFB]">
+                <div className="px-4 py-3 border-b border-gray-100 bg-white">
+                  <h4 className="text-sm font-bold text-[#0A4F48]">
+                    {selectedClient?.name || "Select a client"}
+                  </h4>
+                  <p className="text-[11px] text-gray-500">
+                    Expert-client conversation history
+                  </p>
+                </div>
+
+                <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
+                  {isLoadingMessages ? (
+                    <p className="text-sm text-gray-500">Loading messages...</p>
+                  ) : chatError ? (
+                    <p className="text-sm text-red-500">{chatError}</p>
+                  ) : !selectedClient ? (
+                    <p className="text-sm text-gray-500">
+                      Choose a client to view chat history.
+                    </p>
+                  ) : monitorMessages.length === 0 ? (
+                    <p className="text-sm text-gray-500">
+                      No messages found between this expert and client.
+                    </p>
+                  ) : (
+                    monitorMessages.map((msg, idx) => {
+                      const isExpertMessage =
+                        String(msg?.sender) === String(expert?._id);
+                      const messageType = getMessageType(msg);
+
+                      return (
+                        <div
+                          key={`${msg?.time || idx}-${idx}`}
+                          className={`flex ${isExpertMessage ? "justify-end" : "justify-start"}`}
+                        >
+                          <div
+                            className={`max-w-[80%] rounded-2xl px-3 py-2 shadow-sm ${
+                              isExpertMessage
+                                ? "bg-[#E7F9F4] text-[#073B35]"
+                                : "bg-white text-[#1F2937]"
+                            }`}
+                          >
+                            {messageType === "image" && msg?.mediaUrl && (
+                              <img
+                                src={msg.mediaUrl}
+                                alt={msg?.mediaMeta?.name || "Image"}
+                                className="rounded-lg max-h-56 w-auto mb-2"
+                              />
+                            )}
+
+                            {messageType === "voice" && msg?.mediaUrl && (
+                              <audio controls src={msg.mediaUrl} className="mb-2 max-w-full" />
+                            )}
+
+                            {msg?.message && (
+                              <p className="text-xs whitespace-pre-wrap break-words">
+                                {msg.message}
+                              </p>
+                            )}
+
+                            <p className="mt-1 text-[10px] text-gray-500">
+                              {msg?.time
+                                ? new Date(msg.time).toLocaleString()
+                                : "Unknown time"}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
