@@ -203,9 +203,9 @@ const ChatWindow = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col h-full overflow-hidden">
       {client ? (
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col h-full overflow-hidden">
           {/* Chat Header */}
           <div className="bg-white rounded-t-lg px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
