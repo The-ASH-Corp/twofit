@@ -204,9 +204,9 @@ const ChatWindow = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full">
+    <div className="flex-1 flex flex-col h-full overflow-hidden">
       {client ? (
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col h-full overflow-hidden">
           {/* Mobile Top Bar - Only visible on mobile */}
           <div className="lg:hidden bg-white px-4 py-3 flex items-center gap-3 border-b">
             <button onClick={onBack} className="p-1">

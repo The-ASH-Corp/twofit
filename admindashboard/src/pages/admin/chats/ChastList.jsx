@@ -9,7 +9,7 @@ const ChastList = ({
   unreadCounts = {},
 }) => {
   return (
-    <div className="w-80 flex flex-col rounded-lg">
+    <div className="w-80 flex flex-col rounded-lg h-full overflow-hidden">
       {/* Search and Filters */}
       <div className="p-4 space-y-4 rounded-lg">
         <div className="flex items-center gap-2">
@@ -62,9 +62,7 @@ const ChastList = ({
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
-                <span className="text-gray-400 text-[10px] whitespace-nowrap">
-                  01:45 PM
-                </span>
+               
               </div>
             </div>
           );

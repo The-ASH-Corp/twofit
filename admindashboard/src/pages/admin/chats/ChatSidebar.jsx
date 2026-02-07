@@ -16,7 +16,7 @@ export default function ChatSidebar({
   };
 
   return (
-    <div className="w-60 bg-white  flex flex-col rounded-lg ">
+    <div className="w-60 bg-white  flex flex-col rounded-lg h-full overflow-hidden">
       <div className="p-4 ">
         <h2 className="text-gray-500 text-xs font-medium mb-4 px-2">
           Category

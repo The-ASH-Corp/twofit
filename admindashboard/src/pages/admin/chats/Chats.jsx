@@ -1,5 +1,5 @@
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { getChats } from "@/redux/features/chat/chat.thunk";
+import { getChats, uploadChatMedia } from "@/redux/features/chat/chat.thunk";
 import { socket } from "@/utils/socket";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,6 +22,7 @@ export default function Chats() {
   const [messages, setMessages] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [unreadCounts, setUnreadCounts] = useState({});
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
 
   const getPrivateRoomId = (u1, u2) => `private:${[u1, u2].sort().join("_")}`;
 
@@ -126,24 +127,99 @@ export default function Chats() {
     return () => socket.off("new_message", onNewMessage);
   }, [client, clearUnreadForUser, user?._id]);
 
+  const sendSocketMessage = useCallback(
+    ({
+      text = "",
+      messageType = "text",
+      mediaUrl = "",
+      mediaMeta = {},
+    } = {}) => {
+      if (!client) return;
+
+      const roomId = getPrivateRoomId(user._id, client._id);
+      const trimmedText = text.trim();
+      const hasMedia = Boolean(mediaUrl);
+
+      if (!trimmedText && !hasMedia) return;
+
+      socket.emit(
+        "send_message",
+        {
+          roomId,
+          text: trimmedText,
+          reciever: client._id,
+          messageType,
+          mediaUrl,
+          mediaMeta,
+        },
+        (ack) => {
+          if (!ack?.ok) console.error(ack?.error || "Message failed");
+        }
+      );
+    },
+    [client, user?._id]
+  );
+
   const messageHandlers = () => {
-    if (!message.trim() || !client) return;
-
-    const roomId = getPrivateRoomId(user._id, client._id);
-
-    socket.emit(
-      "send_message",
-      {
-        roomId,
-        text: message,
-        reciever: client._id,
-      },
-      (ack) => {
-        if (!ack?.ok) console.error("Message failed");
-      }
-    );
-
+    if (!message.trim()) return;
+    sendSocketMessage({ text: message, messageType: "text" });
     setMessage("");
+  };
+
+  const uploadAndSendMedia = useCallback(
+    async (file, messageType, mediaMeta = {}) => {
+      if (!file || !client) return;
+
+      setIsUploadingMedia(true);
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const uploadResponse = await dispatch(
+          uploadChatMedia({ formData })
+        ).unwrap();
+
+        if (!uploadResponse?.url) {
+          throw new Error("Upload response missing media URL");
+        }
+
+        sendSocketMessage({
+          messageType,
+          mediaUrl: uploadResponse.url,
+          mediaMeta: {
+            name: uploadResponse.name || file.name,
+            mimeType: uploadResponse.mimeType || file.type,
+            size: uploadResponse.size || file.size,
+            ...mediaMeta,
+          },
+        });
+      } catch (error) {
+        console.error("Media upload failed:", error);
+      } finally {
+        setIsUploadingMedia(false);
+      }
+    },
+    [client, dispatch, sendSocketMessage]
+  );
+
+  const handleImageUpload = async (file) => {
+    if (!file?.type?.startsWith("image/")) return;
+    await uploadAndSendMedia(file, "image");
+  };
+
+  const handleVoiceUpload = async (audioBlob, durationInSeconds = 0) => {
+    if (!audioBlob) return;
+
+    const extension =
+      audioBlob.type?.split("/")[1]?.split(";")[0] || "webm";
+    const file = new File([audioBlob], `voice-${Date.now()}.${extension}`, {
+      type: audioBlob.type || "audio/webm",
+    });
+
+    await uploadAndSendMedia(file, "voice", {
+      duration: durationInSeconds,
+    });
   };
 
   const [sideTab, setSideTab] = useState("Chats");
@@ -187,6 +263,9 @@ export default function Chats() {
             messageHandlers={messageHandlers}
             user={user}
             onlineUsers={onlineUsers}
+            handleImageUpload={handleImageUpload}
+            handleVoiceUpload={handleVoiceUpload}
+            isUploadingMedia={isUploadingMedia}
           />
         </>
       )}
