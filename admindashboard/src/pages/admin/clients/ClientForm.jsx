@@ -267,7 +267,16 @@ export default function ClientForm() {
           type: "select",
           options: coachesOfAdmin
             ? coachesOfAdmin
-                ?.filter((coach) => coach?.role === "Dietician")
+                ?.filter((coach) => {
+                  if (coach?.role !== "Dietician") return false;
+                  // If a program is selected, only show dieticians assigned to that program
+                  if (selectedProgram?._id) {
+                    return coach.assignedPrograms?.some(
+                      (p) => p._id === selectedProgram._id,
+                    );
+                  }
+                  return true;
+                })
                 ?.map((coach) => ({ label: coach.name, value: coach._id }))
             : [],
         },
@@ -277,7 +286,16 @@ export default function ClientForm() {
           type: "select",
           options: coachesOfAdmin
             ? coachesOfAdmin
-                ?.filter((coach) => coach?.role === "Trainer")
+                ?.filter((coach) => {
+                  if (coach?.role !== "Trainer") return false;
+                  // If a program is selected, only show trainers assigned to that program
+                  if (selectedProgram?._id) {
+                    return coach.assignedPrograms?.some(
+                      (p) => p._id === selectedProgram._id,
+                    );
+                  }
+                  return true;
+                })
                 ?.map((coach) => ({ label: coach.name, value: coach?._id }))
             : [],
         },
