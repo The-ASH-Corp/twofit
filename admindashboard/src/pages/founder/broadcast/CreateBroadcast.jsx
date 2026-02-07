@@ -5,10 +5,12 @@ import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { createBroadcast } from "@/redux/features/broadcast/broadcast.thunk";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const CreateBroadcast = ({ onCancel }) => {
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const initialValues = {
     title: "",
@@ -38,9 +40,9 @@ const CreateBroadcast = ({ onCancel }) => {
     try {
       await dispatch(createBroadcast(formData)).unwrap();
       toast.success("Broadcast created successfully");
+      navigate("founder/broadcast/template");
     } catch (error) {
-      console.log(error)
-      toast.error("Failed to create Broadcast");
+      toast.error(error || "Failed to create Broadcast");
     }
   };
 
