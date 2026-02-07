@@ -2,12 +2,13 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { getChat } from "@/redux/features/chat/chat.selecters";
 import { getChats, uploadChatMedia } from "@/redux/features/chat/chat.thunk";
 import { socket } from "@/utils/socket";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ChastList from "./ChastList";
 import ChatWindow from "./ChatWindow";
 import { getUsersAssignedToACoach } from "@/redux/features/coach/coach.thunk";
 import { selectAssignedClients } from "@/redux/features/coach/coach.selector";
+import { getAdminProfile } from "@/redux/features/admins/admin.thunk";
 
 export default function Chats() {
   const user = useSelector(selectUser);
@@ -16,6 +17,7 @@ export default function Chats() {
   const clients = useSelector(selectAssignedClients);
 
   const [client, setChatClient] = useState(null);
+  const [adminContact, setAdminContact] = useState(null);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
@@ -39,6 +41,48 @@ export default function Chats() {
     if (!user?._id) return;
     dispatch(getUsersAssignedToACoach({ coachId: user._id, page: 1, limit: 100 }));
   }, [dispatch, user?._id]);
+
+  useEffect(() => {
+    const adminId =
+      typeof user?.adminId === "object" ? user?.adminId?._id : user?.adminId;
+    if (!adminId) return;
+
+    let isMounted = true;
+
+    dispatch(getAdminProfile(adminId))
+      .unwrap()
+      .then((admin) => {
+        if (!isMounted || !admin?._id) return;
+        setAdminContact({
+          ...admin,
+          role: admin?.role || "Admin",
+        });
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setAdminContact(null);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [dispatch, user?.adminId]);
+
+  const chatContacts = useMemo(() => {
+    const contactsMap = new Map();
+
+    if (adminContact?._id) {
+      contactsMap.set(String(adminContact._id), adminContact);
+    }
+
+    (clients || []).forEach((assignedClient) => {
+      if (assignedClient?._id) {
+        contactsMap.set(String(assignedClient._id), assignedClient);
+      }
+    });
+
+    return Array.from(contactsMap.values());
+  }, [adminContact, clients]);
 
   useEffect(() => {
     fetchAllExperts();
@@ -235,7 +279,7 @@ export default function Chats() {
         <>
           {/* Middle - Chat List */}
           <ChastList
-            clients={clients}
+            clients={chatContacts}
             chatClient={chatClient}
             client={client}
             onlineUsers={onlineUsers}

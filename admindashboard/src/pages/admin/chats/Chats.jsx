@@ -1,8 +1,7 @@
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { getChat } from "@/redux/features/chat/chat.selecters";
-import { getChats } from "@/redux/features/chat/chat.thunk";
+import { getChats, uploadChatMedia } from "@/redux/features/chat/chat.thunk";
 import { socket } from "@/utils/socket";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ChatSidebar from "./ChatSidebar";
 import ChastList from "./ChastList";
@@ -15,9 +14,34 @@ import { selectAllCoaches } from "@/redux/features/coach/coach.selector";
 
 export default function Chats() {
   const user = useSelector(selectUser);
+  const dispatch = useDispatch();
+  const clients = useSelector(selectAllCoaches);
+
+  const [client, setChatClient] = useState(null);
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [unreadCounts, setUnreadCounts] = useState({});
+  const [isUploadingMedia, setIsUploadingMedia] = useState(false);
+
+  const getPrivateRoomId = (u1, u2) => `private:${[u1, u2].sort().join("_")}`;
+
+  const clearUnreadForUser = useCallback((chatUserId) => {
+    if (!chatUserId) return;
+
+    setUnreadCounts((prev) => {
+      if (!prev[chatUserId]) return prev;
+      const next = { ...prev };
+      delete next[chatUserId];
+      return next;
+    });
+  }, []);
 
   useEffect(() => {
-    fetchAllExperts();
+    if (!user?._id) return;
+
+    dispatch(getAllCoachesByAdminId({ adminId: user._id, page: 1, limit: 100 }));
+
     socket.auth = {
       userId: user._id,
       token: localStorage.getItem("token"),
@@ -25,12 +49,10 @@ export default function Chats() {
 
     socket.connect();
 
-    // Listen for online users updates
     socket.on("online_users", (users) => {
       setOnlineUsers(users);
     });
 
-    // Request current online users
     socket.emit("get_online_users", (users) => {
       setOnlineUsers(users);
     });
@@ -39,24 +61,7 @@ export default function Chats() {
       socket.off("online_users");
       socket.disconnect();
     };
-  }, [user?._id]);
-
-  const [client, setChatClient] = useState(null);
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [onlineUsers, setOnlineUsers] = useState([]);
-
-  const clients = useSelector(selectAllCoaches);
-
-  const fetchAllExperts=()=>{
-    dispatch(getAllCoachesByAdminId({adminId:user._id,page:1,limit:100}))
-  }
-
-  const chats = useSelector(getChat);
-  const dispatch = useDispatch();
-
-  const getPrivateRoomId = (u1, u2) => `private:${[u1, u2].sort().join("_")}`;
-
+  }, [dispatch, user?._id]);
 
   const chatClient = (selectedClient) => {
     if (client) {
@@ -67,13 +72,9 @@ export default function Chats() {
     const roomId = getPrivateRoomId(user._id, selectedClient._id);
 
     socket.emit("join_room", { roomId });
+    setMessages([]);
     setChatClient(selectedClient);
-  };
-
-  const handleBroadcastChat = () => {
-    socket.emit("broadcast", {
-      roomId: `broadcast_${user._id}`,
-    });
+    clearUnreadForUser(selectedClient._id);
   };
 
   useEffect(() => {
@@ -85,52 +86,141 @@ export default function Chats() {
         limit: 30,
         chatId: getPrivateRoomId(user._id, client._id),
       })
-    );
+    )
+      .unwrap()
+      .then((response) => {
+        setMessages(Array.isArray(response?.messages) ? response.messages : []);
+      })
+      .catch(() => {
+        setMessages([]);
+      });
   }, [client, user?._id, dispatch]);
 
   useEffect(() => {
-    if (chats?.messages) {
-      setMessages(chats.messages);
-    }
-  }, [chats]);
-
-  useEffect(() => {
     const onNewMessage = (msg) => {
-      if (!client) return;
+      if (!msg?.roomId) return;
 
-      const currentRoom = getPrivateRoomId(user._id, client._id);
-      if (msg.roomId !== currentRoom) return;
+      const selectedRoom = client
+        ? getPrivateRoomId(user?._id, client._id)
+        : null;
+      const roomIsOpen = Boolean(selectedRoom && msg.roomId === selectedRoom);
+      const isIncoming = msg.sender !== user?._id;
+      const partnerId = isIncoming ? msg.sender : msg.reciever;
 
-      setMessages((prev) => [...prev, msg]);
+      if (roomIsOpen) {
+        setMessages((prev) => [...prev, msg]);
+        if (isIncoming) {
+          clearUnreadForUser(partnerId);
+        }
+        return;
+      }
+
+      if (isIncoming && partnerId) {
+        setUnreadCounts((prev) => ({
+          ...prev,
+          [partnerId]: (prev[partnerId] || 0) + 1,
+        }));
+      }
     };
 
     socket.on("new_message", onNewMessage);
     return () => socket.off("new_message", onNewMessage);
-  }, [client, user?._id]);
+  }, [client, clearUnreadForUser, user?._id]);
+
+  const sendSocketMessage = useCallback(
+    ({
+      text = "",
+      messageType = "text",
+      mediaUrl = "",
+      mediaMeta = {},
+    } = {}) => {
+      if (!client) return;
+
+      const roomId = getPrivateRoomId(user._id, client._id);
+      const trimmedText = text.trim();
+      const hasMedia = Boolean(mediaUrl);
+
+      if (!trimmedText && !hasMedia) return;
+
+      socket.emit(
+        "send_message",
+        {
+          roomId,
+          text: trimmedText,
+          reciever: client._id,
+          messageType,
+          mediaUrl,
+          mediaMeta,
+        },
+        (ack) => {
+          if (!ack?.ok) console.error(ack?.error || "Message failed");
+        }
+      );
+    },
+    [client, user?._id]
+  );
 
   const messageHandlers = () => {
-    if (!message.trim() || !client) return;
-
-    const roomId = getPrivateRoomId(user._id, client._id);
-
-    socket.emit(
-      "send_message",
-      {
-        roomId,
-        text: message,
-        reciever: client._id,
-      },
-      (ack) => {
-        if (!ack?.ok) console.error("Message failed");
-      }
-    );
-
+    if (!message.trim()) return;
+    sendSocketMessage({ text: message, messageType: "text" });
     setMessage("");
   };
 
-  useEffect(() => {
-    setMessages([]);
-  }, [client]);
+  const uploadAndSendMedia = useCallback(
+    async (file, messageType, mediaMeta = {}) => {
+      if (!file || !client) return;
+
+      setIsUploadingMedia(true);
+
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const uploadResponse = await dispatch(
+          uploadChatMedia({ formData })
+        ).unwrap();
+
+        if (!uploadResponse?.url) {
+          throw new Error("Upload response missing media URL");
+        }
+
+        sendSocketMessage({
+          messageType,
+          mediaUrl: uploadResponse.url,
+          mediaMeta: {
+            name: uploadResponse.name || file.name,
+            mimeType: uploadResponse.mimeType || file.type,
+            size: uploadResponse.size || file.size,
+            ...mediaMeta,
+          },
+        });
+      } catch (error) {
+        console.error("Media upload failed:", error);
+      } finally {
+        setIsUploadingMedia(false);
+      }
+    },
+    [client, dispatch, sendSocketMessage]
+  );
+
+  const handleImageUpload = async (file) => {
+    if (!file?.type?.startsWith("image/")) return;
+    await uploadAndSendMedia(file, "image");
+  };
+
+  const handleVoiceUpload = async (audioBlob, durationInSeconds = 0) => {
+    if (!audioBlob) return;
+
+    const extension =
+      audioBlob.type?.split("/")[1]?.split(";")[0] || "webm";
+    const file = new File([audioBlob], `voice-${Date.now()}.${extension}`, {
+      type: audioBlob.type || "audio/webm",
+    });
+
+    await uploadAndSendMedia(file, "voice", {
+      duration: durationInSeconds,
+    });
+  };
 
   const [sideTab, setSideTab] = useState("Chats");
   const handleSideTabs = (tabName) => {
@@ -161,6 +251,7 @@ export default function Chats() {
             chatClient={chatClient}
             client={client}
             onlineUsers={onlineUsers}
+            unreadCounts={unreadCounts}
           />
 
           {/* Right - Chat Window */}
@@ -172,6 +263,9 @@ export default function Chats() {
             messageHandlers={messageHandlers}
             user={user}
             onlineUsers={onlineUsers}
+            handleImageUpload={handleImageUpload}
+            handleVoiceUpload={handleVoiceUpload}
+            isUploadingMedia={isUploadingMedia}
           />
         </>
       )}

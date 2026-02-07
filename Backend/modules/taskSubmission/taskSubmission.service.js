@@ -193,7 +193,7 @@ export const attemptDayAdvancement = async (userId) => {
                 completedDaySubmission.exercises.forEach(ex => {
                     if (ex.status === 'pending') {
                         ex.status = 'verified';
-                        ex.updatedAt = Date.now();
+                        // ex.updatedAt = Date.now();
                         hasChanges = true;
                     }
                 });

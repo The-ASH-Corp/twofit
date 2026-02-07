@@ -298,7 +298,7 @@ export const getComplianceStats = async (req, res) => {
     const programId = typeof user.programType === 'object' ? user.programType._id : user.programType;
     const program = await getSingleProgram(programId);
 
-    const therapyId = typeof user.therapyType === 'object'
+    const therapyId = (user.therapyType && typeof user.therapyType === 'object')
       ? user.therapyType._id
       : user.therapyType;
 

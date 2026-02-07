@@ -203,9 +203,9 @@ const ChatWindow = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col h-full overflow-hidden">
       {client ? (
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col h-full overflow-hidden">
           {/* Chat Header */}
           <div className="bg-white rounded-t-lg px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -232,7 +232,7 @@ const ChatWindow = ({
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 border-20 border-white rounded-b-lg">
             {messages.map((msg, index) => {
-              const isMe = msg.sender === user._id;
+              const isMe = msg.sender === user?._id;
 
               return (
                 <div
