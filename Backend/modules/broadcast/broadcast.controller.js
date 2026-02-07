@@ -31,3 +31,15 @@ export const getAllBroadcast = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 }
+
+export const deleteBroadcast = async (req, res) => {
+    try {
+        const broadcast = await broadcastService.deleteBroadcast(req.params.id)
+        res.status(200).json({
+          success: true,
+          data: broadcast,
+        });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+} 

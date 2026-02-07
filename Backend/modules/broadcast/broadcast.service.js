@@ -2,15 +2,22 @@ import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 import { broadcastModel } from "./broadcast.model.js";
 
 export const createBroadcast = async (data) => {
-    try {
-        return await broadcastModel.create({
-          ...data,
-          title: capitalizeFirst(data.title),
-        });
-    } catch (error) {
-        throw error;
+  try {
+    const duplicate = await broadcastModel.findOne({
+      title: data.title.trim(),
+    });
+
+    if (duplicate) {
+      throw new Error("Broadcast title already exists");
     }
-}
+    return await broadcastModel.create({
+      ...data,
+      title: capitalizeFirst(data.title),
+    });
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const getAllBroadcast = async (page, limit, type) => {
   try {
@@ -32,6 +39,14 @@ export const getAllBroadcast = async (page, limit, type) => {
       totalCount,
       broadcast,
     };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteBroadcast = async (id) => {
+  try {
+    return await broadcastModel.findByIdAndDelete(id);
   } catch (error) {
     throw error;
   }
