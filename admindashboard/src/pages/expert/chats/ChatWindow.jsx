@@ -232,7 +232,7 @@ const ChatWindow = ({
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 border-20 border-white rounded-b-lg">
             {messages.map((msg, index) => {
-              const isMe = msg.sender === user._id;
+              const isMe = msg.sender === user?._id;
 
               return (
                 <div

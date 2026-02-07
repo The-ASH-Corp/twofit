@@ -46,6 +46,7 @@ export default function TherapyPlan({
         uploadPlanMedia({
           formData,
           onUploadProgress: (progressEvent) => {
+            if (progressEvent.total <= 0) return;
             const percent = Math.round(
               (progressEvent.loaded * 100) / progressEvent.total
             );

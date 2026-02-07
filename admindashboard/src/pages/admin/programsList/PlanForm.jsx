@@ -468,6 +468,7 @@ const PlanSection = ({
           uploadPlanMedia({
             formData,
             onUploadProgress: (progressEvent) => {
+              if (progressEvent.total <= 0) return;
               const percentCompleted = Math.round(
                 (progressEvent.loaded * 100) / progressEvent.total,
               );
