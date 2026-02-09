@@ -23,9 +23,19 @@ app.use(cookieParser())
 
 // app.use(express.urlencoded({ extended: true }))
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5000",
+];
+
+if (process.env.FRONTEND_URL_PROD) {
+  allowedOrigins.push(process.env.FRONTEND_URL_PROD);
+  allowedOrigins.push(process.env.BACKEND_URL_PROD);
+}
+
 app.use(
   cors({
-    origin: ["*"],
+    origin: allowedOrigins,
     credentials: true,
     exposedHeaders: ["x-access-token"],
   })
@@ -43,7 +53,7 @@ const server = http.createServer(app)
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:5000"],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   },
