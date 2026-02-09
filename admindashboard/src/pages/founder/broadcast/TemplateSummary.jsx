@@ -1,38 +1,62 @@
-import { assets } from '@/assets/asset';
-import { MoreHorizontal } from 'lucide-react';
-import React from 'react'
-import { useNavigate } from 'react-router-dom';
+import { assets } from "@/assets/asset";
+import {
+  selectBroadcast,
+  selectBroadcastError,
+  selectBroadcastStatus,
+} from "@/redux/features/broadcast/broadcast.selector";
+import { getBroadcast } from "@/redux/features/broadcast/broadcast.thunk";
+import { MoreHorizontal } from "lucide-react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
+import { SyncLoader } from "react-spinners";
 
- const attachment = [
-   {
-     name: "Breakfast-oats.jpg",
-     type: "JPG",
-     size: "2.4 MB",
-   },
-   {
-     name: "Healthy-snack-almond.pdf",
-     type: "PDF",
-     size: "2.4 MB",
-   },
-   {
-     name: "Healthy-snack-almond.pdf",
-     type: "PDF",
-     size: "2.4 MB",
-   },
-   {
-     name: "Healthy-snack-almond.pdf",
-     type: "PDF",
-     size: "2.4 MB",
-   },
- ];
+const attachment = [
+  {
+    name: "Breakfast-oats.jpg",
+    type: "JPG",
+    size: "2.4 MB",
+  },
+  {
+    name: "Healthy-snack-almond.pdf",
+    type: "PDF",
+    size: "2.4 MB",
+  },
+  {
+    name: "Healthy-snack-almond.pdf",
+    type: "PDF",
+    size: "2.4 MB",
+  },
+  {
+    name: "Healthy-snack-almond.pdf",
+    type: "PDF",
+    size: "2.4 MB",
+  },
+];
 
 const TemplateSummary = () => {
-  const navigate = useNavigate()
-    const data = {
-      message:
-        "🔥 Level Up Your Health Journey!\r\n\r\nUpgrade from **30 Days → 60 Days** and get:\r\n\r\n✔ Free Diet Review \r\n✔ Weekly Progress Calls\r\n✔ Personalized Workout Videos\r\n\r\nLimited-time upgrade bonus! 🤩\r\n\r\n",
-    };
-   
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { id } = useParams();
+
+  const broadcast = useSelector(selectBroadcast);
+  const status = useSelector(selectBroadcastStatus);
+  const error = useSelector(selectBroadcastError);
+
+  useEffect(() => {
+    if (id) {
+      dispatch(getBroadcast(id));
+    }
+  }, [id, dispatch]);
+
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+      </div>
+    );
+  if (error) return <p className="text-red-500">{error}!</p>;
+
   return (
     <div className="h-[calc(100vh-130px)] pb-4 overflow-auto no-scrollbar">
       <div className="bg-white p-4 rounded-lg flex flex-col items-center justify-between gap-4 w-full lg:w-[50%] mb-5">
@@ -49,25 +73,25 @@ const TemplateSummary = () => {
         <div className="w-full flex flex-col items-center justify-between gap-6">
           <div className="w-full flex flex-col items-start gap-2 pb-6 border-b border-b-[#DBDEDD]">
             <p className="text-[#66706D] text-[12px]">Broadcast Title</p>
-            <p className="text-[#000000] text-[12px]">Upgrade Your Plan</p>
+            <p className="text-[#000000] text-[12px]">{broadcast?.title}</p>
           </div>
           <div className="w-full flex flex-col items-start gap-2 pb-6 border-b border-b-[#DBDEDD]">
             <p className="text-[#66706D] text-[12px]">Broadcast Type</p>
-            <p className="text-[#000000] text-[12px]">Promotional</p>
+            <p className="text-[#000000] text-[12px]">{broadcast?.type}</p>
           </div>
           <div className="w-full flex flex-col items-start gap-2 pb-6 border-b border-b-[#DBDEDD]">
             <p className="text-[#66706D] text-[12px]">Broadcast Message</p>
             <div>
               <p className="text-[#000000] text-[12px] wrap-break-word whitespace-pre-wrap">
-                {data.message}
+                {broadcast?.message}
               </p>
             </div>
           </div>
           <div className="w-full flex flex-col items-start gap-2 pb-6 ">
             <p className="text-[#66706D] text-[12px]">Attachments</p>
             <div className="flex items-center flex-wrap  gap-2 w-full">
-              {attachment?.map((items, i) => (
-                <div key={i} className="p-4 bg-[#F8F8F8] rounded-lg">
+              {broadcast?.attachment ? (
+                <div className="p-4 bg-[#F8F8F8] rounded-lg">
                   <div className="flex items-center gap-4">
                     <div className="p-2.5 bg-[#F4DBC7] rounded-md">
                       <img
@@ -77,20 +101,18 @@ const TemplateSummary = () => {
                       />
                     </div>
                     <div className="flex flex-col items-start">
-                      <p className="text-[12px]">{items?.name}</p>
+                      <p className="text-[12px]">{broadcast?.attachment}</p>
                       <div className="flex gap-1 items-center">
-                        <p className="text-[#66706D] text-[11px]">
-                          {items?.type}
-                        </p>
+                        <p className="text-[#66706D] text-[11px]">PDF</p>
                         <span className="p-0.5 bg-[#DBDEDD] rounded-full"></span>
-                        <p className="text-[#66706D] text-[11px]">
-                          {items?.size}
-                        </p>
+                        <p className="text-[#66706D] text-[11px]">2.5</p>
                       </div>
                     </div>
                   </div>
                 </div>
-              ))}
+              ) : (
+                <p className="text-[#000000] text-[12px]">! No attachment</p>
+              )}
             </div>
           </div>
         </div>
@@ -116,6 +138,6 @@ const TemplateSummary = () => {
       </div>
     </div>
   );
-}
+};
 
-export default TemplateSummary
+export default TemplateSummary;

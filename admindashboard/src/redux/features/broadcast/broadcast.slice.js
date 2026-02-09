@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getAllBroadcast } from "./broadcast.thunk";
+import { getAllBroadcast, getBroadcast } from "./broadcast.thunk";
 
 
 const initialState = {
   allBroadcast: [],
+  broadcast: null,
   totalBroadcast:0,
   selectedBroadcast: null,
   error: null,
@@ -31,6 +32,19 @@ const BroadcastSlice = createSlice({
         state.error = null;
       })
       .addCase(getAllBroadcast.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(getBroadcast.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(getBroadcast.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.broadcast = action.payload.data;
+        state.error = null;
+      })
+      .addCase(getBroadcast.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

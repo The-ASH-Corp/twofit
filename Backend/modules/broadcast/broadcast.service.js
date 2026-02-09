@@ -44,6 +44,14 @@ export const getAllBroadcast = async (page, limit, type) => {
   }
 };
 
+export const getBroadcast = async (id)=> {
+  try {
+    return await broadcastModel.findById(id)
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const deleteBroadcast = async (id) => {
   try {
     return await broadcastModel.findByIdAndDelete(id);
