@@ -85,7 +85,7 @@ export default function Dashboard() {
           {/* Top Section: Hero and KPI Cards */}
           <div className="grid lg:grid-cols-[1.5fr_1fr] grid-cols-1 gap-6">
             <HeroCard program={program} />
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 ">
               <KpiCard
                 title="Program Days"
                 value={
@@ -98,6 +98,7 @@ export default function Dashboard() {
                 icon={assets.website}
                 bg="#0A4F48"
                 iconColor="white"
+                cardBg="white"
               />
               <KpiCard
                 title="Overall Compliance"
@@ -105,18 +106,21 @@ export default function Dashboard() {
                 icon={assets.website}
                 bg="#0A4F48"
                 iconColor="white"
+                cardBg="white"
               />
               <KpiCard
                 title="Weight Progress"
                 value={user?.currentWeight || 0}
                 icon={assets.website}
                 bg="#F4DBC7"
+                cardBg="white"
               />
               <KpiCard
                 title="Active Streak"
                 value={`${complianceData?.streaks?.activeStreak || 0} Days`}
                 icon={assets.website}
                 bg="#F4DBC7"
+                cardBg="white"
               />
             </div>
           </div>
