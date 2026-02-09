@@ -12,7 +12,11 @@ const menuItems = [
     path: "/client",
   },
   { label: "Daily Plan", icon: assets.clients, path: "/client/daily-plan" },
-  {label:"Habit Tracker",icon:assets.website,path:"/client/habit-tracker"},
+  {
+    label: "Habit Tracker",
+    icon: assets.website,
+    path: "/client/habit-tracker",
+  },
   { label: "Progress", icon: assets.experts, path: "/client/progress" },
   { label: "Messages", icon: assets.chats, path: "/client/chats" },
   { label: "Feedback", icon: assets.website, path: "/client/feedback" },
@@ -30,9 +34,9 @@ export default function Sidebar({ isOpen, onClose }) {
 
   return (
     <>
-    {isOpen && (
+      {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-[60] lg:hidden"
           onClick={onClose}
         />
       )}
@@ -40,7 +44,7 @@ export default function Sidebar({ isOpen, onClose }) {
       {/* Sidebar aside */}
       <aside
         className={`
-        fixed lg:static inset-y-0 left-0 z-50
+        fixed lg:static inset-y-0 left-0 z-[100]
         w-[225px] bg-white py-6 px-5 flex flex-col h-screen
         transform transition-transform duration-300 ease-in-out
         ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
@@ -101,6 +105,6 @@ export default function Sidebar({ isOpen, onClose }) {
           <h1 className="">Logout</h1>
         </button>
       </aside>
-      </>
+    </>
   );
 }

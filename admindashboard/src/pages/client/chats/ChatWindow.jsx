@@ -117,7 +117,7 @@ const ChatWindow = ({
 
         const elapsedSeconds = Math.max(
           1,
-          Math.round((Date.now() - recordingStartedAtRef.current) / 1000)
+          Math.round((Date.now() - recordingStartedAtRef.current) / 1000),
         );
         setRecordingSeconds(0);
 
@@ -248,7 +248,11 @@ const ChatWindow = ({
                   isClientOnline ? "bg-green-500" : "bg-gray-400"
                 }`}
               ></div>
-              <span className="text-green-600 font-medium">
+              <span
+                className={`font-medium ${
+                  isClientOnline ? "text-green-600" : "text-gray-600"
+                }`}
+              >
                 {isClientOnline ? "Online" : "Offline"}
               </span>
             </div>
@@ -327,7 +331,7 @@ const ChatWindow = ({
           </div>
 
           {/* Message Input */}
-          <div className="bg-white lg:rounded-b-lg px-4 lg:px-6 py-3 lg:py-4">
+          <div className="bg-white lg:rounded-b-lg px-4 lg:px-6 py-3 pb-14 lg:pb-4">
             <input
               ref={fileInputRef}
               type="file"

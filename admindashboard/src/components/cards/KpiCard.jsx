@@ -1,8 +1,13 @@
 import React from "react";
 
-export default function KpiCard({ title, value, icon, bg, iconColor }) {
+export default function KpiCard({ title, value, icon, bg, iconColor, cardBg }) {
   return (
-    <div className="flex items-center justify-between w-full p-4 bg-[#F8F8F8] rounded-2xl">
+    <div
+      className={`flex items-center justify-between w-full p-4 rounded-2xl ${
+        cardBg ? "" : "bg-[#F8F8F8]"
+      }`}
+      style={{ backgroundColor: cardBg }}
+    >
       <div className="flex flex-col items-start gap-2">
         <span className="text-[#66706D] text-[12px]">{title}</span>
         <p className="text-[#0A4F48] text-[20px] font-bold ">{value}</p>

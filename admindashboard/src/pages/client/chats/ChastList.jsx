@@ -1,5 +1,5 @@
 import { Bell, Menu, Search, Settings } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 
 const ChastList = ({
   clients,
@@ -8,6 +8,13 @@ const ChastList = ({
   onlineUsers = [],
   unreadCounts = {},
 }) => {
+  const [search, setSearch] = useState("");
+
+  const filteredClients = clients.filter((c) =>
+    c.name.toLowerCase().includes(search.toLowerCase()),
+  );
+
+ 
   return (
     <div className="w-full h-full flex flex-col rounded-lg overflow-hidden">
       {/* Mobile Header - Only visible on mobile */}
@@ -32,18 +39,16 @@ const ChastList = ({
               type="text"
               placeholder="Search"
               className="ml-2 bg-transparent text-sm text-gray-700 outline-none w-full placeholder-gray-400"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
-          {/* Hide settings button on mobile */}
-          <button className="hidden lg:block p-2 hover:bg-gray-50 rounded-lg">
-            <Settings size={16} className="text-gray-500" />
-          </button>
         </div>
       </div>
 
       {/* Chat List Items */}
       <div className="flex-1 overflow-y-auto">
-        {clients.map((chat, idx) => {
+        {filteredClients.map((chat, idx) => {
           const unreadCount = unreadCounts[chat._id] || 0;
 
           return (

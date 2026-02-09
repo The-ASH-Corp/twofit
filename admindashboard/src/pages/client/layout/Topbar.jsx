@@ -56,8 +56,21 @@ const getBreadcrumbs = () => {
 };
 
 const breadcrumbs = getBreadcrumbs();
-const currentPage =
-  breadcrumbs[breadcrumbs.length - 1]?.name || 'Dashboard';
+
+  const getGreeting = () => {
+    const hours = new Date().getHours();
+    if (hours < 12) return "Good Morning";
+    if (hours < 18) return "Good Afternoon";
+    return "Good Evening";
+  };
+
+  const currentBreadcrumb =
+    breadcrumbs[breadcrumbs.length - 1]?.name || "Dashboard";
+
+  const currentPage =
+    currentBreadcrumb === "Dashboard"
+      ? `${getGreeting()}, ${user?.name?.split(" ")[0] || "User"}`
+      : currentBreadcrumb;
 
   return (
     <div className="flex justify-between items-center gap-4">
@@ -92,21 +105,6 @@ const currentPage =
       </div>
 
       <div className="flex items-center gap-3 md:gap-4 flex-1 justify-end max-w-full">
-        {/* Search Bar - Hidden on small screens, shown as icon or collapsed */}
-        <div className="hidden sm:flex items-center bg-white px-3 rounded-xl border border-gray-100 shadow-sm flex-1 max-w-[400px]">
-          <Search size={18} className="text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search anything"
-            className="w-full px-3 py-2.5 text-sm bg-white focus:outline-none placeholder:text-gray-400"
-          />
-          <img
-            src={assets.filter}
-            className="w-4 h-4 cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
-            alt="Filter"
-          />
-        </div>
-
         {/* Action icons */}
         <div className="flex items-center gap-2 md:gap-4 shrink-0">
           <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all relative">
