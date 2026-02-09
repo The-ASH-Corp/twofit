@@ -38,3 +38,19 @@ export const getAllBroadcast = createAsyncThunk(
     }
   },
 );
+
+export const getBroadcast = createAsyncThunk(
+  "broadcast/getBroadcast",
+  async (id, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(
+        `/broadcast/get/${id}`,
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get Broadcast",
+      );
+    }
+  },
+);
