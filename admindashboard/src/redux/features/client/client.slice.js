@@ -10,7 +10,7 @@ import {
 
 const initialState = {
   allClients: [],
-   clientsWithHabitPlan: [], 
+  clientsWithHabitPlan: [], 
   founderClientList: [],
   selectedClient: null,
   weightHistory: [],
@@ -19,6 +19,7 @@ const initialState = {
   error: null,
   status: "idle",
 };
+
 
 const clientSlice = createSlice({
   name: "client",
