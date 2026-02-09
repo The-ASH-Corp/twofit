@@ -6,7 +6,7 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useDispatch } from "react-redux";
 import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
 
-export default function ExpertCard({ fetchFeedbackData }) {
+export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedExpert, setSelectedExpert] = useState(null);
   const user = useAppSelector(selectUser);
@@ -72,12 +72,21 @@ export default function ExpertCard({ fetchFeedbackData }) {
             </div>
             <button
               onClick={() => {
-                setSelectedExpert(expert);
-                setIsOpen(!isOpen);
+                if (!ratedExpertIds.includes(expert._id)) {
+                  setSelectedExpert(expert);
+                  setIsOpen(!isOpen);
+                }
               }}
-              className="text-white p-3 bg-[#0A4F48] rounded-xl mt-4 w-full"
+              disabled={ratedExpertIds.includes(expert._id)}
+              className={`text-white p-3 rounded-xl mt-4 w-full transition-all ${
+                ratedExpertIds.includes(expert._id)
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-[#0A4F48] hover:bg-[#083d38]"
+              }`}
             >
-              Rate & Review
+              {ratedExpertIds.includes(expert._id)
+                ? "Already Rated"
+                : "Rate & Review"}
             </button>
           </div>
         ))}
@@ -132,19 +141,32 @@ export default function ExpertCard({ fetchFeedbackData }) {
             {/* Button */}
             <button
               onClick={() => {
-                setSelectedExpert(expert);
-                setIsOpen(!isOpen);
+                if (!ratedExpertIds.includes(expert._id)) {
+                  setSelectedExpert(expert);
+                  setIsOpen(!isOpen);
+                }
               }}
-              className="w-full text-white py-3 bg-[#0A4F48] rounded-xl font-medium text-[14px] hover:bg-[#083d38] transition-colors"
+              disabled={ratedExpertIds.includes(expert._id)}
+              className={`w-full py-3 rounded-xl font-medium text-[14px] transition-colors ${
+                ratedExpertIds.includes(expert._id)
+                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                  : "bg-[#0A4F48] text-white hover:bg-[#083d38]"
+              }`}
             >
-              Rate & Review
+              {ratedExpertIds.includes(expert._id)
+                ? "Already Rated"
+                : "Rate & Review"}
             </button>
           </div>
         ))}
       </div>
 
       {isOpen ? (
-        <Modal expert={selectedExpert} onClose={() => setIsOpen(false)} fetchFeedbackData={fetchFeedbackData} />
+        <Modal
+          expert={selectedExpert}
+          onClose={() => setIsOpen(false)}
+          fetchFeedbackData={fetchFeedbackData}
+        />
       ) : (
         ""
       )}
