@@ -29,13 +29,13 @@ jobs:
             git pull origin main
 
             echo "🛑 Stop containers"
-            docker compose down || true
+            docker-compose down || true
 
             echo "🏗️ Build containers"
-            docker compose build
+            docker-compose build
 
             echo "🚀 Start containers"
-            docker compose up -d
+            docker-compose up -d
 
             echo "✅ Deployment successful"
           EOF
