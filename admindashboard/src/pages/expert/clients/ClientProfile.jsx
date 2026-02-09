@@ -27,7 +27,7 @@ const ClientProfile = () => {
 
   const user = useSelector(selectUser);
 
-  const client = useSelector(selectSelectedClient);
+  const client = useSelector(selectSelectedClient);  
   const status = useSelector(selectClientStatus);
   const error = useSelector(selectClientError);
   const dashboardStats = useSelector(selectCoachDashboardStats);
@@ -56,7 +56,7 @@ const ClientProfile = () => {
   return (
     <>
       <div className="flex justify-end mb-2">
-        {user?.role === "Dietician" && (
+        {user?.role === "Dietician" && !client?.dietPlanPdf && (
           <button
             onClick={() => setIsDietDrawerOpen(true)}
             className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg"

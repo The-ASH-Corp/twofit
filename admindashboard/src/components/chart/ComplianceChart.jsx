@@ -1,5 +1,4 @@
 import React from "react";
-import { weeklyCompliance } from "@/assets/weeklyCompliance";
 import {
   BarChart,
   Bar,
@@ -12,14 +11,27 @@ import {
 import LegendHeader from "./LegendHeader";
 
 export default function ComplianceChart({ data }) {
-  // Use provided data or fallback to static data
-  const chartData = (data && Array.isArray(data) && data.length > 0) ? data : weeklyCompliance;
+  const hasData = data && Array.isArray(data) && data.length > 0;
+
+  if (!hasData) {
+    return (
+      <div className="h-[220px] w-full flex flex-col">
+        <LegendHeader />
+        <div className="flex-1 flex items-center justify-center bg-gray-50 rounded-lg border border-dashed border-gray-200">
+          <p className="text-xs text-gray-400 font-medium">
+            No data available
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-[220px] w-full">
       <LegendHeader />
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
-          data={chartData}
+          data={data}
           stackOffset="expand"
           barSize={32}
           margin={{ top: 0, right: 0, left: -27, bottom: 0 }}
