@@ -54,7 +54,7 @@ export default function FinanceTable() {
       </div>
     );
   return (
-    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
+    <div className="h-[calc(100vh-130px)] pb-4 overflow-auto no-scrollbar">
       <FinanceKpi />
       {employees.length > 0 && (
         <BaseTable

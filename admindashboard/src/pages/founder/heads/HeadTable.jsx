@@ -6,35 +6,15 @@ import { getFounderAllHeads } from "@/redux/features/head/head.thunk";
 import {
   selectFounderAllHeads,
   selectHeadCount,
+  selectHeadError,
   selectHeadStatus,
 } from "@/redux/features/head/head.selectors";
 import { useNavigate } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
 
 const HeadTable = () => {
-  // const therapyData = [
-  //   {
-  //     name: "Therapy A",
-  //     sets: 5,
-  //     attachment: "attachmentA.pdf",
-  //     media: "mediaA.mp4",
-  //   },
-  //   {
-  //     name: "Therapy A",
-  //     sets: 5,
-  //     attachment: "attachmentA.pdf",
-  //     media: "mediaA.mp4",
-  //   },
-  //   {
-  //     name: "Therapy A",
-  //     sets: 5,
-  //     attachment: "attachmentA.pdf",
-  //     media: "mediaA.mp4",
-  //   },
-  // ];
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  // const [totalCount, setTotalCount] = useState(0);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -49,7 +29,7 @@ const HeadTable = () => {
   const data = useSelector(selectFounderAllHeads);
   const totalCount = useSelector(selectHeadCount);
   const status = useSelector(selectHeadStatus);
-  // const error = useSelector(selectHeadError);
+  const error = useSelector(selectHeadError);
 
   const [heads, setHeads] = useState([]);
  
@@ -80,10 +60,10 @@ const HeadTable = () => {
         <SyncLoader color="#0A4F48" loading margin={2} size={20} />
       </div>
     );
-  // if (error) return <p className="text-red-500">{error?.error}</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
+    <div className="h-[calc(100vh-130px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         data={heads}
         columns={therapyColumns()}

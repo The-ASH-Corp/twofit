@@ -58,7 +58,7 @@ export default function ExpertTable() {
   // if (error) return <p>{error}</p>;
 
   return (
-    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
+    <div className="h-[calc(100vh-130px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         columns={ExpertColumns}
         data={coaches}

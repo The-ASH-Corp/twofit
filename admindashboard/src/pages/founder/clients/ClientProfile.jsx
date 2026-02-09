@@ -41,7 +41,7 @@ const ClientProfile = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="flex flex-col lg:flex-row lg:justify-between w-full gap-4 h-[calc(100vh-120px)] ">
+    <div className="flex flex-col lg:flex-row lg:justify-between w-full gap-4 h-[calc(100vh-130px)] ">
       <div className="w-full lg:w-[25%] lg:overflow-auto no-scrollbar">
         <ProfileLeftSide client={client} complianceStats={complianceStats} />
       </div>

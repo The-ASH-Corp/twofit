@@ -15,7 +15,7 @@ export const allEmployees = async (page, limit) => {
   ).lean();
 
   const getCurrentMonthName = () => {
-    return new Date("03-03-2020").toLocaleString("en-IN", { month: "long" });
+    return new Date().toLocaleString("en-IN", { month: "long" });
   };
 
   const unifiedData = [
