@@ -25,7 +25,7 @@ app.use(cookieParser())
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5000"],
+    origin: ["http://localhost:5173", process.env.FRONTEND_URL_PROD, "http://localhost:5000"],
     credentials: true,
     exposedHeaders: ["x-access-token"],
   })
