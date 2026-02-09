@@ -51,6 +51,28 @@ export const createFeedback = createAsyncThunk(
   }
 );
 
+export const assignDietPlan = createAsyncThunk(
+  "client/assignDietPlan",
+  async ({ clientId, formData }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.post(
+        `/clients/assign-diet-plan/${clientId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to assign diet plan",
+      );
+    }
+  },
+);
+
 export const getAllFeedbacks = createAsyncThunk(
   "client/getAllFeedbacks",
   async ({ id, page = 1, limit = 10 }, { rejectWithValue }) => {

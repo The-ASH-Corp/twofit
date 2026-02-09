@@ -26,9 +26,10 @@ export default function Modal({ expert, onClose, fetchFeedbackData }) {
       fetchFeedbackData();
       toast.success("Feedback submitted successfully");
     } catch (error) {
-      toast.error(
-        error || "Failed to submit feedback",
-      );
+      // Display the specific error message from backend
+      const errorMessage =
+        error?.message || error || "Failed to submit feedback";
+      toast.error(errorMessage);
     } finally {
       onClose();
       setRating(0);
@@ -117,7 +118,7 @@ export default function Modal({ expert, onClose, fetchFeedbackData }) {
         </div>
 
         {/* Buttons - Mobile has Cancel + Submit, Desktop has only Submit */}
-        <div className="p-4 lg:p-6 lg:pt-4 border-t border-gray-100 space-y-3 lg:space-y-0">
+        <div className="p-4 pb-20 lg:p-6 lg:pt-4 border-t border-gray-100 space-y-3 lg:space-y-0">
           {/* Cancel button - Mobile only */}
           <button
             onClick={onClose}

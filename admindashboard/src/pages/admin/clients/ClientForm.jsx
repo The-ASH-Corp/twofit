@@ -47,6 +47,7 @@ export default function ClientForm() {
   const [program, setProgram] = useState(null);
   const [coachesOfAdmin, setCoachesOfAdmin] = useState([]);
   const [selectedProgram, setSelectedProgram] = useState(null);
+  const [selectedTherapyType, setSelectedTherapyType] = useState("");
   const [therapy, setTherapy] = useState([]);
   const dispatch = useDispatch();
 
@@ -252,6 +253,7 @@ export default function ClientForm() {
                 value: t._id,
               }))
             : [],
+          onChange: (e) => setSelectedTherapyType(e.target.value),
         },
       ],
     },
@@ -265,7 +267,16 @@ export default function ClientForm() {
           type: "select",
           options: coachesOfAdmin
             ? coachesOfAdmin
-                ?.filter((coach) => coach?.role === "Dietician")
+                ?.filter((coach) => {
+                  if (coach?.role !== "Dietician") return false;
+                  // If a program is selected, only show dieticians assigned to that program
+                  if (selectedProgram?._id) {
+                    return coach.assignedPrograms?.some(
+                      (p) => p._id === selectedProgram._id,
+                    );
+                  }
+                  return true;
+                })
                 ?.map((coach) => ({ label: coach.name, value: coach._id }))
             : [],
         },
@@ -275,20 +286,36 @@ export default function ClientForm() {
           type: "select",
           options: coachesOfAdmin
             ? coachesOfAdmin
-                ?.filter((coach) => coach?.role === "Trainer")
+                ?.filter((coach) => {
+                  if (coach?.role !== "Trainer") return false;
+                  // If a program is selected, only show trainers assigned to that program
+                  if (selectedProgram?._id) {
+                    return coach.assignedPrograms?.some(
+                      (p) => p._id === selectedProgram._id,
+                    );
+                  }
+                  return true;
+                })
                 ?.map((coach) => ({ label: coach.name, value: coach?._id }))
             : [],
         },
-        {
-          name: "therapist",
-          label: "Therapist",
-          type: "select",
-          options: coachesOfAdmin
-            ? coachesOfAdmin
-                ?.filter((coach) => coach?.role === "Therapist")
-                ?.map((coach) => ({ label: coach.name, value: coach._id }))
-            : [],
-        },
+        ...(selectedTherapyType
+          ? [
+              {
+                name: "therapist",
+                label: "Therapist",
+                type: "select",
+                options: coachesOfAdmin
+                  ? coachesOfAdmin
+                      ?.filter((coach) => coach?.role === "Therapist")
+                      ?.map((coach) => ({
+                        label: coach.name,
+                        value: coach._id,
+                      }))
+                  : [],
+              },
+            ]
+          : []),
       ],
     },
     {

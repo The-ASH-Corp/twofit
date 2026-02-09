@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import DailyTaskDrawer from "./DailyTaskDrawer";
 import MobileBottomNav from "../components/MobileBottomNav";
 import { useDispatch } from "react-redux";
@@ -9,6 +9,7 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { getProgramById } from "@/redux/features/program/program.thunk";
 import { getClient } from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
+import { assets } from "@/assets/asset";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -64,15 +65,26 @@ export default function DailyPlan() {
     }
   }, [clientUser]);
 
+  const isProgramStarted = React.useMemo(() => {
+    const startDate = clientUser?.programStartDate || user?.programStartDate;
+    if (!startDate) return true;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    return today >= start;
+  }, [user?.programStartDate, clientUser?.programStartDate]);
+
   // Calculate calendar data based on tasks and program
   useEffect(() => {
     if (!program || !tasks) return;
 
     const newCalendarData = {};
-    const programStartDateStr = user?.programStartDate
-      ? user.programStartDate
-      : new Date();
-    
+    const programStartDateStr =
+      clientUser?.programStartDate || user?.programStartDate;
+
+    if (!programStartDateStr) return; // Don't generate calendar if no start date
+
     // Normalize start date to midnight
     let iteratorDate = new Date(programStartDateStr);
     iteratorDate.setHours(0, 0, 0, 0);
@@ -152,7 +164,8 @@ export default function DailyPlan() {
         // Build the task list for this day
         const taskList = [];
         const isWeightLoss = program?.title?.toLowerCase().includes("weight loss");
-        const mealCount = isWeightLoss ? 5 : 6;
+        const defaultMealCount = isWeightLoss ? 5 : 6;
+        const mealCount = clientUser?.dietPlanMealCount || user?.dietPlanMealCount || defaultMealCount;
 
         const workoutCount = currentPDay.exercises?.length || 0;
         const therapyCount = currentTherapyDay?.therapies?.length || 0;
@@ -253,7 +266,39 @@ export default function DailyPlan() {
     }
     
     setCalendarData(newCalendarData);
-  }, [program, therapyPlan, tasks, user?.programStartDate]);
+  }, [program, therapyPlan, tasks, user?.programStartDate, clientUser?.programStartDate]);
+
+  if (!isProgramStarted) {
+    const startDate = clientUser?.programStartDate || user?.programStartDate;
+    return (
+      <>
+        {/* Mobile Header */}
+        <div className="lg:hidden flex items-center justify-between p-4 bg-white sticky top-0 z-10 border-b border-gray-100">
+          <h1 className="text-[18px] font-bold text-[#181E27]">Daily Plan</h1>
+        </div>
+
+        <div className="w-full flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
+          <div className="bg-[#E6EEED] p-4 rounded-full mb-4">
+            <Calendar className="w-8 h-8 text-[#0A4F48] opacity-50" />
+          </div>
+          <h2 className="text-xl font-bold text-[#0A4F48] mb-2">
+            Program Hasn't Started Yet
+          </h2>
+          <p className="text-gray-500 max-w-md">
+            Your program is scheduled to start on{" "}
+            <b>{new Date(startDate).toLocaleDateString("en-US", {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}</b>.
+            Your daily plan will be available then.
+          </p>
+        </div>
+        <MobileBottomNav />
+      </>
+    );
+  }
 
   const handleSkipTask = async (task) => {
     if (task.type !== "Meal") return;

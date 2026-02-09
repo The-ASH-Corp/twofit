@@ -48,8 +48,17 @@ const ProfileLeftSide = ({ client, complianceStats }) => {
   const compliance = [
     {
       title: "Diet",
-      Missed: `Missed Diet: ${complianceStats?.stats?.missedCount + complianceStats?.stats?.skippedCount || 0}`,
-      percentage: `${(((complianceStats?.stats?.missedCount + complianceStats?.stats?.skippedCount) / complianceStats?.stats?.expectedMeals) * 100).toFixed(0)}%`,
+      Missed: `Missed Diet: ${
+        (complianceStats?.stats?.missedCount || 0) +
+        (complianceStats?.stats?.skippedCount || 0)
+      }`,
+      percentage: `${(() => {
+        const missed = complianceStats?.stats?.missedCount || 0;
+        const skipped = complianceStats?.stats?.skippedCount || 0;
+        const expected = complianceStats?.stats?.expectedMeals || 0;
+        if (expected === 0) return 0;
+        return (((missed + skipped) / expected) * 100).toFixed(0);
+      })()}%`,
       color: "#0A4F48",
     },
     {

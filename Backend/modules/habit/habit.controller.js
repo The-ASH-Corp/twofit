@@ -2,6 +2,8 @@ import {
   createHabitsService,
   getClientHabitsService,
   updateHabitStatusService,
+  updateHabit,
+  getHabitByIdService
 } from "./habit.service.js";
 
 export const createHabitsController = async (req, res) => {
@@ -54,6 +56,56 @@ export const getClientHabitsController = async (req, res) => {
     return res.status(500).json({
       message: "Failed to fetch habits",
       error: error.message,
+    });
+  }
+};
+
+
+export const getHabitByIdController=async(req,res)=>{
+  try{
+    const {habitId}=req.params;
+    console.log(habitId)
+    const habit=await getHabitByIdService(habitId);
+    console.log(habit)
+    if(!habit){
+      return res.status(404).json({
+        message:"No habits found"
+      })
+    }
+    return res.status(200).json({
+      data:habit
+    })
+  }
+  catch(error){
+    return res.status(500).json({
+      message:"Failed to fetch Habits",
+      error:error.message
+    })
+  }
+}
+export const updateHabitById = async (req, res) => {
+  try {
+    const { habitId } = req.params;
+    const updateData = req.body;
+
+    const updatedHabit = await updateHabit(habitId, updateData);
+
+    if (!updatedHabit) {
+      return res.status(404).json({
+        success: false,
+        message: "Habit plan not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Habit plan updated successfully",
+      data: updatedHabit,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
     });
   }
 };

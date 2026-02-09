@@ -17,8 +17,12 @@ export const createBroadcast = async (req, res) => {
 
 export const getAllBroadcast = async (req, res) => {
     try {
-        const {page, limit} = req.params;
-        const broadcasts = await broadcastService.getAllBroadcast(page, limit)
+        const {page, limit, type} = req.params;
+        const broadcasts = await broadcastService.getAllBroadcast(
+          page,
+          limit,
+          type,
+        );
         res.status(200).json({
           success: true,
           data: broadcasts,
@@ -27,3 +31,15 @@ export const getAllBroadcast = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 }
+
+export const deleteBroadcast = async (req, res) => {
+    try {
+        const broadcast = await broadcastService.deleteBroadcast(req.params.id)
+        res.status(200).json({
+          success: true,
+          data: broadcast,
+        });
+    } catch (error) {
+        res.status(400).json({ success: false, message: error.message });
+    }
+} 

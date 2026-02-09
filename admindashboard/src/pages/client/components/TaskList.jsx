@@ -14,7 +14,13 @@ import { useEffect } from "react";
 import { socket } from "@/utils/socket";
 import { selectToken } from "@/redux/features/auth/auth.selectores";
 
-export default function TaskList({ plans, therapyPlan, programTitle }) {
+export default function TaskList({
+  plans,
+  therapyPlan,
+  programTitle,
+  isProgramStarted = true,
+  mealCount,
+}) {
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
   const token = useAppSelector(selectToken);
@@ -100,7 +106,8 @@ export default function TaskList({ plans, therapyPlan, programTitle }) {
     }) || [];
 
   const isWeightLoss = programTitle?.toLowerCase().includes("weight loss");
-  const numberOfMeals = isWeightLoss ? 5 : 6;
+  const defaultMealCount = isWeightLoss ? 5 : 6;
+  const numberOfMeals = mealCount || defaultMealCount;
   const mealNames = Array.from({ length: numberOfMeals }, (_, i) => `Meal ${i + 1}`);
 
   const mealTasks = mealNames.map(
@@ -264,6 +271,19 @@ export default function TaskList({ plans, therapyPlan, programTitle }) {
       alert("Failed to skip task: " + error);
     }
   };
+
+  if (!isProgramStarted) {
+    return (
+      <div className="bg-white p-8 rounded-2xl shadow-sm text-center border border-dashed border-[#0A4F48]/30 mt-4">
+        <h3 className="text-[#0A4F48] font-bold text-lg mb-2">
+          Your Plan Hasn't Started Yet
+        </h3>
+        <p className="text-gray-500 text-sm">
+          Your tasks will appear here once your program begins.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3 mt-4">

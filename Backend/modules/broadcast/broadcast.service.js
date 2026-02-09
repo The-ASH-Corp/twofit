@@ -2,26 +2,52 @@ import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 import { broadcastModel } from "./broadcast.model.js";
 
 export const createBroadcast = async (data) => {
-    try {
-        return await broadcastModel.create({
-          ...data,
-          title: capitalizeFirst(data.title),
-        });
-    } catch (error) {
-        throw error;
-    }
-}
+  try {
+    const duplicate = await broadcastModel.findOne({
+      title: data.title.trim(),
+    });
 
-export const getAllBroadcast = async (page, limit) => {
-    try {
-        const skip = (page - 1) * limit;
-        const totalCount = await broadcastModel.countDocuments();
-        const broadcast = await broadcastModel.find().skip(skip).limit(limit);
-        return {
-            totalCount,
-            broadcast,
-        }
-    } catch (error) {
-        throw error;
+    if (duplicate) {
+      throw new Error("Broadcast title already exists");
     }
-}
+    return await broadcastModel.create({
+      ...data,
+      title: capitalizeFirst(data.title),
+    });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAllBroadcast = async (page, limit, type) => {
+  try {
+    const skip = (page - 1) * limit;
+
+    const filter = {};
+    if (type && type !== "All") {
+      filter.type = type;
+    }
+
+    const totalCount = await broadcastModel.countDocuments(filter);
+    const broadcast = await broadcastModel
+      .find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    return {
+      totalCount,
+      broadcast,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const deleteBroadcast = async (id) => {
+  try {
+    return await broadcastModel.findByIdAndDelete(id);
+  } catch (error) {
+    throw error;
+  }
+};

@@ -35,7 +35,7 @@ export const refreshAccessToken = async (req, res) => {
 
     // Ensure Redis is connected
     if (!redisClient.isOpen) {
-      console.log("Redis client disconnected, attempting to reconnet...");
+      console.log("Redis client disconnected, attempting to reconnect...");
       await redisClient.connect();
     }
 
@@ -54,22 +54,31 @@ export const refreshAccessToken = async (req, res) => {
 
     const userPayload = { id: decoded.id, role: decoded.role, email: decoded.email };
 
-    // Like strict rotation: Generate NEW tokens
+    // Generate NEW Access Token
     const newAccessToken = generateAccessToken(userPayload);
-    const newRefreshToken = generateRefreshToken(userPayload);
 
-    // Update Redis
-    await redisClient.set(`refresh:${decoded.id}`, newRefreshToken, {
-      EX: 7 * 24 * 60 * 60, // 7 days
-    });
+    // Check if refresh token needs rotation (if < 3 days remaining)
+    const now = Math.floor(Date.now() / 1000);
+    const timeRemaining = decoded.exp - now;
+    const ROTATION_THRESHOLD = 3 * 24 * 60 * 60; // 3 days
 
-    // Set new Cookie
-    res.cookie("refreshToken", newRefreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000, 
-    });
+    if (timeRemaining < ROTATION_THRESHOLD) {
+      // Like strict rotation: Generate NEW tokens
+      const newRefreshToken = generateRefreshToken(userPayload);
+
+      // Update Redis
+      await redisClient.set(`refresh:${decoded.id}`, newRefreshToken, {
+        EX: 7 * 24 * 60 * 60, // 7 days
+      });
+
+      // Set new Cookie
+      res.cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000, 
+      });
+    }
 
     res.setHeader("x-access-token", newAccessToken);
 

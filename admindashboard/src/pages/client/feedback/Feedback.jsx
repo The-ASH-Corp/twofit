@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import ExpertCard from './ExpertCard'
-import FeedbackList from './FeedbackList'
-import MobileBottomNav from '../components/MobileBottomNav'
-import { useAppSelector } from '@/redux/store/hooks';
-import { selectUser } from '@/redux/features/auth/auth.selectores';
-import { useDispatch } from 'react-redux';
-import { getAllFeedbacks } from '@/redux/features/client/client.thunk';
+import React, { useEffect, useState } from "react";
+import ExpertCard from "./ExpertCard";
+import FeedbackList from "./FeedbackList";
+import MobileBottomNav from "../components/MobileBottomNav";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { useDispatch } from "react-redux";
+import { getAllFeedbacks } from "@/redux/features/client/client.thunk";
 
 export default function Feedback() {
   const user = useAppSelector(selectUser);
@@ -17,7 +17,7 @@ export default function Feedback() {
 
   const fetchFeedbackData = async () => {
     const response = await dispatch(
-      getAllFeedbacks({ id: user._id, page, limit })
+      getAllFeedbacks({ id: user._id, page, limit }),
     );
     const result = await response.payload;
     const data = result?.data;
@@ -39,7 +39,7 @@ export default function Feedback() {
             day: "numeric",
           }),
           _id: fb._id,
-        }))
+        })),
       ) || [];
 
     setFeedbackData(flattenedData);
@@ -61,7 +61,10 @@ export default function Feedback() {
 
   return (
     <div className="flex flex-col gap-5">
-      <ExpertCard fetchFeedbackData={fetchFeedbackData} />
+      <ExpertCard
+        fetchFeedbackData={fetchFeedbackData}
+        ratedExpertIds={feedbackData.map((fb) => fb.coachId)}
+      />
       <FeedbackList
         feedbackData={feedbackData}
         page={page}

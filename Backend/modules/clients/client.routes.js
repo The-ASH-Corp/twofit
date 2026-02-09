@@ -13,8 +13,10 @@ import {
   getFounderClientList,
   getComplianceStats,
   getClientsWithHabitPlan,
+  assignDietPlan,
 } from "./client.controller.js";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
+import { uploader } from "../../middleware/upload.js";
 
 
 const router = express.Router()
@@ -24,6 +26,12 @@ router.get("/founder/list/:page/:limit", authMiddleware, getFounderClientList);
 router.get("/all-clients/:page/:limit", authMiddleware, getAllClients);
 router.get("/get-client/:id", authMiddleware, getSingleClient)
 router.post("/update-client/:id", authMiddleware, updateClient)
+router.post(
+  "/assign-diet-plan/:id",
+  authMiddleware,
+  uploader.single("file"),
+  assignDietPlan,
+);
 router.delete("/delete-client/:id", authMiddleware, deleteClient)
 
 router.post("/get-all-users-based-on-coach-for-admin", authMiddleware, getClientsBasedOnCoach)

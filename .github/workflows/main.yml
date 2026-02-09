@@ -1,0 +1,41 @@
+name: Twofit 
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Deploy to Server
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+          ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+
+            cd ${{ secrets.APP_PATH }} || exit 1
+
+            echo "📥 Pull latest code"
+            git pull origin main
+
+            echo "🛑 Stop containers"
+            docker compose down || true
+
+            echo "🏗️ Build containers"
+            docker compose build
+
+            echo "🚀 Start containers"
+            docker compose up -d
+
+            echo "✅ Deployment successful"
+          EOF

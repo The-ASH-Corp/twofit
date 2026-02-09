@@ -15,14 +15,19 @@ import ExpertClientProfileLeftSide from "@/components/clients/ExpertClientProfil
 import ExpertClientProfileCenterSide from "@/components/clients/ExpertClientProfileCenterSide";
 import ExpertClientProfileRightSide from "@/components/clients/ExpertClientProfileRightSide";
 import { selectCoachDashboardStats } from "@/redux/features/coach/coach.selector";
-import {  getAllUserSubmissions } from "@/redux/features/tasks/task.thunk";
+import { getAllUserSubmissions } from "@/redux/features/tasks/task.thunk";
+import AssignDietPlanDrawer from "./AssignDietPlanDrawer";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 const ClientProfile = () => {
   const dispatch = useDispatch();
   const [clientComplianceStats, setClientComplianceStats] = useState(null);
+  const [isDietDrawerOpen, setIsDietDrawerOpen] = useState(false);
   const { id } = useParams();
 
-  const client = useSelector(selectSelectedClient);
+  const user = useSelector(selectUser);
+
+  const client = useSelector(selectSelectedClient);  
   const status = useSelector(selectClientStatus);
   const error = useSelector(selectClientError);
   const dashboardStats = useSelector(selectCoachDashboardStats);
@@ -31,7 +36,6 @@ const ClientProfile = () => {
   useEffect(() => {
     if (id) {
       dispatch(getClient({ id }));
-      // dispatch(getPendingSubmissions()); // Optional: if you still want to keep global pending tasks up to date
       dispatch(getAllUserSubmissions(id));
       dispatch(fetchClientComplianceStats(id))
         .unwrap()
@@ -50,28 +54,46 @@ const ClientProfile = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="flex flex-col lg:flex-row lg:justify-between w-full gap-4 h-[calc(100vh-120px)] ">
-      <div className="w-full lg:w-[25%] lg:overflow-auto no-scrollbar">
-        <ExpertClientProfileLeftSide
-          client={client}
-          clientComplianceStats={clientComplianceStats}
-          dashboardStats={dashboardStats}
-        />
+    <>
+      <div className="flex justify-end mb-2">
+        {user?.role === "Dietician" && !client?.dietPlanPdf && (
+          <button
+            onClick={() => setIsDietDrawerOpen(true)}
+            className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg"
+          >
+            Add Diet Plan
+          </button>
+        )}
       </div>
-      <div className="w-full lg:w-[50%] lg:overflow-auto no-scrollbar">
-        <ExpertClientProfileCenterSide
-          client={client}
-          pendingTasks={selectedUserTasks}
-        />
+      <div className="flex flex-col lg:flex-row lg:justify-between w-full gap-4 h-[calc(100vh-120px)] ">
+        <div className="w-full lg:w-[25%] lg:overflow-auto no-scrollbar">
+          <ExpertClientProfileLeftSide
+            client={client}
+            clientComplianceStats={clientComplianceStats}
+            dashboardStats={dashboardStats}
+          />
+        </div>
+        <div className="w-full lg:w-[50%] lg:overflow-auto no-scrollbar">
+          <ExpertClientProfileCenterSide
+            client={client}
+            pendingTasks={selectedUserTasks}
+          />
+        </div>
+        <div className="w-full lg:w-[25%] lg:overflow-auto no-scrollbar">
+          <ExpertClientProfileRightSide
+            client={client}
+            clientComplianceStats={clientComplianceStats}
+            dashboardStats={dashboardStats}
+          />
+        </div>
       </div>
-      <div className="w-full lg:w-[25%] lg:overflow-auto no-scrollbar">
-        <ExpertClientProfileRightSide
-          client={client}
-          clientComplianceStats={clientComplianceStats}
-          dashboardStats={dashboardStats}
-        />
-      </div>
-    </div>
+
+      <AssignDietPlanDrawer
+        isOpen={isDietDrawerOpen}
+        onClose={() => setIsDietDrawerOpen(false)}
+        clientId={id}
+      />
+    </>
   );
 };
 

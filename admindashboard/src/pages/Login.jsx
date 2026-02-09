@@ -3,6 +3,7 @@ import { assets } from "../assets/asset";
 import { login } from "@/redux/features/auth/auth.thunk";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Login = () => {
   useEffect(() => {
@@ -55,7 +56,7 @@ const Login = () => {
       navigate(redirectPath, { replace: true });
     } catch (error) {
       console.error("Login failed:", error);
-      alert(error?.message || "Invalid email or password");
+      toast.error(error?.message || "Invalid email or password");
     }
   };
 

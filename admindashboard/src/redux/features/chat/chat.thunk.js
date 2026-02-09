@@ -14,3 +14,23 @@ export const getChats = createAsyncThunk(
   }
 );
 
+export const uploadChatMedia = createAsyncThunk(
+  "chats/upload-media",
+  async ({ formData, onUploadProgress }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.post("/chats/upload-media", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress,
+      });
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Chat media upload failed"
+      );
+    }
+  }
+);
+

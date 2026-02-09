@@ -1,3 +1,4 @@
+import { FounderModel } from "../../seeds/createAdmin.js";
 import { AdminModel } from "../admin/admin.model.js";
 import allProgramModel from "../allPrograms/allPrograma.model.js";
 import User from "../auth/auth.model.js";
@@ -271,6 +272,6 @@ export const getDashboardData = async() => {
 } 
 
 export const getFounderProfile = async (id) => {
-    const profile = await User.findById(id).select("-password");
+    const profile = await FounderModel.findById(id).select("-password");
     return profile;
 }

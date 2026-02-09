@@ -195,11 +195,14 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
               <span className="text-[12px] text-[#66706D]">Plan Duration</span>
               <span className="text-[12px] text-[#66706D]">
                 <span className="text-[#0A4F48] font-bold">
-                  {(
-                    (client?.currentGlobalDay /
-                      client?.programType?.plan?.duration.split(" ")[0]) *
-                    100
-                  ).toFixed(0)}
+                  {(() => {
+                    const durationStr = client?.programType?.plan?.duration || "";
+                    const durationVal = parseInt(durationStr.split(" ")[0]) || 0;
+                    const day = client?.currentGlobalDay || 0;
+                    if (durationVal === 0) return 0;
+                    const pct = (day / durationVal) * 100;
+                    return isNaN(pct) ? 0 : pct.toFixed(0);
+                  })()}
                   %
                 </span>{" "}
                 / 100%
@@ -214,7 +217,14 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
               <div
                 className="h-full bg-[#0A4F48] rounded-full"
                 style={{
-                  width: `${(client?.currentGlobalDay / client?.programType?.plan?.duration.split(" ")[0]) * 100}%`,
+                  width: `${(() => {
+                    const durationStr = client?.programType?.plan?.duration || "";
+                    const durationVal = parseInt(durationStr.split(" ")[0]) || 0;
+                    const day = client?.currentGlobalDay || 0;
+                    if (durationVal === 0) return "0%";
+                    const pct = (day / durationVal) * 100;
+                    return `${Math.min(isNaN(pct) ? 0 : pct, 100)}%`;
+                  })()}`,
                 }} 
               />
             </div>
