@@ -16,11 +16,13 @@ import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectAllBroadcast, selectBroadcastError, selectBroadcastStatus, selectTotalBroadcast } from "@/redux/features/broadcast/broadcast.selector";
 import { SyncLoader } from "react-spinners";
+import { useNavigate } from "react-router-dom";
 
 const Templates = () => {
   const [activeFilter, setActiveFilter] = useState("All");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const navigate = useNavigate()
   const dispatch = useDispatch();
   const filters = [
     "All",
@@ -111,6 +113,7 @@ const Templates = () => {
     setBroadcast(filtered);
   };
 
+
   if (status === "loading")
     return (
       <div className="flex justify-center items-center h-[calc(100vh-120px)]">
@@ -158,42 +161,39 @@ const Templates = () => {
       {/* Templates Grid */}
       <div className="flex-1 overflow-auto no-scrollbar">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
-          {broadcast.map((template, i) => (
+          {broadcast?.map((template, i) => (
             <div
               key={i}
               className="bg-white rounded-2xl p-6 flex flex-col gap-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] relative"
             >
-              <button className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors">
-                <MoreHorizontal size={20} />
-              </button>
+              <div>
+                <button className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors">
+                  <MoreHorizontal size={20} />
+                </button>
+              </div>
 
               <div className="flex flex-col gap-1">
                 <h3 className="text-lg font-bold text-[#0A4F48]">
-                  {template.title}
+                  {template?.title}
                 </h3>
                 <span className="text-xs text-[#66706D] font-medium">
-                  {template.type}
+                  {template?.type}
                 </span>
               </div>
 
               <div className="bg-[#F8F9FA] rounded-xl p-5 flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-sm">
-                  <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
-                  <span className="font-semibold text-gray-800">
-                    Level Up Your Health Journey!
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600 leading-relaxed font-medium">
-                  {template.message
-                    .split("**")
-                    .map((part, i) =>
-                      i % 2 === 1 ? <strong key={i}>{part}</strong> : part,
-                    )}
+                <p className="text-sm text-gray-600 leading-relaxed font-medium wrap-break-word whitespace-pre-wrap">
+                  {template?.message}
                 </p>
               </div>
 
               <div className="flex justify-end mt-1">
-                <button className="bg-[#0A4F48] text-white px-7 py-2.5 rounded-xl text-sm font-bold hover:bg-[#073a35] transition-colors shadow-sm">
+                <button
+                  onClick={() =>
+                    navigate(`/founder/broadcasts/summary/${template?._id}`)
+                  }
+                  className="bg-[#0A4F48] text-white px-7 py-2.5 rounded-xl text-sm font-bold hover:bg-[#073a35] transition-colors shadow-sm"
+                >
                   Use Template
                 </button>
               </div>
@@ -294,5 +294,3 @@ const Templates = () => {
 };
 
 export default Templates;
-
-// integration completed"

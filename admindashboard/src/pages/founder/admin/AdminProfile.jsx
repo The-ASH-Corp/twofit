@@ -35,7 +35,7 @@ const AdminProfile = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="flex flex-col lg:flex-row flex-1 justify-between w-full gap-4 h-[calc(100vh-120px)] overflow-auto no-scrollbar pb-6">
+    <div className="flex flex-col lg:flex-row flex-1 justify-between w-full gap-4 h-[calc(100vh-130px)] overflow-auto no-scrollbar pb-6">
       {/* left */}
       <div className="w-full lg:w-[38%]">
         <AdminLeftSide admin={expert} />

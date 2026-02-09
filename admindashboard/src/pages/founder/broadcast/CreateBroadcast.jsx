@@ -38,9 +38,9 @@ const CreateBroadcast = ({ onCancel }) => {
     }
 
     try {
-      await dispatch(createBroadcast(formData)).unwrap();
+      const broadcast = await dispatch(createBroadcast(formData)).unwrap();
       toast.success("Broadcast created successfully");
-      navigate("founder/broadcast/template");
+      navigate(`/founder/broadcasts/summary/${broadcast?.data?._id}`);
     } catch (error) {
       toast.error(error || "Failed to create Broadcast");
     }

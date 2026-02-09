@@ -36,7 +36,7 @@ const HeadProfile = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="flex flex-col gap-6 w-full h-[calc(100vh-120px)] overflow-hidden">
+    <div className="flex flex-col gap-6 w-full h-[calc(100vh-130px)] overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-[#0A4F48]">Profile Details</h1>
