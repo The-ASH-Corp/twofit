@@ -405,17 +405,21 @@ export const resetPassword = async ({ email, otp, newPassword }) => {
 
 export const editUserProfile = async (userId, profileData) => {
     const user =
-      (await User.findOne({ email: profileData.email })) ||
-      (await AdminModel.findOne({ email: profileData.email })) ||
-      (await HeadsModel.findOne({ email: profileData.email })) ||
-      (await FounderModel.findOne({ email: profileData.email })) ||
-      (await CoachModel.findOne({ email: profileData.email }));
+      (await User.findById(userId)) ||
+      (await AdminModel.findById(userId)) ||
+      (await HeadsModel.findById(userId)) ||
+      (await FounderModel.findById(userId)) ||
+      (await CoachModel.findById(userId));
   if (!user) {
     throw new Error("User not found");
   }
 
   Object.keys(profileData).forEach((key) => {
-    user[key] = profileData[key];
+    if (user[key] === undefined) {
+      user.set(key, profileData[key]);
+    } else {
+      user[key] = profileData[key];
+    }
   });
 
   await user.save();
