@@ -17,6 +17,7 @@ import { useAppSelector } from "@/redux/store/hooks";
 import { selectAllBroadcast, selectBroadcastError, selectBroadcastStatus, selectTotalBroadcast } from "@/redux/features/broadcast/broadcast.selector";
 import { SyncLoader } from "react-spinners";
 import { useNavigate } from "react-router-dom";
+import BroadcastMenu from "./BroadcastMenu";
 
 const Templates = () => {
   const [activeFilter, setActiveFilter] = useState("All");
@@ -124,7 +125,7 @@ const Templates = () => {
   return (
     <div className="flex-1 flex flex-col gap-5  overflow-y-auto no-scrollbar h-[calc(100vh-130px)]">
       {/* Header & Filters */}
-      <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex flex-col lg:flex-row gap-4 pr-1 pt-1">
         <div className="flex items-center justify-between w-full">
           <h1 className="text-2xl font-bold text-[#0A4F48]">Templates</h1>
         </div>
@@ -152,7 +153,7 @@ const Templates = () => {
             type="text"
             placeholder="Search Templates"
             onChange={(e) => searchInputHandler(e)}
-            className="pl-10 pr-4 py-2 bg-white border border-gray-100 rounded-lg text-sm w-72 focus:outline-none focus:ring-1 focus:ring-[#0A4F48]"
+            className="pl-10 pr-4 py-2 bg-white border border-gray-100 rounded-lg text-sm w-72 focus:outline-none  focus:ring-[#0A4F48]"
           />
         </div>
       </div>
@@ -166,10 +167,8 @@ const Templates = () => {
                 key={i}
                 className="bg-white rounded-2xl p-6 flex flex-col gap-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] relative"
               >
-                <div>
-                  <button className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 transition-colors">
-                    <MoreHorizontal size={20} />
-                  </button>
+                <div className="absolute top-6 right-6">
+                  <BroadcastMenu row={template} />
                 </div>
 
                 <div className="flex flex-col gap-1">
@@ -182,7 +181,7 @@ const Templates = () => {
                 </div>
 
                 <div className="bg-[#F8F9FA] rounded-xl p-5 flex flex-col gap-2">
-                  <p className="text-sm text-gray-600 leading-relaxed font-medium wrap-break-word whitespace-pre-wrap">
+                  <p className="text-sm text-gray-600 leading-relaxed font-medium line-clamp-2 wrap-break-word whitespace-pre-wrap">
                     {template?.message}
                   </p>
                 </div>
@@ -203,92 +202,94 @@ const Templates = () => {
         </div>
 
         {/* Pagination */}
-        <div className="flex flex-col sm:flex-row sm:items-start items-center justify-between gap-4 pt-4 mt-auto border-t border-gray-100">
-          {/* Results Per Page */}
-          <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-[#66706D] font-medium">
-            <span className="whitespace-nowrap">Show</span>
-            <div className="relative">
-              <select
-                value={limit}
-                onChange={(e) => {
-                  setLimit(Number(e.target.value));
-                  setPage(1);
-                }}
-                className="appearance-none pl-2 sm:pl-3 pr-7 sm:pr-8 py-1.5 text-xs sm:text-sm bg-white border border-gray-200 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0A4F48] focus:border-transparent"
+        {broadcast.length > 0 && (
+          <div className="flex flex-col sm:flex-row sm:items-start items-center justify-between gap-4 pt-4 mt-auto border-t border-gray-100">
+            {/* Results Per Page */}
+            <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-[#66706D] font-medium">
+              <span className="whitespace-nowrap">Show</span>
+              <div className="relative">
+                <select
+                  value={limit}
+                  onChange={(e) => {
+                    setLimit(Number(e.target.value));
+                    setPage(1);
+                  }}
+                  className="appearance-none pl-2 sm:pl-3 pr-7 sm:pr-8 py-1.5 text-xs sm:text-sm bg-white border border-gray-200 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0A4F48] focus:border-transparent"
+                >
+                  <option value={8}>8</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                </select>
+                <MdOutlineKeyboardArrowDown className="w-3 h-3 sm:w-4 sm:h-4 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500" />
+              </div>
+              <span className="whitespace-nowrap">of {totalCount} results</span>
+            </div>
+
+            {/* Page Navigation */}
+            <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 w-full sm:w-auto justify-center sm:justify-end">
+              {/* Previous Button */}
+              <button
+                onClick={() => setPage(Math.max(1, page - 1))}
+                disabled={page === 1}
+                className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg shrink-0 ${
+                  page === 1
+                    ? "bg-gray-100 text-gray-300 cursor-not-allowed"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                }`}
+                aria-label="Previous page"
               >
-                <option value={8}>8</option>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-              </select>
-              <MdOutlineKeyboardArrowDown className="w-3 h-3 sm:w-4 sm:h-4 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500" />
-            </div>
-            <span className="whitespace-nowrap">of {totalCount} results</span>
-          </div>
+                <MdOutlineKeyboardArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
 
-          {/* Page Navigation */}
-          <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 w-full sm:w-auto justify-center sm:justify-end">
-            {/* Previous Button */}
-            <button
-              onClick={() => setPage(Math.max(1, page - 1))}
-              disabled={page === 1}
-              className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg shrink-0 ${
-                page === 1
-                  ? "bg-gray-100 text-gray-300 cursor-not-allowed"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-              }`}
-              aria-label="Previous page"
-            >
-              <MdOutlineKeyboardArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
+              {/* Page Numbers */}
+              <div className="flex items-center gap-1 sm:gap-2">
+                {paginationRange.map((pageNumber, idx) => {
+                  if (pageNumber === "...") {
+                    return (
+                      <span
+                        key={idx}
+                        className="px-1 text-gray-400 font-bold text-xs sm:text-sm"
+                      >
+                        ...
+                      </span>
+                    );
+                  }
 
-            {/* Page Numbers */}
-            <div className="flex items-center gap-1 sm:gap-2">
-              {paginationRange.map((pageNumber, idx) => {
-                if (pageNumber === "...") {
                   return (
-                    <span
+                    <button
                       key={idx}
-                      className="px-1 text-gray-400 font-bold text-xs sm:text-sm"
+                      onClick={() => setPage(pageNumber)}
+                      className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs sm:text-sm font-bold transition-colors shrink-0 ${
+                        page === pageNumber
+                          ? "bg-[#0A4F48] text-white shadow-md"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                      aria-label={`Page ${pageNumber}`}
+                      aria-current={page === pageNumber ? "page" : undefined}
                     >
-                      ...
-                    </span>
+                      {pageNumber}
+                    </button>
                   );
-                }
+                })}
+              </div>
 
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => setPage(pageNumber)}
-                    className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs sm:text-sm font-bold transition-colors shrink-0 ${
-                      page === pageNumber
-                        ? "bg-[#0A4F48] text-white shadow-md"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    }`}
-                    aria-label={`Page ${pageNumber}`}
-                    aria-current={page === pageNumber ? "page" : undefined}
-                  >
-                    {pageNumber}
-                  </button>
-                );
-              })}
+              {/* Next Button */}
+              <button
+                onClick={() => setPage(Math.min(totalPages, page + 1))}
+                disabled={page === totalPages}
+                className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg shrink-0 ${
+                  page === totalPages
+                    ? "bg-gray-100 text-gray-300 cursor-not-allowed"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                }`}
+                aria-label="Next page"
+              >
+                <MdOutlineKeyboardArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
             </div>
-
-            {/* Next Button */}
-            <button
-              onClick={() => setPage(Math.min(totalPages, page + 1))}
-              disabled={page === totalPages}
-              className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg shrink-0 ${
-                page === totalPages
-                  ? "bg-gray-100 text-gray-300 cursor-not-allowed"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-              }`}
-              aria-label="Next page"
-            >
-              <MdOutlineKeyboardArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
