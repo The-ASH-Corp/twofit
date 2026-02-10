@@ -27,6 +27,8 @@ const TemplateSummary = () => {
     }
   }, [id, dispatch]);
 
+  const fileExt = broadcast?.attachment?.split(".").pop()?.toUpperCase();
+
   if (status === "loading")
     return (
       <div className="flex justify-center items-center h-[calc(100vh-120px)]">
@@ -37,15 +39,12 @@ const TemplateSummary = () => {
 
   return (
     <div className="h-[calc(100vh-130px)] pb-4 overflow-auto no-scrollbar">
-      <div className="bg-white p-4 rounded-lg flex flex-col items-center justify-between gap-4 w-full lg:w-[50%] mb-5">
+      <div className="bg-white p-4 rounded-lg flex flex-col items-center justify-between gap-7 w-full lg:w-[50%] mb-5">
         {/* header */}
         <div className="w-full flex items-center justify-between">
           <h1 className="text-[16px] text-[#0A4F48] font-bold">
             Broadcast Summary
           </h1>
-          <button className="text-gray-400 hover:text-gray-600 transition-colors">
-            <MoreHorizontal size={20} />
-          </button>
         </div>
         {/* content */}
         <div className="w-full flex flex-col items-center justify-between gap-6">
@@ -79,17 +78,20 @@ const TemplateSummary = () => {
                       />
                     </div>
                     <div className="flex flex-col items-start">
-                      <p className="text-[12px]">{broadcast?.attachment}</p>
+                      <p className="text-[12px] line-clamp-2">
+                        {broadcast?.attachment.split("/").pop()}
+                      </p>
                       <div className="flex gap-1 items-center">
-                        <p className="text-[#66706D] text-[11px]">PDF</p>
                         <span className="p-0.5 bg-[#DBDEDD] rounded-full"></span>
-                        <p className="text-[#66706D] text-[11px]">2.5</p>
+                        <p className="text-[#66706D] text-[11px]">{fileExt}</p>
                       </div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <p className="text-[#000000] text-[12px]">! No attachment</p>
+                <p className="text-[#000000] text-[12px]">
+                  Attachment not added
+                </p>
               )}
             </div>
           </div>

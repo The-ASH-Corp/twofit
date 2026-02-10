@@ -22,7 +22,6 @@ export const createProgram = createAsyncThunk(
       return response;
     } catch (error) {
       return rejectWithValue(
-        console.log(error.response?.data),
         error.response?.data?.message || "Failed to Create Program",
       );
     }

@@ -20,7 +20,6 @@ export default function ProgramForm() {
   const data = useAppSelector(selectAllCategories);
 
   useEffect(() => {
-    console.log(data)
     if (data?.data?.length === 0) {
       toast.error("Add category");
       navigate(-1);
