@@ -23,7 +23,7 @@ export default function HabitDisplay() {
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-semibold mb-4">Habit Plan</h2>
+      <h2 className="text-xl font-semibold mb-4 text-[#0A4F48]">Habit Plan</h2>
 
       <div className="space-y-3">
         {habitDetails.habits.map((habit, index) => (

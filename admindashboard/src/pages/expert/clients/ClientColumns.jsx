@@ -63,7 +63,7 @@ export const getClientColumns = (role, navigate) => {
           return (
             <button
               onClick={(e) =>{e.stopPropagation();  navigate(`/expert/clients/habit/${habitId}`)}}
-              className="px-3 py-1 text-white rounded-full bg-green-800 text-blue-700"
+              className="px-3 py-1 text-white rounded-full bg-[#0A4F48] text-blue-700"
             >
               View Plan
             </button>
