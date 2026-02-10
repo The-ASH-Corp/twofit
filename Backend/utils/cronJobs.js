@@ -12,9 +12,9 @@ export const startImageCleanupTask = () => {
 };
 
 const cleanupOldClientImages = async () => {
-    console.log("Running scheduled task: Cleanup of old client images (older than 1 week)...");
+    console.log("Running scheduled task: Cleanup of old client images (older than 3 months)...");
     try {
-        const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        const threeMonthsAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
         
         // Fetch all task submissions
         // Note: For large datasets, this should be optimized with an aggregation pipeline or specific queries.
@@ -30,7 +30,7 @@ const cleanupOldClientImages = async () => {
                     if (daily.exercises) {
                         for (const exercise of daily.exercises) {
                             // Check criteria: has file AND created more than 7 days ago
-                            if (exercise.file && exercise.createdAt && new Date(exercise.createdAt) < sevenDaysAgo) {
+                            if (exercise.file && exercise.createdAt && new Date(exercise.createdAt) < threeMonthsAgo) {
                                 const filePathRelative = exercise.file; // e.g. "/uploads/filename"
                                 
                                 // Remove leading slash if present to make it relative to root
