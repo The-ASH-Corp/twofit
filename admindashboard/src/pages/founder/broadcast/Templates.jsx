@@ -180,7 +180,12 @@ const Templates = () => {
                   </span>
                 </div>
 
-                <div className="bg-[#F8F9FA] rounded-xl p-5 flex flex-col gap-2">
+                <div
+                  onClick={() =>
+                    navigate(`/founder/broadcasts/summary/${template?._id}`)
+                  }
+                  className="bg-[#F8F9FA] rounded-xl p-5 flex flex-col gap-2"
+                >
                   <p className="text-sm text-gray-600 leading-relaxed font-medium line-clamp-2 wrap-break-word whitespace-pre-wrap">
                     {template?.message}
                   </p>
