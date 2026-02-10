@@ -23,13 +23,13 @@ jobs:
           ssh -o StrictHostKeyChecking=no \
           ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
 
-            cd ${{ secrets.APP_PATH }} || exit 1
+            cd ${{ secrets.APP_PATH }}
 
             echo "📥 Pull latest code"
             git pull origin master
 
             echo "🛑 Stop containers"
-            docker-compose down || true
+            docker-compose down
 
             echo "🏗️ Build containers"
             docker-compose build
