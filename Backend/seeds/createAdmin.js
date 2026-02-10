@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
+import readline from "readline";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
@@ -24,12 +26,25 @@ const founderSchema = new mongoose.Schema(
 export const FounderModel = mongoose.model("Founder", founderSchema);
 
 const seedAdmin = async () => {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  const ask = (query) => new Promise((resolve) => rl.question(query, resolve));
+
   try {
     await mongoose.connect(process.env.MONGOURI);
     console.log(" Database connected");
 
-    const email = "founder@twofit.com";
-    const password = "Founder@2025";
+    const email = await ask("Enter Admin Email: ");
+    const password = await ask("Enter Admin Password: ");
+    rl.close();
+
+    if (!email || !password) {
+      console.log("Email and Password are required.");
+      process.exit(1);
+    }
 
     const existing = await FounderModel.findOne({ email });
 
@@ -56,8 +71,11 @@ const seedAdmin = async () => {
     process.exit(0);
   } catch (err) {
     console.log("Seed failed:", err);
+    rl.close(); // ensure rl is closed on error
     process.exit(1);
   }
 };
 
-// seedAdmin();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  seedAdmin();
+}
