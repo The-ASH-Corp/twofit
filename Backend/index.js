@@ -38,25 +38,18 @@ if (process.env.BACKEND_URL_PROD) {
 // CORS MUST COME VERY EARLY
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // allow requests with no origin (like mobile apps or curl requests)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        let msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-        return callback(new Error(msg), false);
-      }
-      return callback(null, true);
-    },
+    origin: allowedOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
       "Authorization",
       "x-access-token",
       "Accept",
-      "X-Requested-With"
+      "X-Requested-With",
+      "Range"
     ],
     credentials: true,
-    exposedHeaders: ["x-access-token"],
+    exposedHeaders: ["x-access-token", "Content-Range"],
     preflightContinue: false,
     optionsSuccessStatus: 204
   })
