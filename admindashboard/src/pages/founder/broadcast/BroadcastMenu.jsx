@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { IoMdClose } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 
-const BroadcastMenu = ({ row, editActionPath, deleteActionPath }) => {
+const BroadcastMenu = ({ row }) => {
   const [activeRowId, setActiveRowId] = useState(null);
 
   const isOpen = activeRowId === row._id;
@@ -11,16 +11,12 @@ const BroadcastMenu = ({ row, editActionPath, deleteActionPath }) => {
 
   const handelEdit = (id) => {
     setActiveRowId(false);
-    if (editActionPath) {
-      navigate(`${editActionPath}${id}`);
-    }
+      navigate(`/founder/broadcasts/delete/${id}`);
   };
 
   const handelDelete = (id) => {
     setActiveRowId(false);
-    if (deleteActionPath) {
-      navigate(`${deleteActionPath}${id}`);
-    }
+    navigate(`/founder/broadcasts/delete/${id}`);
   };
 
   return (
