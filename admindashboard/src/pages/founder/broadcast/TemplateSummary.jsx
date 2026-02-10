@@ -11,28 +11,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
 
-const attachment = [
-  {
-    name: "Breakfast-oats.jpg",
-    type: "JPG",
-    size: "2.4 MB",
-  },
-  {
-    name: "Healthy-snack-almond.pdf",
-    type: "PDF",
-    size: "2.4 MB",
-  },
-  {
-    name: "Healthy-snack-almond.pdf",
-    type: "PDF",
-    size: "2.4 MB",
-  },
-  {
-    name: "Healthy-snack-almond.pdf",
-    type: "PDF",
-    size: "2.4 MB",
-  },
-];
 
 const TemplateSummary = () => {
   const navigate = useNavigate();
