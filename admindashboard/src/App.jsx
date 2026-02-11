@@ -44,6 +44,7 @@ import FounderTemplateSummary from "./pages/founder/broadcast/TemplateSummary";
 import FounderBroadcastCreate from "./pages/founder/broadcast/CreateBroadcast";
 import FounderBroadcastAutoReminder from "./pages/founder/broadcast/AutoReminders";
 import FounderBroadcastDelete from "./pages/founder/broadcast/broadcastDeletePopUp";
+import FounderBroadcastEdit from "./pages/founder/broadcast/broadcastEdit";
 
 //Head Pages Imports
 import HeadLayout from "./pages/head/layout/HeadLayout";
@@ -183,7 +184,14 @@ function App() {
           <Route path="therapy/create" element={<FounderTherapyForm />} />
           <Route path="therapy/plan/:id" element={<FounderTherapyPlanView />} />
           <Route path="broadcasts" element={<FounderBroadcastTemplates />} />
-          <Route path="broadcasts/delete/:id" element={<FounderBroadcastDelete />} />
+          <Route
+            path="broadcasts/delete/:id"
+            element={<FounderBroadcastDelete />}
+          />
+          <Route
+            path="broadcasts/edit/:id"
+            element={<FounderBroadcastEdit />}
+          />
           <Route
             path="broadcasts/summary/:id"
             element={<FounderTemplateSummary />}
