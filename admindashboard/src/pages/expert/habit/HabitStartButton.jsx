@@ -1,8 +1,13 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function HabitStartButton({ clientId }) {
   const navigate = useNavigate();
+
+  // const handleClick = (e) => {
+  //   e.stopPropagation();  
+  //   navigate(`add-habit/${clientId}`);
+  // };
+
   return (
     <div>
       <button

@@ -10,6 +10,7 @@ export const createUserByAdmin = async (req, res) => {
       data: user,
     });
   } catch (err) {
+    console.log(err)
     res.status(400).json({ success: false, message: err.message });
   }
 };

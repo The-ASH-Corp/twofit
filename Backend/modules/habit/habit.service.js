@@ -18,9 +18,21 @@ export const createHabitsService = async (clientId, habitNames) => {
   });
 };
 
+export const updateHabit = async (habitId, updateData) => {
+  return await HabitModel.findByIdAndUpdate(
+    habitId,
+    { $set: updateData },
+    { new: true, runValidators: true }
+  );
+};
+
 export const getClientHabitsService = async (clientId) => {
   return await HabitModel.findOne({ clientId });
 };
+
+export const getHabitByIdService=async(habitId)=>{
+  return await HabitModel.findOne({_id: habitId })
+}
 export const updateHabitStatusService = async (
   clientId,
   habitName,

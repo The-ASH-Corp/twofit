@@ -99,6 +99,7 @@ import DailyPlan from "./pages/client/dailyPlan/DailyPlan";
 import ClientChat from "./pages/client/chats/Chats";
 import Habit from "./pages/expert/habit/Habit";
 import HabitTracker from "./pages/client/habit/HabitTracker";
+import HabitDisplay from "./pages/expert/habit/HabitDisplay";
 
 
 function App() {
@@ -282,7 +283,11 @@ function App() {
             element={<ExpertTherapyPlanDetails />}
           />
           {/* <Route path="habit" element={<Habit/>}/> */}
-          <Route path="clients/add-habit/:id" element={<Habit />} />
+          <Route path="clients/add-habit/:id" element={<Habit/>}/>
+          <Route path="clients/habit/:habitId" element={<HabitDisplay/>}/>
+
+
+         
         </Route>
 
         {/* CLIENT */}

@@ -30,3 +30,16 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
     }
   }
 );
+
+export const getClientHabitByHabitId=createAsyncThunk("clients/getHabitPlan",
+  async (habitId, {rejectWithValue})=>{
+    try{
+      const res=await axiosInstance.get(`/habits/get/${habitId}`);
+      return res.data;
+    }
+    catch(error){
+      return rejectWithValue(error.response?.data?.message || "Failed to fetch Habit")
+    }
+  }
+)
+
