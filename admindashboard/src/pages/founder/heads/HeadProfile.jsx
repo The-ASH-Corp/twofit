@@ -3,10 +3,11 @@ import HeadLeftSide from "@/components/head/HeadLeftSide";
 import HeadRightSide from "@/components/head/HeadRightSide";
 import {
   selectHead,
+  selectHeadDashboardData,
   selectHeadError,
   selectHeadStatus,
 } from "@/redux/features/head/head.selectors";
-import { getHead } from "@/redux/features/head/head.thunk";
+import { getHead, getDashboardData } from "@/redux/features/head/head.thunk";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -14,20 +15,22 @@ import { SyncLoader } from "react-spinners";
 
 const HeadProfile = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { id } = useParams();
 
   const head = useSelector(selectHead);
+  const dashboardData = useSelector(selectHeadDashboardData);
   const status = useSelector(selectHeadStatus);
   const error = useSelector(selectHeadError);
 
   useEffect(() => {
     if (id) {
       dispatch(getHead(id));
+      dispatch(getDashboardData(id));
     }
   }, [id, dispatch]);
 
-  if (status === "loading")
+  if (status === "loading" && !head)
     return (
       <div className="flex justify-center items-center h-[calc(100vh-120px)]">
         <SyncLoader color="#0A4F48" loading margin={2} size={20} />
@@ -59,7 +62,7 @@ const HeadProfile = () => {
         </div>
         {/* right */}
         <div className="w-full lg:w-[24%]">
-          <HeadRightSide Head={head} />
+          <HeadRightSide Head={head} dashboardData={dashboardData} />
         </div>
       </div>
     </div>

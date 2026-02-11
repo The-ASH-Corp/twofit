@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { SyncLoader } from "react-spinners";
 
 import {
@@ -44,7 +44,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
 );
 
 const Dashboard = () => {
@@ -60,8 +60,20 @@ const Dashboard = () => {
   const [founder, setFounder] = useState();
   const [growthDuration, setGrowthDuration] = useState(6);
   const [complianceDuration, setComplianceDuration] = useState(12);
+  const [adminPerformanceDuration, setAdminPerformanceDuration] = useState(12);
+  const [expertPerformanceDuration, setExpertPerformanceDuration] =
+    useState(12);
   const [filterCategory, setFilterCategory] = useState("All Categories");
   const [showFilter, setShowFilter] = useState(false);
+
+  useEffect(() => {
+    dispatch(
+      founderDashboardData({
+        adminDuration: `${adminPerformanceDuration}m`,
+        expertDuration: `${expertPerformanceDuration}m`,
+      }),
+    );
+  }, [dispatch, adminPerformanceDuration, expertPerformanceDuration]);
 
   useEffect(() => {
     setFounder(data);
@@ -127,10 +139,11 @@ const Dashboard = () => {
   const complianceData = {
     labels: getSlicedData(complianceDataRaw?.labels, complianceDuration),
     datasets: ["Workout", "Therapy", "Diet"].map((label) => {
-      const dataset =
-        (complianceDataRaw?.datasets || []).find((ds) => ds.label === label) || {
-          data: [],
-        };
+      const dataset = (complianceDataRaw?.datasets || []).find(
+        (ds) => ds.label === label,
+      ) || {
+        data: [],
+      };
       const color =
         label === "Workout"
           ? "#F4DBC7"
@@ -154,37 +167,71 @@ const Dashboard = () => {
     }),
   };
 
-  
+  const expertPerformanceData = useMemo(() => {
+    const perf = founder?.data?.expertPerformance || {
+      taskCompletion: 0,
+      rating: 0,
+      clientsAssigned: 0,
+    };
+    return {
+      labels: ["Task Completion", "Rating", "Clients Assigned"],
+      datasets: [
+        {
+          data: [
+            perf.taskCompletion,
+            (perf.rating / 5) * 100,
+            perf.clientsAssigned,
+          ],
+          backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
+          borderWidth: 0,
+          cutout: "75%",
+          hoverOffset: 1,
+          spacing: 3,
+          borderRadius: 8,
+        },
+      ],
+      isZero:
+        perf.taskCompletion === 0 &&
+        perf.rating === 0 &&
+        perf.clientsAssigned === 0,
+    };
+  }, [founder]);
 
-  const expertPerformanceData = {
-    labels: ["Task Completion", "Rating", "Clients Assigned"],
-    datasets: [
-      {
-        data: [40, 85, 60],
-        backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
-        borderWidth: 0,
-        cutout: "75%",
-        hoverOffset: 1,
-        spacing: 3,
-        borderRadius: 8,
-      },
-    ],
-  };
+  const subAdminPerformanceData = useMemo(() => {
+    const perf = founder?.data?.adminPerformance || {
+      programs: 0,
+      experts: 0,
+      clients: 0,
+    };
+    const total =
+      (perf.programs || 0) + (perf.experts || 0) + (perf.clients || 0);
+    const toPct = (val) => (total > 0 ? Math.round((val / total) * 100) : 0);
 
-  const subAdminPerformanceData = {
-    labels: ["Programs", "Experts", "Clients "],
-    datasets: [
-      {
-        data: [70, 85, 60],
-        backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
-        borderWidth: 0,
-        cutout: "75%",
-        hoverOffset: 1,
-        spacing: 3,
-        borderRadius: 8,
+    return {
+      labels: ["Programs", "Experts", "Clients"],
+      datasets: [
+        {
+          data: [
+            toPct(perf.programs),
+            toPct(perf.experts),
+            toPct(perf.clients),
+          ],
+          backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
+          borderWidth: 0,
+          cutout: "75%",
+          hoverOffset: 1,
+          spacing: 3,
+          borderRadius: 8,
+        },
+      ],
+      raw: {
+        programs: toPct(perf.programs),
+        experts: toPct(perf.experts),
+        clients: toPct(perf.clients),
       },
-    ],
-  };
+      isZero: total === 0,
+    };
+  }, [founder]);
 
   const calculateTimeAgo = (dateString) => {
     if (!dateString) return "N/A";
@@ -197,25 +244,27 @@ const Dashboard = () => {
 
     if (diffInDays === 0) {
       if (diffInHours === 0) {
-         if(diffInMinutes < 5) return "Just now";
-         return `${diffInMinutes} mins ago`;
+        if (diffInMinutes < 5) return "Just now";
+        return `${diffInMinutes} mins ago`;
       }
-      return `Today, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      return `Today, ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
     } else if (diffInDays === 1) {
-      return `Yesterday, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      return `Yesterday, ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
     } else {
       return `${diffInDays} Days Ago`;
     }
   };
 
-  const progressReportsRaw = founder?.data?.latestReports?.map(report => ({
+  const progressReportsRaw =
+    founder?.data?.latestReports?.map((report) => ({
       ...report,
-      time: calculateTimeAgo(report.time)
-  })) || [];
+      time: calculateTimeAgo(report.time),
+    })) || [];
 
-  const progressReports = filterCategory === "All Categories"
-    ? progressReportsRaw
-    : progressReportsRaw.filter(report => report.type === filterCategory);
+  const progressReports =
+    filterCategory === "All Categories"
+      ? progressReportsRaw
+      : progressReportsRaw.filter((report) => report.type === filterCategory);
 
   const trainers = founder?.data?.Trainers || 0;
   const dietitians = founder?.data?.Dietitians || 0;
@@ -354,7 +403,7 @@ const Dashboard = () => {
     },
   };
 
-  if (status === "loading")
+  if (status === "loading" && !founder)
     return (
       <div className="flex justify-center items-center h-[calc(100vh-120px)]">
         <SyncLoader color="#0A4F48" loading margin={2} size={20} />
@@ -383,7 +432,7 @@ const Dashboard = () => {
                 bg: "bg-[#FAF3E0]",
               },
               {
-                label: "Sub Admins",
+                label: "Admins",
                 value: founder?.data?.totalAdmins || 0,
                 icon: <FileText size={20} className="text-[#0A4F48]" />,
                 bg: "bg-[#EBF3F2]",
@@ -460,52 +509,94 @@ const Dashboard = () => {
 
           {/* Row 3: New Clients Joined & Expert Performance */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <DashboardCard title="Sub Admin Performance" subTitle="Last Months">
+            <DashboardCard
+              title="Admin Performance"
+              subTitle={
+                adminPerformanceDuration === 12
+                  ? "Last Year"
+                  : `Last ${adminPerformanceDuration} Months`
+              }
+              onToggle={() =>
+                toggleDuration(
+                  adminPerformanceDuration,
+                  setAdminPerformanceDuration,
+                )
+              }
+            >
               <div className="h-64 relative flex items-center justify-center">
-                <Doughnut
-                  data={subAdminPerformanceData}
-                  options={{
-                    plugins: { legend: { display: false } },
-                    maintainAspectRatio: false,
-                  }}
-                />
-              
+                {!subAdminPerformanceData.isZero ? (
+                  <Doughnut
+                    data={subAdminPerformanceData}
+                    options={{
+                      plugins: { legend: { display: false } },
+                      maintainAspectRatio: false,
+                    }}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                    No data available
+                  </div>
+                )}
               </div>
               <div className="flex justify-between mt-4">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-xs bg-[#0A4F48]"></div>
                   <span className="text-[11px] text-[#66706D]">
                     Programs{" "}
-                    <strong className="text-[#0A4F48] text-[12px]">50%</strong>
+                    <strong className="text-[#0A4F48] text-[12px]">
+                      {subAdminPerformanceData.raw.programs}%
+                    </strong>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-xs bg-[#EBF3F2]"></div>
                   <span className="text-[11px] text-[#66706D]">
                     Experts{" "}
-                    <strong className="text-[#0A4F48] text-[12px]">50%</strong>
+                    <strong className="text-[#0A4F48] text-[12px]">
+                      {subAdminPerformanceData.raw.experts}%
+                    </strong>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-xs bg-[#F4DBC7]"></div>
                   <span className="text-[11px] text-[#66706D]">
                     Clients{" "}
-                    <strong className="text-[#0A4F48] text-[12px]">73%</strong>
+                    <strong className="text-[#0A4F48] text-[12px]">
+                      {subAdminPerformanceData.raw.clients}%
+                    </strong>
                   </span>
                 </div>
               </div>
             </DashboardCard>
 
-            <DashboardCard title="Expert Performance" subTitle="Last Months">
+            <DashboardCard
+              title="Expert Performance"
+              subTitle={
+                expertPerformanceDuration === 12
+                  ? "Last Year"
+                  : `Last ${expertPerformanceDuration} Months`
+              }
+              onToggle={() =>
+                toggleDuration(
+                  expertPerformanceDuration,
+                  setExpertPerformanceDuration,
+                )
+              }
+            >
               <div className="h-64 relative flex items-center justify-center">
-                <Doughnut
-                  data={expertPerformanceData}
-                  options={{
-                    plugins: { legend: { display: false } },
-                    maintainAspectRatio: false,
-                  }}
-                />
-                  
+                {!expertPerformanceData.isZero ? (
+                  <Doughnut
+                    data={expertPerformanceData}
+                    options={{
+                      plugins: { legend: { display: false } },
+                      maintainAspectRatio: false,
+                    }}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                    No data available
+                  </div>
+                )}
               </div>
               <div className="flex justify-between mt-4">
                 <div className="flex items-center gap-2">
@@ -513,7 +604,7 @@ const Dashboard = () => {
                   <span className="text-[12px] text-[#66706D]">
                     Task Completion{" "}
                     <strong className="text-[#0A4F48] text-[12px]">
-                      1.8 h
+                      {expertPerformanceData?.raw?.taskCompletion}%
                     </strong>
                   </span>
                 </div>
@@ -521,14 +612,18 @@ const Dashboard = () => {
                   <div className="w-2 h-2 rounded-xs bg-[#EBF3F2]"></div>
                   <span className="text-[12px] text-[#66706D]">
                     Rating{" "}
-                    <strong className="text-[#0A4F48] text-[12px]">4.6</strong>
+                    <strong className="text-[#0A4F48] text-[12px]">
+                      {expertPerformanceData?.raw?.rating}
+                    </strong>
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-xs bg-[#F4DBC7]"></div>
                   <span className="text-[12px] text-[#66706D]">
                     Clients Assigned{" "}
-                    <strong className="text-[#0A4F48] text-[12px]">73%</strong>
+                    <strong className="text-[#0A4F48] text-[12px]">
+                      {expertPerformanceData?.raw?.clientsAssigned}%
+                    </strong>
                   </span>
                 </div>
               </div>
@@ -543,30 +638,30 @@ const Dashboard = () => {
               </h3>
               <div className="relative">
                 <button
-                   onClick={() => setShowFilter(!showFilter)}
-                   className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D]"
-                 >
-                   {filterCategory} <ChevronDown size={14} />
-                 </button>
-                 {showFilter && (
-                   <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-lg shadow-lg z-10 py-1">
-                     {["All Categories", "Diet", "Workout", "Therapy"].map(
-                       (cat) => (
-                         <button
-                           key={cat}
-                           onClick={() => {
-                             setFilterCategory(cat);
-                             setShowFilter(false);
-                           }}
-                           className="w-full text-left px-4 py-2 text-xs hover:bg-gray-50 text-[#66706D]"
-                         >
-                           {cat}
-                         </button>
-                       )
-                     )}
-                   </div>
-                 )}
-               </div>
+                  onClick={() => setShowFilter(!showFilter)}
+                  className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D]"
+                >
+                  {filterCategory} <ChevronDown size={14} />
+                </button>
+                {showFilter && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-lg shadow-lg z-10 py-1">
+                    {["All Categories", "Diet", "Workout", "Therapy"].map(
+                      (cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => {
+                            setFilterCategory(cat);
+                            setShowFilter(false);
+                          }}
+                          className="w-full text-left px-4 py-2 text-xs hover:bg-gray-50 text-[#66706D]"
+                        >
+                          {cat}
+                        </button>
+                      ),
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left">
@@ -599,8 +694,8 @@ const Dashboard = () => {
                               report.expert === "Dietitian"
                                 ? "bg-[#FAF3E0] text-[#DAA520]"
                                 : report.expert === "Trainer"
-                                ? "bg-[#EBF3F2] text-[#0A4F48]"
-                                : "bg-[#F0FDF4] text-[#15803D]"
+                                  ? "bg-[#EBF3F2] text-[#0A4F48]"
+                                  : "bg-[#F0FDF4] text-[#15803D]"
                             }`}
                           >
                             {report.expert}
@@ -626,7 +721,7 @@ const Dashboard = () => {
                         colSpan="5"
                         className="px-6 py-4 text-center text-sm text-[#66706D]"
                       >
-                         No progress reports found.
+                        No progress reports found.
                       </td>
                     </tr>
                   )}

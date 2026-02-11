@@ -1,20 +1,39 @@
-import React from "react";
+import React, { useMemo } from "react";
 import DonutChart from "./AdminChart";
 
-const HeadRightSide = ({ Head }) => {
-  // Mock performance data matching the design
-  const performanceData = {
-    programs: 50,
-    experts: 20,
-    clients: 30,
-    average: 73, // Center text value from design usually represents an average or total
-  };
+const HeadRightSide = ({ Head, dashboardData }) => {
+  // Performance data rendering logic based on dashboardData
+  const performanceInfo = useMemo(() => {
+    const adminPerf = dashboardData?.adminPerformance || {
+      programs: 0,
+      experts: 0,
+      clients: 0,
+    };
 
-  const metrics = [
-    { label: "Programs", value: "50%", color: "bg-[#0A4F48]" },
-    { label: "Experts", value: "20%", color: "bg-[#EBF3F2]" },
-    { label: "Clients", value: "30%", color: "bg-[#F4DBC7]" },
-  ];
+    const total = adminPerf.programs + adminPerf.experts + adminPerf.clients;
+
+    const toPercent = (val) =>
+      total > 0 ? Math.round((val / total) * 100) : 0;
+
+    const programsPct = toPercent(adminPerf.programs);
+    const expertsPct = toPercent(adminPerf.experts);
+    const clientsPct = toPercent(adminPerf.clients);
+
+    // Use expertPerformance.taskCompletion as the center average compliance score
+    const avgCompliance = dashboardData?.expertPerformance?.taskCompletion || 0;
+
+    return {
+      programs: programsPct,
+      experts: expertsPct,
+      clients: clientsPct,
+      average: avgCompliance,
+      metrics: [
+        { label: "Programs", value: `${programsPct}%`, color: "bg-[#0A4F48]" },
+        { label: "Experts", value: `${expertsPct}%`, color: "bg-[#EBF3F2]" },
+        { label: "Clients", value: `${clientsPct}%`, color: "bg-[#F4DBC7]" },
+      ],
+    };
+  }, [dashboardData]);
 
   return (
     <div className=" flex flex-col gap-4">
@@ -28,17 +47,17 @@ const HeadRightSide = ({ Head }) => {
         <div className="flex flex-col items-center gap-0">
           <div className="">
             <DonutChart
-              percentage={performanceData.average}
-              high={performanceData.programs}
-              medium={performanceData.experts}
-              low={performanceData.clients}
+              percentage={performanceInfo.average}
+              high={performanceInfo.programs}
+              medium={performanceInfo.experts}
+              low={performanceInfo.clients}
               size={180}
             />
           </div>
 
           {/* Legend Table */}
           <div className="w-full flex flex-col">
-            {metrics.map((metric, i) => (
+            {performanceInfo.metrics.map((metric, i) => (
               <div key={i} className="flex items-center justify-between py-5">
                 <div className="flex items-center gap-3">
                   <div className={`w-3 h-3 rounded-sm ${metric.color}`}></div>
