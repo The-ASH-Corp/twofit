@@ -9,7 +9,7 @@ export const createProgram = createAsyncThunk(
         programDetails instanceof FormData
           ? {
               headers: {
-                "Content-Type": "multipart/form-data",
+                // "Content-Type": "multipart/form-data",
               },
             }
           : {};

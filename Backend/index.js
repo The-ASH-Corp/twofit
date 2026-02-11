@@ -25,10 +25,11 @@ const allowedOrigins = [
 ];
 
 if (process.env.FRONTEND_URL_PROD) {
-  allowedOrigins.push(process.env.FRONTEND_URL_PROD);
+  const prodUrl = process.env.FRONTEND_URL_PROD.replace(/\/$/, "");
+  allowedOrigins.push(prodUrl);
   // Add www variant if not already present
-  if (process.env.FRONTEND_URL_PROD.includes("https://") && !process.env.FRONTEND_URL_PROD.includes("www.")) {
-    allowedOrigins.push(process.env.FRONTEND_URL_PROD.replace("https://", "https://www."));
+  if (prodUrl.includes("https://") && !prodUrl.includes("www.")) {
+    allowedOrigins.push(prodUrl.replace("https://", "https://www."));
   }
 }
 if (process.env.BACKEND_URL_PROD) {
