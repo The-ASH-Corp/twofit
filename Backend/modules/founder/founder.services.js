@@ -268,52 +268,113 @@ export const getDashboardData = async (adminDuration = "12m", expertDuration = "
     };
   });
 
-  // --- Expert Performance Metrics (Filtered by duration) ---
-  // 1. Task Completion Rate
-  const performanceSubmissionStats = await TaskSubmission.aggregate([
-    { $match: { userId: { $in: clientIds } } },
-    { $unwind: "$dailySubmissions" },
-    { $unwind: "$dailySubmissions.exercises" },
+  // --- Expert Performance Metrics (Refined Calculations) ---
+
+  // 1. Task Completion Rate (Progress vs Entire Plan - All Clients)
+  // This calculates: (Total Verified Tasks) / (Total Tasks in Entire Program Plan)
+
+  const clientProgressStats = await User.aggregate([
+    { $match: { _id: { $in: clientIds } } },
     {
-      $match: {
-        "dailySubmissions.exercises.updatedAt": { $gte: expertPerformanceStartDate }
+      $lookup: {
+        from: "tasksubmissions",
+        localField: "_id",
+        foreignField: "userId",
+        as: "submission"
       }
     },
+    { $unwind: { path: "$submission", preserveNullAndEmptyArrays: true } },
     {
-      $group: {
-        _id: null,
-        totalTasks: { $sum: 1 },
-        verifiedTasks: {
-          $sum: { $cond: [{ $eq: ["$dailySubmissions.exercises.status", "verified"] }, 1, 0] }
-        }
+      $lookup: {
+        from: "programslists",
+        localField: "programType",
+        foreignField: "_id",
+        as: "program"
+      }
+    },
+    { $unwind: { path: "$program", preserveNullAndEmptyArrays: true } },
+    {
+      $lookup: {
+        from: "plans",
+        localField: "program.plan",
+        foreignField: "_id",
+        as: "plan"
+      }
+    },
+    { $unwind: { path: "$plan", preserveNullAndEmptyArrays: true } },
+    {
+      $project: {
+        currentGlobalDay: 1,
+        programTitle: "$program.title",
+        planWeeks: "$plan.weeks",
+        submissions: "$submission.dailySubmissions"
       }
     }
   ]);
 
-  const taskCompletionRate = performanceSubmissionStats.length > 0 && performanceSubmissionStats[0].totalTasks > 0
-    ? Math.round((performanceSubmissionStats[0].verifiedTasks / performanceSubmissionStats[0].totalTasks) * 100)
-    : 0;
+  let totalExpectedTasks = 0;
+  let totalVerifiedTasks = 0;
 
-  // 2. Average Rating
-  const performanceCoaches = await CoachModel.find({}).select("feedback avgRating assignedUsers maxClient");
-  let totalRating = 0;
-  let ratingCount = 0;
-  performanceCoaches.forEach(coach => {
-    if (coach.feedback && coach.feedback.length > 0) {
-      coach.feedback.forEach(f => {
-        if (f.rating && new Date(f.createdAt) >= expertPerformanceStartDate) {
-          totalRating += f.rating;
-          ratingCount++;
+  clientProgressStats.forEach(client => {
+    const currentDay = client.currentGlobalDay || 1;
+    const isWeightLoss = (client.programTitle || "").toLowerCase().includes("weight loss");
+    const mealsPerDay = isWeightLoss ? 5 : 6;
+
+    // Calculate expected tasks up to current day
+    const weeks = client.planWeeks || [];
+    let dayCounter = 0;
+    let expectedForClient = 0;
+
+    for (const week of weeks) {
+      for (const day of week.days || []) {
+        dayCounter++;
+        if (dayCounter <= currentDay) {
+          const workoutTasks = (day.exercises || []).length;
+          expectedForClient += workoutTasks + mealsPerDay;
+        }
+        if (dayCounter >= currentDay) break;
+      }
+      if (dayCounter >= currentDay) break;
+    }
+
+    totalExpectedTasks += expectedForClient;
+
+    // Count ALL verified tasks (no day limit)
+    const submissions = client.submissions || [];
+    submissions.forEach(daySub => {
+      (daySub.exercises || []).forEach(ex => {
+        if (ex.status === "verified") {
+          totalVerifiedTasks++;
         }
       });
-    }
+    });
   });
-  const averageRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : (performanceCoaches.reduce((acc, c) => acc + (c.avgRating || 0), 0) / (performanceCoaches.length || 1)).toFixed(1);
 
-  // 3. Clients Assigned Rate
-  const activeExpertsCount = performanceCoaches.filter(e => e.assignedUsers && e.assignedUsers.length > 0).length;
-  const activeExpertsRate = performanceCoaches.length > 0
-    ? Math.round((activeExpertsCount / performanceCoaches.length) * 100)
+  console.log("Task Completion Debug:", {
+    totalClients: clientProgressStats.length,
+    totalExpectedTasks,
+    totalVerifiedTasks,
+    calculatedRate: totalExpectedTasks > 0 ? Math.round((totalVerifiedTasks / totalExpectedTasks) * 100) : 0
+  });
+
+  const taskCompletionRate = totalExpectedTasks > 0
+    ? Math.round((totalVerifiedTasks / totalExpectedTasks) * 100)
+    : 0;
+
+  // 2. Average Rating (Average of all expert ratings)
+  const performanceCoaches = await CoachModel.find({}).select("feedback avgRating maxClient");
+
+  const coachesWithRating = performanceCoaches.filter(c => (c.avgRating || 0) > 0);
+  const averageExpertRating = coachesWithRating.length > 0
+    ? (coachesWithRating.reduce((acc, c) => acc + c.avgRating, 0) / coachesWithRating.length).toFixed(1)
+    : 0;
+
+  // 3. Clients Assigned Rate (Total Users / Sum of Max Capacities)
+  const sumMaxCapacity = performanceCoaches.reduce((acc, c) => acc + (c.maxClient || 0), 0);
+  const totalUsers = clients.length;
+
+  const clientsAssignedRate = sumMaxCapacity > 0
+    ? Math.round(Math.min((totalUsers / sumMaxCapacity) * 100, 100))
     : 0;
 
   // --- Admin Performance Metrics (Filtered by duration - new entities) ---
@@ -337,8 +398,8 @@ export const getDashboardData = async (adminDuration = "12m", expertDuration = "
     },
     expertPerformance: {
       taskCompletion: taskCompletionRate,
-      rating: averageRating,
-      clientsAssigned: activeExpertsRate
+      rating: averageExpertRating,
+      clientsAssigned: clientsAssignedRate
     },
     graphData,
     latestReports: formattedReports,
