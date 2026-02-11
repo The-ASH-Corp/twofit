@@ -31,11 +31,10 @@ export default function Dashboard() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-  if (user?._id) {
-    dispatch(getClient({ id: user._id }));
-  }
-}, [user?._id, dispatch]);
-
+    if (user?._id) {
+      dispatch(getClient({ id: user._id }));
+    }
+  }, [user?._id, dispatch]);
 
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -66,14 +65,14 @@ export default function Dashboard() {
     // Check both user (auth) and clientUser (fetched) for the start date
     // The field name in DB is programStartDate
     const startDate = clientUser?.programStartDate || user?.programStartDate;
-    
+
     if (!startDate) return true; // Fallback if no date found (should ideally be false, but keeping existing behavior for undefined)
-    
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const start = new Date(startDate);
     start.setHours(0, 0, 0, 0);
-    
+
     return today >= start;
   }, [user?.programStartDate, clientUser?.programStartDate]);
 
@@ -91,7 +90,7 @@ export default function Dashboard() {
                 value={
                   !isProgramStarted
                     ? "Not Started"
-                    : `${user?.currentGlobalDay || 1}/ ${
+                    : `${clientUser?.currentGlobalDay || user?.currentGlobalDay || 1}/ ${
                         program?.plan?.duration || 0
                       }`
                 }
@@ -166,7 +165,9 @@ export default function Dashboard() {
               therapyPlan={clientUser?.therapyType}
               programTitle={program?.title}
               isProgramStarted={isProgramStarted}
-              mealCount={clientUser?.dietPlanMealCount || user?.dietPlanMealCount}
+              mealCount={
+                clientUser?.dietPlanMealCount || user?.dietPlanMealCount
+              }
             />
           </div>
 

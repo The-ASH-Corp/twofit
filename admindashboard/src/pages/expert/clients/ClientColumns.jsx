@@ -1,10 +1,10 @@
 import HabitStartButton from "../habit/HabitStartButton";
 
-const statusColors={
-  Active:"bg-[#45C4A2] text-white",
-  Inactive:"bg-[#66706D] text-white",
-  Suspended:"bg-[#FB5858] text-white"
-}
+const statusColors = {
+  Active: "bg-[#45C4A2] text-white",
+  Inactive: "bg-[#66706D] text-white",
+  Suspended: "bg-[#FB5858] text-white",
+};
 
 export const getClientColumns = (role, navigate) => {
   const columns = [
@@ -36,8 +36,7 @@ export const getClientColumns = (role, navigate) => {
       header: "Status",
       cell: ({ row }) => {
         const status = row.original.status;
-        const colorClass =
-          statusColors[status] || "bg-gray-200 text-gray-700";
+        const colorClass = statusColors[status] || "bg-gray-200 text-gray-700";
 
         return (
           <span className={`px-2 py-1 text-[11px] rounded-xl ${colorClass}`}>
@@ -48,26 +47,25 @@ export const getClientColumns = (role, navigate) => {
     },
   ];
 
-   if (role === "therapist") {
+  if (role === "therapist") {
     columns.push({
       accessorKey: "habitTracker",
       header: "Habit Plan",
       cell: ({ row }) => {
         const client = row.original;
+        const habitId=client.habitId
 
         const hasPlan =
-          !!client.habitPlan ||
+          !!client.hasHabitPlan ||
           (Array.isArray(client.habits) && client.habits.length > 0);
 
         if (hasPlan) {
           return (
             <button
-              onClick={() =>
-                navigate(`/therapist/habits/edit/${client._id}`)
-              }
-              className="px-3 py-1 text-[11px] rounded-full bg-blue-100 text-blue-700"
+              onClick={(e) =>{e.stopPropagation();  navigate(`/expert/clients/habit/${habitId}`)}}
+              className="px-3 py-1 text-white rounded-full bg-[#0A4F48] text-blue-700"
             >
-              View / Edit Plan
+              View Plan
             </button>
           );
         }

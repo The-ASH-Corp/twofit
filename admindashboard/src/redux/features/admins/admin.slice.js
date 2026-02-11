@@ -1,11 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createAdmin, getAdminProfile, getAllAdmins, getFounderAllAdmins } from "./admin.thunk";
+import { createAdmin, getAdminProfile, getAllAdmins, getFounderAllAdmins, getDashboardData } from "./admin.thunk";
 
 const initialState = {
   admins: [],
   founderAdminList: [],
   adminCount: 0,
   selectedAdmin: null,
+  dashboardData: null,
   status: "idle", // idle | loading | succeeded | failed
   error: null,
 };
@@ -69,6 +70,18 @@ const adminSlice = createSlice({
         state.error = null;
       })
       .addCase(getFounderAllAdmins.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+      .addCase(getDashboardData.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(getDashboardData.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.dashboardData = action.payload.data ?? action.payload;
+        state.error = null;
+      })
+      .addCase(getDashboardData.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

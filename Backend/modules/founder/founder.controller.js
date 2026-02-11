@@ -2,7 +2,8 @@ import * as founderService from "./founder.services.js"
 
 export const getDashboardData = async (req, res) => {
     try {
-        const data = await founderService.getDashboardData();
+        const { adminDuration, expertDuration } = req.query;
+        const data = await founderService.getDashboardData(adminDuration, expertDuration);
         res.status(200).json({
             success: true,
             data: data,
