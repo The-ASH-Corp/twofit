@@ -56,7 +56,7 @@ export default function CategoryTable() {
   );
   if (error) return <p className="text-red-500">{error}!</p>;
   return (
-    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
+    <div className="h-[calc(100vh-130px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         columns={CategoryListColumns()}
         data={categories}

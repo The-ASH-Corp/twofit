@@ -38,7 +38,7 @@ const menuItems = [
     children: [
       {
         label: "Templates",
-        path: "/founder/broadcast/template",
+        path: "/founder/broadcasts",
       },
       {
         label: "Add New",
@@ -46,7 +46,7 @@ const menuItems = [
       },
       {
         label: "Auto Reminders",
-        path: "/founder/broadcast/auto-remainder",
+        path: "/founder/auto-remainder",
       },
     ],
   },

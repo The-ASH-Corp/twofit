@@ -14,10 +14,10 @@ export default function AppLayout() {
       {/* Sidebar - Handles its own mobile/desktop logic with isOpen */}
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      <div className="flex-1 flex flex-col p-4 md:p-6 overflow-hidden min-w-0">
+      <div className="flex-1 flex flex-col px-4 pt-4 md:p-6 overflow-hidden min-w-0">
         <TopBar onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
 
-        <div className="mt-6 flex-1 overflow-auto no-scrollbar">
+        <div className="mt-14 md:mt-6 flex-1 overflow-auto no-scrollbar">
           <Outlet />
         </div>
       </div>

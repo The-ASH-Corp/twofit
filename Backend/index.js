@@ -17,24 +17,50 @@ import { startImageCleanupTask } from "./utils/cronJobs.js";
 const app = express();
 dotenv.config();
 
-// BODY PARSER MUST COME FIRST
-app.use(express.json());
-app.use(cookieParser())
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5000",
+  "http://127.0.0.1:5173",
+  "http://127.0.0.1:5000",
+];
 
-// app.use(express.urlencoded({ extended: true }))
+if (process.env.FRONTEND_URL_PROD) {
+  allowedOrigins.push(process.env.FRONTEND_URL_PROD);
+  // Add www variant if not already present
+  if (process.env.FRONTEND_URL_PROD.includes("https://") && !process.env.FRONTEND_URL_PROD.includes("www.")) {
+    allowedOrigins.push(process.env.FRONTEND_URL_PROD.replace("https://", "https://www."));
+  }
+}
+if (process.env.BACKEND_URL_PROD) {
+  allowedOrigins.push(process.env.BACKEND_URL_PROD);
+}
 
+// CORS MUST COME VERY EARLY
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5000"],
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "x-access-token",
+      "Accept",
+      "X-Requested-With",
+      "Range"
+    ],
     credentials: true,
-    exposedHeaders: ["x-access-token"],
+    exposedHeaders: ["x-access-token", "Content-Range"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204
   })
 );
 
+// BODY PARSER MUST COME AFTER CORS
+app.use(express.json());
+app.use(cookieParser())
+
 app.use("/uploads", express.static("uploads"));
 app.use(morgan("dev"));
-
-
 
 app.use("/api/v1", router1);
 
@@ -43,7 +69,7 @@ const server = http.createServer(app)
 
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "http://localhost:5000"],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
     credentials: true
   },

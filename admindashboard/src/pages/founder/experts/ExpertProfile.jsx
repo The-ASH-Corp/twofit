@@ -35,7 +35,7 @@ const ExpertProfile = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 w-full h-[calc(100vh-111px)] bg-[#F8F9FA] p-2 sm:p-4 lg:p-2 ">
+    <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 w-full h-[calc(100vh-130px)] bg-[#F8F9FA] p-2 sm:p-4 lg:p-2 ">
       {/* left sidebar - Full width on mobile, fixed width on desktop */}
       <div className="w-full lg:w-[280px] xl:w-[300px] lg:overflow-auto no-scrollbar">
         <ExpertLeftSide expert={expert} />

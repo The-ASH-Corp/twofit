@@ -4,7 +4,7 @@ import WorkoutTasksModal from "./WorkoutTasksModal";
 import TherapyTasksModal from "./TherapyTasksModal";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
-import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { selectToken, selectUser } from "@/redux/features/auth/auth.selectores";
 import {
   getUserTaskStatus,
   uploadTask,
@@ -12,7 +12,7 @@ import {
 import { refreshProfile } from "@/redux/features/auth/auth.thunk";
 import { useEffect } from "react";
 import { socket } from "@/utils/socket";
-import { selectToken } from "@/redux/features/auth/auth.selectores";
+import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 
 export default function TaskList({
   plans,
@@ -37,7 +37,10 @@ export default function TaskList({
     task: null,
   });
 
-  const currentGlobalDay = user?.currentGlobalDay || 1;
+  const clientUser = useAppSelector(selectSelectedClient);
+
+  const currentGlobalDay =
+    clientUser?.currentGlobalDay || user?.currentGlobalDay || 1;
 
   useEffect(() => {
     dispatch(getUserTaskStatus());
@@ -108,31 +111,32 @@ export default function TaskList({
   const isWeightLoss = programTitle?.toLowerCase().includes("weight loss");
   const defaultMealCount = isWeightLoss ? 5 : 6;
   const numberOfMeals = mealCount || defaultMealCount;
-  const mealNames = Array.from({ length: numberOfMeals }, (_, i) => `Meal ${i + 1}`);
-
-  const mealTasks = mealNames.map(
-    (mealName, index) => {
-      const mealIndex = 100 + index; // Use a high index range for static meals to avoid collisions
-      const submission = tasks?.find(
-        (t) =>
-          t.globalDayIndex === currentGlobalDay &&
-          t.exerciseIndex === mealIndex &&
-          t.taskType === "Meal",
-      );
-      return {
-        name: mealName,
-        type: "Meal",
-        notes: "Log your meal photo/video for review.",
-        programId: plans?.program,
-        weekIndex: currentDayData?.weekIndex || 1,
-        dayIndex: currentDayData?.dayIndex || 1,
-        globalDayIndex: currentGlobalDay,
-        exerciseIndex: mealIndex,
-        status: submission?.status || "todo",
-        submission,
-      };
-    },
+  const mealNames = Array.from(
+    { length: numberOfMeals },
+    (_, i) => `Meal ${i + 1}`,
   );
+
+  const mealTasks = mealNames.map((mealName, index) => {
+    const mealIndex = 100 + index; // Use a high index range for static meals to avoid collisions
+    const submission = tasks?.find(
+      (t) =>
+        t.globalDayIndex === currentGlobalDay &&
+        t.exerciseIndex === mealIndex &&
+        t.taskType === "Meal",
+    );
+    return {
+      name: mealName,
+      type: "Meal",
+      notes: "Log your meal photo/video for review.",
+      programId: plans?.program,
+      weekIndex: currentDayData?.weekIndex || 1,
+      dayIndex: currentDayData?.dayIndex || 1,
+      globalDayIndex: currentGlobalDay,
+      exerciseIndex: mealIndex,
+      status: submission?.status || "todo",
+      submission,
+    };
+  });
 
   const therapyDays =
     therapyPlan?.weeks?.flatMap((week, weekIndex) =>
@@ -241,7 +245,6 @@ export default function TaskList({
 
   // Add meal tasks individually
   groupedTasks.push(...mealTasks);
-
 
   const handleSkipTask = (task) => {
     setSkipConfirmation({ isOpen: true, task });
