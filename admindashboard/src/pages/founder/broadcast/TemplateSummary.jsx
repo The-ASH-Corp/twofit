@@ -1,11 +1,10 @@
-import { assets } from "@/assets/asset";
 import {
   selectBroadcast,
   selectBroadcastError,
   selectBroadcastStatus,
 } from "@/redux/features/broadcast/broadcast.selector";
 import { getBroadcast } from "@/redux/features/broadcast/broadcast.thunk";
-import { MoreHorizontal } from "lucide-react";
+import { BsFileEarmarkText } from "react-icons/bs";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -28,6 +27,8 @@ const TemplateSummary = () => {
   }, [id, dispatch]);
 
   const fileExt = broadcast?.attachment?.split(".").pop()?.toUpperCase();
+
+  console.log(`http://localhost:5000${broadcast?.attachment}`);
 
   if (status === "loading")
     return (
@@ -71,11 +72,7 @@ const TemplateSummary = () => {
                 <div className="p-4 bg-[#F8F8F8] rounded-lg">
                   <div className="flex items-center gap-4">
                     <div className="p-2.5 bg-[#F4DBC7] rounded-md">
-                      <img
-                        src={assets.pdfVector}
-                        alt="pdf"
-                        className="w-4 h-4"
-                      />
+                      <BsFileEarmarkText size={20} />
                     </div>
                     <div className="flex flex-col items-start">
                       <p className="text-[12px] line-clamp-2">
@@ -97,6 +94,10 @@ const TemplateSummary = () => {
           </div>
         </div>
       </div>
+      <img
+        src={`http://localhost:5000${broadcast?.attachment}`}
+        alt="pdf"
+      />
       <div className="flex flex-col gap-6">
         <div className="h-px bg-gray-200 w-full mt-2"></div>
 
