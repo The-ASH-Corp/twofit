@@ -1,14 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   createHabitsThunk,
+  getClientHabitByHabitId,
   getClientHabitsThunk,
 } from "./habit.thunk";
 
+ 
 const initialState = {
-  habits: null,
+  habits: null,         
+  habitDetails: null,   
   loading: false,
   error: null,
 };
+;
 
 const habitSlice = createSlice({
   name: "habit",
@@ -42,6 +46,19 @@ const habitSlice = createSlice({
         state.habits = action.payload;
       })
       .addCase(getClientHabitsThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+       .addCase(getClientHabitByHabitId.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getClientHabitByHabitId.fulfilled, (state, action) => {
+        state.loading = false;
+        state.habitDetails = action.payload;
+      })
+      .addCase(getClientHabitByHabitId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

@@ -1,50 +1,57 @@
-import React from "react";
+import React, { useEffect } from 'react'
 import { ChevronDown } from "lucide-react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
-import { createBroadcast } from "@/redux/features/broadcast/broadcast.thunk";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-
-const CreateBroadcast = () => {
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const initialValues = {
-    title: "",
-    type: "Promotional",
-    message: "",
-    attachment: null,
-  };
-
-  const validationSchema = Yup.object({
-    title: Yup.string().required("Broadcast title is required"),
-    type: Yup.string().required("Broadcast type is required"),
-    message: Yup.string().required("Message body is required"),
-  });
-
-  const handleSubmit = async (values) => {
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, useParams } from 'react-router-dom';
+import { selectBroadcast } from '@/redux/features/broadcast/broadcast.selector';
+import { getBroadcast } from '@/redux/features/broadcast/broadcast.thunk';
     
-    const formData = new FormData();
 
-    formData.append("title", values.title);
-    formData.append("type", values.type);
-    formData.append("message", values.message);
+const BroadcastEdit = () => {
 
-    if (values.attachment) {
-      formData.append("attachment", values.attachment);
-    }
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    try {
-      const broadcast = await dispatch(createBroadcast(formData)).unwrap();
-      toast.success("Broadcast created successfully");
-      navigate(`/founder/broadcasts/summary/${broadcast?.data?._id}`);
-    } catch (error) {
-      toast.error(error || "Failed to create Broadcast");
-    }
-  };
+    const { id } = useParams();
+
+    const broadcast = useSelector(selectBroadcast);
+
+    useEffect(() => {
+      if (id) {
+        dispatch(getBroadcast(id));
+      }
+    }, [id, dispatch]);
+
+    const initialValues = {
+      title: broadcast?.title,
+      type: broadcast?.type,
+      message: broadcast?.message,
+      attachment: null,
+    };
+
+    const validationSchema = Yup.object({
+      title: Yup.string().required("Broadcast title is required"),
+      type: Yup.string().required("Broadcast type is required"),
+      message: Yup.string().required("Message body is required"),
+    });
+
+    const handleSubmit = async (values) => {
+      //   const formData = new FormData();
+      //   formData.append("title", values.title);
+      //   formData.append("type", values.type);
+      //   formData.append("message", values.message);
+      //   if (values.attachment) {
+      //     formData.append("attachment", values.attachment);
+      //   }
+      //   try {
+      //     const broadcast = await dispatch(createBroadcast(formData)).unwrap();
+      //     toast.success("Broadcast created successfully");
+      //     navigate(`/founder/broadcasts/summary/${broadcast?.data?._id}`);
+      //   } catch (error) {
+      //     toast.error(error || "Failed to create Broadcast");
+      //   }
+    };
 
   return (
     <div className="flex-1 flex flex-col gap-6 overflow-auto no-scrollbar h-[calc(100vh-130px)]">
@@ -172,6 +179,6 @@ const CreateBroadcast = () => {
       </Formik>
     </div>
   );
-};
+}
 
-export default CreateBroadcast;
+export default BroadcastEdit

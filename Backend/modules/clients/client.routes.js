@@ -12,6 +12,7 @@ import {
   updateWeight,
   getFounderClientList,
   getComplianceStats,
+  getClientsWithHabitPlan,
   assignDietPlan,
 } from "./client.controller.js";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
@@ -41,6 +42,8 @@ router.get("/get-all-feedbacks/:userId", authMiddleware, getAllFeedbacks)
 router.get("/weight-history",authMiddleware, getWeightHistoryOnly);
 router.get("/measurement-history",authMiddleware, getMeasurementHistoryOnly);
 router.get("/compliance-stats",authMiddleware, getComplianceStats);
+
+router.get("/clients", getClientsWithHabitPlan);
 
 
 export default router;

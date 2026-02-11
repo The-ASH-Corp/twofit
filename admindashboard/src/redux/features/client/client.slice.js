@@ -1,8 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchClientWeightHistory, getAllClients, getClient, getClientsBasedOnCoach, getFounderAllClients } from "./client.thunk";
+import {
+  fetchClientWeightHistory,
+  getAllClients,
+  getClient,
+  getClientsBasedOnCoach,
+  getClientsWithHabitPlanThunk,
+  getFounderAllClients,
+} from "./client.thunk";
 
 const initialState = {
   allClients: [],
+  clientsWithHabitPlan: [], 
   founderClientList: [],
   selectedClient: null,
   weightHistory: [],
@@ -11,6 +19,7 @@ const initialState = {
   error: null,
   status: "idle",
 };
+
 
 const clientSlice = createSlice({
   name: "client",
@@ -22,7 +31,7 @@ const clientSlice = createSlice({
       state.weightHistory = [];
       state.currentWeight = null;
       state.error = null;
-      state.status = "idle"
+      state.status = "idle";
     },
   },
   extraReducers: (builder) => {
@@ -90,8 +99,21 @@ const clientSlice = createSlice({
       .addCase(getFounderAllClients.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
-      });
+      })
+      .addCase(getClientsWithHabitPlanThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
 
+      .addCase(getClientsWithHabitPlanThunk.fulfilled, (state, action) => {
+  state.status = "succeeded";
+  state.clientsWithHabitPlan = action.payload;
+})
+
+      .addCase(getClientsWithHabitPlanThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      });
   },
 });
 

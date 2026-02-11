@@ -44,6 +44,7 @@ import FounderTemplateSummary from "./pages/founder/broadcast/TemplateSummary";
 import FounderBroadcastCreate from "./pages/founder/broadcast/CreateBroadcast";
 import FounderBroadcastAutoReminder from "./pages/founder/broadcast/AutoReminders";
 import FounderBroadcastDelete from "./pages/founder/broadcast/broadcastDeletePopUp";
+import FounderBroadcastEdit from "./pages/founder/broadcast/broadcastEdit";
 
 //Head Pages Imports
 import HeadLayout from "./pages/head/layout/HeadLayout";
@@ -99,6 +100,7 @@ import DailyPlan from "./pages/client/dailyPlan/DailyPlan";
 import ClientChat from "./pages/client/chats/Chats";
 import Habit from "./pages/expert/habit/Habit";
 import HabitTracker from "./pages/client/habit/HabitTracker";
+import HabitDisplay from "./pages/expert/habit/HabitDisplay";
 
 
 function App() {
@@ -182,7 +184,14 @@ function App() {
           <Route path="therapy/create" element={<FounderTherapyForm />} />
           <Route path="therapy/plan/:id" element={<FounderTherapyPlanView />} />
           <Route path="broadcasts" element={<FounderBroadcastTemplates />} />
-          <Route path="broadcasts/delete/:id" element={<FounderBroadcastDelete />} />
+          <Route
+            path="broadcasts/delete/:id"
+            element={<FounderBroadcastDelete />}
+          />
+          <Route
+            path="broadcasts/edit/:id"
+            element={<FounderBroadcastEdit />}
+          />
           <Route
             path="broadcasts/summary/:id"
             element={<FounderTemplateSummary />}
@@ -282,7 +291,11 @@ function App() {
             element={<ExpertTherapyPlanDetails />}
           />
           {/* <Route path="habit" element={<Habit/>}/> */}
-          <Route path="clients/add-habit/:id" element={<Habit />} />
+          <Route path="clients/add-habit/:id" element={<Habit/>}/>
+          <Route path="clients/habit/:habitId" element={<HabitDisplay/>}/>
+
+
+         
         </Route>
 
         {/* CLIENT */}

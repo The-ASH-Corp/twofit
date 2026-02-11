@@ -11,7 +11,7 @@ const BroadcastMenu = ({ row }) => {
 
   const handelEdit = (id) => {
     setActiveRowId(false);
-      navigate(`/founder/broadcasts/delete/${id}`);
+      navigate(`/founder/broadcasts/edit/${id}`);
   };
 
   const handelDelete = (id) => {
