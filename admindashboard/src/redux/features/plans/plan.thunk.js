@@ -36,7 +36,7 @@ export const uploadPlanMedia = createAsyncThunk(
             // axiosInstance interceptor returns response.data, so we just capture that
             const data = await axiosInstance.post("/plans/upload-media", formData, {
                 headers: {
-                    "Content-Type": "multipart/form-data",
+                    // "Content-Type": "multipart/form-data", // Let browser set boundary
                 },
                 onUploadProgress,
             });
