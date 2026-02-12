@@ -27,9 +27,9 @@ export default function BaseForm({
       enableReinitialize={enableReinitialize}
     >
       {(formik) => (
-        <Form className="rounded-2xl grid grid-cols-1 lg:grid-cols-[2.5fr_1fr] gap-4 h-auto lg:h-[80vh]">
+        <Form className="rounded-2xl grid grid-cols-1 lg:grid-cols-[2.5fr_1fr] gap-4 min-h-[80vh] lg:h-[80vh] overflow-x-hidden">
           {/* LEFT COLUMN */}
-          <div className="overflow-y-visible lg:overflow-y-auto no-scrollbar pr-0 lg:pr-2">
+          <div className="overflow-y-visible lg:overflow-y-auto no-scrollbar pr-0 lg:pr-2 w-full">
             {fields
               .filter((section) => section.position === "left")
               .map((section, index) => (
@@ -103,7 +103,7 @@ export default function BaseForm({
           </div>
 
           {/* RIGHT COLUMN */}
-          <div className="overflow-y-visible lg:overflow-y-auto no-scrollbar pl-0 lg:pl-2">
+          <div className="overflow-y-visible lg:overflow-y-auto no-scrollbar pl-0 lg:pl-2 w-full">
             {fields
               .filter((section) => section.position === "right")
               .map((section, index) => (
@@ -190,20 +190,20 @@ export default function BaseForm({
                 </div>
               ))}
           </div>
-          <div className="w-full col-span-1 lg:col-span-2 flex flex-col items-center gap-3">
+          <div className="w-full col-span-1 lg:col-span-2 flex flex-col items-center gap-3 mt-4">
             <hr className="w-full text-gray-300" />
-            <div className="flex justify-end items-center text-[12px] font-semibold  w-full">
+            <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center text-[12px] font-semibold w-full gap-3">
               {/* <h2>Save as Draft</h2> */}
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-2 w-full sm:w-auto">
                 <button
                   onClick={() => navigate(-1)}
                   type="button"
-                  className="bg-[#EBF3F2]  rounded-md p-2  "
+                  className="bg-[#EBF3F2] rounded-md p-3 sm:p-2 min-h-[44px] sm:min-h-0 w-full sm:w-auto"
                 >
                   Cancel
                 </button>
                 <button
-                  className="bg-[#0A4F48] p-2 rounded-md text-white"
+                  className="bg-[#0A4F48] p-3 sm:p-2 rounded-md text-white min-h-[44px] sm:min-h-0 w-full sm:w-auto"
                   type="submit"
                 >
                   Save & {heading ?? "Client"}
