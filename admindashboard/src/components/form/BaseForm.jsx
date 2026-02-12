@@ -27,21 +27,21 @@ export default function BaseForm({
       enableReinitialize={enableReinitialize}
     >
       {(formik) => (
-        <Form className="rounded-2xl grid grid-cols-[2.5fr_1fr] gap-4 h-[80vh]">
+        <Form className="rounded-2xl grid grid-cols-1 lg:grid-cols-[2.5fr_1fr] gap-4 h-auto lg:h-[80vh]">
           {/* LEFT COLUMN */}
-          <div className="overflow-y-auto no-scrollbar pr-2">
+          <div className="overflow-y-visible lg:overflow-y-auto no-scrollbar pr-0 lg:pr-2">
             {fields
               .filter((section) => section.position === "left")
               .map((section, index) => (
                 <div
                   key={index}
-                  className="space-y-4 bg-white p-5 rounded-xl mb-4"
+                  className="space-y-4 bg-white p-4 sm:p-5 rounded-xl mb-4"
                 >
                   <h2 className="text-[16px] font-bold text-[#181E27]">
                     {section.section}
                   </h2>
 
-                  <div className="grid grid-cols-2 gap-4 text-[11px]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[11px]">
                     {section.fields.map((field) => {
                       if (field.type === "radio") {
                         return (
@@ -103,13 +103,13 @@ export default function BaseForm({
           </div>
 
           {/* RIGHT COLUMN */}
-          <div className="overflow-y-auto  no-scrollbar pl-2">
+          <div className="overflow-y-visible lg:overflow-y-auto no-scrollbar pl-0 lg:pl-2">
             {fields
               .filter((section) => section.position === "right")
               .map((section, index) => (
                 <div
                   key={index}
-                  className="space-y-4 bg-white p-5 rounded-xl mb-4"
+                  className="space-y-4 bg-white p-4 sm:p-5 rounded-xl mb-4"
                 >
                   <h2 className="text-[16px] font-bold">{section.section}</h2>
 
@@ -190,7 +190,7 @@ export default function BaseForm({
                 </div>
               ))}
           </div>
-          <div className="w-full col-span-2 flex flex-col items-center gap-3">
+          <div className="w-full col-span-1 lg:col-span-2 flex flex-col items-center gap-3">
             <hr className="w-full text-gray-300" />
             <div className="flex justify-end items-center text-[12px] font-semibold  w-full">
               {/* <h2>Save as Draft</h2> */}
