@@ -11,7 +11,7 @@ export default function FinanceKpi() {
     <div className=" bg-white p-5 rounded-xl mb-4 space-y-4">
       <h2 className="text-[#0A4F48] font-bold text-[16px]">Salary Overview</h2>
 
-      <div className="flex gap-4 justify-between  ">
+      <div className="flex flex-col md:flex-row gap-4 justify-between  ">
         <KpiCard
           title="Base Salary"
           value={`₹ ${user?.salary?.toLocaleString("en-IN")}`}
