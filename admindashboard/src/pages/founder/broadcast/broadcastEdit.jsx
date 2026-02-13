@@ -5,7 +5,8 @@ import * as Yup from "yup";
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 import { selectBroadcast } from '@/redux/features/broadcast/broadcast.selector';
-import { getBroadcast } from '@/redux/features/broadcast/broadcast.thunk';
+import { getBroadcast, updateBroadcast } from '@/redux/features/broadcast/broadcast.thunk';
+import { toast } from 'react-toastify';
     
 
 const BroadcastEdit = () => {
@@ -27,7 +28,10 @@ const BroadcastEdit = () => {
       title: broadcast?.title,
       type: broadcast?.type,
       message: broadcast?.message,
-      attachment: null,
+      attachment: null, 
+      attachmentName: broadcast?.attachment
+        ? broadcast.attachment.split("/").pop()
+        : "",
     };
 
     const validationSchema = Yup.object({
@@ -37,20 +41,23 @@ const BroadcastEdit = () => {
     });
 
     const handleSubmit = async (values) => {
-      //   const formData = new FormData();
-      //   formData.append("title", values.title);
-      //   formData.append("type", values.type);
-      //   formData.append("message", values.message);
-      //   if (values.attachment) {
-      //     formData.append("attachment", values.attachment);
-      //   }
-      //   try {
-      //     const broadcast = await dispatch(createBroadcast(formData)).unwrap();
-      //     toast.success("Broadcast created successfully");
-      //     navigate(`/founder/broadcasts/summary/${broadcast?.data?._id}`);
-      //   } catch (error) {
-      //     toast.error(error || "Failed to create Broadcast");
-      //   }
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("type", values.type);
+      formData.append("message", values.message);
+
+      if (values.attachment instanceof File) {
+        formData.append("attachment", values.attachment);
+      }
+        try {
+          const broadcast = await dispatch(
+            updateBroadcast({ id, updatedData: formData }),
+          ).unwrap();
+          toast.success("Broadcast updated successfully");
+          navigate(`/founder/broadcasts/summary/${broadcast?.data?._id}`);
+        } catch (error) {
+          toast.error(error || "Failed to update Broadcast");
+        }
     };
 
   return (
@@ -59,13 +66,14 @@ const BroadcastEdit = () => {
         initialValues={initialValues}
         validationSchema={validationSchema}
         onSubmit={handleSubmit}
+        enableReinitialize={true}
       >
         {({ setFieldValue, values }) => (
           <Form className="flex flex-col gap-6">
             {/* Main Form Card */}
             <div className="bg-white rounded-3xl p-8 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] flex flex-col gap-8">
               <h2 className="text-xl font-bold text-[#0A4F48]">
-                Create Broadcast
+                Edit Broadcast
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -148,7 +156,8 @@ const BroadcastEdit = () => {
                   <span className="px-4 text-sm text-gray-500 italic truncate max-w-60">
                     {values.attachment
                       ? values.attachment.name
-                      : "Upload Image (jpg/png) or PDF"}
+                      : initialValues.attachmentName ||
+                        "Upload Image (jpg/png) or PDF"}
                   </span>
                 </div>
               </div>
@@ -170,7 +179,7 @@ const BroadcastEdit = () => {
                   type="submit"
                   className="px-8 py-2.5 rounded-xl text-sm font-bold bg-[#0A4F48] text-white hover:bg-[#073a35] shadow-sm"
                 >
-                  Save & Continue
+                  Update & Continue
                 </button>
               </div>
             </div>

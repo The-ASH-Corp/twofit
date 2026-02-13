@@ -61,7 +61,21 @@ export const deleteBroadcast = createAsyncThunk(
       return data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to get Broadcast",
+        error.response?.data?.message || "Failed to delete Broadcast",
+      );
+    }
+  },
+);
+
+export const updateBroadcast = createAsyncThunk(
+  "broadcast/update",
+  async ({id, updatedData}, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.put(`/broadcast/update/${id}`, updatedData);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update Broadcast",
       );
     }
   },

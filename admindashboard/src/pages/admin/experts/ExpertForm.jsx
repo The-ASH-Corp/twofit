@@ -23,14 +23,14 @@ export default function ExpertForm() {
 
   useEffect(() => {
     dispatch(
-      getAllProgramsByAdmin({ adminId: user._id, page: 1, limit: 120 }),
+      getAllProgramsByAdmin({ adminId: user?._id, page: 1, limit: 120 }),
     ).then((res) => {
       setProgram(res.payload.data);
     });
     dispatch(fetchTherapyPlans({ page: 1, limit: 120 })).then((res) => {
       setTherapy(res.payload.data.therapy);
     });
-  }, [dispatch, user._id]);
+  }, [dispatch, user?._id]);
   console.log(therapy)
 
   const fields = [
@@ -124,7 +124,7 @@ export default function ExpertForm() {
               type: "multiple",
               options: therapy?.map((thr) => ({
                 label: thr.name,
-                value: thr._id,
+                value: thr?._id,
               })),
             }
           : {
@@ -133,7 +133,7 @@ export default function ExpertForm() {
               type: "multiple",
               options: program?.map((prog) => ({
                 label: prog.title,
-                value: prog._id,
+                value: prog?._id,
               })),
             },
       ],
@@ -256,12 +256,12 @@ export default function ExpertForm() {
       });
 
       if (user?._id) {
-        formData.append("adminId", user._id);
+        formData.append("adminId", user?._id);
       }
       const coach = await dispatch(createCoach(formData));
 
       if (coach.meta.requestStatus === "fulfilled") {
-        await dispatch(refreshProfile({ id: user._id, role: user.role }));
+        await dispatch(refreshProfile({ id: user?._id, role: user.role }));
         toast("Coach created successfully", { type: "success" });
         navigate(-1);
       } else {

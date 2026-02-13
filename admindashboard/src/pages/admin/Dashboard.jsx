@@ -52,7 +52,7 @@ export default function Dashboard() {
 
   const getDashboardDatas = async () => {
     const data = await dispatch(
-      getDashboardData({ adminId: user._id, duration: "12m" }),
+      getDashboardData({ adminId: user?._id, duration: "12m" }),
     );
     setDashboardData(data.payload);
   };

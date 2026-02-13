@@ -17,7 +17,7 @@ export default function Feedback() {
 
   const fetchFeedbackData = async () => {
     const response = await dispatch(
-      getAllFeedbacks({ id: user._id, page, limit }),
+      getAllFeedbacks({ id: user?._id, page, limit }),
     );
     const result = await response.payload;
     const data = result?.data;
@@ -26,7 +26,7 @@ export default function Feedback() {
     const flattenedData =
       data?.flatMap((coach) =>
         coach.feedback.map((fb) => ({
-          coachId: coach._id,
+          coachId: coach?._id,
           name: coach.name
             ? coach.name.charAt(0).toUpperCase() + coach.name.slice(1)
             : "N/A",
@@ -38,7 +38,7 @@ export default function Feedback() {
             month: "short",
             day: "numeric",
           }),
-          _id: fb._id,
+          _id: fb?._id,
         })),
       ) || [];
 

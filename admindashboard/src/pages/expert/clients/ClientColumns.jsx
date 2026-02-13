@@ -70,7 +70,7 @@ export const getClientColumns = (role, navigate) => {
           );
         }
 
-        return <HabitStartButton clientId={client._id} />;
+        return <HabitStartButton clientId={client?._id} />;
       },
     });
   }

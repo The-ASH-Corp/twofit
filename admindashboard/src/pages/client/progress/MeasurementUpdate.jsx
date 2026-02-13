@@ -28,7 +28,7 @@ export default function MeasurementUpdate({ onClose }) {
     try {
       await dispatch(
         updateMeasurementOfClient({
-          id: user._id,
+          id: user?._id,
           chest: Number(chest),
           waist: Number(waist),
           hip: Number(hip),
@@ -41,7 +41,7 @@ export default function MeasurementUpdate({ onClose }) {
       console.error(err);
       toast.error("Failed to update measurements");
     }finally{
-      dispatch(refreshProfile({id: user._id, role: user.role})) 
+      dispatch(refreshProfile({id: user?._id, role: user.role})) 
     }
   };
 

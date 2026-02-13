@@ -80,7 +80,7 @@ export default function Dashboard() {
   }, [pendingTasks]);
 
   const fetchData = async () => {
-    dispatch(getCoachDashboardStats(user._id)).then((res) => {
+    dispatch(getCoachDashboardStats(user?._id)).then((res) => {
       if (res.meta?.requestStatus === "fulfilled") {
         setDashboardStats(res.payload);
       }
@@ -91,7 +91,7 @@ export default function Dashboard() {
       }
     });
     dispatch(
-      getCoachRatingGraph({ id: user._id, duration: ratingDuration }),
+      getCoachRatingGraph({ id: user?._id, duration: ratingDuration }),
     ).then((res) => {
       if (res.meta?.requestStatus === "fulfilled") {
         setRatingGraphData(res.payload);
@@ -105,7 +105,7 @@ export default function Dashboard() {
       fetchData();
 
       // Socket.IO Setup
-      socket.auth = { userId: user._id, token: token };
+      socket.auth = { userId: user?._id, token: token };
       socket.connect();
 
       socket.on("connect", () => {

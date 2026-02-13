@@ -33,7 +33,7 @@ const ChatWindow = ({
   handleVoiceUpload,
   isUploadingMedia = false,
 }) => {
-  const isClientOnline = client && onlineUsers.includes(client._id);
+  const isClientOnline = client && onlineUsers.includes(client?._id);
   const fileInputRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const mediaStreamRef = useRef(null);

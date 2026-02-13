@@ -74,7 +74,7 @@ const ActionCell = ({ row }) => {
     <button
       onClick={() =>
         navigate("/expert/programs/viewPlan", {
-          state: { programId: row.original._id },
+          state: { programId: row.original?._id },
         })
       }
       className="flex items-center gap-1.5 px-3 py-1.5 bg-[#EBF3F2] hover:bg-[#dceceb] text-[#0A4F48] text-[11px] font-bold rounded-lg transition-colors"

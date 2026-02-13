@@ -32,7 +32,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (user?._id) {
-      dispatch(getClient({ id: user._id }));
+      dispatch(getClient({ id: user?._id }));
     }
   }, [user?._id, dispatch]);
 

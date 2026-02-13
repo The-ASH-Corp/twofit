@@ -45,11 +45,11 @@ export default function TherapyViewPlan() {
 
       const formattedWeeks = plan.weeks.map((week, wIdx) => ({
         ...week,
-        id: week._id,
+        id: week?._id,
         expanded: wIdx === 0,
         days: week.days.map((day, dIdx) => ({
           ...day,
-          id: day._id,
+          id: day?._id,
           expanded: dIdx === 0,
           therapyPlan: day.therapies,
         })),

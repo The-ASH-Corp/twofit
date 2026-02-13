@@ -55,7 +55,7 @@ export default function ClientForm() {
 
   const fetchProgram = async () => {
     await dispatch(
-      getAllProgramsByAdmin({ adminId: user._id, page: 1, limit: 120 }),
+      getAllProgramsByAdmin({ adminId: user?._id, page: 1, limit: 120 }),
     ).then((res) => {
       setProgram(res.payload.data);
     });
@@ -78,7 +78,7 @@ export default function ClientForm() {
 
 
   const setProgramId = (programId) => {
-    const selectedProgram = program?.find((p) => p._id === programId);
+    const selectedProgram = program?.find((p) => p?._id === programId);
     setSelectedProgram(selectedProgram);
   };
 
@@ -204,7 +204,7 @@ export default function ClientForm() {
           type: "select",
           options: program?.map((prog) => ({
             label: prog.title,
-            value: prog._id,
+            value: prog?._id,
           })),
           onChange: (e) => setProgramId(e.target.value),
         },
@@ -250,7 +250,7 @@ export default function ClientForm() {
           options: therapy
             ? therapy.map((t) => ({
                 label: t.name,
-                value: t._id,
+                value: t?._id,
               }))
             : [],
           onChange: (e) => setSelectedTherapyType(e.target.value),
@@ -272,12 +272,12 @@ export default function ClientForm() {
                   // If a program is selected, only show dieticians assigned to that program
                   if (selectedProgram?._id) {
                     return coach.assignedPrograms?.some(
-                      (p) => p._id === selectedProgram._id,
+                      (p) => p?._id === selectedProgram?._id,
                     );
                   }
                   return true;
                 })
-                ?.map((coach) => ({ label: coach.name, value: coach._id }))
+                ?.map((coach) => ({ label: coach.name, value: coach?._id }))
             : [],
         },
         {
@@ -291,7 +291,7 @@ export default function ClientForm() {
                   // If a program is selected, only show trainers assigned to that program
                   if (selectedProgram?._id) {
                     return coach.assignedPrograms?.some(
-                      (p) => p._id === selectedProgram._id,
+                      (p) => p?._id === selectedProgram?._id,
                     );
                   }
                   return true;
@@ -310,7 +310,7 @@ export default function ClientForm() {
                       ?.filter((coach) => coach?.role === "Therapist")
                       ?.map((coach) => ({
                         label: coach.name,
-                        value: coach._id,
+                        value: coach?._id,
                       }))
                   : [],
               },
@@ -342,7 +342,7 @@ export default function ClientForm() {
   ];
 
   const handleUserCreation = async (values) => {
-    const updatedValues = { ...values, adminId: user._id };
+    const updatedValues = { ...values, adminId: user?._id };
     const client = await dispatch(createClient(updatedValues));
     if (client.payload.success) {
       toast.success("Client created successfully");

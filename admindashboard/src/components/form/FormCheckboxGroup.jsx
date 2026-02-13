@@ -8,7 +8,7 @@ const FormCheckboxGroup = ({ label, name, options }) => {
       <div className="grid grid-cols-2 gap-3 bg-[#F8F8F8] p-4 rounded-lg">
         {options.map((option) => (
           <label
-            key={option.value ?? option._id}
+            key={option.value ?? option?._id}
             className="flex items-center gap-2 cursor-pointer"
           >
             <Field
