@@ -138,7 +138,7 @@ const PayrollMenu = ({ setPayrollOpen, payrollOpen }) => {
   };
 
   return (
-    <div className="absolute z-20 w-76 flex flex-col items-center gap-10 bg-white rounded-2xl p-4 shadow-[0_10px_30px_rgba(0,0,0,0.25)] right-1 top-1">
+    <div className="absolute z-20 w-full md:w-76 flex flex-col items-center gap-10 bg-white rounded-2xl p-4 shadow-[0_10px_30px_rgba(0,0,0,0.25)] md:right-1 top-1">
       {/* header */}
       <div className="flex justify-between items-center w-full">
         <h2 className="text-[16px] font-bold text-[#0A4F48]">Incentives</h2>

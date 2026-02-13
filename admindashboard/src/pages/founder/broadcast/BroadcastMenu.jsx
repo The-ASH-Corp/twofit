@@ -3,10 +3,10 @@ import React, { useState } from 'react'
 import { IoMdClose } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
 
-const BroadcastMenu = ({ row }) => {
+const BroadcastMenu = ({ data }) => {
   const [activeRowId, setActiveRowId] = useState(null);
 
-  const isOpen = activeRowId === row._id;
+  const isOpen = activeRowId === data._id;
   const navigate = useNavigate();
 
   const handelEdit = (id) => {
@@ -25,7 +25,7 @@ const BroadcastMenu = ({ row }) => {
         className="w-full  text-gray-400 hover:text-gray-600 transition-colors"
         onClick={(e) => {
           e.stopPropagation();
-          setActiveRowId(isOpen ? null : row._id);
+          setActiveRowId(isOpen ? null : data._id);
         }}
       >
         <MoreHorizontal size={20} />
@@ -48,13 +48,13 @@ const BroadcastMenu = ({ row }) => {
               <IoMdClose />
             </div>
             <button
-              onClick={() => handelEdit(row._id)}
+              onClick={() => handelEdit(data._id)}
               className="w-full bg-[#EBF3F2] hover:bg-[#0A4F48] hover:text-white p-2 rounded-lg"
             >
               Edit
             </button>
             <button
-              onClick={() => handelDelete(row._id)}
+              onClick={() => handelDelete(data._id)}
               className=" w-full bg-[#EBF3F2] hover:bg-red-600 hover:text-white p-2 rounded-lg"
             >
               Delete

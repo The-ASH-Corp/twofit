@@ -10,7 +10,7 @@ const ReminderCard = ({
   icon,
 }) => {
   return (
-    <div className="bg-white rounded-2xl p-6 flex flex-col gap-6 shadow-sm border border-gray-50 flex-1 min-w-[300px]">
+    <div className="bg-white rounded-2xl p-6 flex flex-col gap-6 shadow-sm border border-gray-50 flex-1 w-full ">
       <div className="flex items-center justify-between">
         <h3 className="text-[#0A4F48] font-bold text-lg">{title}</h3>
         <label className="relative inline-flex items-center cursor-pointer">
@@ -77,8 +77,8 @@ const AutoReminders = () => {
   const therapySettings = [{ label: "Daily Reminder", time: "8:00 PM" }];
 
   return (
-    <div className="flex-1 bg-[#F8F9FA] p-6 overflow-auto no-scrollbar h-[calc(100vh-130px)]">
-      <div className="flex flex-col md:flex-row gap-6 w-full mx-auto">
+    <div className="flex-1 bg-[#F8F9FA] pb-6  overflow-auto no-scrollbar h-[calc(100vh-130px)]">
+      <div className="flex flex-col md:flex-wrap md:flex-row gap-6 w-full mx-auto">
         <ReminderCard
           title="Meal Reminders"
           isActive={mealActive}

@@ -28,8 +28,6 @@ const TemplateSummary = () => {
 
   const fileExt = broadcast?.attachment?.split(".").pop()?.toUpperCase();
 
-  console.log(`http://localhost:5000${broadcast?.attachment}`);
-
   if (status === "loading")
     return (
       <div className="flex justify-center items-center h-[calc(100vh-120px)]">
@@ -75,7 +73,7 @@ const TemplateSummary = () => {
                       <BsFileEarmarkText size={20} />
                     </div>
                     <div className="flex flex-col items-start">
-                      <p className="text-[12px] line-clamp-2">
+                      <p className="text-[12px] line-clamp-1">
                         {broadcast?.attachment.split("/").pop()}
                       </p>
                       <div className="flex gap-1 items-center">
@@ -94,10 +92,6 @@ const TemplateSummary = () => {
           </div>
         </div>
       </div>
-      <img
-        src={`http://localhost:5000${broadcast?.attachment}`}
-        alt="pdf"
-      />
       <div className="flex flex-col gap-6">
         <div className="h-px bg-gray-200 w-full mt-2"></div>
 

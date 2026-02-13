@@ -60,3 +60,37 @@ export const deleteBroadcast = async (id) => {
     throw error;
   }
 };
+
+
+export const updateBroadcast = async (id, data) => {
+  try {
+    if (data.title) {
+      const duplicate = await broadcastModel.findOne({
+        title: data.title.trim(),
+        _id: { $ne: id },
+      });
+
+      if (duplicate) {
+        throw new Error("Broadcast title already exists");
+      }
+    }
+
+    const updatedBroadcast = await broadcastModel.findByIdAndUpdate(
+      id,
+      {
+        ...data,
+        ...(data.title && { title: capitalizeFirst(data.title) }),
+      },
+      { new: true }
+    );
+
+    if (!updatedBroadcast) {
+      throw new Error("Broadcast not found");
+    }
+
+    return updatedBroadcast;
+  } catch (error) {
+    throw error;
+  }
+};
+
