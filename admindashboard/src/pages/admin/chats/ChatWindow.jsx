@@ -1,4 +1,4 @@
-import { ArrowLeft, Mic, Paperclip, Square } from "lucide-react";
+import { ArrowLeft, ChevronLeft, Mic, Paperclip, Square } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import Lottie from "lottie-react";
 import chatShimmer from "../../../assets/ChatShimmer.json";
@@ -207,21 +207,18 @@ const ChatWindow = ({
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       {client ? (
         <div className="flex-1 flex flex-col h-full overflow-hidden">
-          {/* Mobile Top Bar - Only visible on mobile */}
-          <div className="lg:hidden bg-white px-4 py-3 flex items-center gap-3 border-b">
-            {onBack && (
-              <button onClick={onBack} className="p-1">
-                <ArrowLeft size={20} className="text-gray-700" />
-              </button>
-            )}
-            <div className="flex-1">
-              <h1 className="text-[#0A4F48] text-lg font-semibold">twofit</h1>
-            </div>
-          </div>
-
-          {/* Desktop Chat Header - Only visible on desktop */}
-          <div className="hidden lg:flex bg-white rounded-t-lg px-6 py-4 items-center justify-between">
+          {/* Chat Header */}
+          <div className="bg-white rounded-t-lg px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
+              {onBack && (
+                <button
+                  onClick={onBack}
+                  className="lg:hidden p-1.5 -ml-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
+                  aria-label="Back to chat list"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+              )}
               <div className="w-12 h-12 rounded-full bg-[#E8B5AD] flex items-center justify-center text-white font-semibold">
                 {client?.name?.split(" ")?.[0]?.[0]}
               </div>
@@ -243,7 +240,7 @@ const ChatWindow = ({
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 lg:p-6 space-y-4 bg-white lg:bg-gray-50 lg:border-20 lg:border-white lg:rounded-b-lg">
+          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 border-20 border-white rounded-b-lg">
             {messages.map((msg, index) => {
               const isMe = msg.sender === user?._id;
 
@@ -253,22 +250,18 @@ const ChatWindow = ({
                   className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                 >
                   {!isMe && (
-                    <div className="hidden lg:flex w-10 h-10 rounded-full bg-[#D4A5A0] items-center justify-center text-white text-sm font-semibold shrink-0">
+                    <div className="w-10 h-10 rounded-full bg-[#D4A5A0] flex items-center justify-center text-white text-sm font-semibold shrink-0">
                       {client?.name?.split(" ")?.[0]?.[0]}
                       {client?.name?.split(" ")?.[1]?.[0]}
                     </div>
                   )}
 
-                  <div
-                    className={`max-w-[75%] lg:max-w-md ${
-                      !isMe ? "lg:ml-3" : ""
-                    }`}
-                  >
+                  <div className={`max-w-md ${!isMe ? "ml-3" : ""}`}>
                     <div
                       className={`px-4 py-3 rounded-2xl text-sm shadow-sm ${
                         isMe
                           ? "bg-[#E8F5E9] text-gray-800"
-                          : "bg-gray-100 lg:bg-white text-gray-800"
+                          : "bg-white text-gray-800"
                       }`}
                     >
                       {renderMessageBody(msg)}
@@ -292,7 +285,7 @@ const ChatWindow = ({
           </div>
 
           {/* Message Input */}
-          <div className="bg-white lg:rounded-b-lg px-4 lg:px-6 py-3 lg:py-4">
+          <div className="bg-white rounded-b-lg px-6 py-4">
             <input
               ref={fileInputRef}
               type="file"
