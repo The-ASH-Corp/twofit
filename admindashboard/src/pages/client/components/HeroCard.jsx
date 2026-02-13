@@ -9,8 +9,8 @@ export default function HeroCard({ program }) {
         alt="Weight Loss"
         className="w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-l from-black/50 via-transparent to-transparent flex items-center p-8">
-        <h1 className="text-white text-[32px] font-bold max-w-[200px] leading-[1] text-right absolute right-10 bottom-10 drop-shadow-lg">
+      <div className="absolute inset-0 bg-linear-to-l from-black/50 via-transparent to-transparent flex items-center p-8">
+        <h1 className="text-white text-[32px] font-bold max-w-[200px] leading-none text-right absolute right-10 bottom-10 drop-shadow-lg">
           {program?.title}
         </h1>
       </div>

@@ -105,49 +105,49 @@ export const getHeadById = async (id) => {
 };
 
 export const updateHead = async (id, data) => {
-   try {
-      if (!data?.name || !data?.email || !data?.phone) {
-        throw new Error("Name, email, and phone are required");
-      }
-  
-      const duplicate = await HeadsModel.findOne({
-        _id: { $ne: id },
-        $or: [
-          { name: data.name.trim() },
-          { email: data.email?.trim() },
-          { phone: data.phone?.trim() },
-        ],
-      });
-
-      if (duplicate) {
-        throw new Error("Head already exists with same name, email, or phone");
-      }
-  
-      const updated = await HeadsModel.findByIdAndUpdate(
-        id,
-        {
-          name: capitalizeFirst(data.name.trim()),
-          dob: data.dob,
-          gender: data.gender,
-          email: data.email,
-          phone: data.phone,
-          address: data.address,
-          specialization: data.specialization,
-          experience: data.experience,
-          qualification: data.qualification,
-          salary: data.salary,
-        },
-        { new: true, runValidators: true },
-      );
-  
-      if (!updated) {
-        throw new Error("Head not found");
-      }
-  
-      return updated;
-    } catch (error) {
-      throw error;
+  try {
+    if (!data?.name || !data?.email || !data?.phone) {
+      throw new Error("Name, email, and phone are required");
     }
+
+    const duplicate = await HeadsModel.findOne({
+      _id: { $ne: id },
+      $or: [
+        { name: data.name.trim() },
+        { email: data.email?.trim() },
+        { phone: data.phone?.trim() },
+      ],
+    });
+
+    if (duplicate) {
+      throw new Error("Head already exists with same name, email, or phone");
+    }
+
+    const updated = await HeadsModel.findByIdAndUpdate(
+      id,
+      {
+        name: capitalizeFirst(data.name.trim()),
+        dob: data.dob,
+        gender: data.gender,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        specialization: data.specialization,
+        experience: data.experience,
+        qualification: data.qualification,
+        salary: data.salary,
+      },
+      { new: true, runValidators: true },
+    );
+
+    if (!updated) {
+      throw new Error("Head not found");
+    }
+
+    return updated;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const deleteHead = async (id) => {
@@ -192,7 +192,10 @@ export const deleteHead = async (id) => {
   }
 };
 
-export const getDashboardData = async (id) => {
+export const getDashboardData = async (id, duration) => {
+  let startDate = new Date();
+  const months = parseInt(duration) || 3; // Default to 3 months if not provided
+  startDate.setMonth(startDate.getMonth() - months);
 
   const head = await HeadsModel.find({ _id: id }).populate("programCategory")
   const totalAdmins = await AdminModel.find({ headId: id });
@@ -217,126 +220,180 @@ export const getDashboardData = async (id) => {
   const totalPrograms = await ProgramModel.countDocuments({ category: head[0].programCategory._id });
 
   const totalTrainers = totalExperts.filter(expert => expert.role === "Trainer").length;
-  
+
   const totalDietitians = totalExperts.filter(expert => expert.role === "Dietician").length;
 
   const totalTherapists = totalExperts.filter(expert => expert.role === "Therapist").length;
 
 
+
+  const newProgramsCount = await ProgramModel.countDocuments({
+    category: head[0].programCategory._id,
+    createdAt: { $gte: startDate }
+  });
+
+  const newExpertsCount = totalExperts.filter(expert => new Date(expert.createdAt) >= startDate).length;
+
+
+  let newClientsCount = 0;
+  const processedUserIds = new Set();
+  totalExperts.forEach(expert => {
+    if (expert.assignedUsers && expert.assignedUsers.length > 0) {
+      expert.assignedUsers.forEach(user => {
+        const uId = user._id ? user._id.toString() : user.toString();
+        if (!processedUserIds.has(uId)) {
+          if (user.createdAt && new Date(user.createdAt) >= startDate) {
+            newClientsCount++;
+          }
+          // If createdAt is missing (e.g. not selected in populate), this will be 0.
+          // Assuming standard populate returns all fields or at least timestamps.
+          processedUserIds.add(uId);
+        }
+      });
+    }
+  });
+
+
   // --- Expert Performance Metrics ---
 
-  // 1. Task Completion Rate
-  // Aggregate submissions for all clients
-  const submissionStats = await TaskSubmission.aggregate([
-    { $match: { userId: { $in: clientIds.map(id => new mongoose.Types.ObjectId(id)) } } },
+  // Filter by submission date >= startDate
+  const clientCompletionRates = await TaskSubmission.aggregate([
+    {
+      $match: {
+        userId: { $in: clientIds.map(id => new mongoose.Types.ObjectId(id)) },
+      }
+    },
     { $unwind: "$dailySubmissions" },
     { $unwind: "$dailySubmissions.exercises" },
+    // Filter by dailySubmissions.exercises.createdAt or updatedAt
+    { $match: { "dailySubmissions.exercises.updatedAt": { $gte: startDate } } },
+    {
+      $group: {
+        _id: "$userId",
+        totalTasks: { $sum: 1 },
+        verifiedTasks: {
+          $sum: { $cond: [{ $eq: ["$dailySubmissions.exercises.status", "verified"] }, 1, 0] }
+        }
+      }
+    },
+    {
+      $project: {
+        completionRate: {
+          $cond: [
+            { $eq: ["$totalTasks", 0] },
+            0,
+            { $multiply: [{ $divide: ["$verifiedTasks", "$totalTasks"] }, 100] }
+          ]
+        }
+      }
+    },
     {
       $group: {
         _id: null,
-        totalTasks: { $sum: 1 },
-        verifiedTasks: {
-            $sum: { $cond: [{ $eq: ["$dailySubmissions.exercises.status", "verified"] }, 1, 0] }
-        }
+        averageCompletionRate: { $avg: "$completionRate" }
       }
     }
   ]);
 
-  const taskCompletionRate = submissionStats.length > 0 && submissionStats[0].totalTasks > 0
-    ? Math.round((submissionStats[0].verifiedTasks / submissionStats[0].totalTasks) * 100)
+  const taskCompletionRate = clientCompletionRates.length > 0
+    ? Math.round(clientCompletionRates[0].averageCompletionRate)
     : 0;
 
-  // 2. Average Rating
-   let totalRating = 0;
-   let ratingCount = 0;
-   totalExperts.forEach(expert => {
-       if (expert.feedback && expert.feedback.length > 0) {
-           expert.feedback.forEach(f => {
-               if (f.rating) {
-                   totalRating += f.rating;
-                   ratingCount++;
-               }
-           });
-       }
-   });
-   const averageRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : 0;
+  // 2. Average Rating (Filtered)
+  let totalRating = 0;
+  let ratingCount = 0;
+  totalExperts.forEach(expert => {
+    if (expert.feedback && expert.feedback.length > 0) {
+      expert.feedback.forEach(f => {
+        // Assuming feedback has a date or createdAt field
+        if (f.rating && (!f.createdAt || new Date(f.createdAt) >= startDate)) {
+          totalRating += f.rating;
+          ratingCount++;
+        }
+      });
+    }
+  });
+  const averageRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : 0;
 
-   // 3. Clients Assigned Rate (% of experts who have clients)
-   const activeExpertsCount = totalExperts.filter(e => e.assignedUsers && e.assignedUsers.length > 0).length;
-   const activeExpertsRate = totalExperts.length > 0 
-    ? Math.round((activeExpertsCount / totalExperts.length) * 100) 
+  // 3. Clients Assigned Rate (unique clients / Sum of Max Capacities)
+  const sumMaxCapacity = totalExperts.reduce((acc, c) => acc + (c.maxClient || 0), 0);
+  
+  // Use unique clients count (totalClients calculated above) as per user request
+  const clientsAssignedRate = sumMaxCapacity > 0
+    ? Math.round((totalClients / sumMaxCapacity) * 100)
     : 0;
 
-    // --- Latest Progress Reports ---
-    const latestReports = await TaskSubmission.aggregate([
-        { 
-            $match: { 
-                userId: { $in: clientIds.map(id => new mongoose.Types.ObjectId(id)) },
-                // ensure exercises exist and have been updated/acted upon (optional check)
-                "dailySubmissions.exercises": { $exists: true, $ne: [] }
-            } 
-        },
-        { $unwind: "$dailySubmissions" },
-        { $unwind: "$dailySubmissions.exercises" },
-        // Filter out items without timestamp if necessary, or just sort
-        // Assuming 'updatedAt' exists per admin functionality
-        { $sort: { "dailySubmissions.exercises.updatedAt": -1, "dailySubmissions.exercises.status": -1 } }, 
-        { $limit: 10 },
-        {
-           $lookup: {
-             from: "users",
-             localField: "userId",
-             foreignField: "_id",
-             as: "user"
-           }
-        },
-        { $unwind: "$user" },
-        {
-            $lookup: { from: "coaches", localField: "user.trainer", foreignField: "_id", as: "trainer" }
-        },
-        {
-            $lookup: { from: "coaches", localField: "user.dietition", foreignField: "_id", as: "dietitian" }
-        },
-        {
-             $lookup: { from: "coaches", localField: "user.therapist", foreignField: "_id", as: "therapist" }
-        },
-        {
-            $project: {
-                clientName: "$user.name",
-                taskType: "$dailySubmissions.exercises.taskType",
-                status: "$dailySubmissions.exercises.status",
-                updatedAt: "$dailySubmissions.exercises.updatedAt",
-                trainerName: { $arrayElemAt: ["$trainer.name", 0] },
-                dietitianName: { $arrayElemAt: ["$dietitian.name", 0] },
-                therapistName: { $arrayElemAt: ["$therapist.name", 0] }
-            }
-        }
-    ]);
+  // --- Latest Progress Reports ---
+  const latestReports = await TaskSubmission.aggregate([
+    {
+      $match: {
+        userId: { $in: clientIds.map(id => new mongoose.Types.ObjectId(id)) },
+        // ensure exercises exist and have been updated/acted upon (optional check)
+        "dailySubmissions.exercises": { $exists: true, $ne: [] }
+      }
+    },
+    { $unwind: "$dailySubmissions" },
 
-    // Format for frontend
-    const formattedReports = latestReports.map(report => {
-        let expertName = "N/A";
-        let expertType = "N/A";
-        
-        if (report.taskType === 'Workout') {
-            expertName = report.trainerName;
-            expertType = "Trainer";
-        } else if (report.taskType === 'Meal' || report.taskType === 'Diet') {
-            expertName = report.dietitianName;
-            expertType = "Dietitian";
-        } else if (report.taskType === 'Therapy') {
-            expertName = report.therapistName;
-            expertType = "Therapist";
-        }
+    { $unwind: "$dailySubmissions.exercises" },
+    // Filter out items without timestamp if necessary, or just sort
+    // Assuming 'updatedAt' exists per admin functionality
+    { $sort: { "dailySubmissions.exercises.updatedAt": -1, "dailySubmissions.exercises.status": -1 } },
+    { $limit: 10 },
+    {
+      $lookup: {
+        from: "users",
+        localField: "userId",
+        foreignField: "_id",
+        as: "user"
+      }
+    },
+    { $unwind: "$user" },
+    {
+      $lookup: { from: "coaches", localField: "user.trainer", foreignField: "_id", as: "trainer" }
+    },
+    {
+      $lookup: { from: "coaches", localField: "user.dietition", foreignField: "_id", as: "dietitian" }
+    },
+    {
+      $lookup: { from: "coaches", localField: "user.therapist", foreignField: "_id", as: "therapist" }
+    },
+    {
+      $project: {
+        clientName: "$user.name",
+        taskType: "$dailySubmissions.exercises.taskType",
+        status: "$dailySubmissions.exercises.status",
+        updatedAt: "$dailySubmissions.exercises.updatedAt",
+        trainerName: { $arrayElemAt: ["$trainer.name", 0] },
+        dietitianName: { $arrayElemAt: ["$dietitian.name", 0] },
+        therapistName: { $arrayElemAt: ["$therapist.name", 0] }
+      }
+    }
+  ]);
 
-        return {
-            name: report.clientName,
-            type: report.taskType === 'Meal' ? 'Diet' : report.taskType,
-            expert: expertType,
-            submittedBy: expertName ? `${expertType} ${expertName.split(' ')[0]}` : "Client",
-            time: report.updatedAt
-        };
-    });
+  // Format for frontend
+  const formattedReports = latestReports.map(report => {
+    let expertName = "N/A";
+    let expertType = "N/A";
+
+    if (report.taskType === 'Workout') {
+      expertName = report.trainerName;
+      expertType = "Trainer";
+    } else if (report.taskType === 'Meal' || report.taskType === 'Diet') {
+      expertName = report.dietitianName;
+      expertType = "Dietitian";
+    } else if (report.taskType === 'Therapy') {
+      expertName = report.therapistName;
+      expertType = "Therapist";
+    }
+
+    return {
+      name: report.clientName,
+      type: report.taskType === 'Meal' ? 'Diet' : report.taskType,
+      expert: expertType,
+      submittedBy: expertName ? `${expertType} ${expertName.split(' ')[0]}` : "Client",
+      time: report.updatedAt
+    };
+  });
 
   return {
     totalClients,
@@ -347,14 +404,16 @@ export const getDashboardData = async (id) => {
     totalDietitians,
     totalTherapists,
     adminPerformance: {
-        programs: totalPrograms,
-        experts: totalExperts.length,
-        clients: totalClients
+      programs: newProgramsCount, // Filtered
+      experts: newExpertsCount,   // Filtered
+      clients: newClientsCount    // Filtered
     },
     expertPerformance: {
-        taskCompletion: taskCompletionRate,
-        rating: averageRating,
-        clientsAssigned: activeExpertsRate
+      taskCompletion: taskCompletionRate, // Filtered
+      rating: averageRating,            // Filtered
+      clientsAssigned: clientsAssignedRate, // Updated Logic
+      totalClientsAssigned: totalClients,
+      totalCapacity: sumMaxCapacity,
     },
     latestReports: formattedReports
   };
