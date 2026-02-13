@@ -18,7 +18,7 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
     if (!pendingTasks || !client?._id) return [];
 
     let clientTasks = pendingTasks.filter(
-      (task) => task.userId?._id === client._id,
+      (task) => task.userId?._id === client?._id,
     );
 
     // Filter based on Expert Role
@@ -77,7 +77,7 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
     try {
       const pendingTasksToVerify = taskGroup.tasks.filter(t => t.status === 'pending');
       for (const task of pendingTasksToVerify) {
-        await dispatch(verifyTask(task._id)).unwrap();
+        await dispatch(verifyTask(task?._id)).unwrap();
       }
       toast.success("Tasks approved successfully");
     } catch (error) {
@@ -96,7 +96,7 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
     try {
       const pendingTasksToReject = taskGroup.tasks.filter(t => t.status === 'pending');
       for (const task of pendingTasksToReject) {
-        await dispatch(rejectTask({ id: task._id, comment })).unwrap();
+        await dispatch(rejectTask({ id: task?._id, comment })).unwrap();
       }
       toast.success("Feedback sent to client");
       setComment("");
@@ -295,7 +295,7 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
                   <div className="p-4 space-y-4 animate-in fade-in duration-200">
                     {group.tasks.map((task) => (
                       <div
-                        key={task._id}
+                        key={task?._id}
                         className="bg-white p-3 rounded-lg border border-gray-50 shadow-sm"
                       >
                         <div className="flex justify-between items-start mb-2">

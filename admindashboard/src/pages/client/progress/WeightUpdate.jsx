@@ -25,7 +25,7 @@ export default function WeightUpdate({ onClose }) {
     try {
       await dispatch(
         updateWeightOfClient({
-          id: user._id,
+          id: user?._id,
           currentWeight: Number(weight),
         })
       ).unwrap();

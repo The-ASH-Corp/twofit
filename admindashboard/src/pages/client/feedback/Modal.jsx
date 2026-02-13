@@ -15,10 +15,10 @@ export default function Modal({ expert, onClose, fetchFeedbackData }) {
   const handleSubmit = async () => {
     try {
       const values = {
-        expertId: expert._id,
+        expertId: expert?._id,
         rating,
         feedback,
-        userId: user._id,
+        userId: user?._id,
       };
 
       await dispatch(createFeedback(values)).unwrap();

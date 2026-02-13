@@ -43,7 +43,7 @@ const ProgramEditForm = () => {
             type: "select",
             options:data?.data?.map((items) => ({
               label: items.name,
-              value: items._id,
+              value: items?._id,
             })),
           },
           {

@@ -25,7 +25,7 @@ const BroadcastMenu = ({ data }) => {
         className="w-full  text-gray-400 hover:text-gray-600 transition-colors"
         onClick={(e) => {
           e.stopPropagation();
-          setActiveRowId(isOpen ? null : data._id);
+          setActiveRowId(isOpen ? null : data?._id);
         }}
       >
         <MoreHorizontal size={20} />
@@ -48,13 +48,13 @@ const BroadcastMenu = ({ data }) => {
               <IoMdClose />
             </div>
             <button
-              onClick={() => handelEdit(data._id)}
+              onClick={() => handelEdit(data?._id)}
               className="w-full bg-[#EBF3F2] hover:bg-[#0A4F48] hover:text-white p-2 rounded-lg"
             >
               Edit
             </button>
             <button
-              onClick={() => handelDelete(data._id)}
+              onClick={() => handelDelete(data?._id)}
               className=" w-full bg-[#EBF3F2] hover:bg-red-600 hover:text-white p-2 rounded-lg"
             >
               Delete

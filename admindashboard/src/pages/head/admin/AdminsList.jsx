@@ -17,7 +17,7 @@ export default function AdminsList() {
 
   const dispatch = useDispatch();
   const fetchAdminData=async()=>{
-    const admin =await dispatch(getAdminsByHeadId({page,limit,headId:user._id})).unwrap()
+    const admin =await dispatch(getAdminsByHeadId({page,limit,headId:user?._id})).unwrap()
     setAdmins(admin.data)
     setTotalCount(admin.total)
   }

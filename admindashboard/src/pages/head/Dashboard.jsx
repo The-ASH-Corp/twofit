@@ -54,7 +54,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     // Initial fetch
-    dispatch(getDashboardData({ headId: user._id, duration: "3" })).then(
+    dispatch(getDashboardData({ headId: user?._id, duration: "3" })).then(
       (res) => {
         setDashboardData(res.payload);
       },
@@ -66,12 +66,12 @@ export default function Dashboard() {
     
 
     dispatch(
-      getDashboardData({ headId: user._id, duration: adminDuration }),
+      getDashboardData({ headId: user?._id, duration: adminDuration }),
     ).then((res) => {
       // Using adminDuration as primary for now
       setDashboardData(res.payload);
     });
-  }, [adminDuration, dispatch, user._id]);
+  }, [adminDuration, dispatch, user?._id]);
 
  
   const timeframeOptions = [

@@ -27,7 +27,7 @@ export default function ClientsTable() {
   const [limit, setLimit] = useState(10);
 
   if (coachIds.length === 0) {
-    dispatch(getAllCoachesByAdminId(user._id, page, limit));
+    dispatch(getAllCoachesByAdminId(user?._id, page, limit));
   }
 
   const fetchClientData = async () => {

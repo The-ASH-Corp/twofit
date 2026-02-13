@@ -85,7 +85,7 @@ export default function AdminForm() {
           label: "Choose Program",
           type: "multiple",
           options:programs?.map((program) => ({
-            key: program._id,
+            key: program?._id,
             label: program.title,
             value: program.title,
           })),
@@ -142,7 +142,7 @@ export default function AdminForm() {
         createAdmin({
           ...values,
           chooseProgram: selectedProgramIds,
-          headId: user._id,
+          headId: user?._id,
         })
       ).unwrap();
       toast("Admin created successfully", { type: "success" });
