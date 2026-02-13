@@ -15,6 +15,10 @@ export default function Chats() {
   const dispatch = useDispatch();
   const chats = useSelector(getChat);
   const clients = useSelector(selectAssignedClients);
+  const [showChatWindow, setShowChatWindow] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(
+    typeof window !== "undefined" ? window.innerWidth >= 1024 : true,
+  );
 
   const [client, setChatClient] = useState(null);
   const [adminContact, setAdminContact] = useState(null);
@@ -25,6 +29,12 @@ export default function Chats() {
   const [isUploadingMedia, setIsUploadingMedia] = useState(false);
 
   const getPrivateRoomId = (u1, u2) => `private:${[u1, u2].sort().join("_")}`;
+
+  useEffect(() => {
+    const onResize = () => setIsDesktop(window.innerWidth >= 1024);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   const clearUnreadForUser = useCallback((chatUserId) => {
     if (!chatUserId) return;
@@ -121,7 +131,12 @@ export default function Chats() {
     const roomId = getPrivateRoomId(user?._id, selectedClient?._id);
     socket.emit("join_room", { roomId });
     setChatClient(selectedClient);
+    setShowChatWindow(true);
     clearUnreadForUser(selectedClient?._id);
+  };
+
+  const handleBackToList = () => {
+    setShowChatWindow(false);
   };
 
   useEffect(() => {
@@ -149,13 +164,24 @@ export default function Chats() {
       const selectedRoom = client
         ? getPrivateRoomId(user?._id, client?._id)
         : null;
-      const roomIsOpen = Boolean(selectedRoom && msg.roomId === selectedRoom);
+      const roomMatchesSelected = Boolean(
+        selectedRoom && msg.roomId === selectedRoom,
+      );
       const isIncoming = msg.sender !== user?._id;
       const partnerId = isIncoming ? msg.sender : msg.reciever;
+      const chatWindowVisible = isDesktop || showChatWindow;
 
-      if (roomIsOpen) {
+      if (roomMatchesSelected) {
         setMessages((prev) => [...prev, msg]);
-        if (isIncoming) {
+
+        if (isIncoming && !chatWindowVisible && partnerId) {
+          setUnreadCounts((prev) => ({
+            ...prev,
+            [partnerId]: (prev[partnerId] || 0) + 1,
+          }));
+        }
+
+        if (isIncoming && chatWindowVisible) {
           clearUnreadForUser(partnerId);
         }
         return;
@@ -171,7 +197,7 @@ export default function Chats() {
 
     socket.on("new_message", onNewMessage);
     return () => socket.off("new_message", onNewMessage);
-  }, [client, clearUnreadForUser, user?._id]);
+  }, [client, clearUnreadForUser, isDesktop, showChatWindow, user?._id]);
 
   const sendSocketMessage = useCallback(
     ({
@@ -274,8 +300,13 @@ export default function Chats() {
 
 
   return (
-    <div className="flex h-[calc(100vh-120px)]  gap-5">
-        <>
+    <div className="flex h-[calc(100vh-120px)] gap-5">
+      <>
+        <div
+          className={`${
+            showChatWindow ? "hidden lg:block" : "block"
+          } w-full lg:w-80`}
+        >
           {/* Middle - Chat List */}
           <ChastList
             clients={chatContacts}
@@ -284,7 +315,13 @@ export default function Chats() {
             onlineUsers={onlineUsers}
             unreadCounts={unreadCounts}
           />
+        </div>
 
+        <div
+          className={`${
+            showChatWindow ? "block" : "hidden lg:block"
+          } w-full lg:flex-1`}
+        >
           {/* Right - Chat Window */}
           <ChatWindow
             client={client}
@@ -294,12 +331,13 @@ export default function Chats() {
             messageHandlers={messageHandlers}
             user={user}
             onlineUsers={onlineUsers}
+            onBack={handleBackToList}
             handleImageUpload={handleImageUpload}
             handleVoiceUpload={handleVoiceUpload}
             isUploadingMedia={isUploadingMedia}
           />
-        </>
-      
+        </div>
+      </>
     </div>
   );
 }

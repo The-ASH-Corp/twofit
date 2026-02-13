@@ -417,10 +417,10 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA] h-[calc(100vh-120px)] overflow-auto no-scrollbar">
+    <div className="flex flex-col gap-6 p-4 bg-[#F8F9FA] h-[calc(100vh-120px)] overflow-auto no-scrollbar">
       {/* Top Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl p-5 flex items-center gap-4 shadow-sm">
+        <div className="bg-white rounded-2xl p-4 sm:p-5 flex items-center gap-4 shadow-sm">
           <div className="w-12 h-12 rounded-xl bg-[#EBF3F2] flex items-center justify-center">
             <Users size={20} className="text-[#0A4F48]" />
           </div>
@@ -434,7 +434,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 flex items-center gap-4 shadow-sm">
+        <div className="bg-white rounded-2xl p-4 sm:p-5 flex items-center gap-4 shadow-sm">
           <div className="w-12 h-12 rounded-xl bg-[#FAE8E6] flex items-center justify-center">
             <FileText size={20} className="text-[#D4A5A0]" />
           </div>
@@ -448,7 +448,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 flex items-center gap-4 shadow-sm">
+        <div className="bg-white rounded-2xl p-4 sm:p-5 flex items-center gap-4 shadow-sm">
           <div className="w-12 h-12 rounded-xl bg-[#E8F5E9] flex items-center justify-center">
             <TrendingUp size={20} className="text-[#45C4A2]" />
           </div>
@@ -462,7 +462,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 flex items-center gap-4 shadow-sm">
+        <div className="bg-white rounded-2xl p-4 sm:p-5 flex items-center gap-4 shadow-sm">
           <div className="w-12 h-12 rounded-xl bg-[#F0FDF4] flex items-center justify-center">
             <Activity size={20} className="text-[#45C4A2]" />
           </div>
@@ -484,9 +484,9 @@ export default function Dashboard() {
         {/* Left Section - Charts & Pending Reviews */}
         <div className="lg:col-span-2 space-y-6">
           {/* Charts Row */}
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Client Compliance Chart */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-[16px] font-bold text-gray-900">
                   Client Compliance
@@ -513,7 +513,7 @@ export default function Dashboard() {
             </div>
 
             {/* Rating Score Chart */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-[16px] font-bold text-gray-900">
                   Rating Score
@@ -542,7 +542,7 @@ export default function Dashboard() {
           </div>
 
           {/* Pending Reviews Table */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
             <h2 className="text-[16px] font-bold text-gray-900 mb-4">
               Pending Reviews
             </h2>
@@ -628,7 +628,7 @@ export default function Dashboard() {
         {/* Right Section - My Performance & Daily Activity */}
         <div className="space-y-6">
           {/* My Performance Card */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col border border-gray-50 h-[500px] overflow-hidden">
+          <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm flex flex-col border border-gray-50 h-[500px] overflow-hidden">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-base font-bold text-[#0A4F48]">
                 My Performance
@@ -680,7 +680,7 @@ export default function Dashboard() {
           </div>
 
           {/* Daily Activity Log */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
             <h2 className="text-[16px] font-bold text-gray-900 mb-4">
               Daily Activity Log
             </h2>
