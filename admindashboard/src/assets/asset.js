@@ -34,6 +34,10 @@ import totalEmploy from "./totalExpert.svg"
 import totalPayroll from "./totalPayroll.svg"
 import pendingPayroll from "./pendingPayroll.svg"
 import broadCast from "./BroadcastVector.svg";
+import wl from "./wl.jpg";
+import Workout from "./Workout.png";
+import MealPlaceholder from "./MealPlaceholder.png";
+import breakfast from "./breakfast.svg";
 
 export const assets = {
   menu,
@@ -72,5 +76,9 @@ export const assets = {
   totalPayroll,
   pendingPayroll,
   broadCast,
+  wl,
+  Workout,
+  MealPlaceholder,
+  breakfast,
 };
 

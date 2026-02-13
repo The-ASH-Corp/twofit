@@ -4,8 +4,6 @@ import { assets } from "@/assets/asset";
 import { useDispatch, useSelector } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import { uploadTask } from "@/redux/features/tasks/task.thunk";
-
-import MealPlaceholder from "@/assets/MealPlaceholder.png";
 import { toast } from "react-toastify";
 
 export default function TaskModal({ task, onClose, onSuccess }) {
@@ -139,7 +137,13 @@ export default function TaskModal({ task, onClose, onSuccess }) {
         <div className="flex-1 overflow-y-auto space-y-6 pr-2 -mr-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <div className="w-full aspect-video rounded-2xl overflow-hidden shadow-sm">
             <img
-              src={isMeal ? MealPlaceholder : "src/assets/Workout.png"}
+              src={
+                isMeal
+                  ? effectiveTask.name?.toLowerCase().includes("breakfast")
+                    ? assets.breakfast
+                    : assets.MealPlaceholder
+                  : assets.Workout
+              }
               alt={effectiveTask.name}
               className="w-full h-full object-cover"
             />

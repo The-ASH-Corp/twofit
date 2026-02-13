@@ -13,6 +13,7 @@ import { refreshProfile } from "@/redux/features/auth/auth.thunk";
 import { useEffect } from "react";
 import { socket } from "@/utils/socket";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
+import { assets } from "@/assets/asset";
 
 export default function TaskList({
   plans,
@@ -297,7 +298,17 @@ export default function TaskList({
         >
           <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0">
             <img
-              src={"src/assets/Workout.png"}
+              src={
+                item.type === "WorkoutGroup"
+                  ? assets.Workout
+                  : item.type === "TherapyGroup"
+                    ? assets.wl
+                    : item.type === "Meal"
+                      ? item.name?.toLowerCase().includes("breakfast")
+                        ? assets.breakfast
+                        : assets.MealPlaceholder
+                      : assets.Workout
+              }
               alt={item.type}
               className="w-full h-full object-cover"
             />
