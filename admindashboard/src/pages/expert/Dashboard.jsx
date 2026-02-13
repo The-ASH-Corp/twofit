@@ -29,6 +29,7 @@ import {
 import { getPendingSubmissions } from "@/redux/features/tasks/task.thunk";
 import { socket } from "@/utils/socket";
 import { selectToken } from "@/redux/features/auth/auth.selectores";
+import HabitProgress from "./components/HabitProgress";
 
 ChartJS.register(
   CategoryScale,
@@ -540,6 +541,8 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
+
+          {user?.role?.toLowerCase() === "therapist" && <HabitProgress />}
 
           {/* Pending Reviews Table */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">
