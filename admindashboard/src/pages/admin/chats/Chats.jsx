@@ -40,10 +40,10 @@ export default function Chats() {
   useEffect(() => {
     if (!user?._id) return;
 
-    dispatch(getAllCoachesByAdminId({ adminId: user._id, page: 1, limit: 100 }));
+    dispatch(getAllCoachesByAdminId({ adminId: user?._id, page: 1, limit: 100 }));
 
     socket.auth = {
-      userId: user._id,
+      userId: user?._id,
       token: localStorage.getItem("token"),
     };
 
@@ -65,16 +65,15 @@ export default function Chats() {
 
   const chatClient = (selectedClient) => {
     if (client) {
-      const prevRoom = getPrivateRoomId(user._id, client._id);
+      const prevRoom = getPrivateRoomId(user?._id, client?._id);
       socket.emit("leave_room", { roomId: prevRoom });
     }
 
-    const roomId = getPrivateRoomId(user._id, selectedClient._id);
-
+    const roomId = getPrivateRoomId(user?._id, selectedClient?._id);
     socket.emit("join_room", { roomId });
     setMessages([]);
     setChatClient(selectedClient);
-    clearUnreadForUser(selectedClient._id);
+    clearUnreadForUser(selectedClient?._id);
   };
 
   useEffect(() => {
@@ -84,7 +83,7 @@ export default function Chats() {
       getChats({
         page: 1,
         limit: 30,
-        chatId: getPrivateRoomId(user._id, client._id),
+        chatId: getPrivateRoomId(user?._id, client?._id),
       })
     )
       .unwrap()
@@ -101,7 +100,7 @@ export default function Chats() {
       if (!msg?.roomId) return;
 
       const selectedRoom = client
-        ? getPrivateRoomId(user?._id, client._id)
+        ? getPrivateRoomId(user?._id, client?._id)
         : null;
       const roomIsOpen = Boolean(selectedRoom && msg.roomId === selectedRoom);
       const isIncoming = msg.sender !== user?._id;
@@ -136,7 +135,7 @@ export default function Chats() {
     } = {}) => {
       if (!client) return;
 
-      const roomId = getPrivateRoomId(user._id, client._id);
+      const roomId = getPrivateRoomId(user?._id, client?._id);
       const trimmedText = text.trim();
       const hasMedia = Boolean(mediaUrl);
 
@@ -147,7 +146,7 @@ export default function Chats() {
         {
           roomId,
           text: trimmedText,
-          reciever: client._id,
+          reciever: client?._id,
           messageType,
           mediaUrl,
           mediaMeta,

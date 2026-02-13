@@ -36,7 +36,7 @@ export default function BaseTable({
   const table = useReactTable({
     data,
     columns,
-    getRowId: (row) => row._id,
+    getRowId: (row) => row?._id,
     getCoreRowModel: getCoreRowModel(),
     state: { rowSelection },
     onRowSelectionChange: setRowSelection,
@@ -177,7 +177,7 @@ export default function BaseTable({
                     className="border-b border-[#DBDEDD] hover:bg-gray-50 transition cursor-pointer md:table-row flex flex-col md:flex-row py-3 md:py-0"
                     onClick={() => {
                       if (profilePath) {
-                        profilePath(row.original._id);
+                        profilePath(row.original?._id);
                       }
                     }}
                   >

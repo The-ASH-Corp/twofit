@@ -146,7 +146,7 @@ const ExpertCenterSide = ({ expert }) => {
   useEffect(() => {
     if (!expert?._id) return;
     dispatch(
-      getCoachRatingGraph({ id: expert._id, duration: ratingDuration }),
+      getCoachRatingGraph({ id: expert?._id, duration: ratingDuration }),
     ).then((res) => {
       if (res.meta?.requestStatus === "fulfilled") {
         setRatingGraphData(res.payload?.data ?? res.payload);

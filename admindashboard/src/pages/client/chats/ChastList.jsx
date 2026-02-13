@@ -49,13 +49,13 @@ const ChastList = ({
       {/* Chat List Items */}
       <div className="flex-1 overflow-y-auto">
         {filteredClients.map((chat, idx) => {
-          const unreadCount = unreadCounts[chat._id] || 0;
+          const unreadCount = unreadCounts[chat?._id] || 0;
 
           return (
             <div
               key={idx}
               className={`flex items-center gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer transition rounded-lg ${
-                client?._id === chat._id ? "bg-gray-200" : ""
+                client?._id === chat?._id ? "bg-gray-200" : ""
               }`}
               onClick={() => chatClient(chat)}
             >
@@ -64,7 +64,7 @@ const ChastList = ({
                   {chat?.name?.split(" ")?.[0]?.[0]}
                   {chat?.name?.split(" ")?.[1]?.[0]}
                 </div>
-                {onlineUsers.includes(chat._id) && (
+                {onlineUsers.includes(chat?._id) && (
                   <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                 )}
               </div>

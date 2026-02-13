@@ -85,16 +85,15 @@ export default function Chats() {
 
   const chatClient = (selectedClient) => {
     if (client) {
-      const prevRoom = getPrivateRoomId(user._id, client._id);
+      const prevRoom = getPrivateRoomId(user?._id, client?._id);
       socket.emit("leave_room", { roomId: prevRoom });
     }
 
-    const roomId = getPrivateRoomId(user._id, selectedClient._id);
-
+    const roomId = getPrivateRoomId(user?._id, selectedClient?._id);
     socket.emit("join_room", { roomId });
     setChatClient(selectedClient);
     setShowChatWindow(true);
-    clearUnreadForUser(selectedClient._id);
+    clearUnreadForUser(selectedClient?._id);
   };
 
   const handleBackToList = () => {
@@ -108,7 +107,7 @@ export default function Chats() {
       getChats({
         page: 1,
         limit: 30,
-        chatId: getPrivateRoomId(user._id, client._id),
+        chatId: getPrivateRoomId(user?._id, client?._id),
       })
     );
   }, [client, dispatch, user?._id]);
@@ -124,7 +123,7 @@ export default function Chats() {
       if (!msg?.roomId) return;
 
       const selectedRoom = client
-        ? getPrivateRoomId(user?._id, client._id)
+        ? getPrivateRoomId(user?._id, client?._id)
         : null;
       const roomMatchesSelected = Boolean(
         selectedRoom && msg.roomId === selectedRoom
@@ -170,7 +169,7 @@ export default function Chats() {
     } = {}) => {
       if (!client) return;
 
-      const roomId = getPrivateRoomId(user._id, client._id);
+      const roomId = getPrivateRoomId(user?._id, client?._id);
       const trimmedText = text.trim();
       const hasMedia = Boolean(mediaUrl);
 
@@ -181,7 +180,7 @@ export default function Chats() {
         {
           roomId,
           text: trimmedText,
-          reciever: client._id,
+          reciever: client?._id,
           messageType,
           mediaUrl,
           mediaMeta,

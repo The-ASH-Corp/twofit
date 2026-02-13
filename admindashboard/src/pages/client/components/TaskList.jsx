@@ -48,7 +48,7 @@ export default function TaskList({
 
     if (user?._id && token) {
       // Socket.IO Setup
-      socket.auth = { userId: user._id, token: token };
+      socket.auth = { userId: user?._id, token: token };
       socket.connect();
 
       socket.on("connect", () => {
@@ -63,7 +63,7 @@ export default function TaskList({
       socket.on("day_advanced", (data) => {
         console.log("Day advanced via socket:", data);
         // Refresh user profile to get updated currentGlobalDay and task list
-        dispatch(refreshProfile({ id: user._id, role: user.role }));
+        dispatch(refreshProfile({ id: user?._id, role: user.role }));
         dispatch(getUserTaskStatus());
       });
 

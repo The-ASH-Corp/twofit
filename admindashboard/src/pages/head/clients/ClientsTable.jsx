@@ -26,7 +26,7 @@ export default function ClientsTable() {
   const [limit, setLimit] = useState(10);
 
   const fetchClientData = async () => {
-    const client = await dispatch(getAllUsersByHead({ headId:user._id,page, limit })).unwrap();
+    const client = await dispatch(getAllUsersByHead({ headId:user?._id,page, limit })).unwrap();
     setClients(client.data);
     setTotalCount(client.total);
   };

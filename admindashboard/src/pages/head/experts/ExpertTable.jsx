@@ -17,7 +17,7 @@ export default function ExpertTable() {
   
   const dispatch = useDispatch();
   const fetchCoachData=async()=>{
-    const coache =await dispatch(getAllCoachesByHead({page,limit,headId:user._id})).unwrap()
+    const coache =await dispatch(getAllCoachesByHead({page,limit,headId:user?._id})).unwrap()
     setCoaches(coache.data)
   }
 

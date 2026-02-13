@@ -9,7 +9,7 @@ export const createHead = async (req, res) => {
       total: totalCount,
     });
   } catch (error) {
-    
+
     res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -79,7 +79,8 @@ export const deleteHead = async (req, res) => {
 
 export const getDashboardData = async (req, res) => {
   try {
-    const head = await headService.getDashboardData(req.params.id);
+    const { duration } = req.query;
+    const head = await headService.getDashboardData(req.params.id, duration);
     res.status(200).json({
       success: true,
       data: head,
@@ -89,31 +90,31 @@ export const getDashboardData = async (req, res) => {
   }
 };
 
-export const getAllCoachesByHead =async(req,res)=>{
+export const getAllCoachesByHead = async (req, res) => {
   try {
-    const {headId,page,limit} = req.params;
-    const {coaches,totalCount} = await headService.getAllCoachesByHead(headId,page,limit);
+    const { headId, page, limit } = req.params;
+    const { coaches, totalCount } = await headService.getAllCoachesByHead(headId, page, limit);
     res.status(200).json({
       success: true,
       data: coaches,
       total: totalCount,
     });
   } catch (error) {
-    res.status(400).json({success:false,message:error.message})
+    res.status(400).json({ success: false, message: error.message })
   }
 }
 
-export const getAllUsersByHead =async(req,res)=>{
+export const getAllUsersByHead = async (req, res) => {
   try {
-    const {headId,page,limit} = req.params;
-    const {users,totalCount} = await headService.getAllUsersByHead(headId,page,limit);
+    const { headId, page, limit } = req.params;
+    const { users, totalCount } = await headService.getAllUsersByHead(headId, page, limit);
     res.status(200).json({
       success: true,
       data: users,
       total: totalCount,
     });
   } catch (error) {
-    res.status(400).json({success:false,message:error.message})
+    res.status(400).json({ success: false, message: error.message })
   }
 }
 

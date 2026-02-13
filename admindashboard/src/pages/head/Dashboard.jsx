@@ -38,19 +38,48 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  Filler
+  Filler,
 );
 export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState({});
   const [filterCategory, setFilterCategory] = useState("All Categories");
   const [showFilter, setShowFilter] = useState(false);
+  const [adminDuration, setAdminDuration] = useState("3");
+  const [expertDuration, setExpertDuration] = useState("3");
+  const [showAdminDuration, setShowAdminDuration] = useState(false);
+  const [showExpertDuration, setShowExpertDuration] = useState(false);
+
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
+
   useEffect(() => {
-    dispatch(getDashboardData(user._id)).then((res) => {
+    // Initial fetch
+    dispatch(getDashboardData({ headId: user?._id, duration: "3" })).then(
+      (res) => {
+        setDashboardData(res.payload);
+      },
+    );
+  }, []);
+
+  
+  useEffect(() => {
+    
+
+    dispatch(
+      getDashboardData({ headId: user?._id, duration: adminDuration }),
+    ).then((res) => {
+      // Using adminDuration as primary for now
       setDashboardData(res.payload);
     });
-  }, []);
+  }, [adminDuration, dispatch, user?._id]);
+
+ 
+  const timeframeOptions = [
+    { label: "Last 3 Months", value: "3" },
+    { label: "Last 6 Months", value: "6" },
+    { label: "Last 12 Months", value: "12" },
+  ];
+
   const trainers = dashboardData?.totalTrainers || 0;
   const dietitians = dashboardData?.totalDietitians || 0;
   const therapists = dashboardData?.totalTherapists || 0;
@@ -84,14 +113,14 @@ export default function Dashboard() {
     taskCompletion: dashboardData?.expertPerformance?.taskCompletion || 0,
     rating: dashboardData?.expertPerformance?.rating || 0,
     clientsAssigned: dashboardData?.expertPerformance?.clientsAssigned || 0,
+    totalClientsAssigned: dashboardData?.expertPerformance?.totalClientsAssigned, // Optional
+    totalCapacity: dashboardData?.expertPerformance?.totalCapacity, // Optional
   };
 
   const hasAdminData =
     adminPerf.programs > 0 || adminPerf.experts > 0 || adminPerf.clients > 0;
   const subAdminPerformanceData = {
-    labels: hasAdminData
-      ? ["Programs", "Experts", "Clients"]
-      : ["No Data"],
+    labels: hasAdminData ? ["Programs", "Experts", "Clients"] : ["No Data"],
     datasets: [
       {
         data: hasAdminData
@@ -120,12 +149,12 @@ export default function Dashboard() {
 
     if (diffInDays === 0) {
       if (diffInHours === 0) {
-         if(diffInMinutes < 5) return "Just now";
-         return `${diffInMinutes} mins ago`;
+        if (diffInMinutes < 5) return "Just now";
+        return `${diffInMinutes} mins ago`;
       }
-      return `Today, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      return `Today, ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
     } else if (diffInDays === 1) {
-      return `Yesterday, ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      return `Yesterday, ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
     } else {
       return `${diffInDays} Days Ago`;
     }
@@ -160,14 +189,16 @@ export default function Dashboard() {
     ],
   };
 
-  const progressReportsRaw = dashboardData?.latestReports?.map(report => ({
+  const progressReportsRaw =
+    dashboardData?.latestReports?.map((report) => ({
       ...report,
-      time: calculateTimeAgo(report.time)
-  })) || [];
+      time: calculateTimeAgo(report.time),
+    })) || [];
 
-  const progressReports = filterCategory === "All Categories"
-    ? progressReportsRaw
-    : progressReportsRaw.filter(report => report.type === filterCategory);
+  const progressReports =
+    filterCategory === "All Categories"
+      ? progressReportsRaw
+      : progressReportsRaw.filter((report) => report.type === filterCategory);
 
   return (
     <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA]">
@@ -176,6 +207,7 @@ export default function Dashboard() {
         <div className="flex-1 flex flex-col gap-6">
           {/* Row 1: Summary Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* ... summary cards ... */}
             {[
               {
                 label: "Total Clients",
@@ -216,7 +248,38 @@ export default function Dashboard() {
           </div>
           {/* Row 2: Sub Admin & Expert Performance */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <DashboardCard title="Admin Performance" subTitle="Last Months">
+            {/* Admin Performance Card */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-base font-bold text-[#0A4F48]">
+                  Admin Performance
+                </h3>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowAdminDuration(!showAdminDuration)}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-[10px] font-semibold text-[#66706D] uppercase tracking-wider"
+                  >
+                    Last {adminDuration} Months <ChevronDown size={14} />
+                  </button>
+                  {showAdminDuration && (
+                    <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-100 rounded-lg shadow-lg z-10 py-1">
+                      {timeframeOptions.map((opt) => (
+                        <button
+                          key={opt.value}
+                          onClick={() => {
+                            setAdminDuration(opt.value);
+                            setExpertDuration(opt.value); // Syncing for now as per "Global" API limitation hypothesis, or clearer UX.
+                            setShowAdminDuration(false);
+                          }}
+                          className="w-full text-left px-4 py-2 text-xs hover:bg-gray-50 text-[#66706D]"
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
               <div className="h-48 relative flex items-center justify-center">
                 <Doughnut
                   data={subAdminPerformanceData}
@@ -244,14 +307,67 @@ export default function Dashboard() {
                   value={adminPerf.clients}
                 />
               </div>
-            </DashboardCard>
+            </div>
 
-            <DashboardCard title="Expert Performance" subTitle="Last Months">
+            {/* Expert Performance Card */}
+            <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-base font-bold text-[#0A4F48]">
+                  Expert Performance
+                </h3>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowExpertDuration(!showExpertDuration)}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-[10px] font-semibold text-[#66706D] uppercase tracking-wider"
+                  >
+                    Last {expertDuration} Months <ChevronDown size={14} />
+                  </button>
+                  {showExpertDuration && (
+                    <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-100 rounded-lg shadow-lg z-10 py-1">
+                      {timeframeOptions.map((opt) => (
+                        <button
+                          key={opt.value}
+                          onClick={() => {
+                            setExpertDuration(opt.value);
+                            setAdminDuration(opt.value); // Syncing
+                            setShowExpertDuration(false);
+                          }}
+                          className="w-full text-left px-4 py-2 text-xs hover:bg-gray-50 text-[#66706D]"
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
               <div className="h-48 relative flex items-center justify-center">
                 <Doughnut
                   data={expertPerformanceChartData}
                   options={{
-                    plugins: { legend: { display: false } },
+                    plugins: {
+                      legend: { display: false },
+                      tooltip: {
+                        callbacks: {
+                          label: function (context) {
+                            let label = context.label || "";
+                            if (label) {
+                              label += ": ";
+                            }
+                            if (context.parsed !== null) {
+                              if (context.label === "Rating") {
+                                label += expertPerf.rating + "/5";
+                              } else if (context.label === "Clients Assigned" && expertPerf.totalClientsAssigned !== undefined) {
+                                label += `${expertPerf.totalClientsAssigned} / ${expertPerf.totalCapacity} (${expertPerf.clientsAssigned}%)`;
+                              } else {
+                                label += Math.round(context.parsed) + "%";
+                              }
+                            }
+                            return label;
+                          },
+                        },
+                      },
+                    },
                     maintainAspectRatio: false,
                     cutout: "75%",
                   }}
@@ -266,7 +382,7 @@ export default function Dashboard() {
                 <LegendItem
                   color="#45C4A2"
                   label="Rating"
-                  value={expertPerf.rating}
+                  value={`${expertPerf.rating}/5`}
                 />
                 <LegendItem
                   color="#FFD7A8"
@@ -274,7 +390,7 @@ export default function Dashboard() {
                   value={`${expertPerf.clientsAssigned}%`}
                 />
               </div>
-            </DashboardCard>
+            </div>
           </div>
 
           {/* Row 4: Latest Progress Reports */}
@@ -304,7 +420,7 @@ export default function Dashboard() {
                         >
                           {cat}
                         </button>
-                      )
+                      ),
                     )}
                   </div>
                 )}
@@ -340,8 +456,8 @@ export default function Dashboard() {
                               report.expert === "Dietitian"
                                 ? "bg-[#FAF3E0] text-[#DAA520]"
                                 : report.expert === "Trainer"
-                                ? "bg-[#EBF3F2] text-[#0A4F48]"
-                                : "bg-[#F0FDF4] text-[#15803D]"
+                                  ? "bg-[#EBF3F2] text-[#0A4F48]"
+                                  : "bg-[#F0FDF4] text-[#15803D]"
                             }`}
                           >
                             {report.expert}
@@ -470,7 +586,7 @@ export default function Dashboard() {
               ].map((notif, i) => (
                 <div key={i} className="flex gap-4">
                   <div
-                    className={`${notif.bg} p-2.5 h-fit rounded-full flex-shrink-0`}
+                    className={`${notif.bg} p-2.5 h-fit rounded-full shrink-0`}
                   >
                     {notif.icon}
                   </div>

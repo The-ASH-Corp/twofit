@@ -26,7 +26,7 @@ export default function ClientsTable() {
   const coachId = useAppSelector(selectUser);
   useEffect(() => {
     if (coachId?._id) {
-      dispatch(getUsersAssignedToACoach({ coachId: coachId._id, page, limit }));
+      dispatch(getUsersAssignedToACoach({ coachId: coachId?._id, page, limit }));
     }
   }, [dispatch, coachId, page, limit]);
 
@@ -43,7 +43,7 @@ useEffect(() => {
   console.log("Habit Clients:", habitClients);
 const mergedClients = assignedClients.map((client) => {
   const habitInfo = habitClients?.find(
-    (h) => h._id === client._id
+    (h) => h?._id === client?._id
   );
 
   return {

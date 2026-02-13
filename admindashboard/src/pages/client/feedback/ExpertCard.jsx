@@ -72,19 +72,19 @@ export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
             </div>
             <button
               onClick={() => {
-                if (!ratedExpertIds.includes(expert._id)) {
+                if (!ratedExpertIds.includes(expert?._id)) {
                   setSelectedExpert(expert);
                   setIsOpen(!isOpen);
                 }
               }}
-              disabled={ratedExpertIds.includes(expert._id)}
+              disabled={ratedExpertIds.includes(expert?._id)}
               className={`text-white p-3 rounded-xl mt-4 w-full transition-all ${
-                ratedExpertIds.includes(expert._id)
+                ratedExpertIds.includes(expert?._id)
                   ? "bg-gray-300 cursor-not-allowed"
                   : "bg-[#0A4F48] hover:bg-[#083d38]"
               }`}
             >
-              {ratedExpertIds.includes(expert._id)
+              {ratedExpertIds.includes(expert?._id)
                 ? "Already Rated"
                 : "Rate & Review"}
             </button>
@@ -141,19 +141,19 @@ export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
             {/* Button */}
             <button
               onClick={() => {
-                if (!ratedExpertIds.includes(expert._id)) {
+                if (!ratedExpertIds.includes(expert?._id)) {
                   setSelectedExpert(expert);
                   setIsOpen(!isOpen);
                 }
               }}
-              disabled={ratedExpertIds.includes(expert._id)}
+              disabled={ratedExpertIds.includes(expert?._id)}
               className={`w-full py-3 rounded-xl font-medium text-[14px] transition-colors ${
-                ratedExpertIds.includes(expert._id)
+                ratedExpertIds.includes(expert?._id)
                   ? "bg-gray-300 text-gray-600 cursor-not-allowed"
                   : "bg-[#0A4F48] text-white hover:bg-[#083d38]"
               }`}
             >
-              {ratedExpertIds.includes(expert._id)
+              {ratedExpertIds.includes(expert?._id)
                 ? "Already Rated"
                 : "Rate & Review"}
             </button>
