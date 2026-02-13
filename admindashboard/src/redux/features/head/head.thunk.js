@@ -79,15 +79,15 @@ export const deleteHead = createAsyncThunk(
 
 export const getDashboardData = createAsyncThunk(
   "head/get-dashboard-data",
-  async (headId, { rejectWithValue }) => {
+  async ({ headId, duration }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `heads/dashboard-data/${headId}`,
+        `heads/dashboard-data/${headId}?duration=${duration || '3'}`,
       );
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || "Failed to get heads",
+        error.response?.data?.message || "Failed to get dashboard data",
       );
     }
   },
