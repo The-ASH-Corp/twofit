@@ -187,6 +187,7 @@ export default function Dashboard() {
           <ExpertsList expert={coaches} />
           <Measeurement />
           <NotificationsList />
+          
         </div>
       </div>
 
