@@ -1,11 +1,11 @@
 import React from "react";
+import { assets } from "@/assets/asset";
 
-export default function HeroCard({program}) {
-  
+export default function HeroCard({ program }) {
   return (
     <div className="relative w-full h-[320px] rounded-[32px] overflow-hidden shadow-sm">
       <img
-        src="src/assets/wl.jpg"
+        src={assets.wl}
         alt="Weight Loss"
         className="w-full h-full object-cover"
       />

@@ -166,7 +166,6 @@ const Dashboard = () => {
       };
     }),
   };
-
   const expertPerformanceData = useMemo(() => {
     const perf = founder?.data?.expertPerformance || {
       taskCompletion: 0,
@@ -190,6 +189,11 @@ const Dashboard = () => {
           borderRadius: 8,
         },
       ],
+      raw: {
+        taskCompletion: perf.taskCompletion,
+        rating: perf.rating,
+        clientsAssigned: perf.clientsAssigned,
+      },
       isZero:
         perf.taskCompletion === 0 &&
         perf.rating === 0 &&
@@ -403,6 +407,28 @@ const Dashboard = () => {
     },
   };
 
+  const performanceOptions = {
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const label = context.label || "";
+            const value = context.raw || 0;
+            if (label === "Rating") {
+              const actualRating = ((value / 100) * 5).toFixed(1);
+              return `${label}: ${actualRating}/5`;
+            }
+            return `${label}: ${Math.round(value)}%`;
+          },
+        },
+      },
+    },
+  };
+
   if (status === "loading" && !founder)
     return (
       <div className="flex justify-center items-center h-[calc(100vh-120px)]">
@@ -527,10 +553,7 @@ const Dashboard = () => {
                 {!subAdminPerformanceData.isZero ? (
                   <Doughnut
                     data={subAdminPerformanceData}
-                    options={{
-                      plugins: { legend: { display: false } },
-                      maintainAspectRatio: false,
-                    }}
+                    options={performanceOptions}
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-400 text-sm">
@@ -587,10 +610,7 @@ const Dashboard = () => {
                 {!expertPerformanceData.isZero ? (
                   <Doughnut
                     data={expertPerformanceData}
-                    options={{
-                      plugins: { legend: { display: false } },
-                      maintainAspectRatio: false,
-                    }}
+                    options={performanceOptions}
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full text-gray-400 text-sm">

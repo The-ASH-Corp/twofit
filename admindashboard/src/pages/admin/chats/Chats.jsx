@@ -230,11 +230,11 @@ export default function Chats() {
   return (
     <div className="flex h-[calc(100vh-120px)]  gap-5">
       {/* Left Sidebar */}
-      <ChatSidebar
+      {/* <ChatSidebar
         clients={clients}
         handleSideTabs={handleSideTabs}
         sideTab={sideTab}
-      />
+      /> */}
 
       {/* Right - Content based on tab */}
       {sideTab === "Templates" ? (

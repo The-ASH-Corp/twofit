@@ -134,7 +134,7 @@ export default function Dashboard() {
       complianceDuration,
     ),
     datasets: [
-       {
+      {
         label: "Workout",
         data: getSlicedData(
           getDatasetByLabel(
@@ -392,12 +392,10 @@ export default function Dashboard() {
   const filteredProgressReports =
     reportCategory === "All Categories"
       ? progressReports
-      : progressReports.filter(
-          (report) => report.expert === reportCategory,
-        );
+      : progressReports.filter((report) => report.expert === reportCategory);
 
   return (
-    <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA]">
+    <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA] overflow-x-hidden">
       <div className="flex gap-6 lg:flex-row flex-col">
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col gap-6">
@@ -532,8 +530,8 @@ export default function Dashboard() {
                 )}
               </div>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
+            <div className="overflow-x-auto -mx-6 px-6">
+              <table className="w-full text-left min-w-[640px]">
                 <thead>
                   <tr className="bg-[#F8F9FA] text-[11px] uppercase tracking-wider text-[#66706D] font-bold">
                     <th className="px-6 py-4">Client Name</th>
@@ -546,7 +544,10 @@ export default function Dashboard() {
                 <tbody className="divide-y divide-gray-50">
                   {filteredProgressReports.length > 0 ? (
                     filteredProgressReports.map((report, i) => (
-                      <tr key={i} className="hover:bg-gray-50 transition-colors">
+                      <tr
+                        key={i}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
                         <td className="px-6 py-4 text-sm font-medium text-[#0A4F48]">
                           {report.name}
                         </td>
@@ -559,8 +560,8 @@ export default function Dashboard() {
                               report.expert === "Dietitian"
                                 ? "bg-[#FAF3E0] text-[#DAA520]"
                                 : report.expert === "Trainer"
-                                ? "bg-[#EBF3F2] text-[#0A4F48]"
-                                : "bg-[#F0FDF4] text-[#15803D]"
+                                  ? "bg-[#EBF3F2] text-[#0A4F48]"
+                                  : "bg-[#F0FDF4] text-[#15803D]"
                             }`}
                           >
                             {report.expert}
@@ -591,7 +592,7 @@ export default function Dashboard() {
         </div>
 
         {/* Right Sidebar */}
-        <div className="lg:w-80 flex flex-col gap-6">
+        <div className="w-full lg:w-80 lg:max-w-[320px] flex flex-col gap-6">
           {/* Experts Gauge Card at the top of Sidebar */}
           <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col h-[400px] border border-gray-50">
             <div className="flex items-center justify-between mb-4">
@@ -721,7 +722,7 @@ export default function Dashboard() {
               ].map((notif, i) => (
                 <div key={i} className="flex gap-4">
                   <div
-                    className={`${notif.bg} p-2.5 h-fit rounded-full flex-shrink-0`}
+                    className={`${notif.bg} p-2.5 h-fit rounded-full shrink-0`}
                   >
                     {notif.icon}
                   </div>
