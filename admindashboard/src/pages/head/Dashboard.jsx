@@ -350,6 +350,7 @@ export default function Dashboard() {
                       tooltip: {
                         callbacks: {
                           label: function (context) {
+                            if (context.label === "No Data") return " No Data Available";
                             let label = context.label || "";
                             if (label) {
                               label += ": ";
@@ -358,7 +359,7 @@ export default function Dashboard() {
                               if (context.label === "Rating") {
                                 label += expertPerf.rating + "/5";
                               } else if (context.label === "Clients Assigned" && expertPerf.totalClientsAssigned !== undefined) {
-                                label += `${expertPerf.totalClientsAssigned} / ${expertPerf.totalCapacity} (${expertPerf.clientsAssigned}%)`;
+                                label += `${expertPerf.totalClientsAssigned} / ${expertPerf.totalCapacity || 0} (${expertPerf.clientsAssigned}%)`;
                               } else {
                                 label += Math.round(context.parsed) + "%";
                               }
@@ -387,7 +388,11 @@ export default function Dashboard() {
                 <LegendItem
                   color="#FFD7A8"
                   label="Clients Assigned"
-                  value={`${expertPerf.clientsAssigned}%`}
+                  value={
+                    expertPerf.totalClientsAssigned !== undefined
+                      ? `${expertPerf.totalClientsAssigned} / ${expertPerf.totalCapacity || 0} (${expertPerf.clientsAssigned}%)`
+                      : `${expertPerf.clientsAssigned}%`
+                  }
                 />
               </div>
             </div>
