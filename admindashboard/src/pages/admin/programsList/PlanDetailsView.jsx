@@ -48,7 +48,7 @@ export default function PlanDetailsView() {
 
       const formattedWeeks = data.payload.weeks.map((week, index) => ({
         ...week,
-        id: week._id,
+        id: week?._id,
         expanded: index === 0,
         days: week.days.map((day, dIndex) => {
           // Remove duplicate exercises within the same day
@@ -70,7 +70,7 @@ export default function PlanDetailsView() {
 
           return {
             ...day,
-            id: day._id,
+            id: day?._id,
             expanded: dIndex === 0,
             workoutPlan: uniqueExercises,
           };

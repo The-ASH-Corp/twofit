@@ -28,7 +28,7 @@ export default function HabitDisplay() {
       <div className="space-y-3">
         {habitDetails.habits.map((habit, index) => (
           <div
-            key={habit._id}
+            key={habit?._id}
             className="p-3 border bg-white border-gray-200 rounded-lg flex justify-between"
           >
             <span>

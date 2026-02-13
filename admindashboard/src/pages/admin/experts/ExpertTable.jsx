@@ -17,7 +17,7 @@ export default function ExpertTable() {
 
   const fetchCoachData = async () => {
     const response = await dispatch(
-      getAllCoachesByAdminId({ page, limit, adminId: user._id })
+      getAllCoachesByAdminId({ page, limit, adminId: user?._id })
     ).unwrap();
     const coachesData = response;
     const totalCount = response.length;

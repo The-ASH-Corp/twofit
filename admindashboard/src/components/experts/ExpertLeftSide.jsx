@@ -64,7 +64,7 @@ const ExpertLeftSide = ({ expert }) => {
       setChatError("");
 
       try {
-        const roomId = getPrivateRoomId(expert._id, selectedClient._id);
+        const roomId = getPrivateRoomId(expert?._id, selectedClient?._id);
         const response = await dispatch(
           getChats({ page: 1, limit: 300, chatId: roomId }),
         ).unwrap();
@@ -270,10 +270,10 @@ const ExpertLeftSide = ({ expert }) => {
                 ) : (
                   <div className="p-2 space-y-1">
                     {assignedClients.map((client) => {
-                      const isActive = selectedClient?._id === client._id;
+                      const isActive = selectedClient?._id === client?._id;
                       return (
                         <button
-                          key={client._id}
+                          key={client?._id}
                           onClick={() => setSelectedClient(client)}
                           className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
                             isActive

@@ -82,7 +82,7 @@ const Profile = () => {
     e.preventDefault();
     try {
       await dispatch(editProfile(profileForm)).unwrap();
-      await dispatch(refreshProfile({id:user._id, role:user.role})).unwrap();
+      await dispatch(refreshProfile({id:user?._id, role:user.role})).unwrap();
       toast.success("Profile updated successfully!");
       setIsEditMode(false);
     } catch (error) {

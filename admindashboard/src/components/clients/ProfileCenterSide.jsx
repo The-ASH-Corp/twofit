@@ -43,7 +43,7 @@ const ProfileCenterSide = ({ client }) => {
 
   useEffect(() => {
     if (client?._id) {
-      dispatch(getAllUserSubmissions(client._id));
+      dispatch(getAllUserSubmissions(client?._id));
     }
   }, [client?._id, dispatch]);
 

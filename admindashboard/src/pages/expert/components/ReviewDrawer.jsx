@@ -40,10 +40,10 @@ export default function ReviewDrawer({ review, onClose }) {
     if (isGroupedTasks) {
       // Approve all tasks in the group
       for (const task of tasks) {
-        await dispatch(verifyTask(task._id));
+        await dispatch(verifyTask(task?._id));
       }
     } else {
-      await dispatch(verifyTask(review._id));
+      await dispatch(verifyTask(review?._id));
     }
     setProcessing(false);
     onClose();
@@ -58,10 +58,10 @@ export default function ReviewDrawer({ review, onClose }) {
     if (isGroupedTasks) {
       // Reject all tasks in the group with the same comment
       for (const task of tasks) {
-        await dispatch(rejectTask({ id: task._id, comment }));
+        await dispatch(rejectTask({ id: task?._id, comment }));
       }
     } else {
-      await dispatch(rejectTask({ id: review._id, comment }));
+      await dispatch(rejectTask({ id: review?._id, comment }));
     }
     setProcessing(false);
     onClose();
@@ -178,7 +178,7 @@ export default function ReviewDrawer({ review, onClose }) {
                   <div className="space-y-2 p-4">
                     {tasks.map((task, index) => (
                       <div
-                        key={task._id}
+                        key={task?._id}
                         className="border border-gray-100 rounded-xl overflow-hidden bg-white shadow-sm"
                       >
                         {/* Accordion Header */}

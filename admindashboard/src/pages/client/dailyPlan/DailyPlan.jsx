@@ -32,12 +32,12 @@ export default function DailyPlan() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await dispatch(getClient({ id: user._id }));
+        await dispatch(getClient({ id: user?._id }));
 
         if (user?.programType) {
           const programId =
             typeof user.programType === "object"
-              ? user.programType._id
+              ? user.programType?._id
               : user.programType;
           const programData = await dispatch(
             getProgramById(programId),
@@ -191,7 +191,7 @@ export default function DailyPlan() {
             weekIndex: currentPDay.weekIndex,
             dayIndex: currentPDay.dayIndex,
             exerciseIndex: idx,
-            programId: program._id,
+            programId: program?._id,
             ...meta
           });
         };
