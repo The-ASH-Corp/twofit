@@ -168,7 +168,7 @@ const Templates = () => {
                 className="bg-white rounded-2xl p-6 flex flex-col gap-5 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] relative"
               >
                 <div className="absolute top-6 right-6">
-                  <BroadcastMenu row={template} />
+                  <BroadcastMenu data={template} />
                 </div>
 
                 <div className="flex flex-col gap-1">
