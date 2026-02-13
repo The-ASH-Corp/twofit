@@ -1,12 +1,16 @@
-
 import React, { useState } from "react";
 import { X, ChevronDown, ChevronUp } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { uploadMultipleWorkoutTasks } from "@/redux/features/tasks/task.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
 import { toast } from "react-toastify";
+import { assets } from "@/assets/asset";
 
-export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) {
+export default function TherapyTasksModal({
+  therapyTasks,
+  onClose,
+  onSuccess,
+}) {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [fileName, setFileName] = useState("Upload File");
   const [file, setFile] = useState(null);
@@ -21,18 +25,18 @@ export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) 
 
   // Get overall status
   const getOverallStatus = () => {
-    const submissions = therapyTasks.map(task => {
+    const submissions = therapyTasks.map((task) => {
       return tasks?.find(
         (t) =>
           t.globalDayIndex === task.globalDayIndex &&
           t.exerciseIndex === task.exerciseIndex &&
-          t.taskType === task.type
+          t.taskType === task.type,
       );
     });
 
-    const allVerified = submissions.every(s => s?.status === "verified");
-    const anyPending = submissions.some(s => s?.status === "pending");
-    const anyRejected = submissions.some(s => s?.status === "rejected");
+    const allVerified = submissions.every((s) => s?.status === "verified");
+    const anyPending = submissions.some((s) => s?.status === "pending");
+    const anyRejected = submissions.some((s) => s?.status === "rejected");
 
     if (allVerified) return "verified";
     if (anyPending) return "pending";
@@ -54,7 +58,11 @@ export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) 
   };
 
   const handleVideoView = (videoUrl, exerciseName, exerciseIndex) => {
-    setSelectedVideo({ url: videoUrl, name: exerciseName, index: exerciseIndex });
+    setSelectedVideo({
+      url: videoUrl,
+      name: exerciseName,
+      index: exerciseIndex,
+    });
     setCurrentVideoEnded(false);
     setShowVideoModal(true);
   };
@@ -62,7 +70,7 @@ export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) 
   const handleVideoEnd = () => {
     setCurrentVideoEnded(true);
     if (selectedVideo) {
-      setWatchedVideos(prev => new Set([...prev, selectedVideo.index]));
+      setWatchedVideos((prev) => new Set([...prev, selectedVideo.index]));
     }
   };
 
@@ -72,13 +80,14 @@ export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) 
     setCurrentVideoEnded(false);
   };
 
-  
-  const allVideosWatched = therapyTasks.every((task, index) => 
-    !task.mediaUrl || watchedVideos.has(index)
+  const allVideosWatched = therapyTasks.every(
+    (task, index) => !task.mediaUrl || watchedVideos.has(index),
   );
-  
+
   // If no videos at all, we can allow upload (assume finished reading instructions)
-  const hasWatchedAnyVideo = therapyTasks.length > 0 && (allVideosWatched || therapyTasks.every(t => !t.mediaUrl));
+  const hasWatchedAnyVideo =
+    therapyTasks.length > 0 &&
+    (allVideosWatched || therapyTasks.every((t) => !t.mediaUrl));
 
   const handleSubmit = async () => {
     if (!file) {
@@ -91,14 +100,19 @@ export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) 
       const formData = new FormData();
       formData.append("file", file);
       formData.append("notes", comment);
-      
-      const exerciseIndices = therapyTasks.map(task => task.exerciseIndex);
+
+      const exerciseIndices = therapyTasks.map((task) => task.exerciseIndex);
       formData.append("exerciseIndices", JSON.stringify(exerciseIndices));
-      
+
       // Use programId from the task object or fallback to empty string
       // This is important for the backend to link the submission, although validation might be loose for non-workout types
-      formData.append("programId", therapyTasks[0].programId || therapyTasks[0].submission?.programId || "");
-      
+      formData.append(
+        "programId",
+        therapyTasks[0].programId ||
+          therapyTasks[0].submission?.programId ||
+          "",
+      );
+
       formData.append("weekIndex", therapyTasks[0].weekIndex || 1);
       formData.append("dayIndex", therapyTasks[0].dayIndex || 1);
       formData.append("globalDayIndex", therapyTasks[0].globalDayIndex || 1);
@@ -114,7 +128,9 @@ export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) 
       }
     } catch (err) {
       console.error("Upload error:", err);
-      toast.error("An unexpected error occurred: " + (err.message || "Unknown error"));
+      toast.error(
+        "An unexpected error occurred: " + (err.message || "Unknown error"),
+      );
     } finally {
       setUploading(false);
     }
@@ -136,9 +152,7 @@ export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) 
       <div className="relative w-full max-w-[400px] h-full bg-white shadow-2xl flex flex-col p-6 pb-24 lg:pb-6 animate-in slide-in-from-right duration-300">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-3">
-            <h1 className="text-[#0A4F48] text-[18px] font-bold">
-              Therapy
-            </h1>
+            <h1 className="text-[#0A4F48] text-[18px] font-bold">Therapy</h1>
             {isVerified && (
               <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-bold">
                 VERIFIED
@@ -168,7 +182,7 @@ export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) 
           {/* Hero Image */}
           <div className="w-full aspect-video rounded-2xl overflow-hidden shadow-sm">
             <img
-              src="/src/assets/Workout.png"
+              src={assets.wl}
               alt="Therapy"
               className="w-full h-full object-cover"
             />
@@ -184,9 +198,9 @@ export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) 
                 (t) =>
                   t.globalDayIndex === exercise.globalDayIndex &&
                   t.exerciseIndex === exercise.exerciseIndex &&
-                  t.taskType === exercise.type
+                  t.taskType === exercise.type,
               );
-              
+
               const exerciseStatus = submission?.status || "todo";
               const isExpanded = expandedIndex === index;
 
@@ -235,19 +249,22 @@ export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) 
                       </p>
 
                       {/* Rejection Comment */}
-                      {exerciseStatus === "rejected" && submission?.adminComment && (
-                        <div className="bg-red-50 p-3 rounded-lg border border-red-100">
-                          <p className="text-xs text-red-800 font-bold mb-1">
-                            Expert Feedback:
-                          </p>
-                          <p className="text-xs text-red-700">
-                            {submission.adminComment}
-                          </p>
-                        </div>
-                      )}
+                      {exerciseStatus === "rejected" &&
+                        submission?.adminComment && (
+                          <div className="bg-red-50 p-3 rounded-lg border border-red-100">
+                            <p className="text-xs text-red-800 font-bold mb-1">
+                              Expert Feedback:
+                            </p>
+                            <p className="text-xs text-red-700">
+                              {submission.adminComment}
+                            </p>
+                          </div>
+                        )}
 
                       {/* Submitted File */}
-                      {(exerciseStatus === "pending" || exerciseStatus === "verified" || exerciseStatus === "rejected") &&
+                      {(exerciseStatus === "pending" ||
+                        exerciseStatus === "verified" ||
+                        exerciseStatus === "rejected") &&
                         submission?.file && (
                           <div className="mt-4">
                             <p className="text-xs text-gray-500 font-bold uppercase mb-2">
@@ -287,7 +304,13 @@ export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) 
                             </div>
                           </div>
                           <button
-                            onClick={() => handleVideoView(exercise.mediaUrl, exercise.name, index)}
+                            onClick={() =>
+                              handleVideoView(
+                                exercise.mediaUrl,
+                                exercise.name,
+                                index,
+                              )
+                            }
                             className="bg-[#0A4F48] text-white text-[12px] font-bold px-4 py-2 rounded-xl shadow-sm hover:bg-[#083d38] transition-colors"
                           >
                             View
@@ -338,11 +361,13 @@ export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) 
               </div>
             </div>
           )}
-           {!hasWatchedAnyVideo && !isVerified && !isPending && (
-              <div className="text-center p-4 bg-gray-50 rounded-xl">
-                 <p className="text-sm text-gray-500">Please view all therapy materials before submitting.</p>
-              </div>
-           )}
+          {!hasWatchedAnyVideo && !isVerified && !isPending && (
+            <div className="text-center p-4 bg-gray-50 rounded-xl">
+              <p className="text-sm text-gray-500">
+                Please view all therapy materials before submitting.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Footer Buttons */}
@@ -353,7 +378,7 @@ export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) 
           >
             {isVerified || isPending ? "Close" : "Cancel"}
           </button>
-          
+
           {hasWatchedAnyVideo && !isVerified && !isPending && (
             <button
               onClick={handleSubmit}
@@ -396,7 +421,7 @@ export default function TherapyTasksModal({ therapyTasks, onClose, onSuccess }) 
                 Your browser does not support the video tag.
               </video>
 
-              {(currentVideoEnded) && (
+              {currentVideoEnded && (
                 <button
                   onClick={handleCloseVideoModal}
                   className="w-full bg-[#0A4F48] text-white py-3.5 rounded-xl font-bold hover:bg-[#083d38] transition-colors animate-in fade-in slide-in-from-bottom-4 duration-500"
