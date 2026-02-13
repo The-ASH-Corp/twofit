@@ -54,4 +54,31 @@ export const deleteBroadcast = async (req, res) => {
     } catch (error) {
         res.status(400).json({ success: false, message: error.message });
     }
-} 
+}
+
+
+export const updateBroadcast = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (req.files && req.files.attachment && req.files.attachment[0]) {
+      req.body.attachment =
+        "/uploads/" + req.files.attachment[0].filename;
+    }
+
+    const broadcast = await broadcastService.updateBroadcast(
+      id,
+      req.body
+    );
+
+    res.status(200).json({
+      success: true,
+      data: broadcast,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
