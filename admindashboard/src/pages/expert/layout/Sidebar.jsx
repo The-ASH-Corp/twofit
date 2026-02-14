@@ -35,7 +35,7 @@ const menuItems = [
         {
           label:"Habit Tracker",
           icon:assets.chats,
-          path:"/expert/habit"
+          path:"/expert/weekly-habit"
 
         }
       ]),

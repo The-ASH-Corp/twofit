@@ -4,6 +4,7 @@ import {
   getClientHabitByHabitId,
   getClientHabitsThunk,
   getDailyHabitSummaryThunk,
+  getWeeklyHabitSummaryThunk,
   updateHabitStatusThunk,
 } from "./habit.thunk";
 
@@ -11,6 +12,7 @@ const initialState = {
   habits: null,
   habitDetails: null,
   dailySummary: [],
+  weeklySummary: [],
   loading: false,
   error: null,
 };
@@ -85,6 +87,17 @@ const habitSlice = createSlice({
         state.dailySummary = action.payload;
       })
       .addCase(getDailyHabitSummaryThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getWeeklyHabitSummaryThunk.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getWeeklyHabitSummaryThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.weeklySummary = action.payload;
+      })
+      .addCase(getWeeklyHabitSummaryThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
