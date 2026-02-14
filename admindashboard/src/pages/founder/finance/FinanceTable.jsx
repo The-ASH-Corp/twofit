@@ -8,7 +8,7 @@ import { useDispatch } from 'react-redux'
 import { useAppSelector } from '@/redux/store/hooks'
 import { SyncLoader } from "react-spinners";
 import { getAllEmployees } from '@/redux/features/finance/finance.thunk'
-import { selectAllEmployees, selectEmployeeCount, selectEmployeeStatus } from '@/redux/features/finance/finance.selector'
+import { selectAllEmployees, selectEmployeeCount, selectEmployeeError, selectEmployeeStatus } from '@/redux/features/finance/finance.selector'
 
 
 export default function FinanceTable() {
@@ -23,7 +23,7 @@ export default function FinanceTable() {
 
   const data = useAppSelector(selectAllEmployees);
   const count = useAppSelector(selectEmployeeCount);
-  // const error = useAppSelector(selectEmployeeError);
+  const error = useAppSelector(selectEmployeeError);
   const status = useAppSelector(selectEmployeeStatus);
 
   const [employees, setEmployees] = useState([]);
@@ -53,10 +53,11 @@ export default function FinanceTable() {
         <SyncLoader color="#0A4F48" loading margin={2} size={20} />
       </div>
     );
+    if (error) return <p className="text-red-500">{error}</p>;
   return (
     <div className="h-[calc(100vh-130px)] pb-4 overflow-auto no-scrollbar">
       <FinanceKpi />
-      {employees.length > 0 && (
+      {count > 0 && (
         <BaseTable
           columns={FinanceColumns}
           data={employees}

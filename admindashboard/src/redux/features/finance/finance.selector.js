@@ -3,5 +3,7 @@ export const selectEmployeeCount = (state) => state.finance.allEmployeeCount;
 export const selectTotalSalary = (state) => state.finance.totalSalary;
 export const selectTotalBaseSalary = (state) => state.finance.totalBaseSalary;
 export const selectTotalIncentive = (state) => state.finance.totalIncentive;
+export const selectEmployeeHistory = (state) => state.finance.employeeHistory;
+export const selectEmployeeHistoryCount = (state) => state.finance.employeeCount;
 export const selectEmployeeError = (state) => state.finance.error;
 export const selectEmployeeStatus = (state) => state.finance.status;
