@@ -113,13 +113,11 @@ export default function Dashboard() {
         socket.emit("join_task_rooms", { role: user.role });
       });
 
-      socket.on("new_task_submission", (data) => {
-        console.log("New task submission received via socket:", data);
+      socket.on("new_task_submission", () => {
         fetchData(); // Refresh data in real-time
       });
 
-      socket.on("task_updated", (data) => {
-        console.log("Task updated via socket:", data);
+      socket.on("task_updated", () => {
         fetchData(); // Refresh data in real-time
       });
 

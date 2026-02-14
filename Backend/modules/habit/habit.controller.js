@@ -65,9 +65,7 @@ export const getClientHabitsController = async (req, res) => {
 export const getHabitByIdController=async(req,res)=>{
   try{
     const {habitId}=req.params;
-    console.log(habitId)
     const habit=await getHabitByIdService(habitId);
-    console.log(habit)
     if(!habit){
       return res.status(404).json({
         message:"No habits found"

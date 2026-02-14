@@ -14,7 +14,6 @@ export default function HabitProgress() {
   }, [dispatch]);
 
   if (loading) return <p>Loading summary...</p>;
-    console.log(dailySummary)
   return (
     <div className="bg-white rounded-2xl shadow-md p-4">
       <h2 className="text-md font-bold mb-4 text-[#0A4F48] ">

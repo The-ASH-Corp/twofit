@@ -123,7 +123,6 @@ export const adminCreateUser = async (userData) => {
 
    return user;
  } catch (error) {
-  console.log(error)
    throw error;
  }
 };

@@ -335,7 +335,6 @@ export const fetchClientsWithHabitPlan = async () => {
    const clientsWithHabit = await Promise.all(
     clients.map(async (client) => {
       const habit = await HabitModel.findOne({ clientId: client._id });
-      console.log("Habit for client", client._id, ":", habit);
 
       return {
         ...client.toObject(),

@@ -62,7 +62,6 @@ export const getDailyHabitSummaryThunk = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get("/habits/daily-habit");
-      console.log(response);
       return response;
     } catch (error) {
       return rejectWithValue(
