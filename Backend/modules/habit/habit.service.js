@@ -143,8 +143,7 @@ export const getDailyClientHabitSummary = async () => {
         if (todayLog.status === "done") done++;
         if (todayLog.status === "missed") missed++;
       } else {
-        // 🔥 If not marked today → count as missed
-        missed++;
+         missed++;
       }
     });
 
@@ -167,3 +166,71 @@ export const getDailyClientHabitSummary = async () => {
 
   return summary;
 };
+
+
+
+ 
+export const getWeeklyClientHabitSummaryService = async () => {
+  const habits = await HabitModel.find()
+    .populate("clientId", "name");
+
+   const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+   const day = today.getDay(); 
+  const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(diff);
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  console.log("Start of Week:", startOfWeek);
+  console.log("End of Week:", endOfWeek);
+
+  const summary = habits.map((doc) => {
+    let done = 0;
+    let missed = 0;
+
+   doc.habits.forEach((habit) => {
+  habit.logs.forEach((log) => {
+    const logDate = new Date(log.date);
+    logDate.setHours(0, 0, 0, 0);
+
+    if (
+      logDate >= startOfWeek &&
+      logDate <= endOfWeek
+    ) {
+      if (log.status === "done") done++;
+      else if (log.status === "missed") missed++;
+    }
+  });
+});
+
+const total = doc.habits.length * 7;
+missed = total - done;
+
+
+   
+
+    const percentage =
+      total > 0
+        ? Math.round((done / total) * 100)
+        : 0;
+
+    return {
+      clientId: doc.clientId._id,
+      clientName: doc.clientId.name,
+      done,
+      missed,
+      total,
+      percentage,
+    };
+  });
+
+  return summary;
+};
+
