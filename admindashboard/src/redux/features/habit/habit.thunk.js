@@ -70,3 +70,21 @@ export const getDailyHabitSummaryThunk = createAsyncThunk(
     }
   },
 );
+
+
+export const getWeeklyHabitSummaryThunk = createAsyncThunk(
+  "habit/getWeeklySummary",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        "/habits/weekly-habit"
+      );
+
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch weekly summary"
+      );
+    }
+  }
+);

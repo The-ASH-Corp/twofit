@@ -14,6 +14,19 @@ export default function HabitProgress() {
   }, [dispatch]);
 
   if (loading) return <p>Loading summary...</p>;
+console.log(dailySummary)
+  if (!dailySummary || dailySummary.length === 0) {
+  return (
+    <div className="bg-white rounded-2xl shadow-md p-6 text-center">
+      <h2 className="text-md font-bold mb-2 text-[#0A4F48]">
+        Daily Habit Summary
+      </h2>
+      <p className="text-gray-400 text-md italic">
+        No habit progress available for today.
+      </p>
+    </div>
+  );
+}
   return (
     <div className="bg-white rounded-2xl shadow-md p-4">
       <h2 className="text-md font-bold mb-4 text-[#0A4F48] ">

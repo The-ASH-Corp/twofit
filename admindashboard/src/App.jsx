@@ -101,6 +101,7 @@ import ClientChat from "./pages/client/chats/Chats";
 import Habit from "./pages/expert/habit/Habit";
 import HabitTracker from "./pages/client/habit/HabitTracker";
 import HabitDisplay from "./pages/expert/habit/HabitDisplay";
+import WeeklyHabit from "./pages/expert/habit/WeeklyHabit";
 
 
 function App() {
@@ -279,6 +280,7 @@ function App() {
           <Route index element={<ExpertDashboard />} />
           <Route path="clients" element={<ExpertClientsTable />} />
           <Route path="clients/profile/:id" element={<ExpertClientProfile />} />
+          <Route path="weekly-habit" element={<WeeklyHabit/>}/>
           <Route path="chats" element={<ExpertChats />} />
           <Route path="programs" element={<ExpertPrograms />} />
           <Route path="programs/viewPlan" element={<ExpertPlanDetails />} />
