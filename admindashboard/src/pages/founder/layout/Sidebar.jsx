@@ -87,7 +87,7 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* Logo and Mobile Close */}
         <div className="flex items-center justify-between lg:justify-center mb-8 px-2">
           <div className="flex justify-center">
-            <img src={assets.logo} alt="logo" className="h-8" />
+            <img src={assets.logo} alt="logo" className="h-8 cursor-pointer" onClick={() => navigate("/founder")} />
           </div>
           {/* Close button for mobile */}
           <button

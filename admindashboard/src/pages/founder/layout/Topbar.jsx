@@ -94,7 +94,7 @@ const currentPage =
 
       <div className="flex items-center gap-3 md:gap-4 flex-1 justify-end max-w-full">
         {/* Search Bar - Hidden on small screens, shown as icon or collapsed */}
-        <div className="hidden sm:flex items-center bg-white px-3 rounded-xl border border-gray-100 shadow-sm flex-1 max-w-[400px]">
+        {/* <div className="hidden sm:flex items-center bg-white px-3 rounded-xl border border-gray-100 shadow-sm flex-1 max-w-[400px]">
           <Search size={18} className="text-gray-400" />
           <input
             type="text"
@@ -106,7 +106,7 @@ const currentPage =
             className="w-4 h-4 cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
             alt="Filter"
           />
-        </div>
+        </div> */}
 
         {/* Action icons */}
         <div className="flex items-center gap-2 md:gap-4 shrink-0">
