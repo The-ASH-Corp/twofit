@@ -393,13 +393,13 @@ export default function TherapyTasksModal({
 
       {/* Video Modal */}
       {showVideoModal && selectedVideo && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={handleCloseVideoModal}
           />
-          <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b border-gray-100">
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-gray-100 shrink-0">
               <h2 className="text-[#0A4F48] text-lg font-bold">
                 {selectedVideo.name}
               </h2>
@@ -410,21 +410,23 @@ export default function TherapyTasksModal({
                 <X className="w-6 h-6 text-gray-400" />
               </button>
             </div>
-            <div className="p-4 flex flex-col gap-4">
-              <video
-                controls
-                autoPlay
-                className="w-full rounded-xl"
-                src={selectedVideo.url}
-                onEnded={handleVideoEnd}
-              >
-                Your browser does not support the video tag.
-              </video>
+            <div className="p-4 flex flex-col gap-4 overflow-y-auto">
+              <div className="w-full flex justify-center bg-black rounded-xl overflow-hidden">
+                <video
+                  controls
+                  autoPlay
+                  className="max-w-full max-h-[60vh] object-contain"
+                  src={selectedVideo.url}
+                  onEnded={handleVideoEnd}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              </div>
 
               {currentVideoEnded && (
                 <button
                   onClick={handleCloseVideoModal}
-                  className="w-full bg-[#0A4F48] text-white py-3.5 rounded-xl font-bold hover:bg-[#083d38] transition-colors animate-in fade-in slide-in-from-bottom-4 duration-500"
+                  className="w-full bg-[#0A4F48] text-white py-3.5 rounded-xl font-bold hover:bg-[#083d38] transition-colors animate-in fade-in slide-in-from-bottom-4 duration-500 shrink-0"
                 >
                   Mark as Done & Continue
                 </button>

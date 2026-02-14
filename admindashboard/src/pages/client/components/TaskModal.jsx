@@ -283,13 +283,13 @@ export default function TaskModal({ task, onClose, onSuccess }) {
 
       {/* Video/Image Modal */}
       {showVideoModal && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={() => setShowVideoModal(false)}
           />
-          <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b border-gray-100">
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b border-gray-100 shrink-0">
               <h2 className="text-[#0A4F48] text-lg font-bold">
                 {isMeal ? "Dietary Recommendation" : "Exercise Video"}
               </h2>
@@ -300,32 +300,34 @@ export default function TaskModal({ task, onClose, onSuccess }) {
                 <X className="w-6 h-6 text-gray-400" />
               </button>
             </div>
-            <div className="p-4 flex flex-col gap-4">
+            <div className="p-4 flex flex-col gap-4 overflow-y-auto">
               {isMeal ? (
-                <div className="w-full rounded-xl overflow-hidden shadow-inner bg-gray-50">
+                <div className="w-full rounded-xl overflow-hidden shadow-inner bg-gray-50 text-center">
                   <img
-                    src={MealPlaceholder}
+                    src={assets.MealPlaceholder}
                     alt="Healthy Meal"
                     className="w-full h-auto max-h-[60vh] object-contain mx-auto"
                     onLoad={() => setVideoWatched(true)}
                   />
                 </div>
               ) : (
-                <video
-                  controls
-                  autoPlay
-                  className="w-full rounded-xl"
-                  src={effectiveTask.url}
-                  onEnded={() => setVideoWatched(true)}
-                >
-                  Your browser does not support the video tag.
-                </video>
+                <div className="w-full flex justify-center bg-black rounded-xl overflow-hidden">
+                  <video
+                    controls
+                    autoPlay
+                    className="max-w-full max-h-[60vh] object-contain"
+                    src={effectiveTask.url}
+                    onEnded={() => setVideoWatched(true)}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
               )}
 
               {videoWatched && (
                 <button
                   onClick={() => setShowVideoModal(false)}
-                  className="w-full bg-[#0A4F48] text-white py-3.5 rounded-xl font-bold hover:bg-[#083d38] transition-colors animate-in fade-in slide-in-from-bottom-4 duration-500"
+                  className="w-full bg-[#0A4F48] text-white py-3.5 rounded-xl font-bold hover:bg-[#083d38] transition-colors animate-in fade-in slide-in-from-bottom-4 duration-500 shrink-0"
                 >
                   {isMeal ? "Continue to Log Meal" : "Mark as Done & Continue"}
                 </button>
