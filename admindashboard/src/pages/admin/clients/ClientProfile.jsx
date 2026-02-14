@@ -44,14 +44,14 @@ const ClientProfile = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="flex flex-col lg:flex-row lg:justify-between w-full gap-4 h-[calc(100vh-120px)] overflow-x-hidden">
-      <div className="w-full lg:w-[25%] overflow-y-auto lg:overflow-auto no-scrollbar">
+    <div className="flex flex-col lg:flex-row lg:justify-between w-full gap-4 h-[calc(100vh-120px)] overflow-x-hidden overflow-y-auto lg:overflow-y-hidden">
+      <div className="w-full lg:w-[25%] h-fit lg:h-full lg:overflow-y-auto no-scrollbar">
         <ProfileLeftSide client={client} complianceStats={complianceStats} />
       </div>
-      <div className="w-full lg:w-[50%] overflow-y-auto lg:overflow-auto no-scrollbar">
+      <div className="w-full lg:w-[50%] h-fit lg:h-full lg:overflow-y-auto no-scrollbar">
         <ProfileCenterSide client={client} />
       </div>
-      <div className="w-full lg:w-[25%] overflow-y-auto lg:overflow-auto no-scrollbar">
+      <div className="w-full lg:w-[25%] h-fit lg:h-full lg:overflow-y-auto no-scrollbar">
         <ProfileRightSide client={client} />
       </div>
     </div>

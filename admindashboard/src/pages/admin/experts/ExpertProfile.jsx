@@ -35,19 +35,19 @@ const ExpertProfile = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 w-full h-[calc(100vh-110px)] bg-[#F8F9FA] p-2 sm:p-4 lg:p-2 overflow-hidden">
+    <div className="flex flex-col lg:flex-row gap-4 lg:gap-6 w-full h-[calc(100vh-110px)] bg-[#F8F9FA] p-2 sm:p-4 lg:p-2 overflow-y-auto lg:overflow-y-hidden">
       {/* left sidebar - Full width on mobile, fixed width on desktop */}
-      <div className="w-full lg:w-[280px] xl:w-[300px] h-full overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="w-full lg:w-[280px] xl:w-[300px] h-fit lg:h-full lg:overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <ExpertLeftSide expert={expert} />
       </div>
 
       {/* center content - Full width on mobile, flex-1 on desktop */}
-      <div className="w-full lg:flex-1 h-full overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="w-full lg:flex-1 h-fit lg:h-full lg:overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <ExpertCenterSide expert={expert} />
       </div>
 
       {/* right sidebar - Full width on mobile, fixed width on desktop */}
-      <div className="w-full lg:w-[300px] xl:w-[320px] h-full overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="w-full lg:w-[300px] xl:w-[320px] h-fit lg:h-full lg:overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         <ExpertRightSide expert={expert} />
       </div>
     </div>

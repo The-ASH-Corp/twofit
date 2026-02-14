@@ -22,6 +22,7 @@ export default function ClientsTable() {
   const error = useAppSelector(selectClientError);
   const [clients, setClients] = useState([]);
   const [clientsLength, setClientsLength] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
@@ -49,15 +50,14 @@ export default function ClientsTable() {
   };
 
   const searchInpiutHandler = (e) => {
-    const value = e.target.value.toLowerCase();
-    const filteredAdmins = clients.filter((admin) => {
-      return admin.name.toLowerCase().includes(value);
-    });
-    setClients(filteredAdmins);
-    if (value == "") {
-      fetchClientData();
-    }
+    setSearchTerm(e.target.value);
   };
+
+  const filteredClients = clients.filter((client) =>
+    client.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const profilePath = (id) => {
     navigate(`/admin/clients/profile/${id}`);
   };
@@ -73,14 +73,14 @@ export default function ClientsTable() {
     <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         columns={ClientColumns}
-        data={clients}
+        data={filteredClients}
         actionLabel="Add Client"
         actionPath="/admin/clients/addclient"
         profilePath={profilePath}
         pageLabel={"Clients"}
-        onPageChange={handlePageChange}
-        onLimitChange={handleLimitChange}
-        onSearchInput={searchInpiutHandler}
+        handlePageChange={handlePageChange}
+        handleLimitChange={handleLimitChange}
+        onSearchInputChange={searchInpiutHandler}
         page={page}
         limit={limit}
         totalCount={clientsLength}
