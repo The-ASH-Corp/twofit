@@ -214,7 +214,7 @@ const PayrollMenu = ({ setPayrollOpen, payrollOpen }) => {
         </div>
 
         {/* SECTION 3: Extend Program */}
-        <div className="flex flex-col items-start gap-4 w-full">
+        {/* <div className="flex flex-col items-start gap-4 w-full">
           <label className="relative inline-flex items-center cursor-pointer gap-2">
             <input
               type="checkbox"
@@ -251,10 +251,10 @@ const PayrollMenu = ({ setPayrollOpen, payrollOpen }) => {
               ))}
             </div>
           )}
-        </div>
+        </div> */}
 
         {/* SECTION 4: Target */}
-        <div className="flex flex-col items-start gap-4 w-full">
+        {/* <div className="flex flex-col items-start gap-4 w-full">
           <label className="relative inline-flex items-center cursor-pointer gap-2">
             <input
               type="checkbox"
@@ -275,7 +275,7 @@ const PayrollMenu = ({ setPayrollOpen, payrollOpen }) => {
               onChange={(e) => handleChange("targetAchieved", e.target.value)}
             />
           )}
-        </div>
+        </div> */}
       </div>
 
       {/* footer */}

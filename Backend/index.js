@@ -10,6 +10,8 @@ import http from "http";
 import { Server } from "socket.io";
 import initSocket from "./utils/socket.js";
 import { startImageCleanupTask } from "./utils/cronJobs.js";
+import "./utils/payroll.cron.js";
+
 
 
 
