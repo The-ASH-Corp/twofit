@@ -1,5 +1,5 @@
 import { CoachModel } from "../coach/coach.model.js";
-import { PayrollModel } from "./payroll.model.js";
+import  PayrollModel  from "./payroll.model.js";
 
 
 export const calculateRatingIncentive = async (coachId) => {

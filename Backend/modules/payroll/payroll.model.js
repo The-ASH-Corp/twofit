@@ -12,4 +12,5 @@ const payrollSchema = new mongoose.Schema({
   targetAchieved: { type: Number, default: 0 },
 });
 
-export const PayrollModel = mongoose.model('Payroll', payrollSchema)
+const incentiveModel = mongoose.model("incentive", payrollSchema);
+export default incentiveModel;

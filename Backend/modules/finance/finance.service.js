@@ -1,10 +1,13 @@
 import { AdminModel } from "../admin/admin.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import { HeadsModel } from "../Heads/heads.modal.js";
-
+import { PayrollModel } from "./finance.model.js";
 
 export const allEmployees = async (page, limit) => {
-  const heads = await HeadsModel.find({}, "_id name salary email role status").lean();
+  const heads = await HeadsModel.find(
+    {},
+    "_id name salary email role status",
+  ).lean();
   const admins = await AdminModel.find(
     {},
     "_id name salary email role status",
@@ -45,7 +48,7 @@ export const allEmployees = async (page, limit) => {
   page = Number(page);
   limit = Number(limit);
   const skip = (page - 1) * limit;
-  
+
   const employees = unifiedData.slice(skip, skip + limit);
   const totalSalary = unifiedData.reduce(
     (sum, emp) => sum + Number(emp.netSalary),
@@ -64,4 +67,95 @@ export const allEmployees = async (page, limit) => {
     totalIncentive,
     totalBaseSalary,
   };
+};
+
+export const generateMonthlyPayroll = async () => {
+  try {
+    const now = new Date();
+    const month = now.getMonth() + 1; 
+    const year = now.getFullYear();
+
+    const alreadyGenerated = await PayrollModel.findOne({ month, year });
+    if (alreadyGenerated) {
+      console.log("Payroll already generated for this month.");
+      return;
+    }
+
+    const heads = await HeadsModel.find().lean();
+    const admins = await AdminModel.find().lean();
+    const coaches = await CoachModel.find().lean();
+
+    const allEmployees = [
+      ...heads.map((h) => ({
+        ...h,
+        type: "Head",
+      })),
+      ...admins.map((a) => ({
+        ...a,
+        type: "Admin",
+      })),
+      ...coaches.map((c) => ({ ...c, type: "Expert" })),
+    ];
+
+    for (let emp of allEmployees) {
+      const baseSalary = emp.salary || 0;
+      const extraClientIncentive = emp.extraClientIncentive || 0;
+      const ratingIncentive = emp.ratingIncentiveAmount || 0;
+      const incentive = emp.incentives || 0;
+      const netSalary = baseSalary + incentive;
+
+      await PayrollModel.updateOne(
+        {
+          employeeId: emp._id,
+          employeeType: emp.type,
+          month,
+          year,
+        },
+        {
+          employeeId: emp._id,
+          employeeType: emp.type,
+          month,
+          year,
+          extraClientIncentive,
+          ratingIncentive,
+          baseSalary,
+          incentive,
+          netSalary,
+        },
+        { upsert: true },
+      );
+    }
+
+    return "Payroll generated successfully";
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getPayrollHistoryById = async (employeeId, page, limit) => {
+  try {
+    page = Number(page);
+    limit = Number(limit);
+    const skip = (page - 1) * limit;
+    const totalCount = await PayrollModel.countDocuments({ employeeId });
+    const history = await PayrollModel.find({ employeeId })
+      .sort({ year: -1, month: -1 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const formattedData = history.map((item) => ({
+      ...item,
+      monthYear: new Date(item.year, item.month - 1).toLocaleString("en-IN", {
+        month: "short",
+        year: "numeric",
+      }),
+    }));
+     return {
+       totalCount,
+       data: formattedData,
+     };
+  } catch (error) {
+    throw error;
+  }
 };
