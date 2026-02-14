@@ -22,6 +22,7 @@ export default function ClientsTable() {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [search, setSearch] = useState("");
 
   const coachId = useAppSelector(selectUser);
   useEffect(() => {
@@ -39,8 +40,6 @@ useEffect(() => {
 }, [dispatch]);
 
 
-  console.log("Assigned Clients:", assignedClients);
-  console.log("Habit Clients:", habitClients);
 const mergedClients = assignedClients.map((client) => {
   const habitInfo = habitClients?.find(
     (h) => h?._id === client?._id
@@ -51,8 +50,10 @@ const mergedClients = assignedClients.map((client) => {
     hasHabitPlan: habitInfo?.hasHabitPlan ?? false,
     habitId: habitInfo?.habitId ?? null,
   };
-});
-  console.log("Merged Clients:", mergedClients);
+}).filter(client => 
+  client?.name?.toLowerCase().includes(search.toLowerCase()) || 
+  client?.email?.toLowerCase().includes(search.toLowerCase())
+);
   const clientTotalCount = useAppSelector(selectTotalClientsCount);
   const status = useAppSelector(selectClientStatus);
   const error = useAppSelector(selectClientError);
@@ -63,6 +64,10 @@ const mergedClients = assignedClients.map((client) => {
 
   const handleLimitChange = (newLimit) => {
     setLimit(newLimit);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
   };
 
   if (status === "loading") return <p>Loading clients...</p>;
@@ -87,6 +92,7 @@ const mergedClients = assignedClients.map((client) => {
         page={page}
         limit={limit}
         totalCount={clientTotalCount}
+        onSearchInputChange={handleSearchChange}
       />
     </div>
   );

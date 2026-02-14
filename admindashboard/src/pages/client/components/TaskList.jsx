@@ -55,13 +55,11 @@ export default function TaskList({
         console.log("Client task socket connected");
       });
 
-      socket.on("task_status_updated", (data) => {
-        console.log("Task status updated via socket:", data);
+      socket.on("task_status_updated", () => {
         dispatch(getUserTaskStatus()); // Refresh task list
       });
 
-      socket.on("day_advanced", (data) => {
-        console.log("Day advanced via socket:", data);
+      socket.on("day_advanced", () => {
         // Refresh user profile to get updated currentGlobalDay and task list
         dispatch(refreshProfile({ id: user?._id, role: user.role }));
         dispatch(getUserTaskStatus());

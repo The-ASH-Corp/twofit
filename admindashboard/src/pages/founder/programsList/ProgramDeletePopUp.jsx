@@ -11,7 +11,6 @@ const ProgramDeletePopUp = () => {
   const [errorMessage, setErrorMessage] = useState(null);
 
   const handleDelete = async () => {
-    // console.log("Delete ID:", row.id);
     try {
       await dispatch(deleteProgram({ id })).unwrap();
       toast.success("program deleted successfully");

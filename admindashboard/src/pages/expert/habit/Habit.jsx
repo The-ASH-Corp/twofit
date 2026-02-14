@@ -42,7 +42,6 @@ export default function HabitForm() {
    const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
-console.log("Client ID:", id);
   const { loading, error } = useSelector(
     (state) => state.habit
   );

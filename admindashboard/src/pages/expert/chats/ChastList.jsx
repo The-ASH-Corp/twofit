@@ -1,5 +1,5 @@
 import { Search, Settings } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 
 const ChastList = ({
   clients,
@@ -8,6 +8,12 @@ const ChastList = ({
   onlineUsers = [],
   unreadCounts = {},
 }) => {
+  const [search, setSearch] = useState("");
+
+  const filteredClients = clients.filter((c) =>
+    c.name.toLowerCase().includes(search.toLowerCase()),
+  );
+
   return (
     <div className="w-80 flex flex-col rounded-lg h-full overflow-hidden">
       {/* Search and Filters */}
@@ -19,6 +25,8 @@ const ChastList = ({
               type="text"
               placeholder="Search"
               className="ml-2 bg-transparent text-sm text-gray-700 outline-none w-full placeholder-gray-400"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
           </div>
           <button className="p-2 hover:bg-gray-50 rounded-lg">
@@ -29,7 +37,7 @@ const ChastList = ({
 
       {/* Chat List Items */}
       <div className="flex-1 overflow-y-auto">
-        {clients.map((chat, idx) => {
+        {filteredClients.map((chat, idx) => {
           const unreadCount = unreadCounts[chat?._id] || 0;
 
           return (
@@ -63,7 +71,6 @@ const ChastList = ({
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
-              
               </div>
             </div>
           );

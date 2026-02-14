@@ -85,7 +85,6 @@ const ProgramEditForm = () => {
            const category = await dispatch(
              updateProgram({ id, updatedData: value }),
            ).unwrap();
-          //  console.log(category)
            if (category.success) {
              toast.success("Program updated successfully");
              navigate("/founder/programs");
@@ -93,7 +92,6 @@ const ProgramEditForm = () => {
              toast.error("Failed to update program");
            }
          } catch (error) {
-           // console.log(error)
            toast.error(`program updating failed: ${error}`);
          }
     };

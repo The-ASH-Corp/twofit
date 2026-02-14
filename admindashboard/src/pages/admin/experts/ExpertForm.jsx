@@ -31,7 +31,6 @@ export default function ExpertForm() {
       setTherapy(res.payload.data.therapy);
     });
   }, [dispatch, user?._id]);
-  console.log(therapy)
 
   const fields = [
     {
@@ -227,7 +226,6 @@ export default function ExpertForm() {
   };
 
   const handleCoachCreation = async (values) => {
-    console.log(values)
     try {
       const formData = new FormData();
 

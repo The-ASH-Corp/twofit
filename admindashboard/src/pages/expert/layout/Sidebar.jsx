@@ -75,7 +75,7 @@ const menuItems = [
       >
         <div className="flex items-center justify-between lg:justify-center mb-8 px-2">
           <h1 className="text-2xl">
-            <img src={assets.logo} className="text-[#66706D] h-8" alt="Logo" />
+            <img src={assets.logo} className="text-[#66706D] h-8" alt="Logo" onClick={()=>navigate("/expert")}/>
           </h1>
           {/* Close button for mobile */}
           <button
