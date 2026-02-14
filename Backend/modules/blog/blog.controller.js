@@ -3,7 +3,6 @@ import * as blogService from "./blog.service.js";
 
 export const createBlog = async (req, res)=> {
     try {
-      console.log(req.file)
         const { heading, description, points } = req.body;
         let parsedPoints = [];
         if (points) {
@@ -31,7 +30,7 @@ export const createBlog = async (req, res)=> {
             data: blog,
           });
     } catch (error) {
-        console.log(error)
+        res.status(400).json({ success: false, message: error.message });
     }
 }
 
@@ -43,7 +42,7 @@ export const getAllBlogs = async (req, res)=> {
             data: blogs,
         })
     } catch (error) {
-        console.log(error)
+        res.status(400).json({ success: false, message: error.message });
     }
 }
 
@@ -72,7 +71,7 @@ export const getBlogById = async (req, res)=> {
             data: blog,
         });
     } catch (error) {
-        console.log(error)
+        res.status(400).json({ success: false, message: error.message });
     }
 }
 
@@ -93,7 +92,7 @@ export const updateBlogById = async (req, res)=> {
             message: "Blog updated successfully",
         })
     } catch (error) {
-        console.log(error)
+        res.status(400).json({ success: false, message: error.message });
     }
 }
 
@@ -122,6 +121,6 @@ export const deleteBlogById = async (req, res)=> {
             message: "blog deleted successfully"
         })
     } catch (error) {
-        console.log(error)
+        res.status(400).json({ success: false, message: error.message });
     }
 }

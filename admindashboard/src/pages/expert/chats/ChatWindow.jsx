@@ -1,4 +1,4 @@
-import { Mic, Paperclip, Square } from "lucide-react";
+import { Mic, Paperclip, Square, ChevronLeft } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import chatShimmer from "../../../assets/ChatShimmer.json";
 import Lottie from "lottie-react";
@@ -32,6 +32,7 @@ const ChatWindow = ({
   handleImageUpload,
   handleVoiceUpload,
   isUploadingMedia = false,
+  onBack,
 }) => {
   const isClientOnline = client && onlineUsers.includes(client?._id);
   const fileInputRef = useRef(null);
@@ -209,6 +210,13 @@ const ChatWindow = ({
           {/* Chat Header */}
           <div className="bg-white rounded-t-lg px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-4">
+              <button
+                onClick={onBack}
+                className="lg:hidden p-1.5 -ml-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="Back to chat list"
+              >
+                <ChevronLeft size={24} />
+              </button>
               <div className="w-12 h-12 rounded-full bg-[#E8B5AD] flex items-center justify-center text-white font-semibold">
                 {client?.name?.split(" ")?.[0]?.[0]}
               </div>

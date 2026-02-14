@@ -1,7 +1,7 @@
 import React from "react";
 
 const AdminLeftSide = ({ admin }) => {
-  console.log("Admin data in AdminLeftSide:", admin?.program);
+
   const profileDetails = [
     {
       title: "Programs",

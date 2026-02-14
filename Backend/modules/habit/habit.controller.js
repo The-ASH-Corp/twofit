@@ -3,7 +3,9 @@ import {
   getClientHabitsService,
   updateHabitStatusService,
   updateHabit,
-  getHabitByIdService
+  getHabitByIdService,
+  getDailyClientHabitSummary,
+  getWeeklyClientHabitSummaryService
 } from "./habit.service.js";
 
 export const createHabitsController = async (req, res) => {
@@ -64,9 +66,7 @@ export const getClientHabitsController = async (req, res) => {
 export const getHabitByIdController=async(req,res)=>{
   try{
     const {habitId}=req.params;
-    console.log(habitId)
     const habit=await getHabitByIdService(habitId);
-    console.log(habit)
     if(!habit){
       return res.status(404).json({
         message:"No habits found"
@@ -110,30 +110,64 @@ export const updateHabitById = async (req, res) => {
   }
 };
 
+ 
 
 
+
+ 
 export const updateHabitStatusController = async (req, res) => {
   try {
-    const { clientId ,habitName} = req.params;
-    const {  status } = req.body;
-    await updateHabitStatusService(clientId, habitName, status);
+    const { clientId } = req.params;
+    const { habitId, status } = req.body;
+
+    if (!habitId || !status) {
+      return res.status(400).json({
+        message: "habitId and status are required",
+      });
+    }
+
+    const updatedHabit = await updateHabitStatusService(
+      clientId,
+      habitId,
+      status
+    );
 
     return res.status(200).json({
       message: "Habit status updated successfully",
+      data: updatedHabit,
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: error.message || "Server Error",
     });
   }
-    catch (error) {
-    if (
-      error.message === "Habits not found for this client" ||
-      error.message === "Habit not found"
-    ) {
-      return res.status(404).json({
-        message: error.message,
-      });
-    }
+};
+
+
+ 
+export const getDailyClientHabitSummaryController = async (req, res) => {
+  try {
+    const data = await getDailyClientHabitSummary();
+
+    return res.status(200).json(data);
+
+  } catch (error) {
     return res.status(500).json({
-      message: "Failed to update habit status",
-      error: error.message,
+      message: error.message,
+    });
+  }
+};
+
+
+export const getWeeklyClientHabitSummaryController = async (req, res) => {
+  try {
+    const data = await getWeeklyClientHabitSummaryService();
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
     });
   }
 };
