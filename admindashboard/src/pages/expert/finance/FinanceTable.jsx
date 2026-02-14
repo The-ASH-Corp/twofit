@@ -1,8 +1,6 @@
 import BaseTable from '@/components/table/BaseTable'
 import React, { useEffect, useState } from 'react'
 import { FinanceColumns } from './FinanceColumns'
-import { financeData } from './financeData'
-import KpiCard from '@/components/cards/KpiCard'
 import FinanceKpi from './FinanceKpi'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllEmployeeHistory } from '@/redux/features/finance/finance.thunk'
