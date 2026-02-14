@@ -13,7 +13,7 @@ import {
 } from "react-icons/md";
 import { BiPlus } from "react-icons/bi";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { BsDatabaseAdd } from "react-icons/bs";
 
 export default function BaseTable({
@@ -31,10 +31,31 @@ export default function BaseTable({
   totalCount,
 }) {
   const [rowSelection, setRowSelection] = useState({});
+  const [statusFilter, setStatusFilter] = useState("All Status");
+  const [openStatus, setOpenStatus] = useState(false);
 
   const navigate = useNavigate();
+
+  const availableStatuses = useMemo(() => {
+    if (!data) return [];
+    const statuses = new Set();
+    data.forEach((item) => {
+      // Check for common status fields or use specific ones based on component usage
+      if (item.status) statuses.add(item.status);
+    });
+    // Ensure we handle the specific status values requested
+    // If data doesn't contain them (e.g. empty page), they won't appear, which is correct behavior for dynamic filtering
+    return Array.from(statuses);
+  }, [data]);
+
+  const filteredData = useMemo(() => {
+    if (!data) return [];
+    if (statusFilter === "All Status") return data;
+    return data.filter((item) => item.status === statusFilter);
+  }, [data, statusFilter]);
+
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     getRowId: (row) => row?._id,
     getCoreRowModel: getCoreRowModel(),
@@ -126,12 +147,44 @@ export default function BaseTable({
             />
           </div>
 
-          {/* Action Buttons - Horizontal scroll on mobile if needed */}
-          <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-1 sm:pb-0">
-            <button className="bg-[#EBF3F2] rounded-md text-[11px] sm:text-[12px] font-semibold px-2 sm:px-3 py-2 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
-              All Status
-              <MdOutlineKeyboardArrowDown className="w-4 h-4 shrink-0" />
-            </button>
+          {/* Action Buttons */}
+          <div className="flex gap-2 sm:gap-3 flex-wrap">
+            {availableStatuses.length > 0 && (
+              <div className="relative">
+                <button
+                  onClick={() => setOpenStatus(!openStatus)}
+                  className="bg-[#EBF3F2] rounded-md text-[11px] sm:text-[12px] font-semibold px-2 sm:px-3 py-2 flex items-center gap-1 sm:gap-2 whitespace-nowrap"
+                >
+                  {statusFilter}
+                  <MdOutlineKeyboardArrowDown className="w-4 h-4 shrink-0" />
+                </button>
+                {openStatus && (
+                  <div className="absolute top-full text-left left-0 mt-1 w-full min-w-[120px] bg-white border border-gray-200 rounded-md shadow-lg z-50 py-1">
+                    <button
+                      onClick={() => {
+                        setStatusFilter("All Status");
+                        setOpenStatus(false);
+                      }}
+                      className="block w-full px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 text-left"
+                    >
+                      All Status
+                    </button>
+                    {availableStatuses.map((status) => (
+                      <button
+                        key={status}
+                        onClick={() => {
+                          setStatusFilter(status);
+                          setOpenStatus(false);
+                        }}
+                        className="block w-full px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 text-left"
+                      >
+                        {status}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
             {/* <button className="bg-[#EBF3F2] rounded-md text-[11px] sm:text-[12px] font-semibold px-2 sm:px-3 py-2 flex items-center gap-1 sm:gap-2 whitespace-nowrap">
               Bulk Actions
               <MdOutlineKeyboardArrowDown className="w-4 h-4 shrink-0" />
