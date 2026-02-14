@@ -1,5 +1,5 @@
 export const selectAllEmployees = (state) => state.finance.allEmployees;
-export const selectEmployeeCount = (state) => state.finance.employeeCount;
+export const selectEmployeeCount = (state) => state.finance.allEmployeeCount;
 export const selectTotalSalary = (state) => state.finance.totalSalary;
 export const selectTotalBaseSalary = (state) => state.finance.totalBaseSalary;
 export const selectTotalIncentive = (state) => state.finance.totalIncentive;
