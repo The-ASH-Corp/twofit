@@ -68,7 +68,6 @@ const CategoryEditForm = () => {
         toast.error("Failed to update category");
       }
     } catch (error) {
-      // console.log(error)
       toast.error(`Category updating failed: ${error}`);
     }
   };

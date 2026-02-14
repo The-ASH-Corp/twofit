@@ -39,8 +39,6 @@ useEffect(() => {
 }, [dispatch]);
 
 
-  console.log("Assigned Clients:", assignedClients);
-  console.log("Habit Clients:", habitClients);
 const mergedClients = assignedClients.map((client) => {
   const habitInfo = habitClients?.find(
     (h) => h?._id === client?._id
@@ -52,7 +50,6 @@ const mergedClients = assignedClients.map((client) => {
     habitId: habitInfo?.habitId ?? null,
   };
 });
-  console.log("Merged Clients:", mergedClients);
   const clientTotalCount = useAppSelector(selectTotalClientsCount);
   const status = useAppSelector(selectClientStatus);
   const error = useAppSelector(selectClientError);

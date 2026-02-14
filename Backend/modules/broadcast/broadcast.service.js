@@ -56,7 +56,6 @@ export const deleteBroadcast = async (id) => {
   try {
     return await broadcastModel.findByIdAndDelete(id);
   } catch (error) {
-    console.log(error)
     throw error;
   }
 };

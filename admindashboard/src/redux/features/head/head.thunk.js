@@ -64,7 +64,6 @@ export const deleteHead = createAsyncThunk(
   async ({ id }, { rejectWithValue }) => {
     try {
       const data = await axiosInstance.delete(`/heads/delete/${id}`);
-      // console.log(data.data)
       return data;
     } catch (error) {
       return rejectWithValue(

@@ -350,12 +350,6 @@ export const getDashboardData = async (adminDuration = "12m", expertDuration = "
     });
   });
 
-  console.log("Task Completion Debug:", {
-    totalClients: clientProgressStats.length,
-    totalExpectedTasks,
-    totalVerifiedTasks,
-    calculatedRate: totalExpectedTasks > 0 ? Math.round((totalVerifiedTasks / totalExpectedTasks) * 100) : 0
-  });
 
   const taskCompletionRate = totalExpectedTasks > 0
     ? Math.round((totalVerifiedTasks / totalExpectedTasks) * 100)

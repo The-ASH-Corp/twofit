@@ -63,7 +63,6 @@ const habitSlice = createSlice({
         state.error = action.payload;
       })
       .addCase(updateHabitStatusThunk.fulfilled, (state, action) => {
-        console.log("Updated Habit:", action.payload);
         const updatedHabit = action.payload;
 
         const index = state.habits.habits.findIndex(

@@ -63,10 +63,8 @@ export const updateProgram = createAsyncThunk(
         `/programs/update/${id}`,
         updatedData,
       );
-      // console.log(data.data)
       return data;
     } catch (error) {
-      // console.log(error.response?.data?.message);
       return rejectWithValue(
         error.response?.data?.message || "Failed to get categories",
       );
@@ -79,7 +77,6 @@ export const deleteProgram = createAsyncThunk(
   async ({ id }, { rejectWithValue }) => {
     try {
       const data = await axiosInstance.delete(`/programs/delete/${id}`);
-      // console.log(data.data)
       return data;
     } catch (error) {
       return rejectWithValue(

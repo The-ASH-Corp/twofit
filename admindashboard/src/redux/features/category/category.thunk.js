@@ -56,7 +56,6 @@ export const updateCategories = createAsyncThunk(
       );
       return data;
     } catch (error) {
-      // console.log(error.response?.data?.message);
       return rejectWithValue(
         error.response?.data?.message || "Failed to get categories",
       );
@@ -69,7 +68,6 @@ export const deleteCategory = createAsyncThunk(
   async ({ id }, { rejectWithValue }) => {
     try {
       const data = await axiosInstance.delete(`/category/delete/${id}`);
-      // console.log(data.data)
       return data;
     } catch (error) {
       return rejectWithValue(
