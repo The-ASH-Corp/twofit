@@ -11,7 +11,6 @@ import { SyncLoader } from 'react-spinners'
 
 export default function FinanceTable() {
     const dispatch = useDispatch();
-    //  const navigate = useNavigate();
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
       const user = useSelector(selectUser);
@@ -32,7 +31,7 @@ export default function FinanceTable() {
       );
       if (error) return <p className="text-red-500">{error}</p>;
   return (
-    <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
+    <div className="h-[calc(100vh-130px)] pb-4 overflow-auto no-scrollbar">
       <FinanceKpi />
       {count > 0 && (
         <BaseTable
