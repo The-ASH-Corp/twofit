@@ -7,10 +7,7 @@ import {
   FileText,
   Layout,
   MoreHorizontal,
-  Bell,
   ChevronDown,
-  MessageSquare,
-  RefreshCw,
 } from "lucide-react";
 import {
   Chart as ChartJS,
@@ -33,6 +30,8 @@ import {
   selectFounderDashBoard,
   selectFounderStatus,
 } from "@/redux/features/founder/founder.selector";
+import useRecentNotifications from "@/hooks/useRecentNotifications";
+import RecentNotificationsCard from "@/components/notifications/RecentNotificationsCard";
 
 ChartJS.register(
   CategoryScale,
@@ -49,6 +48,8 @@ ChartJS.register(
 
 const Dashboard = () => {
   const dispatch = useDispatch();
+  const { notifications, loading: notificationsLoading } =
+    useRecentNotifications(4);
 
   useEffect(() => {
     dispatch(founderDashboardData());
@@ -811,58 +812,11 @@ const Dashboard = () => {
           </div>
 
           {/* Recent Notifications */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col flex-1 overflow-hidden ">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-[#0A4F48]">
-                Recent Notifications
-              </h3>
-              <MoreHorizontal size={20} className="text-gray-400" />
-            </div>
-            <div className="flex flex-col gap-6 overflow-y-auto pr-2 no-scrollbar">
-              {[
-                {
-                  icon: <Bell size={16} className="text-[#0A4F48]" />,
-                  bg: "bg-[#EBF3F2]",
-                  text: "WhatsApp delivery failed for 14 messages",
-                  time: "Today, 11:20 AM",
-                },
-                {
-                  icon: <MessageSquare size={16} className="text-[#DAA520]" />,
-                  bg: "bg-[#FAF3E0]",
-                  text: 'New feedback received: "Trainer was very helpful"',
-                  time: "Today, 10:00 AM",
-                },
-                {
-                  icon: <RefreshCw size={16} className="text-[#45C4A2]" />,
-                  bg: "bg-[#F0FDF4]",
-                  text: "Dietitian Priya has 5 pending meal reviews",
-                  time: "Yesterday, 6:05 PM",
-                },
-                {
-                  icon: <Bell size={16} className="text-[#DAA520]" />,
-                  bg: "bg-[#FAF3E0]",
-                  text: "Client Neha requested expert change",
-                  time: "2 Days Ago, 2:30 PM",
-                },
-              ].map((notif, i) => (
-                <div key={i} className="flex gap-4">
-                  <div
-                    className={`${notif.bg} p-2.5 h-fit rounded-full shrink-0`}
-                  >
-                    {notif.icon}
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <p className="text-xs font-semibold text-[#0A4F48] leading-tight">
-                      {notif.text}
-                    </p>
-                    <span className="text-[10px] text-[#66706D]">
-                      {notif.time}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <RecentNotificationsCard
+            notifications={notifications}
+            loading={notificationsLoading}
+            className="min-h-0"
+          />
         </div>
       </div>
     </div>
