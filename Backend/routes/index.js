@@ -15,7 +15,7 @@ import financeRoutes from "../modules/finance/finance.route.js"
 import taskSubmissionRoutes from "../modules/taskSubmission/taskSubmission.routes.js";
 import broadcastRoutes from "../modules/broadcast/broadcast.routes.js"
 import habitRoutes from "../modules/habit/habit.routes.js"
-import notificationRoutes from "../modules/notification/notification.routes.js"
+import notificationRoutes from "../modules/notification/notification.routes.js";
 
 const router = express.Router();
 
