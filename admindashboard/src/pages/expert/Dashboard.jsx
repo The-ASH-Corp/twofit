@@ -30,6 +30,8 @@ import { getPendingSubmissions } from "@/redux/features/tasks/task.thunk";
 import { socket } from "@/utils/socket";
 import { selectToken } from "@/redux/features/auth/auth.selectores";
 import HabitProgress from "./components/HabitProgress";
+import RecentNotificationsCard from "@/components/notifications/RecentNotificationsCard";
+import useRecentNotifications from "@/hooks/useRecentNotifications";
 
 ChartJS.register(
   CategoryScale,
@@ -53,6 +55,8 @@ export default function Dashboard() {
   const [complianceDuration, setComplianceDuration] = useState("12");
   const [ratingGraphData, setRatingGraphData] = useState(null);
   const [ratingDuration, setRatingDuration] = useState("6");
+  const { notifications, loading: notificationsLoading } =
+    useRecentNotifications(4);
 
   // Group pending tasks by user and day
   const groupedPendingTasks = useMemo(() => {
@@ -328,34 +332,6 @@ export default function Dashboard() {
       },
     },
   };
-
-  // Activity Log Data
-  const activityLog = [
-    {
-      icon: <Users size={16} className="text-[#0A4F48]" />,
-      bg: "bg-[#EBF3F2]",
-      text: "Meal Uploaded (Lunch: Paneer Salad)",
-      time: "10:00 AM",
-    },
-    {
-      icon: <Activity size={16} className="text-[#D4A5A0]" />,
-      bg: "bg-[#FAE8E6]",
-      text: "Workout Completed (20 mins HIT)",
-      time: "8:15 AM",
-    },
-    {
-      icon: <Users size={16} className="text-[#0A4F48]" />,
-      bg: "bg-[#EBF3F2]",
-      text: "Meal Skipped (Dinner)",
-      time: "Yesterday, 6:05 PM",
-    },
-    {
-      icon: <Activity size={16} className="text-[#F4DBC7]" />,
-      bg: "bg-[#FAF3E0]",
-      text: "Therapy Task Completed",
-      time: "2 Days Ago, 2:30 PM",
-    },
-  ];
 
   const getStatusColor = (status) => {
     const statusMap = {
@@ -681,30 +657,10 @@ export default function Dashboard() {
           </div>
 
           {/* Daily Activity Log */}
-          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
-            <h2 className="text-[16px] font-bold text-gray-900 mb-4">
-              Daily Activity Log
-            </h2>
-            <div className="space-y-4">
-              {activityLog.map((activity, index) => (
-                <div key={index} className="flex gap-3">
-                  <div
-                    className={`w-8 h-8 rounded-full ${activity.bg} flex items-center justify-center flex-shrink-0`}
-                  >
-                    {activity.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] text-gray-900 font-medium leading-tight">
-                      {activity.text}
-                    </p>
-                    <p className="text-[12px] text-gray-500 mt-1">
-                      {activity.time}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <RecentNotificationsCard
+            notifications={notifications}
+            loading={notificationsLoading}
+          />
         </div>
       </div>
 
