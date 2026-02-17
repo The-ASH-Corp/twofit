@@ -3,6 +3,7 @@ import User from "../auth/auth.model.js";
 import Plan from "../plan/plan.model.js";
 import mongoose from "mongoose";
 import { getIO } from "../../utils/socket.js";
+import { createNotification } from "../notification/notification.service.js";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -252,10 +253,18 @@ const getTaskTypeFromPlan = async (userId, globalDayIndex, exerciseIndex) => {
 };
 
 // Helper to notify via socket
+const safeCreateNotification = async (notificationData) => {
+    try {
+        await createNotification(notificationData);
+    } catch (error) {
+        console.error("Notification persistence failed:", error.message);
+    }
+};
+
 const notifyExpertsAndAdmins = async (userId, submissionId, eventType, extraData = {}) => {
     try {
         const io = getIO();
-        const client = await User.findById(userId).select("trainer dietition therapist");
+        const client = await User.findById(userId).select("name trainer dietition therapist");
 
         if (client) {
             const expertsToNotify = [
@@ -264,11 +273,68 @@ const notifyExpertsAndAdmins = async (userId, submissionId, eventType, extraData
                 client.therapist?.toString()
             ].filter(id => id);
 
+            const taskType = String(extraData.taskType || "task");
+            const normalizedTaskType = taskType.toLowerCase();
+            const status = String(extraData.status || "").toLowerCase();
+            const clientName = client.name || "A client";
+
+            let type = "generic";
+            let message = `${clientName} has a task update`;
+
+            if (eventType === "new_task_submission") {
+                if (normalizedTaskType === "meal") {
+                    type = "pending_meal_reviews";
+                    message = `${clientName} submitted a meal that is pending review`;
+                } else {
+                    message = `${clientName} submitted a ${normalizedTaskType} task for review`;
+                }
+            }
+
+            if (eventType === "task_updated") {
+                message = `${clientName}'s ${normalizedTaskType} task was ${status || "updated"}`;
+                if (status === "rejected") {
+                    type = "feedback_received";
+                }
+            }
+
             expertsToNotify.forEach(expertId => {
                 io.to(expertId).emit(eventType, { userId, submissionId, ...extraData });
             });
 
             io.to("admin_tasks").emit(eventType, { userId, submissionId, ...extraData });
+
+            await Promise.all(
+                expertsToNotify.map((expertId) =>
+                    safeCreateNotification({
+                        type,
+                        message,
+                        recipientRole: "coach",
+                        recipientId: expertId,
+                        metadata: {
+                            eventType,
+                            submissionId,
+                            userId,
+                            ...extraData
+                        }
+                    })
+                )
+            );
+
+            await Promise.all(
+                ["admin", "head", "founder"].map((role) =>
+                    safeCreateNotification({
+                        type,
+                        message,
+                        recipientRole: role,
+                        metadata: {
+                            eventType,
+                            submissionId,
+                            userId,
+                            ...extraData
+                        }
+                    })
+                )
+            );
         }
     } catch (socketError) {
         console.error("Socket notification failed:", socketError.message);
@@ -388,7 +454,21 @@ export const createTaskSubmission = async (submissionData) => {
     const submission = day.exercises.find(e => e.exerciseIndex === eIndex);
 
     // Notify Experts and Admins via Socket
-    await notifyExpertsAndAdmins(userId, userSubmission._id, "new_task_submission", { status });
+    await notifyExpertsAndAdmins(userId, userSubmission._id, "new_task_submission", { status, taskType });
+
+    if (taskType === "Meal" && status === "skipped") {
+        await safeCreateNotification({
+            type: "meal_skipped",
+            message: "You skipped a meal today",
+            recipientRole: "user",
+            recipientId: userId,
+            metadata: {
+                submissionId: userSubmission._id,
+                globalDayIndex: gIndex,
+                exerciseIndex: eIndex
+            }
+        });
+    }
 
     return submission;
 };
@@ -491,7 +571,9 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
     await User.findByIdAndUpdate(userId, { $set: { lastTaskSubmissionDate: new Date() } }).exec();
 
     // Notify Experts and Admins via Socket
-    await notifyExpertsAndAdmins(userId, userSubmission._id, "new_task_submission");
+    await notifyExpertsAndAdmins(userId, userSubmission._id, "new_task_submission", {
+        taskType: taskType || "Workout"
+    });
 
     // Check if day is complete
     await checkAndAdvanceDay(userId, gIndex);
@@ -658,6 +740,7 @@ export const verifyTaskSubmission = async (submissionId) => {
 
     let foundGlobalDayIndex = null;
     let foundExerciseIndex = null;
+    let foundTaskType = "task";
 
     userSubmission.dailySubmissions.forEach(day => {
         const ex = day.exercises.find(e => e._id.toString() === submissionId);
@@ -666,6 +749,7 @@ export const verifyTaskSubmission = async (submissionId) => {
             ex.updatedAt = Date.now();
             foundGlobalDayIndex = day.globalDayIndex;
             foundExerciseIndex = ex.exerciseIndex;
+            foundTaskType = ex.taskType || "task";
         }
     });
 
@@ -675,7 +759,10 @@ export const verifyTaskSubmission = async (submissionId) => {
     await checkAndAdvanceDay(userSubmission.userId, foundGlobalDayIndex);
 
     // Notify Experts and Admins via Socket
-    await notifyExpertsAndAdmins(userSubmission.userId, userSubmission._id, "task_updated", { status: "verified" });
+    await notifyExpertsAndAdmins(userSubmission.userId, userSubmission._id, "task_updated", {
+        status: "verified",
+        taskType: foundTaskType
+    });
 
     // Notify the specific client
     try {
@@ -690,6 +777,31 @@ export const verifyTaskSubmission = async (submissionId) => {
         console.error("Socket notification failed:", socketError.message);
     }
 
+    let userMessage = "Your task was approved";
+    let userType = "generic";
+
+    if (foundTaskType === "Meal") {
+        userType = "meal_approved";
+        userMessage = "Meal marked as approved by Dietitian";
+    } else if (foundTaskType === "Workout") {
+        userMessage = "Workout marked as approved by Trainer";
+    } else if (foundTaskType === "Therapy") {
+        userMessage = "Therapy marked as approved by Therapist";
+    }
+
+    await safeCreateNotification({
+        type: userType,
+        message: userMessage,
+        recipientRole: "user",
+        recipientId: userSubmission.userId,
+        metadata: {
+            submissionId: userSubmission._id,
+            globalDayIndex: foundGlobalDayIndex,
+            exerciseIndex: foundExerciseIndex,
+            taskType: foundTaskType
+        }
+    });
+
     return { success: true, message: "Task verified" };
 };
 
@@ -702,6 +814,7 @@ export const rejectTaskSubmission = async (submissionId, comment) => {
 
     let foundGlobalDayIndex = null;
     let foundExerciseIndex = null;
+    let foundTaskType = "task";
 
     // Find the rejected task and its globalDayIndex
     userSubmission.dailySubmissions.forEach(day => {
@@ -709,6 +822,7 @@ export const rejectTaskSubmission = async (submissionId, comment) => {
         if (ex) {
             foundGlobalDayIndex = day.globalDayIndex;
             foundExerciseIndex = ex.exerciseIndex;
+            foundTaskType = ex.taskType || "task";
         }
     });
 
@@ -737,7 +851,10 @@ export const rejectTaskSubmission = async (submissionId, comment) => {
     await userSubmission.save();
 
     // Notify Experts and Admins via Socket
-    await notifyExpertsAndAdmins(userSubmission.userId, userSubmission._id, "task_updated", { status: "rejected" });
+    await notifyExpertsAndAdmins(userSubmission.userId, userSubmission._id, "task_updated", {
+        status: "rejected",
+        taskType: foundTaskType
+    });
 
     // Notify the specific client
     try {
@@ -751,6 +868,31 @@ export const rejectTaskSubmission = async (submissionId, comment) => {
     } catch (socketError) {
         console.error("Socket notification failed:", socketError.message);
     }
+
+    const trimmedComment = String(comment || "").trim();
+    let userType = "feedback_received";
+    let userMessage = trimmedComment
+        ? `Task feedback: ${trimmedComment}`
+        : "Your task needs an update";
+
+    if (foundTaskType === "Meal") {
+        userType = "diet_feedback";
+        userMessage = trimmedComment || "Dietitian left feedback on your meal";
+    }
+
+    await safeCreateNotification({
+        type: userType,
+        message: userMessage,
+        recipientRole: "user",
+        recipientId: userSubmission.userId,
+        metadata: {
+            submissionId: userSubmission._id,
+            globalDayIndex: foundGlobalDayIndex,
+            exerciseIndex: foundExerciseIndex,
+            taskType: foundTaskType,
+            comment: trimmedComment || undefined
+        }
+    });
 
     return { success: true, message: "Task rejected" };
 };
