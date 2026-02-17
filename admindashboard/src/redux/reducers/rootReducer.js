@@ -11,7 +11,7 @@ import categoryReducer from "../features/category/category.slice"
 import therapyReducer from "../features/therapy/therapy.slice"
 import headReducer from "../features/head/head.slice"
 import workoutReducer from "../features/workout/workout.slice"
-import payrollReducer from "../features/payroll/payroll.slice"
+import payrollReducer from "../features/incentive/incentive.slice"
 import founderReducer from "../features/founder/founder.slice"
 import financeReducer from "../features/finance/finance.slice"
 import taskReducer from "../features/tasks/task.slice";

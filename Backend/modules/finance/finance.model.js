@@ -4,7 +4,7 @@ const payrollSchema = new mongoose.Schema(
   {
     employeeType: {
       type: String,
-      enum: ["Head", "Admin", "Expert"],
+      enum: ["Head", "Admin", "Coach"],
       required: true,
     },
 
