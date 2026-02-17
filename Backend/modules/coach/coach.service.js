@@ -1,6 +1,6 @@
 import { generatePassword, hashPassword } from "../../utils/password.js";
 import { AdminModel } from "../admin/admin.model.js";
-import { calculateRatingIncentive } from "../payroll/payroll.service.js";
+import { calculateRatingIncentive } from "../incentive/incentive.service.js";
 import { CoachModel } from "./coach.model.js";
 import User from "../auth/auth.model.js";
 import mongoose from "mongoose";

@@ -8,7 +8,7 @@ import therapyRouts from "../modules/therapy/therapy.route.js"
 import adminRoutes from "../modules/admin/admin.routes.js"
 import headRouts from "../modules/Heads/heads.route.js"
 import categoryRouts from "../modules/category/category.routes.js"
-import payrollRouts from "../modules/payroll/payroll.route.js"
+import incentiveRouts from "../modules/incentive/incentive.route.js";
 import planRoutes from "../modules/plan/plan.route.js"
 import founderRoutes from "../modules/founder/founder.routes.js"
 import financeRoutes from "../modules/finance/finance.route.js"
@@ -28,7 +28,7 @@ router.use("/therapy", therapyRouts);
 router.use("/admin", adminRoutes)
 router.use("/heads", headRouts);
 router.use("/category", categoryRouts);
-router.use("/payroll", payrollRouts);
+router.use("/incentive", incentiveRouts);
 router.use("/plans", planRoutes)
 router.use("/founder", founderRoutes)
 router.use("/finance", financeRoutes)

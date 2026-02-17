@@ -7,7 +7,7 @@ import { AdminModel } from "../../modules/admin/admin.model.js";
 import { HeadsModel } from "../Heads/heads.modal.js";
 import { CoachModel } from "../coach/coach.model.js";
 import { FounderModel } from "../../seeds/createAdmin.js";
-import { calculateExtraClientIncentive } from "../payroll/payroll.service.js";
+import { calculateExtraClientIncentive } from "../incentive/incentive.service.js";
 import { sendEmail } from "../../utils/email.js";
 import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 

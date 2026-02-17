@@ -1,6 +1,7 @@
 import { AdminModel } from "../admin/admin.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import { HeadsModel } from "../Heads/heads.modal.js";
+import { calculateExtraClientIncentive, calculateRatingIncentive } from "../incentive/incentive.service.js";
 import { PayrollModel } from "./finance.model.js";
 
 export const allEmployees = async (page, limit) => {
@@ -71,66 +72,58 @@ export const allEmployees = async (page, limit) => {
 
 export const generateMonthlyPayroll = async () => {
   try {
-    const now = new Date();
-    const month = now.getMonth() + 1; 
+    const now = new Date(2025, 6, 1);
+    const month = now.getMonth() + 1;
     const year = now.getFullYear();
 
-    const alreadyGenerated = await PayrollModel.findOne({ month, year });
-    if (alreadyGenerated) {
-      console.log("Payroll already generated for this month.");
-      return;
-    }
+    const alreadyGenerated = await PayrollModel.exists({ month, year });
+    if (alreadyGenerated) return;
 
     const heads = await HeadsModel.find().lean();
     const admins = await AdminModel.find().lean();
     const coaches = await CoachModel.find().lean();
 
     const allEmployees = [
-      ...heads.map((h) => ({
-        ...h,
-        type: "Head",
-      })),
-      ...admins.map((a) => ({
-        ...a,
-        type: "Admin",
-      })),
-      ...coaches.map((c) => ({ ...c, type: "Expert" })),
+      ...heads.map((h) => ({ ...h, type: "Head" })),
+      ...admins.map((a) => ({ ...a, type: "Admin" })),
+      ...coaches.map((c) => ({ ...c, type: "Coach" })),
     ];
 
     for (let emp of allEmployees) {
-      const baseSalary = emp.salary || 0;
-      const extraClientIncentive = emp.extraClientIncentive || 0;
-      const ratingIncentive = emp.ratingIncentiveAmount || 0;
-      const incentive = emp.incentives || 0;
+      let updatedEmp = emp;
+
+      if (emp.type === "Coach") {
+        await calculateRatingIncentive(emp._id);
+        await calculateExtraClientIncentive(emp._id);
+        const freshCoach = await CoachModel.findById(emp._id).lean();
+        updatedEmp = { ...freshCoach, type: "Coach" };
+      }
+
+      const baseSalary = updatedEmp.salary || 0;
+      const extraClientIncentive = updatedEmp.extraClientIncentive || 0;
+      const ratingIncentive = updatedEmp.ratingIncentiveAmount || 0;
+      const incentive = updatedEmp.incentives || 0;
       const netSalary = baseSalary + incentive;
 
-      await PayrollModel.updateOne(
-        {
-          employeeId: emp._id,
-          employeeType: emp.type,
-          month,
-          year,
-        },
-        {
-          employeeId: emp._id,
-          employeeType: emp.type,
-          month,
-          year,
-          extraClientIncentive,
-          ratingIncentive,
-          baseSalary,
-          incentive,
-          netSalary,
-        },
-        { upsert: true },
-      );
+      await PayrollModel.create({
+        employeeId: updatedEmp._id,
+        employeeType: updatedEmp.type,
+        month,
+        year,
+        baseSalary,
+        ratingIncentive,
+        extraClientIncentive,
+        incentive,
+        netSalary,
+      });
     }
-
     return "Payroll generated successfully";
+    
   } catch (error) {
     throw error;
   }
 };
+
 
 export const getPayrollHistoryById = async (employeeId, page, limit) => {
   try {
