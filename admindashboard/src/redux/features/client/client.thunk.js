@@ -190,5 +190,33 @@ export const getClientsWithHabitPlanThunk = createAsyncThunk(
   }
 );
 
+export const deleteClient = createAsyncThunk(
+  "client/deleteClient",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.delete(`/clients/delete-client/${id}`);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete client"
+      );
+    }
+  }
+);
+
+export const updateClient = createAsyncThunk(
+  "client/updateClient",
+  async ({ id, values }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.post(`/clients/update-client/${id}`, values);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update client"
+      );
+    }
+  }
+);
+
 
 

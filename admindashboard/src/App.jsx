@@ -70,9 +70,13 @@ import AdminClientsTable from "./pages/admin/clients/ClientsTable";
 import AdminExpertTable from "./pages/admin/experts/ExpertTable";
 import AdminFinance from "./pages/admin/finance/FinanceTable";
 import AdminAddExpert from "./pages/admin/experts/ExpertForm";
+import AdminExpertEdit from "./pages/admin/experts/ExpertEditForm";
+import AdminExpertDelete from "./pages/admin/experts/ExpertDeletePopUp";
 import AdminExpertProfile from "./pages/admin/experts/ExpertProfile";
 import AdminClientProfile from "./pages/admin/clients/ClientProfile";
 import AdminAddClient from "./pages/admin/clients/ClientForm";
+import AdminClientEdit from "./pages/admin/clients/ClientEditForm";
+import AdminClientDelete from "./pages/admin/clients/ClientDeletePopUp";
 import AdminProgramTable from "./pages/admin/programsList/ProgramTable";
 import PlanForm from "./pages/admin/programsList/PlanForm";
 import AdminPlanView from "./pages/admin/programsList/PlanDetailsView";
@@ -249,14 +253,16 @@ function App() {
           <Route path="clients" element={<AdminClientsTable />} />
           <Route path="experts" element={<AdminExpertTable />} />
           <Route path="chats" element={<AdminChats />} />
-          <Route path="finance" element={<AdminFinance />} />
-          <Route path="experts/addexpert" element={<AdminAddExpert />} />
+          <Route path="experts/edit/:id" element={<AdminExpertEdit />} />
+          <Route path="experts/delete/:id" element={<AdminExpertDelete />} />
           <Route
             path="experts/profile/:expertId"
             element={<AdminExpertProfile />}
           />
           <Route path="clients/profile/:id" element={<AdminClientProfile />} />
           <Route path="clients/addclient" element={<AdminAddClient />} />
+          <Route path="clients/edit/:id" element={<AdminClientEdit />} />
+          <Route path="clients/delete/:id" element={<AdminClientDelete />} />
           <Route path="programs" element={<AdminProgramTable />} />
           <Route path="programs/create" element={<PlanForm />} />
           <Route path="programs/plans" element={<AdminPlanView />} />
