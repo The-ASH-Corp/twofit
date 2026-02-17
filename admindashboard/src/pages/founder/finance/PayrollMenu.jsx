@@ -1,8 +1,8 @@
-import { selectPayroll } from "@/redux/features/payroll/payroll.selector";
+import { selectPayroll } from "@/redux/features/incentive/incentive.selector";
 import {
   createPayroll,
   getPayroll,
-} from "@/redux/features/payroll/payroll.thunk";
+} from "@/redux/features/incentive/incentive.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
 import React, { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
