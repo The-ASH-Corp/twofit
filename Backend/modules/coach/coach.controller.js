@@ -77,6 +77,17 @@ export const getCoachById = async (req, res) => {
 
 export const updateCoachById = async (req, res) => {
   try {
+
+    // Handle file uploads
+    if (req.files) {
+      if (req.files.certifications && req.files.certifications[0]) {
+        req.body.certifications = "/uploads/" + req.files.certifications[0].filename;
+      }
+      if (req.files.photo && req.files.photo[0]) {
+        req.body.photo = "/uploads/" + req.files.photo[0].filename;
+      }
+    }
+
     const { coachId } = req.params;
     const updatedData = req.body;
 
