@@ -255,6 +255,7 @@ function App() {
           <Route path="chats" element={<AdminChats />} />
           <Route path="experts/edit/:id" element={<AdminExpertEdit />} />
           <Route path="experts/delete/:id" element={<AdminExpertDelete />} />
+          <Route path="experts/addexpert" element={<AdminAddExpert />} />
           <Route
             path="experts/profile/:expertId"
             element={<AdminExpertProfile />}
@@ -268,6 +269,7 @@ function App() {
           <Route path="programs/plans" element={<AdminPlanView />} />
           <Route path="profile" element={<Profile />} />
           <Route path="therapy" element={<AdminTherapyList />} />
+          <Route path="finance" element={<AdminFinance />} />
           <Route
             path="therapy/plan/:id"
             element={<AdminTherapyPlanDetails />}
@@ -286,7 +288,7 @@ function App() {
           <Route index element={<ExpertDashboard />} />
           <Route path="clients" element={<ExpertClientsTable />} />
           <Route path="clients/profile/:id" element={<ExpertClientProfile />} />
-          <Route path="weekly-habit" element={<WeeklyHabit/>}/>
+          <Route path="weekly-habit" element={<WeeklyHabit />} />
           <Route path="chats" element={<ExpertChats />} />
           <Route path="programs" element={<ExpertPrograms />} />
           <Route path="programs/viewPlan" element={<ExpertPlanDetails />} />
@@ -299,11 +301,8 @@ function App() {
             element={<ExpertTherapyPlanDetails />}
           />
           {/* <Route path="habit" element={<Habit/>}/> */}
-          <Route path="clients/add-habit/:id" element={<Habit/>}/>
-          <Route path="clients/habit/:habitId" element={<HabitDisplay/>}/>
-
-
-         
+          <Route path="clients/add-habit/:id" element={<Habit />} />
+          <Route path="clients/habit/:habitId" element={<HabitDisplay />} />
         </Route>
 
         {/* CLIENT */}

@@ -74,16 +74,7 @@ export default function ExpertEditForm() {
       section: "Role Assignment",
       position: "left",
       fields: [
-        {
-          name: "role",
-          label: "Choose Role",
-          type: "select",
-          options: [
-            { label: "Trainer", value: "Trainer" },
-            { label: "Dietician", value: "Dietician" },
-            { label: "Therapist", value: "Therapist" },
-          ],
-        },
+        
         {
           name: "specialization",
           label: "Specialization",
