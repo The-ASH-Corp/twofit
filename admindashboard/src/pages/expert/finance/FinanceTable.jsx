@@ -16,8 +16,8 @@ export default function FinanceTable() {
       const user = useSelector(selectUser);
 
     useEffect(() => {
-      dispatch(getAllEmployeeHistory({ id: user._id, page, limit }));
-    }, [dispatch, page, limit, user._id]);
+      dispatch(getAllEmployeeHistory({ id: user?._id, page, limit }));
+    }, [dispatch, page, limit, user?._id]);
 
     const data = useAppSelector(selectEmployeeHistory);
     const count = useAppSelector(selectEmployeeHistoryCount);

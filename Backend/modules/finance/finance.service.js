@@ -72,7 +72,7 @@ export const allEmployees = async (page, limit) => {
 
 export const generateMonthlyPayroll = async () => {
   try {
-    const now = new Date(2025, 6, 1);
+    const now = new Date();
     const month = now.getMonth() + 1;
     const year = now.getFullYear();
 

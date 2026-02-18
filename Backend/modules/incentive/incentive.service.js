@@ -91,8 +91,8 @@ export const updatePayroll = async (payroll) => {
   );
 
   for (const coach of coaches) {
-    await calculateExtraClientIncentive(coach._id);
     await calculateRatingIncentive(coach._id);
+    await calculateExtraClientIncentive(coach._id);
   }
 
   return updatedPayroll;
