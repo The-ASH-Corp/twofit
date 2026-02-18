@@ -16,7 +16,10 @@ router.get("/founder/list/:page/:limit", authMiddleware, coachController.getFoun
 router.post("/get-coaches-by-admin", authMiddleware, coachController.getCoachesByAdmin); //get all coach details of that admin by giving coach ids
 router.put("/assign", authMiddleware, coachController.AssignCoachToUser);
 router.get("/get-coach/:coachId", authMiddleware, coachController.getCoachById);
-router.put("/update/:coachId", authMiddleware, coachController.updateCoachById);
+router.put("/update/:coachId", authMiddleware, uploader.fields([
+  { name: "certifications", maxCount: 1 },
+  { name: "photo", maxCount: 1 }
+]), coachController.updateCoachById);
 router.delete("/delete/:coachId", authMiddleware, coachController.deleteCoachById);
 router.get("/assigned-users/:coachId/:page/:limit", authMiddleware, coachController.getUsersAssignedToACoach);
 

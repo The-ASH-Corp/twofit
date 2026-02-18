@@ -70,8 +70,8 @@ import AdminClientsTable from "./pages/admin/clients/ClientsTable";
 import AdminExpertTable from "./pages/admin/experts/ExpertTable";
 import AdminFinance from "./pages/admin/finance/FinanceTable";
 import AdminAddExpert from "./pages/admin/experts/ExpertForm";
-// import AdminExpertEdit from "./pages/admin/experts/ExpertEditForm";
-// import AdminExpertDelete from "./pages/admin/experts/ExpertDeletePopUp";
+import AdminExpertEdit from "./pages/admin/experts/ExpertEditForm";
+import AdminExpertDelete from "./pages/admin/experts/ExpertDeletePopUp";
 import AdminExpertProfile from "./pages/admin/experts/ExpertProfile";
 import AdminClientProfile from "./pages/admin/clients/ClientProfile";
 import AdminAddClient from "./pages/admin/clients/ClientForm";
@@ -253,8 +253,8 @@ function App() {
           <Route path="clients" element={<AdminClientsTable />} />
           <Route path="experts" element={<AdminExpertTable />} />
           <Route path="chats" element={<AdminChats />} />
-          {/* <Route path="experts/edit/:id" element={<AdminExpertEdit />} />
-          <Route path="experts/delete/:id" element={<AdminExpertDelete />} /> */}
+          <Route path="experts/edit/:id" element={<AdminExpertEdit />} />
+          <Route path="experts/delete/:id" element={<AdminExpertDelete />} />
           <Route path="experts/addexpert" element={<AdminAddExpert />} />
           <Route
             path="experts/profile/:expertId"

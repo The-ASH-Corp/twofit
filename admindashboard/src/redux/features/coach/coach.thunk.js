@@ -153,3 +153,42 @@ export const getCoachRatingGraph = createAsyncThunk(
     }
   },
 );
+
+export const deleteCoach = createAsyncThunk(
+  "coach/deleteCoach",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.delete(`/coach/delete/${id}`);
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete coach"
+      );
+    }
+  }
+);
+
+export const updateCoach = createAsyncThunk(
+  "coach/updateCoach",
+  async ({ id, values }, { rejectWithValue }) => {
+    console.log(values);
+    
+    try {
+      const config =
+        values instanceof FormData
+          ? {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+          : {};
+
+      const data = await axiosInstance.put(`/coach/update/${id}`, values, config);
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update coach"
+      );
+    }
+  }
+);
