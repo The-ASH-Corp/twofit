@@ -4,6 +4,8 @@ const expertColors = {
   Trainer: "bg-[#EBF2FE] text-black",
 };
 
+import ActionMenu from "@/components/actionMenu/ActionMenu";
+
 const statusColors = {
   Active: "bg-[#45C4A2] text-white",
   Inactive: "bg-[#66706D] text-white",
@@ -47,28 +49,6 @@ export const ExpertColumns = [
      { accessorKey: "specialization", header: "Specialisation" },
 
   { accessorKey: "clients", header: "Clients" },
- 
-//   {
-//     accessorKey: "experts",
-//     header: "Experts",
-//     cell: ({ row }) => (
-//       <div className="flex gap-2 flex-wrap">
-//         {row.original.experts.map((exp) => {
-//           const colorClass =
-//             expertColors[exp] || "bg-gray-100 text-gray-700 border";
-
-//           return (
-//             <span
-//               key={exp}
-//               className={`px-2 py-1 text-[11px] rounded-sm ${colorClass}`}
-//             >
-//               {exp}
-//             </span>
-//           );
-//         })}
-//       </div>
-//     ),
-//   },
   { accessorKey: "maxClient", header: "Maximum Limit" },
   { accessorKey: "rating", header: "Rating" },
   { accessorKey: "responseTime", header: "Response Time" },
@@ -87,5 +67,15 @@ export const ExpertColumns = [
       );
     },
   },
-  { id: "actions", header: "Action", cell: () => "⋯" },
+  {
+    id: "actions",
+    header: "Action",
+    cell: ({ row }) => (
+      <ActionMenu
+        row={row}
+        editActionPath="/admin/experts/edit/"
+        deleteActionPath="/admin/experts/delete/"
+      />
+    ),
+  },
 ];
