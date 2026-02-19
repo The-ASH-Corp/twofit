@@ -1,6 +1,7 @@
 import * as planService from "./plan.service.js";
 
 export const createNewPlan = async (req, res) => {
+
   try {
     const plan = await planService.createPlan(req.body);
     res.status(201).json({
@@ -50,6 +51,43 @@ export const getPlanByProgramId = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const updatePlan = async (req, res) => {
+  try {
+    const { planId } = req.params;
+    const updateData = req.body;
+    
+    // Check if plan exists (or just rely on update result)
+    // Assuming planService.updatePlan handles non-existent gracefully or we check here
+    
+    const updated = await planService.updatePlan(planId, updateData);
+    if (!updated) {
+        return res.status(404).json({ success: false, message: "Plan not found" });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Plan updated successfully",
+      data: updated,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const deletePlan = async (req, res) => {
+  try {
+    const { planId } = req.params;
+    await planService.deletePlan(planId);
+    res.status(200).json({
+      success: true,
+      message: "Plan deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 
 export const uploadMedia = async (req, res) => {
   try {

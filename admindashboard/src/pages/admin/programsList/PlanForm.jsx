@@ -1,5 +1,5 @@
-import React, { useState, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useRef, useEffect } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   ChevronDown,
   ChevronUp,
@@ -15,6 +15,8 @@ import { useDispatch } from "react-redux";
 import {
   createNewPlan,
   uploadPlanMedia,
+  getPlanByProgramId,
+  updatePlan
 } from "@/redux/features/plans/plan.thunk";
 import { toast } from "react-toastify";
 
@@ -22,11 +24,7 @@ export default function PlanForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
-
-  const [programDetails, setProgramDetails] = useState({
-    name: location.state?.title || "", // Initialize with program name from location
-    duration: "30 Days",
-  });
+  const { programId: routeProgramId } = useParams();
 
   const [weeks, setWeeks] = useState([
     {
@@ -50,6 +48,57 @@ export default function PlanForm() {
       ],
     },
   ]);
+
+  const [programDetails, setProgramDetails] = useState({
+    name: location.state?.title || "", 
+    duration: "30 Days",
+    clients: []
+  });
+  
+  const [existingPlanId, setExistingPlanId] = useState(null);
+
+  useEffect(() => {
+    if (routeProgramId) {
+      const fetchPlan = async () => {
+        try {
+          // Fetch existing plan
+          const response = await dispatch(getPlanByProgramId(routeProgramId)).unwrap();
+          
+          if (response) {
+            // Store existing plan ID for update
+            setExistingPlanId(response._id);
+            setProgramDetails({
+               name: response.name,
+               duration: response.duration,
+               clients: response.clients || []
+            });
+
+            // Map weeks/days structure
+            if (response.weeks) {
+               const mappedWeeks = response.weeks.map((w, i) => ({
+                   ...w,
+                   id: i + 1, // Ensure numeric ID for UI logic
+                   expanded: i === 0,
+                   days: w.days.map((d, di) => ({
+                       ...d,
+                       id: di + 1,
+                       expanded: di === 0,
+                       exercises: (d.exercises || []).map(ex => ({ ...ex, id: ex._id || String(Date.now() + Math.random()) }))
+                   }))
+               }));
+               setWeeks(mappedWeeks);
+            }
+          }
+        } catch (error) {
+           console.error("Error fetching plan:", error);
+           toast.error("Could not load plan for editing");
+        }
+      };
+      
+      fetchPlan();
+    }
+  }, [routeProgramId, dispatch]);
+  
 
   const toggleWeek = (id) => {
     setWeeks(
@@ -204,32 +253,47 @@ export default function PlanForm() {
   };
 
   const handleSave = async () => {
-    const cleanedWeeks = weeks.map((week) => ({
-      name: week.name,
-      title: week.title,
-      days: week.days.map((day) => ({
-        name: day.name,
-        exercises: (day.exercises || []).map((ex) => {
-          const { id, ...rest } = ex;
-          return rest;
-        }),
-      })),
-    }));
+    try {
+      const cleanedWeeks = weeks.map((week) => ({
+        name: week.name,
+        title: week.title,
+        days: week.days.map((day) => ({
+          name: day.name,
+          exercises: (day.exercises || []).map((ex) => {
+            const { id, ...rest } = ex;
+            return rest;
+          }),
+        })),
+      }));
 
-    const payload = {
-      name: programDetails.name,
-      duration: programDetails.duration,
-      program: location.state?.programId,
-      weeks: cleanedWeeks,
-    };
+      const planData = {
+        name: programDetails.name,
+        duration: programDetails.duration,
+        program: location.state?.programId || routeProgramId,
+        weeks: cleanedWeeks,
+      };
 
-    const data = await dispatch(createNewPlan(payload));
-
-    if (data.meta.requestStatus === "fulfilled") {
-      toast.success("Plan created successfully");
-      navigate(-1);
-    } else {
-      toast.error("Failed to create plan");
+      let response;
+      if (existingPlanId) {
+          // Update Mode
+          response = await dispatch(updatePlan({ planId: existingPlanId, planData })).unwrap();
+          if (response) {
+            toast.success("Plan updated successfully!");
+            navigate(-1);
+          }
+      } else {
+          // Create Mode
+          const data = await dispatch(createNewPlan(planData));
+          if (data.meta.requestStatus === "fulfilled") {
+            toast.success("Plan created successfully");
+            navigate(-1);
+          } else {
+             throw new Error("Failed to create plan");
+          }
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.message || "Failed to save plan");
     }
   };
   return (
@@ -271,9 +335,9 @@ export default function PlanForm() {
           </div>
         </div>
 
-        {/* Create Plan Structure Header */}
+        {/* Create/Edit Plan Structure Header */}
         <h2 className="text-lg font-bold text-[#0A4F48]">
-          Create Plan Structure
+          {existingPlanId ? "Edit Plan Structure" : "Create Plan Structure"}
         </h2>
 
         {/* Weeks List */}
@@ -289,13 +353,15 @@ export default function PlanForm() {
                   {week.name}
                 </h3>
                 <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => removeWeek(week.id)}
-                    className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
-                    title="Remove Week"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                  {(!programDetails.clients || programDetails.clients.length === 0) && (
+                    <button
+                      onClick={() => removeWeek(week.id)}
+                      className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
+                      title="Remove Week"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
                   <button
                     onClick={() => toggleWeek(week.id)}
                     className="p-1.5 bg-[#F8F9FA] hover:bg-gray-100 rounded-lg text-[#66706D]"
@@ -338,13 +404,15 @@ export default function PlanForm() {
                             {day.name}
                           </span>
                           <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => removeDay(week.id, day.id)}
-                              className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
-                              title="Remove Day"
-                            >
-                              <Trash2 size={16} />
-                            </button>
+                            {(!programDetails.clients || programDetails.clients.length === 0) && (
+                              <button
+                                onClick={() => removeDay(week.id, day.id)}
+                                className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
+                                title="Remove Day"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            )}
                             <button
                               onClick={() => toggleDay(week.id, day.id)}
                               className="p-1.5 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg text-[#66706D]"
@@ -364,6 +432,7 @@ export default function PlanForm() {
                             <PlanSection
                               title="Workout Plan"
                               type="Workout"
+                              isAssigned={programDetails.clients && programDetails.clients.length > 0}
                               exercises={day.exercises || []}
                               onAddExercise={(exercise) =>
                                 addExercise(week.id, day.id, exercise)
@@ -418,7 +487,7 @@ export default function PlanForm() {
                 onClick={handleSave}
                 className="bg-[#0A4F48] p-2 rounded-md text-white min-w-[120px]"
               >
-                Save & Add Plan
+                {existingPlanId ? "Update Plan" : "Save & Add Plan"}
               </button>
             </div>
           </div>
@@ -436,6 +505,7 @@ const PlanSection = ({
   onAddExercise,
   onUpdateExercise,
   onRemoveExercise,
+  isAssigned,
 }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [editingId, setEditingId] = useState(null);
@@ -702,6 +772,7 @@ const PlanSection = ({
                   key={ex.id}
                   name={ex.name}
                   checked={true}
+                  isAssigned={isAssigned}
                   onEdit={() => handleEditClick(ex)}
                   onRemove={() => onRemoveExercise(ex.id)}
                 />
@@ -737,7 +808,7 @@ const InputGroup = ({
   </div>
 );
 
-const ExistingItem = ({ name, checked, onRemove, onEdit }) => {
+const ExistingItem = ({ name, checked, onRemove, onEdit, isAssigned }) => {
   const [showMenu, setShowMenu] = useState(false);
 
   return (
@@ -779,16 +850,18 @@ const ExistingItem = ({ name, checked, onRemove, onEdit }) => {
               <Edit2 size={12} />
               Edit
             </button>
-            <button
-              onClick={() => {
-                onRemove();
-                setShowMenu(false);
-              }}
-              className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-500 hover:bg-red-50 rounded-md w-full text-left"
-            >
-              <Trash2 size={12} />
-              Delete
-            </button>
+            {!isAssigned && (
+              <button
+                onClick={() => {
+                  onRemove();
+                  setShowMenu(false);
+                }}
+                className="flex items-center gap-2 px-3 py-2 text-xs font-medium text-red-500 hover:bg-red-50 rounded-md w-full text-left"
+              >
+                <Trash2 size={12} />
+                Delete
+              </button>
+            )}
           </div>
         )}
       </div>

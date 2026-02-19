@@ -1,23 +1,59 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ChevronDown, ChevronUp, MoreHorizontal, Edit, Trash2 } from "lucide-react";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useDispatch } from "react-redux";
-import { getPlanByProgramId } from "@/redux/features/plans/plan.thunk";
+import { getPlanByProgramId, deletePlan } from "@/redux/features/plans/plan.thunk";
+import { toast } from 'react-toastify';
 
 export default function PlanDetailsView() {
   const location = useLocation();
+  const navigate = useNavigate();
   const planData = location.state;
-
   const dispatch = useDispatch();
 
   const [weeks, setWeeks] = useState([]);
+  const [planId, setPlanId] = useState(null);
   const [programDetails, setProgramDetails] = useState(null);
+  const [showMenu, setShowMenu] = useState(false);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const closeMenu = () => setShowMenu(false);
+    if (showMenu) {
+      window.addEventListener('click', closeMenu);
+    }
+    return () => window.removeEventListener('click', closeMenu);
+  }, [showMenu]);
+
+  const handleEdit = (e) => {
+    e.stopPropagation();
+    if (planData?.programId) {
+      navigate(`/admin/programs/plan/edit/${planData.programId}`);
+    }
+  };
+
+
+  const handleDelete = async (e) => {
+    e.stopPropagation();
+    if (planId) {
+      if(window.confirm("Are you sure you want to delete this plan?")) {
+        try {
+          await dispatch(deletePlan(planId)).unwrap();
+          toast.success("Plan deleted successfully");
+          navigate("/admin/programs"); 
+        } catch (error) {
+          toast.error(error.message || "Failed to delete plan");
+        }
+      }
+    }
+  };
 
   const fetchPlanById = async () => {
     const data = await dispatch(getPlanByProgramId(planData?.programId));
     if (data.payload) {
+      setPlanId(data.payload._id);
       // Collect all unique media from exercises
       const allMedia = new Map();
       
@@ -158,9 +194,45 @@ export default function PlanDetailsView() {
         </div>
 
         {/* Weekly Plan Structure Header */}
-        <h2 className="text-lg font-bold text-[#0A4F48]">
-          Weekly Plan Structure
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-[#0A4F48]">
+            Weekly Plan Structure
+          </h2>
+          
+          <div className="relative">
+            <button 
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMenu(!showMenu);
+              }}
+            >
+              <MoreHorizontal size={20} className="text-[#66706D]" />
+            </button>
+            
+            {showMenu && (
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-10 overflow-hidden">
+                <button 
+                  onClick={handleEdit}
+                  className="w-full text-left px-4 py-2.5 text-sm text-[#011412] hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <Edit size={16} />
+                  Edit Plan
+                </button>
+                
+                {(!programDetails?.clients || programDetails.clients.length === 0) && (
+                  <button 
+                    onClick={handleDelete}
+                    className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 border-t border-gray-50"
+                  >
+                    <Trash2 size={16} />
+                    Delete Plan
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
 
         {/* Weeks List */}
         <div className="flex flex-col gap-4">
