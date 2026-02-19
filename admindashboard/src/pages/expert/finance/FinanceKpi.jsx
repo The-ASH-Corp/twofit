@@ -1,11 +1,16 @@
 import { assets } from '@/assets/asset'
 import KpiCard from '@/components/cards/KpiCard'
 import { selectUser } from '@/redux/features/auth/auth.selectores';
-import React from 'react'
-import { useSelector } from 'react-redux';
+import { refreshProfile } from '@/redux/features/auth/auth.thunk';
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux';
 
 export default function FinanceKpi() {
+  const dispatch = useDispatch();
   const user = useSelector(selectUser);
+  useEffect(() => {
+    dispatch(refreshProfile({ id: user?._id, role: user?.role }));
+  }, [dispatch, user?._id, user?.role]);
   const netSalary = user?.salary + user?.incentives;
   return (
     <div className=" bg-white p-5 rounded-xl mb-4 space-y-4">

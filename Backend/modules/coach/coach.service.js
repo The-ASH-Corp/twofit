@@ -197,6 +197,51 @@ export const getCoachById = async (coachId) => {
 };
 
 export const updateCoachById = async (coachId, updatedData) => {
+  const fieldsToParseAsJSON = [
+    "workingHours",
+    "breakSlots",
+    "workingDays", 
+    "specialization",
+    "chooseProgram",
+    "chooseTherapy",
+    "languages",
+  ];
+
+  const booleanFields = [
+    "autoSendWelcome",
+    "autoSendGuide",
+    "automatedReminder",
+  ];
+
+  // Parse JSON strings if present in updatedData
+  fieldsToParseAsJSON.forEach((field) => {
+    if (updatedData[field] && typeof updatedData[field] === "string") {
+      try {
+        updatedData[field] = JSON.parse(updatedData[field]);
+      } catch (e) {
+        console.error(`Failed to parse ${field}:`, e);
+      }
+    }
+  });
+
+  // Convert boolean strings to actual booleans if present
+  booleanFields.forEach((field) => {
+    if (updatedData[field] !== undefined) {
+      updatedData[field] = updatedData[field] === "true" || updatedData[field] === true;
+    }
+  });
+  
+  // Transform fields to match schema
+  if (updatedData.chooseProgram) {
+    updatedData.assignedPrograms = updatedData.chooseProgram;
+    delete updatedData.chooseProgram;
+  }
+  if (updatedData.chooseTherapy) {
+    updatedData.assignedTherapy = updatedData.chooseTherapy;
+    delete updatedData.chooseTherapy;
+  }
+
+
   return await CoachModel.updateOne({ _id: coachId }, { $set: updatedData });
 };
 
