@@ -1,5 +1,5 @@
 import BaseForm from '@/components/form/BaseForm';
-import { selectAllCategories } from '@/redux/features/category/category.selector';
+// import { selectAllCategories } from '@/redux/features/category/category.selector';
 import { getAllCategories } from '@/redux/features/category/category.thunk';
 import { selectProgramById, selectProgramStatus } from '@/redux/features/program/program.selector';
 import { clearSelectedProgram } from '@/redux/features/program/program.slice';
@@ -28,7 +28,7 @@ const ProgramEditForm = () => {
     
 
   
-    const data = useAppSelector(selectAllCategories);
+    // const data = useAppSelector(selectAllCategories);
   
     const fields = [
       {
@@ -37,15 +37,15 @@ const ProgramEditForm = () => {
         fields: [
           { name: "title", label: "Program Name", type: "text" },
           
-          {
-            name: "category",
-            label: "Choose Your Category",
-            type: "select",
-            options:data?.data?.map((items) => ({
-              label: items.name,
-              value: items?._id,
-            })),
-          },
+          // {
+          //   name: "category",
+          //   label: "Choose Your Category",
+          //   type: "select",
+          //   options:data?.data?.map((items) => ({
+          //     label: items.name,
+          //     value: items?._id,
+          //   })),
+          // },
           {
             name: "duration",
             label: "Duration",
