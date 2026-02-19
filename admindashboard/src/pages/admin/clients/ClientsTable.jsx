@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import BaseTable from "../../../components/table/BaseTable";
-import { ClientColumns } from "./ClientColumns";
+import { getClientColumns } from "./ClientColumns";
 import { useDispatch } from "react-redux";
+
 import { useAppSelector } from "@/redux/store/hooks";
 import {
   selectClientStatus,
@@ -39,7 +40,10 @@ export default function ClientsTable() {
     setClientsLength(client.total);
   };
 
+  const columns = useMemo(() => getClientColumns(fetchClientData), [fetchClientData]);
+
   const navigate = useNavigate();
+
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -72,7 +76,7 @@ export default function ClientsTable() {
   return (
     <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
-        columns={ClientColumns}
+        columns={columns}
         data={filteredClients}
         actionLabel="Add Client"
         actionPath="/admin/clients/addclient"

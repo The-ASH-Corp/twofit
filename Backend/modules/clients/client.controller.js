@@ -20,17 +20,60 @@ export const getAllClients = async (req, res) => {
   }
 };
 
+
 export const getSingleClient = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // First fetch the client to check status
+    let client = await service.getSingleClient(id);
+    if (!client) {
+        return res.status(404).json({ success: false, message: "Client not found" });
+    }
+
+    if (client.status === "Inactive") {
+       // If inactive, just return the client data without syncing or advancing.
+       // The frontend should handle showing the "Coordinator Admin" message based on status.
+       return res.status(200).json({
+         success: true,
+         data: { ...client.toObject() }, 
+       });
+    }
+
+    if (client.status === "Completed") {
+        // If completed, just return. Frontend handles "Completed" view.
+        return res.status(200).json({
+            success: true,
+            data: { ...client.toObject() },
+        });
+    }
+
+    // Only sync if Active
     // Sync missed (no-submission) days and extend program end date if needed
     await syncMissedDaysForUser(id);
+
+    // Re-fetch in case sync updated the end date
+    client = await service.getSingleClient(id);
+
+    // Check if program expired
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const endDate = new Date(client.programEndDate);
+    // Ensure endDate is parsed correctly (it might be a string YYYY-MM-DD or full date)
+    
+    if (endDate < today && client.status === "Active") {
+         client = await service.updateOneClient({ status: "Completed" }, id);
+         return res.status(200).json({
+             success: true,
+             data: { ...client.toObject() },
+         });
+    }
 
     // Attempt to advance day if cooldown has expired
     await attemptDayAdvancement(id);
 
-    const client = await service.getSingleClient(id);
+    // Re-fetch final state
+    client = await service.getSingleClient(id);
 
     // Calculate next day unlock time if applicable
     let nextDayUnlockTime = null;
