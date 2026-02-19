@@ -253,8 +253,8 @@ function App() {
           <Route path="clients" element={<AdminClientsTable />} />
           <Route path="experts" element={<AdminExpertTable />} />
           <Route path="chats" element={<AdminChats />} />
-          <Route path="experts/edit/:id" element={<AdminExpertEdit />} />
-          <Route path="experts/delete/:id" element={<AdminExpertDelete />} />
+          <Route path="experts/edit/:id" element={<AdminExpertEdit />} /> 
+           <Route path="experts/delete/:id" element={<AdminExpertDelete />} /> 
           <Route
             path="experts/profile/:expertId"
             element={<AdminExpertProfile />}
