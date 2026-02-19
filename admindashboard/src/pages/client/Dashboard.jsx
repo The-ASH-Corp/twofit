@@ -76,6 +76,30 @@ export default function Dashboard() {
     return today >= start;
   }, [user?.programStartDate, clientUser?.programStartDate]);
 
+  const clientStatus = clientUser?.status || user?.status;
+
+  if (clientStatus === "Inactive") {
+    return (
+      <div className="flex flex-col items-center justify-center h-[80vh] text-center p-8 bg-white rounded-lg shadow-sm">
+        <h1 className="text-3xl font-bold text-gray-800 mb-4">Account Inactive</h1>
+        <p className="text-gray-600 text-lg">
+          You are currently inactive. Please contact the admin to reactivate your account and resume your program.
+        </p>
+      </div>
+    );
+  }
+
+  if (clientStatus === "Completed") {
+    return (
+      <div className="flex flex-col items-center justify-center h-[80vh] text-center p-8 bg-white rounded-lg shadow-sm">
+        <h1 className="text-3xl font-bold text-[#0A4F48] mb-4">Program Completed!</h1>
+        <p className="text-gray-600 text-lg">
+          Congratulations! You have successfully completed your program.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="w-full grid lg:grid-cols-[1fr_350px] grid-cols-1 gap-8 lg:p-2 p-4 lg:pb-2 pb-24">

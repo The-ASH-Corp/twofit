@@ -5,14 +5,10 @@
 // }
 
 import ActionMenu from "@/components/actionMenu/ActionMenu";
+import React from "react";
+import StatusCell from "./StatusCell";
 
-const statusColors = {
-  Active: "bg-[#45C4A2] text-white",
-  Inactive: "bg-[#66706D] text-white",
-  Suspended: "bg-[#FB5858] text-white",
-};
-
-export const ClientColumns = [
+export const getClientColumns = (onRefresh) => [
   {
     id: "select",
     header: ({ table }) => (
@@ -33,25 +29,14 @@ export const ClientColumns = [
     ),
   },
   { accessorKey: "name", header: "Client Name" },
-  // { accessorKey: "program", header: "Program" },
   { accessorKey: "duration", header: "Duration" },
 
   { accessorKey: "programStartDate", header: "Start Date" },
   { accessorKey: "programEndDate", header: "End Date" },
-  // {accessorKey:"compliance",header:"Compliance"},
   {
     accessorKey: "status",
     header: "Status",
-    cell: ({ row }) => {
-      const status = row.original.status;
-      const colorClass = statusColors[status] || "bg-gray-200 text-gray-700";
-
-      return (
-        <span className={`px-2 py-1 text-[11px] rounded-xl ${colorClass}`}>
-          {status}
-        </span>
-      );
-    },
+    cell: ({ row }) => <StatusCell row={row} onRefresh={onRefresh} />,
   },
   {
     id: "actions",

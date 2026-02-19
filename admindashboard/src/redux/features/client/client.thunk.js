@@ -90,6 +90,8 @@ export const getAllFeedbacks = createAsyncThunk(
 );
 
 
+
+
 export const updateWeightOfClient = createAsyncThunk("client/updateWeight", async ({ id, currentWeight }, { rejectWithValue }) => {
   try {
     const data = await axiosInstance.put(`clients/${id}/weight`, { currentWeight })
@@ -100,6 +102,25 @@ export const updateWeightOfClient = createAsyncThunk("client/updateWeight", asyn
     return rejectWithValue(error.response?.data?.message || "Failed to update weight")
   }
 })
+
+
+export const updateClientStatus = createAsyncThunk(
+  "client/updateClientStatus",
+  async ({ id, status }, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.post(`/clients/update-client/${id}`, {
+        status,
+      });
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update client status",
+      );
+    }
+  },
+);
+
+
 
 export const updateMeasurementOfClient = createAsyncThunk("client/updateMeasurement", async ({ id, chest, waist, hip }, { rejectWithValue }) => {
   try {
