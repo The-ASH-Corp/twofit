@@ -42,7 +42,7 @@ export default function PlanDetailsView() {
       setProgramDetails({
         name: data.payload.name,
         duration: data.payload.duration,
-        clients: planData?.clients || 0,
+        clients: data.payload.clients || 0,
         planMedia: Array.from(allMedia.values()),
       });
 
@@ -152,7 +152,7 @@ export default function PlanDetailsView() {
               Clients
             </label>
             <span className="text-sm font-bold text-[#0A4F48]">
-              {programDetails?.clients} Clients
+              {programDetails?.clients?.length || 0} Clients
             </span>
           </div>
         </div>

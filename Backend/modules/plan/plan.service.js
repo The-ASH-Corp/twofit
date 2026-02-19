@@ -1,4 +1,5 @@
 import ProgramModel from "../allPrograms/allPrograma.model.js";
+import User from "../auth/auth.model.js";
 import Plan from "./plan.model.js";
 
 export const createPlan = async (planData) => {
@@ -17,5 +18,6 @@ export const getPlanById = async (planId) => {
 
 export const getPlanByProgramId = async (programId) => {    
     const plan = await Plan.findOne({ program: programId });
-    return plan;
+    const clients = await User.find({ programType: programId }).select("name email");
+    return {...plan.toObject(), clients};
 }
