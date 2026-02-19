@@ -7,6 +7,7 @@ import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import * as Yup from "yup";
 
 export default function ProgramForm() {
   const navigate = useNavigate();
@@ -70,11 +71,28 @@ export default function ProgramForm() {
     },
   ];
 
+    const validationSchema = Yup.object({
+      title: Yup.string()
+        .required("Program Name is required")
+        .min(3, "Name must be at least 3 characters"),
+
+      image: Yup.mixed().required("Image is required"),
+
+      category: Yup.string().required("Select Your Category"),
+
+      duration: Yup.array()
+        .of(Yup.string())
+        .min(1, "Select at least one")
+        .required("Duration is required"),
+
+      status: Yup.string().required("Select status"),
+    });
+
   const initialValues = {
     title: "",
     image: "",
     category: "",
-    duration: "",
+    duration: [],
     status: "",
   };
 
@@ -113,6 +131,7 @@ export default function ProgramForm() {
       <BaseForm
         fields={fields}
         initialValues={initialValues}
+        validationSchema={validationSchema}
         heading={"Add Program"}
         onSubmit={(values) => {
           handleProgramCreation(values);

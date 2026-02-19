@@ -7,6 +7,7 @@ import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import * as Yup from "yup";
 
 const HeadForm = () => {
   const dispatch = useDispatch(); 
@@ -142,8 +143,67 @@ const HeadForm = () => {
         ],
       },
     ];
+
+const validationSchema = Yup.object({
+
+  name: Yup.string()
+    .required("Full Name is required")
+    .min(3, "Name must be at least 3 characters"),
+
+  dob: Yup.date()
+    .required("Date of Birth is required")
+    .max(new Date(), "DOB cannot be in the future"),
+
+  gender: Yup.string()
+    .oneOf(["male", "female"], "Gender is required")
+    .required("Gender is required"),
+
+  email: Yup.string()
+    .email("Invalid email format")
+    .required("Email is required"),
+
+  phone: Yup.string()
+    .required("Phone number is required")
+    .matches(/^[0-9]{10}$/, "Phone must be 10 digits"),
+
+  address: Yup.string()
+    .required("Address is required")
+    .min(5, "Address too short"),
+
+  specialization: Yup.array()
+    .of(Yup.string())
+    .min(1, "Select at least one specialization")
+    .required("Specialization is required"),
+
+  experience: Yup.string().required("Experience is required"),
+
+  qualification: Yup.string().required("Qualification is required"),
+
+  programCategory: Yup.string().required("Program Category is required"),
+
+  salary: Yup.number()
+    .typeError("Salary must be a number")
+    .required("Base Salary is required")
+    .positive("Salary must be positive"),
+
+  // Password
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters"),
+});
+
+
     const initialValues = {
       name: "",
+      gender: "",
+      dob: "",
+      email: "",
+      phone: "",
+      address: "",
+      experience: "",
+      qualification: "",
+      programCategory: "",
+      salary: "",
+      specialization: [],
     };
 
  
@@ -169,7 +229,8 @@ const HeadForm = () => {
       <BaseForm
         fields={fields}
         initialValues={initialValues}
-        heading = {"Add Head"}
+        validationSchema={validationSchema}
+        heading={"Add Head"}
         onSubmit={(value) => handelSubmit(value)}
       />
     </div>
