@@ -1,9 +1,17 @@
-import dashboard from "./dash.png";
-import clients from "./clients.png";
-import experts from "./experts.png";
-import programs from "./programs.png";
-import finance from "./finance.svg";
-import chats from "./contacttick.svg";
+import dashboard from "./layout-dashboard.svg";
+import head from "./user-round-pen.svg"
+import admin from "./user-star.svg"
+import clients from "./users.svg";
+import experts from "./user-round.svg";
+import programs from "./biceps-flexed.svg";
+import finance from "./receipt-indian-rupee.svg";
+import broadCast from "./radio-tower.svg";
+import therapy from "./book-heart.svg"
+import chats from "./messages-square.svg";
+import dailyPlan from "./calendar-range.svg"
+import habitTracker from "./notebook-tabs.svg"
+import progress from "./file-chart-column.svg"
+import feedback from "./message-square-text.svg"
 import analytics from "./dollar.svg";
 import website from "./website.svg";
 import logo from "./Logo.png";
@@ -33,7 +41,7 @@ import pdfVector from "./pdfVector.svg"
 import totalEmploy from "./totalExpert.svg"
 import totalPayroll from "./totalPayroll.svg"
 import pendingPayroll from "./pendingPayroll.svg"
-import broadCast from "./BroadcastVector.svg";
+
 import wl from "./wl.jpg";
 import Workout from "./Workout.png";
 import MealPlaceholder from "./MealPlaceholder.png";
@@ -45,13 +53,20 @@ export const assets = {
   profile,
   filter,
   dashboard,
+  head,
+  admin,
   clients,
   experts,
   programs,
   finance,
+  therapy,
   chats,
   analytics,
   website,
+  dailyPlan,
+  habitTracker,
+  progress,
+  feedback,
   logo,
   signout,
   loginPageImg,

@@ -11,15 +11,15 @@ const menuItems = [
     icon: assets.dashboard,
     path: "/client",
   },
-  { label: "Daily Plan", icon: assets.clients, path: "/client/daily-plan" },
+  { label: "Daily Plan", icon: assets.dailyPlan, path: "/client/daily-plan" },
   {
     label: "Habit Tracker",
-    icon: assets.website,
+    icon: assets.habitTracker,
     path: "/client/habit-tracker",
   },
-  { label: "Progress", icon: assets.experts, path: "/client/progress" },
+  { label: "Progress", icon: assets.progress, path: "/client/progress" },
   { label: "Messages", icon: assets.chats, path: "/client/chats" },
-  { label: "Feedback", icon: assets.website, path: "/client/feedback" },
+  { label: "Feedback", icon: assets.feedback, path: "/client/feedback" },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
