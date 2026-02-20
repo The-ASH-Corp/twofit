@@ -1,25 +1,25 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { ChevronUp } from "lucide-react";
 import { ChevronDown } from "lucide-react";
 import { Trash2 } from "lucide-react";
 import { Plus } from "lucide-react";
 import TherapyPlan from "./TherapyPlan";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import {
   createNewPlan,
+  getTherapyPlanById,
+  updateTherapyPlan,
 } from "@/redux/features/therapy/therapy.thunk";
+import { selectTherapyPlan } from "@/redux/features/therapy/therapy.selectors";
 
 const TherapyForm = () => {
   const navigate = useNavigate();
-
-  
-
+  const { id } = useParams();
   const dispatch = useDispatch();
-
-
+  const fetchedPlan = useSelector(selectTherapyPlan);
 
   const initialWeeks = [
     {
@@ -46,6 +46,38 @@ const TherapyForm = () => {
 
   const [weeks, setWeeks] = useState(initialWeeks);
   const [therapyName, setTherapyName] = useState("");
+
+  useEffect(() => {
+    if (id) {
+      dispatch(getTherapyPlanById(id));
+    }
+  }, [id, dispatch]);
+
+  useEffect(() => {
+    if (id && fetchedPlan) {
+      // Ensure we are editing the correct plan
+      if (fetchedPlan._id === id) {
+        setTherapyName(fetchedPlan.name || "");
+        
+        const mappedWeeks = (fetchedPlan.weeks || []).map((week, index) => ({
+            id: index + 1,
+            name: week.name || `Week ${index + 1}`,
+            title: week.title || "",
+            expanded: index === 0,
+            days: (week.days || []).map((day, dIndex) => ({
+            id: dIndex + 1,
+            name: day.name || `Day ${dIndex + 1}`,
+            expanded: dIndex === 0,
+            therapies: (day.therapies || []).map((th, tIndex) => ({
+                id: tIndex + 1,
+                ...th
+            }))
+            }))
+        }));
+        setWeeks(mappedWeeks);
+      }
+    }
+  }, [fetchedPlan, id]);
 
   const toggleWeek = (id) => {
     setWeeks(
@@ -209,7 +241,7 @@ const TherapyForm = () => {
         name: day.name,
         therapies: (day.therapies || []).map((th) => {
           const { id, ...rest } = th;
-          return rest;
+          return rest; // remove frontend-only ID, keep _id if exists or let backend handle it
         }),
       })),
     }));
@@ -219,13 +251,18 @@ const TherapyForm = () => {
       weeks: cleanedWeeks,
     };
 
-    const data = await dispatch(createNewPlan(payload));
+    let resultAction;
+    if (id) {
+       resultAction = await dispatch(updateTherapyPlan({ id, planData: payload }));
+    } else {
+       resultAction = await dispatch(createNewPlan(payload));
+    }
 
-    if (data.meta.requestStatus === "fulfilled") {
-      toast.success("Plan created successfully");
+    if (resultAction.meta.requestStatus === "fulfilled") {
+      toast.success(id ? "Plan updated successfully" : "Plan created successfully");
       navigate(-1);
     } else {
-      toast.error("Failed to create plan");
+      toast.error(id ? "Failed to update plan" : "Failed to create plan");
     }
   };
   return (
@@ -233,7 +270,7 @@ const TherapyForm = () => {
       {/* <TherapyHeader/> */}
 
       <h2 className="text-lg font-bold text-[#0A4F48] mb-4">
-        Create Plan Structure
+        {id ? "Edit Plan Structure" : "Create Plan Structure"}
       </h2>
       <div className="my-4">
         <label className="block text-xs font-bold text-[#011412] mb-1.5">
@@ -259,13 +296,15 @@ const TherapyForm = () => {
                 {week.name}
               </h3>
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => removeWeek(week.id)}
-                  className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
-                  title="Remove Week"
-                >
-                  <Trash2 size={18} />
-                </button>
+                {!(id && fetchedPlan?.clients > 0) && (
+                  <button
+                    onClick={() => removeWeek(week.id)}
+                    className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
+                    title="Remove Week"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                )}
                 <button
                   onClick={() => toggleWeek(week.id)}
                   className="p-1.5 bg-[#F8F9FA] hover:bg-gray-100 rounded-lg text-[#66706D]"
@@ -305,13 +344,15 @@ const TherapyForm = () => {
                           {day.name}
                         </span>
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => removeDay(week.id, day.id)}
-                            className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
-                            title="Remove Day"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          {!(id && fetchedPlan?.clients > 0) && (
+                            <button
+                              onClick={() => removeDay(week.id, day.id)}
+                              className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
+                              title="Remove Day"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
                           <button
                             onClick={() => toggleDay(week.id, day.id)}
                             className="p-1.5 bg-white border border-gray-200 hover:bg-gray-50 rounded-lg text-[#66706D]"
@@ -339,6 +380,7 @@ const TherapyForm = () => {
                             onRemoveTherapy={(therapyId) =>
                               removeTherapy(week.id, day.id, therapyId)
                             }
+                            readOnly={id && fetchedPlan?.clients > 0}
                           />
                         </div>
                       )}
@@ -385,22 +427,18 @@ const TherapyForm = () => {
           Add New Week
         </button>
       </div>
-      {/* <BaseForm fields={fields} initialValues={initialValues} onSubmit={(value)=> handelSubmit(value)}/> */}
       <div className="fixed bottom-0 right-0 bg-gray-50 border-t border-gray-200 p-4 z-10 left-0 lg:left-[225px]">
-        {/* Adjust lg:pl-64 based on your actual sidebar width if resizing */}
         <div className="max-w-7xl mx-auto flex flex-col gap-3">
-          {/* <hr className="w-full text-gray-300" /> */}
-          <div className="flex items-center justify-between w-full text-[12px] font-semibold">
-            <button className="text-[#011412]">Save as Draft</button>
+          <div className="flex items-center justify-end w-full text-[12px] font-semibold">
             <div className="flex gap-2">
-              <button className="bg-[#EBF3F2] rounded-md p-2 min-w-20">
+              <button className="bg-[#EBF3F2] rounded-md p-2 min-w-20"onClick={()=>navigate(-1)} >
                 Cancel
               </button>
               <button
                 onClick={handleSave}
                 className="bg-[#0A4F48] p-2 rounded-md text-white min-w-[120px]"
               >
-                Save & Add Plan
+                {id ? "Update Plan" : "Save & Add Plan"}
               </button>
             </div>
           </div>
