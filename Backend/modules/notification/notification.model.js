@@ -57,6 +57,8 @@ const notificationSchema = new mongoose.Schema(
 
 notificationSchema.index({ recipientRole: 1, createdAt: -1 });
 notificationSchema.index({ recipientId: 1, createdAt: -1 });
+// Auto-delete after 30 days
+notificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 2592000 });
 
 const NotificationModel = mongoose.model("Notification", notificationSchema);
 export default NotificationModel;

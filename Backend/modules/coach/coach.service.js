@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import { getUserComplianceStats } from "../../utils/complianceCalculator.js";
 import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 import { sendEmail } from "../../utils/email.js";
+import { createNotification } from "../notification/notification.service.js";
 
 export const createCoach = async (coach) => {
   // Parse JSON stringified fields from FormData
@@ -94,6 +95,26 @@ export const createCoach = async (coach) => {
     { $addToSet: { experts: coachCreated._id } },
     { new: true },
   );
+
+  // Notify Admin
+  await createNotification({
+    type: "generic",
+    title: "New Team Member",
+    message: `${coachCreated.name} has been employed as a ${coachCreated.role} under your supervision.`,
+    recipientRole: "admin",
+    recipientId: coach.adminId,
+    metadata: { expertId: coachCreated._id }
+  });
+
+  // Notify Coach
+  await createNotification({
+    type: "generic",
+    title: "Welcome to the Team",
+    message: "Your expert account has been created successfully.",
+    recipientRole: "expert",
+    recipientId: coachCreated._id,
+    metadata: { expertId: coachCreated._id }
+  });
 
   await sendEmail({
     to: coach.email,
