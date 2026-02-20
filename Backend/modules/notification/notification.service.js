@@ -311,6 +311,7 @@ export const getAllNotifications = async (user, query = {}) => {
   }
 };
 
+
 export const markNotificationAsRead = async (notificationId, user) => {
   if (!mongoose.Types.ObjectId.isValid(notificationId)) {
     throw new Error("Invalid notification id");
