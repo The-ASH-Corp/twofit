@@ -125,7 +125,7 @@ const breadcrumbs = getBreadcrumbs();
               </p>
             </div>
             <img
-              src={assets.profile}
+              src={assets.profileVector}
               className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-white shadow-sm object-cover"
               alt="Profile"
             />
