@@ -2,6 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchTherapyPlans,
   getTherapyPlanById,
+  updateTherapyPlan,
+  deleteTherapyPlan,
 } from "./therapy.thunk";
 
 const initialState = {
@@ -29,9 +31,10 @@ const therapySlice = createSlice({
         state.error = null;
       })
       .addCase(fetchTherapyPlans.fulfilled, (state, action) => {
-        state.loading = null;
+        state.loading = "succeeded";
         state.plans = action.payload?.data?.therapy || [];
-        state.plansCount = action.payload?.data.totalTherapy;
+        state.plansCount = action.payload?.data?.totalTherapy || 0;
+        state.assignedUsersCount = action.payload?.data?.users || 0;
       })
       .addCase(fetchTherapyPlans.rejected, (state, action) => {
         state.loading = false;
@@ -48,6 +51,40 @@ const therapySlice = createSlice({
         state.plan = action.payload?.data || null;
       })
       .addCase(getTherapyPlanById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error?.message;
+      })
+      
+      .addCase(updateTherapyPlan.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateTherapyPlan.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedPlan = action.payload.data;
+        state.plans = state.plans.map(plan => 
+          plan._id === updatedPlan?._id ? updatedPlan : plan
+        );
+         if (state.plan && state.plan?._id === updatedPlan?._id) {
+            state.plan = updatedPlan;
+        }
+      })
+      .addCase(updateTherapyPlan.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error?.message;
+      })
+
+      .addCase(deleteTherapyPlan.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteTherapyPlan.fulfilled, (state, action) => {
+        state.loading = false;
+        const { planId } = action.payload; // Since the thunk returns { planId, ... }
+        state.plans = state.plans.filter(plan => plan._id !== planId);
+        state.plansCount -= 1;
+      })
+      .addCase(deleteTherapyPlan.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error?.message;
       });

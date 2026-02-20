@@ -29,6 +29,35 @@ export const getPlanByProgramId = createAsyncThunk("plans/getPlanByProgramId", a
     }
 })
 
+export const updatePlan = createAsyncThunk(
+    "plans/updatePlan",
+    async ({ planId, planData }, { rejectWithValue }) => {
+        try {
+            const data = await axiosInstance.put(`/plans/update-plan/${planId}`, planData);
+            return data.data;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to update plan"
+            );
+        }
+    }
+);
+
+export const deletePlan = createAsyncThunk(
+    "plans/deletePlan",
+    async (planId, { rejectWithValue }) => {
+        try {
+            const data = await axiosInstance.delete(`/plans/delete-plan/${planId}`);
+            return data.data;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to delete plan"
+            );
+        }
+    }
+);
+
+
 export const uploadPlanMedia = createAsyncThunk(
     "plans/uploadMedia",
     async ({ formData, onUploadProgress }, { rejectWithValue }) => {

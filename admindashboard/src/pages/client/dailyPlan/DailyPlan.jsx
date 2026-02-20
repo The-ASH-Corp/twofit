@@ -10,6 +10,7 @@ import { getProgramById } from "@/redux/features/program/program.thunk";
 import { getClient } from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { assets } from "@/assets/asset";
+import { toast } from "react-toastify";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -322,7 +323,7 @@ export default function DailyPlan() {
       await dispatch(getUserTaskStatus());
     } catch (error) {
       console.error("Failed to skip task:", error);
-      alert("Failed to skip task: " + error);
+      toast.error("Failed to skip task: " + error);
     }
   };
 

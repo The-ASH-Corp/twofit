@@ -187,6 +187,7 @@ function App() {
           <Route path="finance" element={<FounderFinanceList />} />
           <Route path="therapy" element={<FounderTherapyList />} />
           <Route path="therapy/create" element={<FounderTherapyForm />} />
+          <Route path="therapy/edit/:id" element={<FounderTherapyForm />} />
           <Route path="therapy/plan/:id" element={<FounderTherapyPlanView />} />
           <Route path="broadcasts" element={<FounderBroadcastTemplates />} />
           <Route
@@ -266,6 +267,7 @@ function App() {
           <Route path="clients/edit/:id" element={<AdminClientEdit />} />
           <Route path="clients/delete/:id" element={<AdminClientDelete />} />
           <Route path="programs" element={<AdminProgramTable />} />
+          <Route path="programs/plan/edit/:programId" element={<PlanForm />} />
           <Route path="programs/create" element={<PlanForm />} />
           <Route path="programs/plans" element={<AdminPlanView />} />
           <Route path="profile" element={<Profile />} />
