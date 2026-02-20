@@ -691,7 +691,7 @@ const Dashboard = () => {
                     <th className="px-6 py-4">Client Name</th>
                     <th className="px-6 py-4">Report Type</th>
                     <th className="px-6 py-4">Expert</th>
-                    <th className="px-6 py-4">Submitted By</th>
+                    <th className="px-6 py-4">Submitted To</th>
                     <th className="px-6 py-4">Date & Time</th>
                     {/* <th className="px-6 py-4">Action</th> */}
                   </tr>

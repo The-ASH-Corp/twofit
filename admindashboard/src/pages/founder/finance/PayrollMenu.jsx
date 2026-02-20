@@ -7,6 +7,7 @@ import { useAppSelector } from "@/redux/store/hooks";
 import React, { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const PayrollMenu = ({ setPayrollOpen, payrollOpen }) => {
@@ -122,12 +123,14 @@ const PayrollMenu = ({ setPayrollOpen, payrollOpen }) => {
     }));
   };
 
+
   const handleSubmit = async () => {
    try {
      const result = await dispatch(createPayroll(payrollData)).unwrap();;
      if (result.success) {
        toast.success("Updated payroll successfully");
        setPayrollOpen(false);
+       window.location.reload();
      } else {
        toast.error("Failed to Updated payroll");
      }
