@@ -14,7 +14,7 @@ import progress from "./file-chart-column.svg"
 import feedback from "./message-square-text.svg"
 import analytics from "./dollar.svg";
 import website from "./website.svg";
-import logo from "./Logo.png";
+import logo from "./logo.svg";
 import signout from "./SignOut.png";
 import filter from "./filter.svg";
 import profile from "./profileimage.svg";
