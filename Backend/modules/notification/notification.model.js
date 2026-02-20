@@ -10,6 +10,12 @@ export const DASHBOARD_NOTIFICATION_TYPES = [
   "diet_feedback",
   "trainer_updated",
   "generic",
+  "chat",
+  "new_user",
+  "new_admin",
+  "new_coach",
+  "welcome",
+  "system_alert"
 ];
 
 const notificationSchema = new mongoose.Schema(
@@ -57,8 +63,8 @@ const notificationSchema = new mongoose.Schema(
 
 notificationSchema.index({ recipientRole: 1, createdAt: -1 });
 notificationSchema.index({ recipientId: 1, createdAt: -1 });
-// Auto-delete after 30 days
-notificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 2592000 });
+// Auto-delete after 7 days
+notificationSchema.index( { createdAt: 1 }, { expireAfterSeconds: 604800 });
 
 const NotificationModel = mongoose.model("Notification", notificationSchema);
 export default NotificationModel;

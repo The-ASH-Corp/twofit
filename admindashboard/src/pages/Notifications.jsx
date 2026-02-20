@@ -18,22 +18,15 @@ export default function Notifications() {
     try {
       setLoading(true);
       const res = await axiosInstance.get(`/notifications?page=${page}&limit=10`);
-      // Adapt to backend response structure
-      // The backend returns { success: true, data: { notifications: [], pagination: {} } }
-      // OR { success: true, data: [] } for recent
-      // I implemented getAllNotifications to return { notifications, pagination } in data.
       
-      const responseData = res.data?.data || {};
-      
-      if (responseData.notifications) {
-          setNotifications(responseData.notifications);
-          setPagination(responseData.pagination || { page, limit: 10, total: 0, totalPages: 1 });
+      if (res.success) {
+          setNotifications(res.data || []);
+          setPagination(res.pagination || { page, limit: 10, total: 0, totalPages: 1 });
           
-          if (responseData.notifications.length > 0 && !selectedNotification) {
-             setSelectedNotification(responseData.notifications[0]);
+          if (res.data?.length > 0 && !selectedNotification) {
+             setSelectedNotification(res.data[0]);
           }
       } else {
-        // Fallback or empty
         setNotifications([]);
       }
 

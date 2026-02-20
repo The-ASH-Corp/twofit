@@ -108,7 +108,7 @@ const breadcrumbs = getBreadcrumbs();
         {/* Action icons */}
         <div className="flex items-center gap-2 md:gap-4 shrink-0">
           <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all relative">
-            <Bell size={20} />
+            <Bell size={20} onClick={() => navigate('/client/notifications')} />
             <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-gray-50 animate-ping"></span>
           </button>
 
