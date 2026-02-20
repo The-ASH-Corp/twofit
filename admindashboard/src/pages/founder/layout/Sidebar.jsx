@@ -12,8 +12,8 @@ const menuItems = [
     icon: assets.dashboard,
     path: "/founder",
   },
-  { label: "Heads", icon: assets.experts, path: "/founder/heads" },
-  { label: "Admins", icon: assets.experts, path: "/founder/admins" },
+  { label: "Heads", icon: assets.head, path: "/founder/heads" },
+  { label: "Admins", icon: assets.admin, path: "/founder/admins" },
   { label: "Experts", icon: assets.experts, path: "/founder/experts" },
   { label: "Clients", icon: assets.clients, path: "/founder/clients" },
   {
@@ -30,8 +30,8 @@ const menuItems = [
       },
     ],
   },
-  { label: "Therapy", icon: assets.clients, path: "/founder/therapy" },
-  { label: "Finance", icon: assets.website, path: "/founder/finance" },
+  { label: "Therapy", icon: assets.therapy, path: "/founder/therapy" },
+  { label: "Finance", icon: assets.finance, path: "/founder/finance" },
   {
     label: "Broadcast",
     icon: assets.broadCast,
