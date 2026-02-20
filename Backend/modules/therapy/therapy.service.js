@@ -14,16 +14,26 @@ export const getAllTherapy = async (page, limit) => {
     .limit(limit)
     .lean();
 
-  const therapy = await Promise.all(
-    therapyList.map(async (t) => {
-      const count = await User.countDocuments({ therapyType: t._id });
-      return { ...t, clients: count };
-    })
-  );
+  // Optimized user counting using aggregation
+  const therapyIds = therapyList.map(t => t._id);
+  const userCountsTrigger = await User.aggregate([
+    { $match: { therapyType: { $in: therapyIds } } },
+    { $group: { _id: "$therapyType", count: { $sum: 1 } } }
+  ]);
+  
+  const countsMap = {};
+  userCountsTrigger.forEach(item => {
+      countsMap[item._id.toString()] = item.count;
+  });
 
-  const users = await User.find({
-    therapyType: { $in: therapyList.map((t) => t._id) },
-  }).countDocuments();
+  const therapy = therapyList.map((t) => ({
+      ...t,
+      clients: countsMap[t._id.toString()] || 0
+  }));
+
+  const users = await User.countDocuments({
+    therapyType: { $in: therapyIds },
+  });
 
   return {
     totalTherapy,
@@ -37,4 +47,12 @@ export const getTherapyById = async (therapyId) => {
   if (!therapy) return null;
   const clients = await User.countDocuments({ therapyType: therapyId });
   return { ...therapy, clients };
+};
+
+export const updateTherapy = async (id, data) => {
+  return await Therapy.findByIdAndUpdate(id, data, { new: true });
+};
+
+export const deleteTherapy = async (id) => {
+  return await Therapy.findByIdAndDelete(id);
 };

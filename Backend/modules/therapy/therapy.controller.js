@@ -27,6 +27,31 @@ export const getAllTherapyController = async (req, res) => {
   }
 };
 
+export const updateTherapyController = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const updatedTherapy = await therapyService.updateTherapy(id, req.body);
+    if (!updatedTherapy) {
+      return res.status(404).json({ success: false, message: "Therapy not found" });
+    }
+    res.status(200).json({ success: true, message: "Therapy updated successfully", data: updatedTherapy });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const deleteTherapyController = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const deletedTherapy = await therapyService.deleteTherapy(id);
+    if (!deletedTherapy) {
+      return res.status(404).json({ success: false, message: "Therapy not found" });
+    }
+    res.status(200).json({ success: true, message: "Therapy deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 export const getATherapyController = async (req, res) => {
   const {id}=req.params

@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import { socket } from "@/utils/socket";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { assets } from "@/assets/asset";
+import { toast } from "react-toastify";
 
 export default function TaskList({
   plans,
@@ -270,7 +271,7 @@ export default function TaskList({
       setSkipConfirmation({ isOpen: false, task: null });
     } catch (error) {
       console.error("Failed to skip task:", error);
-      alert("Failed to skip task: " + error);
+      toast.error("Failed to skip task: " + error);
     }
   };
 

@@ -11,6 +11,7 @@ export default function TherapyPlan({
   onAddTherapy,
   onUpdateTherapy,
   onRemoveTherapy,
+  readOnly = false,
 }) {
   const dispatch = useDispatch();
 
@@ -238,12 +239,14 @@ export default function TherapyPlan({
                     >
                       Edit
                     </button>
-                    <button
-                      onClick={() => onRemoveTherapy(therapy.id)}
-                      className="text-xs text-red-600"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    {!readOnly && (
+                      <button
+                        onClick={() => onRemoveTherapy(therapy.id)}
+                        className="text-xs text-red-600"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
