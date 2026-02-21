@@ -10,6 +10,7 @@ import { FounderModel } from "../../seeds/createAdmin.js";
 import { calculateExtraClientIncentive } from "../incentive/incentive.service.js";
 import { sendEmail } from "../../utils/email.js";
 import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
+import { createNotification } from "../notification/notification.service.js";
 
 export const adminCreateUser = async (userData) => {
  try {
@@ -73,7 +74,28 @@ export const adminCreateUser = async (userData) => {
 
      // Recalculate extra client incentive
      await calculateExtraClientIncentive(coachId);
+
+     // Notify Coach
+     await createNotification({
+       type: "generic",
+       title: "New Client Assigned",
+       message: `You have been assigned a new client: ${user.name}`,
+       recipientRole: "expert", // Could be trainer, dietician etc.
+       recipientId: coachId,
+       metadata: { userId: user._id }
+     });
    }
+
+   // Notify User Welcome
+   await createNotification({
+      type: "generic",
+      title: "Welcome to TwoFit",
+      message: "Your account has been created. Complete your profile setup.",
+      recipientRole: "user",
+      recipientId: user._id,
+      metadata: { userId: user._id }
+   });
+
 
    await sendEmail({
     to: userData.email,

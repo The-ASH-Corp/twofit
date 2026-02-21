@@ -10,6 +10,7 @@ import RoleGuard from "./routes/RoleGuard";
 import Login from "./pages/Login";
 import PublicRoutes from "./routes/PublicRoutes";
 import Profile from "./pages/Profile";
+import Notifications from "./pages/Notifications";
 import Unauthorized from "./pages/Unauthorized";
 import ForgotPasswordEmail from "./pages/ForgotPassword";
 
@@ -206,11 +207,9 @@ function App() {
             path="broadcast/add-Template"
             element={<FounderBroadcastCreate />}
           />
-          <Route
-            path="auto-remainder"
-            element={<FounderBroadcastAutoReminder />}
-          />
+          <Route path="auto-remainder" element={<FounderBroadcastAutoReminder />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="notifications" element={<Notifications />} />
         </Route>
 
         {/* HEAD */}
@@ -237,6 +236,7 @@ function App() {
           <Route path="clients/profile/:Id" element={<HeadClientProfile />} />
           <Route path="programs" element={<HeadProgramTable />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="notifications" element={<Notifications />} />
           <Route path="therapy" element={<HeadTherapyList />} />
           <Route path="therapy/plan/:id" element={<HeadTherapyPlan />} />
         </Route>
@@ -271,6 +271,7 @@ function App() {
           <Route path="programs/create" element={<PlanForm />} />
           <Route path="programs/plans" element={<AdminPlanView />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="notifications" element={<Notifications />} />
           <Route path="therapy" element={<AdminTherapyList />} />
           <Route path="finance" element={<AdminFinance />} />
           <Route
@@ -296,6 +297,7 @@ function App() {
           <Route path="programs" element={<ExpertPrograms />} />
           <Route path="programs/viewPlan" element={<ExpertPlanDetails />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="notifications" element={<Notifications />} />
           <Route path="finance" element={<ExpertFinance />} />
 
           <Route path="therapy" element={<ExpertTherapyList />} />
@@ -322,6 +324,7 @@ function App() {
           <Route path="feedback" element={<ClientFeedback />} />
           <Route path="progress" element={<ClientProgress />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="notifications" element={<Notifications />} />
           <Route path="daily-plan" element={<DailyPlan />} />
           <Route path="habit-tracker" element={<HabitTracker />} />
           <Route path="chats" element={<ClientChat />} />

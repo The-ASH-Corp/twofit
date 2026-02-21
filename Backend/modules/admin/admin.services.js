@@ -6,6 +6,7 @@ import { CoachModel } from "../coach/coach.model.js";
 import { AdminModel } from "./admin.model.js";
 import TaskSubmission from "../taskSubmission/taskSubmission.model.js";
 import { sendEmail } from "../../utils/email.js";
+import { createNotification } from "../notification/notification.service.js";
 
 export const getAllAdmins = async (page, limit) => {
   const skip = (page - 1) * limit;
@@ -57,6 +58,28 @@ export const addNewAdmin = async (adminData) => {
     experience: adminData.experience,
     qualification: adminData.qualification,
   });
+
+  // Notify Head
+  if (adminData.headId) {
+    await createNotification({
+       type: "generic",
+       title: "New Admin",
+       message: `${newAdmin.name} has been added as an Admin under your supervision.`,
+       recipientRole: "head",
+       recipientId: adminData.headId,
+       metadata: { adminId: newAdmin._id }
+    });
+  }
+
+   // Notify Admin
+   await createNotification({
+      type: "generic",
+      title: "Welcome Admin",
+      message: "Your Admin account has been activated.",
+      recipientRole: "admin",
+      recipientId: newAdmin._id,
+      metadata: { adminId: newAdmin._id }
+   });
 
   await sendEmail({
     to: adminData.email,
