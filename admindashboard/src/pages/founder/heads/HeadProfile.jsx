@@ -1,17 +1,18 @@
-import HeadCenterSide from "@/components/head/HeadCenterSide";
-import HeadLeftSide from "@/components/head/HeadLeftSide";
-import HeadRightSide from "@/components/head/HeadRightSide";
 import {
-  selectHead,
   selectHeadDashboardData,
   selectHeadError,
   selectHeadStatus,
+  selectHead,
 } from "@/redux/features/head/head.selectors";
-import { getHead, getDashboardData } from "@/redux/features/head/head.thunk";
+import { getDashboardData, getHead } from "@/redux/features/head/head.thunk";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
+import HeadCenterSide from "@/components/head/HeadCenterSide";
+import HeadLeftSide from "@/components/head/HeadLeftSide";
+import HeadRightSide from "@/components/head/HeadRightSide";
+import { ArrowLeft, UserCog } from "lucide-react";
 
 const HeadProfile = () => {
   const dispatch = useDispatch();
@@ -32,36 +33,52 @@ const HeadProfile = () => {
 
   if (status === "loading" && !head)
     return (
-      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
-        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+      <div className="flex justify-center items-center h-screen w-full bg-[#f8fafc]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={15} />
       </div>
     );
-  if (error) return <p className="text-red-500">{error}</p>;
+  if (error) return <p className="text-red-500 p-8 text-center">{error}</p>;
 
   return (
-    <div className="flex flex-col gap-6 w-full h-[calc(100vh-130px)] overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-[#0A4F48]">Profile Details</h1>
+    <div className="flex flex-col gap-6 w-full h-[calc(100vh-32px)] overflow-hidden font-sans bg-[#F8FAFC] p-6">
+      {/* Header with Breadcrumb-like feel */}
+      <div className="flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-4">
+            <button 
+                onClick={() => navigate(-1)}
+                className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-[#0A4F48] hover:border-[#0A4F48] transition-all shadow-sm hover:shadow-md"
+            >
+                <ArrowLeft size={20} />
+            </button>
+            <div className="flex flex-col">
+                <h1 className="text-2xl font-black text-[#0F172A] tracking-tight leading-none">Head Profile</h1>
+                <p className="text-sm text-[#64748B] font-medium mt-1">Manage and view detailed information</p>
+            </div>
+        </div>
+        
         <button
           onClick={() => navigate(`/founder/heads/edit/${id}`)}
-          className="px-5 py-2 bg-[#0A4F48] text-white rounded-lg text-sm font-bold shadow-sm hover:bg-[#073a35] transition-colors"
+          className="group px-5 py-2.5 bg-[#0A4F48] text-white rounded-xl text-sm font-bold shadow-[0_4px_14px_-4px_rgba(10,79,72,0.5)] hover:bg-[#093E39] hover:shadow-[0_6px_20px_-4px_rgba(10,79,72,0.6)] active:scale-95 transition-all duration-200 flex items-center gap-2.5"
         >
-          Edit Profile
+          <UserCog size={18} className="group-hover:rotate-12 transition-transform" />
+          <span>Edit Profile</span>
         </button>
       </div>
 
-      <div className="flex flex-col lg:flex-row flex-1 justify-between w-full gap-4 h-[calc(100vh-110px)] overflow-auto no-scrollbar pb-6">
-        {/* left */}
-        <div className="w-full lg:w-[38%]">
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 overflow-hidden pb-2">
+        {/* Left Column (Profile Card) - 35% */}
+        <div className="lg:col-span-4 h-full overflow-hidden">
           <HeadLeftSide Head={head} />
         </div>
-        {/* center */}
-        <div className="w-full lg:w-[38%]">
+        
+        {/* Center Column (Details) - 35% */}
+        <div className="lg:col-span-5 h-full overflow-hidden">
           <HeadCenterSide Head={head} />
         </div>
-        {/* right */}
-        <div className="w-full lg:w-[24%]">
+        
+        {/* Right Column (Stats) - 30% */}
+        <div className="lg:col-span-3 h-full overflow-hidden">
           <HeadRightSide Head={head} dashboardData={dashboardData} />
         </div>
       </div>
