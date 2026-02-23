@@ -35,7 +35,7 @@ const HeadLeftSide = ({ Head }) => {
     <div className="flex flex-col h-full bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden transition-all hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.05)] group">
         
        {/* New Header Design */}
-       <div className="relative h-28 bg-linear-to-r from-[#0A4F48] to-[#116D63] overflow-hidden">
+       <div className="relative h-28 bg-linear-to-r from-[#0A4F48] to-[#116D63] overflow-hidden shrink-0">
           {/* Abstract Pattern Overlay */}
           <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
           <div className="absolute -bottom-6 -right-6 text-white/5 rotate-12">
@@ -57,7 +57,7 @@ const HeadLeftSide = ({ Head }) => {
        </div>
 
        {/* Profile Image & Name Section */}
-       <div className="px-6 flex flex-col relative">
+       <div className="px-6 flex flex-col relative shrink-0">
           <div className="-mt-12 mb-3 self-start">
              <div className="w-20 h-20 rounded-2xl bg-white p-1.5 shadow-lg group-hover:scale-105 transition-transform duration-300 ease-out rotate-3 group-hover:rotate-0">
                 <div className="w-full h-full bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center border border-gray-100">
@@ -71,7 +71,7 @@ const HeadLeftSide = ({ Head }) => {
           </div>
           
           <div className="flex flex-col mb-6">
-             <h2 className="text-xl font-bold text-[#1E293B] tracking-tight">{Head?.name}</h2>
+             <h2 className="text-xl font-bold text-[#1E293B] tracking-tight break-words">{Head?.name}</h2>
              <p className="text-xs text-[#64748B] font-medium flex items-center gap-1.5 mt-1">
                 <Briefcase size={12} className="text-[#0A4F48]" />
                 {Head?.programCategory?.name || "General Head"}
@@ -80,12 +80,12 @@ const HeadLeftSide = ({ Head }) => {
        </div>
 
        {/* Enhanced Details List */}
-       <div className="px-6 pb-6 flex-1 overflow-y-auto no-scrollbar">
-          <div className="space-y-3">
+       <div className="px-6 pb-6 flex-1 overflow-y-auto lg:overflow-y-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
              {profileDetails.map((item, i) => (
                 <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC] border border-transparent hover:border-[#EBF3F2] hover:bg-white hover:shadow-sm transition-all duration-200">
                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-white border border-[#F1F5F9] flex items-center justify-center text-[#94A3B8] shadow-sm">
+                      <div className="w-8 h-8 rounded-lg bg-white border border-[#F1F5F9] flex items-center justify-center text-[#94A3B8] shadow-sm shrink-0">
                          <item.icon size={14} strokeWidth={2} />
                       </div>
                       <div className="flex flex-col">

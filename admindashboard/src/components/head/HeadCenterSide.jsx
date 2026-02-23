@@ -45,7 +45,7 @@ const HeadCenterSide = ({ Head }) => {
   return (
     <div className="flex flex-col h-full bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden transition-all hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.05)]">
       {/* Simple Header */}
-      <div className="px-6 py-5 border-b border-[#F1F5F9] bg-[#FAFCFF] flex items-center justify-between">
+      <div className="px-6 py-5 border-b border-[#F1F5F9] bg-[#FAFCFF] flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white border border-[#E2E8F0] shadow-sm flex items-center justify-center text-[#0A4F48]">
                 <Contact size={20} strokeWidth={2} />
@@ -58,8 +58,8 @@ const HeadCenterSide = ({ Head }) => {
       </div>
 
       {/* Enhanced Details List */}
-       <div className="px-6 py-6 flex-1 overflow-y-auto no-scrollbar">
-          <div className="grid grid-cols-1 gap-4">
+       <div className="px-6 py-6 flex-1 overflow-y-auto lg:overflow-y-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
             {personalInfo.map((item, i) => (
                 <div
                 key={i}
@@ -72,15 +72,15 @@ const HeadCenterSide = ({ Head }) => {
                         </span>
                     </div>
                     
-                    <div className="flex items-center justify-between">
-                        <span className={`text-[15px] font-bold text-[#334155] wrap-break-word ${item.content === "N/A" ? "text-gray-400 italic font-normal" : ""}`}>
+                    <div className="flex items-center justify-between gap-2">
+                        <span className={`text-[15px] font-bold text-[#334155] break-all ${item.content === "N/A" ? "text-gray-400 italic font-normal" : ""}`}>
                             {item.content}
                         </span>
                         
                         {item.isCopy && item.content !== "N/A" && (
                             <button 
                                 onClick={() => handleCopy(item.content)}
-                                className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-all"
+                                className="opacity-100 lg:opacity-0 lg:group-hover:opacity-100 p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-slate-600 transition-all shrink-0"
                                 title="Copy"
                             >
                                 <Copy size={14} />

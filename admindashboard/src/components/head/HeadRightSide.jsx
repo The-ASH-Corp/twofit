@@ -56,9 +56,9 @@ const HeadRightSide = ({ dashboardData }) => {
   }, [dashboardData]);
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden transition-all hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.05)]">
+    <div className="flex flex-col h-full min-h-[400px] lg:min-h-0 bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden transition-all hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.05)]">
        {/* Enhanced Header */}
-       <div className="px-6 py-5 border-b border-[#F1F5F9] bg-[#FAFCFF] flex items-center justify-between">
+       <div className="px-6 py-5 border-b border-[#F1F5F9] bg-[#FAFCFF] flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white border border-[#E2E8F0] shadow-sm flex items-center justify-center text-[#0A4F48]">
                 <Activity size={20} strokeWidth={2} />
@@ -81,8 +81,6 @@ const HeadRightSide = ({ dashboardData }) => {
         <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-[#0A4F48]/5 to-transparent rounded-bl-full -mr-10 -mt-10 pointer-events-none"></div>
         
         <div className="relative w-full aspect-square max-h-[220px] flex items-center justify-center p-2 mb-4">
-           {/* Decorative Outer Ring */}
-           <div className="absolute inset-0 rounded-full border border-dashed border-gray-200 animate-[spin_60s_linear_infinite] pointer-events-none opacity-50"></div>
            
            <div className="relative z-10 scale-110 drop-shadow-xl">
               <DonutChart
