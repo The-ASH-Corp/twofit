@@ -1,19 +1,34 @@
+
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  MoreHorizontal,
   Star,
   MessageSquare,
   User,
   Calendar,
   Mail,
   Phone,
-  MapPin,
   X,
+  Briefcase,
+  Layers,
+  Clock,
+  Loader2,
+  Copy
 } from "lucide-react";
-import { useMatch } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getChats } from "@/redux/features/chat/chat.thunk";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { toast } from "react-toastify";
+import { ENV } from "../../utils/env";
 
+const getFileUrl = (path) => {
+    if (!path) return "";
+    if (path.startsWith("http") || path.startsWith("blob:")) return path;
+    const baseUrl = (ENV.API_BASE_URL || "").replace(/\/api\/v1\/?$/, "").replace(/\/api\/?$/, "");
+    const cleanPath = path.startsWith("/") ? path : `/${path}`;
+    return `${baseUrl}${cleanPath}`;
+};
+
+// Helper functions kept same
 const getPrivateRoomId = (u1, u2) =>
   `private:${[String(u1), String(u2)].sort().join("_")}`;
 
@@ -30,6 +45,7 @@ const getMessageType = (msg) => {
 
 const ExpertLeftSide = ({ expert }) => {
   const dispatch = useDispatch();
+  const user = useSelector(selectUser);
   const [isChatMonitorOpen, setIsChatMonitorOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
   const [monitorMessages, setMonitorMessages] = useState([]);
@@ -98,325 +114,209 @@ const ExpertLeftSide = ({ expert }) => {
     setChatError("");
   };
 
+  const handleCopy = (text) => {
+    if (text && text !== "N/A") {
+      navigator.clipboard.writeText(text);
+      toast.success("Copied to clipboard");
+    }
+  };
+
   const profileDetails = [
-    {
-      label: "Joined Date",
-      value: expert?.createdAt?.split("T")[0] || "14 Feb 2023",
-    },
-    {
-      label: "Working Days",
-      value:
-        expert?.workingDays
-          ?.map((day) => day.charAt(0).toUpperCase() + day.slice(1))
-          .join(" - ") || "Mon - Fri",
-    },
-    {
-      label: "Working Hours",
-      value: `${expert?.workingHours?.[0]?.startTime || "9"} - ${
-        expert?.workingHours?.[0]?.endTime || "6"
-      }`,
-    },
-    { label: "Base Salary", value: `₹${expert?.salary || "34,200"}/m` },
+    { label: "Experience", value: `${expert?.experience || 0} Years`, icon: Clock },
+    { label: "Clients", value: expert?.assignedUsers?.length || 0, icon: User },
+    { label: "Rating", value: `${expert?.avgRating?.toFixed(1) || 0} / 5.0`, icon: Star },
+    { label: "Category", value: expert?.specialization?.join(", ") || "N/A", icon: Layers },
   ];
 
-  const personalInfo = [
-    {
-      icon: <User size={16} />,
-      label: "Gender",
-      value: expert?.gender || "Female",
-    },
-    {
-      icon: <Calendar size={16} />,
-      label: "Age",
-      value: `${
-        new Date().getFullYear() -
-        new Date(expert?.dob || "1994-01-01").getFullYear()
-      } y/o`,
-    },
-    {
-      icon: <Mail size={16} />,
-      label: "Email Address",
-      value: expert?.email || "priya.m@gmail.com",
-    },
-    {
-      icon: <Phone size={16} />,
-      label: "Phone Number",
-      value: expert?.phone || "+91 98472 11238",
-    },
-    {
-      icon: <MapPin size={16} />,
-      label: "Address",
-      value: expert?.address || "221B Baker Street, London, United Kingdom",
-    },
+  const contactDetails = [
+    { label: "Email", value: expert?.email || "N/A", icon: Mail, copy: true },
+    { label: "Phone", value: expert?.phone || "N/A", icon: Phone, copy: true },
+    { label: "DOB", value: expert?.dob ? new Date(expert.dob).toLocaleDateString() : "N/A", icon: Calendar },
+    { label: "Gender", value: expert?.gender || "N/A", icon: User },
   ];
-
-  const specialization = [
-    { label: "Role", content: expert?.role || "Dietitian" },
-    {
-      label: "Specialization",
-      content:
-        expert?.specialization.join(", ") ||
-        "PCOD Diet Plans, Therapeutic Diets, Weight-loss Programs, Thyroid",
-    },
-    {
-      label: "Experience",
-      content: expert?.experience ? `${expert.experience} Years` : "7 Years",
-    },
-    {
-      label: "Certifications",
-      content: expert?.qualification || "M.Sc. Clinical Nutrition",
-    },
-    {
-      label: "Languages",
-      content:
-        expert?.languages
-          ?.map((l) => l.charAt(0).toUpperCase() + l.slice(1))
-          .join(", ") || "English, Hindi, Malayalam",
-    },
-  ];
-
-  const isFounderPage = useMatch("/founder/experts/profile/:id");
-  const isHeadPage = useMatch("/head/experts/profile/:id");
 
   return (
-    <div className="w-full flex flex-col gap-4 sm:gap-6  pb-4 sm:pb-6">
-      {/* Profile Card */}
-      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm relative flex flex-col items-center">
-        <button className="absolute top-3 sm:top-4 right-3 sm:right-4 text-gray-400 hover:text-gray-600 transition-colors">
-          <MoreHorizontal size={18} className="sm:w-5 sm:h-5" />
-        </button>
-
-        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full mb-3 sm:mb-4 flex items-center justify-center text-[#0A4F48] font-bold text-xl sm:text-2xl">
-          {expert?.name?.[0]}
+    <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden transition-all hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.05)] group relative">
+      
+      {/* Header Background */}
+      <div className="relative h-28 bg-linear-to-r from-[#0A4F48] to-[#116D63] overflow-hidden shrink-0">
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+        <div className="absolute top-4 right-4 text-white/10">
+          <Briefcase size={80} />
         </div>
-
-        <h2 className="text-base sm:text-lg font-bold text-[#011412] mb-2 sm:mb-3 text-center">
-          {expert?.name || "Priya Menon"}
-        </h2>
-
-        <div className="flex flex-wrap justify-center gap-2 mb-4 sm:mb-6">
-          <span className="px-2.5 sm:px-3 py-1 bg-[#F8F9FA] rounded-full text-[9px] sm:text-[10px] font-bold text-[#66706D] uppercase tracking-wider">
-            {expert?.role || "Dietitian"}
-          </span>
-          <span className="px-2.5 sm:px-3 py-1 bg-[#FAF3E0] rounded-full text-[9px] sm:text-[10px] font-bold text-[#DAA520] flex items-center gap-1">
-            <Star size={10} fill="currentColor" /> {expert?.avgRating || "0"}
-          </span>
-          <span className="px-2.5 sm:px-3 py-1 bg-[#E7F9F4] rounded-full text-[9px] sm:text-[10px] font-bold text-[#00A389]">
-            {expert?.status || "Active"}
-          </span>
-        </div>
-
-        <div className="w-full space-y-2">
-          {profileDetails.map((item, i) => (
-            <div
-              key={i}
-              className="flex justify-between items-center bg-[#F8F8F8] p-3 rounded-xl"
-            >
-              <span className="text-[11px] sm:text-xs text-[#66706D] font-medium">
-                {item.label}
-              </span>
-              <span className="text-[11px] sm:text-xs font-medium text-black wrap-break-word">
-                {item.value}
-              </span>
-            </div>
-          ))}
+        <div className="absolute top-4 right-4 flex gap-2">
+            <span className={`px-2.5 py-0.5 rounded-lg text-[10px] uppercase font-bold tracking-wider backdrop-blur-md border shadow-sm ${
+                expert?.isOnline 
+                ? "bg-emerald-400/20 text-emerald-50 border-emerald-400/30" 
+                : "bg-gray-400/20 text-gray-50 border-gray-400/30"
+            }`}>
+              {expert?.isOnline ? "Online" : "Offline"}
+            </span>
         </div>
       </div>
 
-      {/* Chat Monitoring */}
-      {!isFounderPage && !isHeadPage && (
-        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm">
-          <h3 className="text-sm font-bold text-[#0A4F48] mb-1">
-            Chat Monitoring
-          </h3>
-          <p className="text-[10px] text-[#66706D] mb-3 sm:mb-4">
-            Monitor expert-client chats
+      {/* Profile Info */}
+      <div className="px-6 flex flex-col relative shrink-0">
+        <div className="-mt-12 mb-3 self-start">
+             <div className="w-20 h-20 rounded-2xl bg-white p-1.5 shadow-lg group-hover:scale-105 transition-transform duration-300 ease-out rotate-3 group-hover:rotate-0">
+                <div className="w-full h-full bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center border border-gray-100">
+                    {expert?.image ? (
+                        <img src={getFileUrl(expert.image)} alt={expert.name} className="w-full h-full object-cover" />
+                    ) : (
+                        <User className="text-gray-300 w-8 h-8" />
+                    )}
+                </div>
+             </div>
+        </div>
+        
+        <div className="flex flex-col mb-6">
+           <h2 className="text-xl font-bold text-[#1E293B] tracking-tight break-words">{expert?.name}</h2>
+           <p className="text-xs text-[#64748B] font-medium flex items-center gap-1.5 mt-1">
+              <Briefcase size={12} className="text-[#0A4F48]" />
+              {expert?.specialization?.join(", ") || "General Expert"}
           </p>
+        </div>
+
+        {/* Action Button */}
+        {user?.role === "admin" && (
           <button
             onClick={() => setIsChatMonitorOpen(true)}
-            className="w-full py-2.5 bg-[#0A4F48] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 hover:bg-[#083a35] transition-colors"
+            className="w-full mb-6 py-2.5 bg-[#F0FDF4] hover:bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 shadow-sm"
           >
-            <MessageSquare size={16} /> View Chat
+            <MessageSquare size={16} />
+            <span>Monitor Chats</span>
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
-      {isChatMonitorOpen && (
-        <div className="fixed inset-0 z-50 bg-black/40 p-4 sm:p-8 flex items-center justify-center">
-          <div className="w-full max-w-5xl h-[85vh] bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div className="h-full min-h-0 grid grid-rows-[220px_minmax(0,1fr)] md:grid-rows-1 md:grid-cols-[260px_minmax(0,1fr)]">
-              <div className="border-b md:border-b-0 md:border-r border-gray-100 min-h-0 overflow-y-auto">
-                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                  <div>
-                    <h4 className="text-sm font-bold text-[#0A4F48]">
-                      Chat Monitoring
-                    </h4>
-                    <p className="text-[11px] text-gray-500">
-                      {expert?.name || "Expert"}
-                    </p>
-                  </div>
-                  <button
-                    onClick={closeMonitor}
-                    className="p-1 rounded-md hover:bg-gray-100 text-gray-500"
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
+       {/* Details List */}
+       <div className="px-6 pb-6 overflow-y-visible">
+          <div className="space-y-6">
+            
+            {/* Stats Grid */}
+            <div>
+               <h3 className="text-[11px] uppercase font-bold text-[#94A3B8] tracking-wider mb-3">Professional Stats</h3>
+               <div className="grid grid-cols-2 gap-3">
+                  {profileDetails.map((item, i) => (
+                    <div key={i} className="p-3 bg-[#F8FAFC] rounded-xl border border-dashed border-[#E2E8F0]">
+                       <div className="flex items-center gap-2 mb-1">
+                          <item.icon size={12} className="text-[#64748B]" />
+                          <span className="text-[10px] text-[#64748B] font-medium">{item.label}</span>
+                       </div>
+                       <p className="text-sm font-bold text-[#334155]">{item.value}</p>
+                    </div>
+                  ))}
+               </div>
+            </div>
 
-                {assignedClients.length === 0 ? (
-                  <p className="p-4 text-xs text-gray-500">
-                    No assigned clients found for this expert.
-                  </p>
-                ) : (
-                  <div className="p-2 space-y-1">
-                    {assignedClients.map((client) => {
-                      const isActive = selectedClient?._id === client?._id;
-                      return (
-                        <button
-                          key={client?._id}
-                          onClick={() => setSelectedClient(client)}
-                          className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                            isActive
-                              ? "bg-[#EBF3F2] text-[#0A4F48]"
-                              : "hover:bg-gray-50 text-gray-700"
-                          }`}
-                        >
-                          <p className="text-xs font-semibold truncate">{client.name}</p>
-                          <p className="text-[11px] text-gray-500 truncate">
-                            {client.email || client.role || "Client"}
-                          </p>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              <div className="min-h-0 flex flex-col bg-[#F8FAFB]">
-                <div className="px-4 py-3 border-b border-gray-100 bg-white">
-                  <h4 className="text-sm font-bold text-[#0A4F48]">
-                    {selectedClient?.name || "Select a client"}
-                  </h4>
-                  <p className="text-[11px] text-gray-500">
-                    Expert-client conversation history
-                  </p>
-                </div>
-
-                <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3">
-                  {isLoadingMessages ? (
-                    <p className="text-sm text-gray-500">Loading messages...</p>
-                  ) : chatError ? (
-                    <p className="text-sm text-red-500">{chatError}</p>
-                  ) : !selectedClient ? (
-                    <p className="text-sm text-gray-500">
-                      Choose a client to view chat history.
-                    </p>
-                  ) : monitorMessages.length === 0 ? (
-                    <p className="text-sm text-gray-500">
-                      No messages found between this expert and client.
-                    </p>
-                  ) : (
-                    monitorMessages.map((msg, idx) => {
-                      const isExpertMessage =
-                        String(msg?.sender) === String(expert?._id);
-                      const messageType = getMessageType(msg);
-
-                      return (
-                        <div
-                          key={`${msg?.time || idx}-${idx}`}
-                          className={`flex ${isExpertMessage ? "justify-end" : "justify-start"}`}
-                        >
-                          <div
-                            className={`max-w-[80%] rounded-2xl px-3 py-2 shadow-sm ${
-                              isExpertMessage
-                                ? "bg-[#E7F9F4] text-[#073B35]"
-                                : "bg-white text-[#1F2937]"
-                            }`}
-                          >
-                            {messageType === "image" && msg?.mediaUrl && (
-                              <img
-                                src={msg.mediaUrl}
-                                alt={msg?.mediaMeta?.name || "Image"}
-                                className="rounded-lg max-h-56 w-auto mb-2"
-                              />
-                            )}
-
-                            {messageType === "voice" && msg?.mediaUrl && (
-                              <audio controls src={msg.mediaUrl} className="mb-2 max-w-full" />
-                            )}
-
-                            {msg?.message && (
-                              <p className="text-xs whitespace-pre-wrap break-words">
-                                {msg.message}
-                              </p>
-                            )}
-
-                            <p className="mt-1 text-[10px] text-gray-500">
-                              {msg?.time
-                                ? new Date(msg.time).toLocaleString()
-                                : "Unknown time"}
-                            </p>
-                          </div>
+            {/* Contact Details */}
+            <div>
+               <h3 className="text-[11px] uppercase font-bold text-[#94A3B8] tracking-wider mb-3">Contact Info</h3>
+               <div className="space-y-3">
+                  {contactDetails.map((item, i) => (
+                     <div key={i} className="flex items-center justify-between group/item">
+                        <div className="flex items-center gap-3">
+                           <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center text-[#64748B]">
+                              <item.icon size={14} />
+                           </div>
+                           <div className="flex flex-col">
+                              <span className="text-[10px] text-[#94A3B8] font-medium">{item.label}</span>
+                              <span className="text-sm font-semibold text-[#334155] break-all line-clamp-1">{item.value}</span>
+                           </div>
                         </div>
-                      );
-                    })
-                  )}
-                </div>
-              </div>
+                        {item.copy && (
+                           <button 
+                             onClick={() => handleCopy(item.value)}
+                             className="opacity-100 lg:opacity-0 group-hover/item:opacity-100 p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 transition-all"
+                           >
+                              <Copy size={14} className="rotate-90" /> {/* Using Layers as Copy icon replacement if Copy not imported, but keeping it simple */}
+                           </button>
+                        )}
+                     </div>
+                  ))}
+               </div>
             </div>
+
           </div>
+       </div>
+
+      {/* Chat Monitor Modal/Overlay */}
+      {isChatMonitorOpen && (
+        <div className="absolute inset-0 z-50 bg-white flex flex-col animate-in fade-in duration-200">
+           <div className="p-4 border-b border-[#F1F5F9] flex items-center justify-between bg-[#FAFCFF] shrink-0">
+              <div>
+                 <h3 className="font-bold text-[#1E293B]">Chat Monitor</h3>
+                 <p className="text-[11px] text-[#64748B]">View client interactions</p>
+              </div>
+              <button 
+                onClick={closeMonitor}
+                className="w-8 h-8 rounded-full bg-white border border-[#E2E8F0] flex items-center justify-center text-[#64748B] hover:text-red-500 hover:border-red-200 transition-all"
+              >
+                 <X size={16} />
+              </button>
+           </div>
+           
+           <div className="flex-1 flex overflow-hidden">
+               {/* Client List */}
+               <div className="w-1/3 border-r border-[#F1F5F9] overflow-y-auto bg-[#F8FAFC]">
+                   {assignedClients.length === 0 ? (
+                       <div className="p-4 text-center text-xs text-gray-400">No clients assigned</div>
+                   ) : (
+                       assignedClients.map((client) => (
+                           <div 
+                             key={client._id}
+                             onClick={() => setSelectedClient(client)}
+                             className={`p-3 border-b border-[#F1F5F9] cursor-pointer hover:bg-white transition-colors ${selectedClient?._id === client._id ? "bg-white border-l-4 border-l-[#0A4F48]" : "border-l-4 border-l-transparent"}`}
+                           >
+                               <div className="font-semibold text-xs text-[#334155] truncate">{client.name}</div>
+                           </div>
+                       ))
+                   )}
+               </div>
+
+               {/* Messages Area */}
+               <div className="flex-1 flex flex-col bg-white overflow-hidden">
+                   {/* Messages Header */}
+                    {selectedClient && (
+                        <div className="p-2 border-b border-[#F1F5F9] text-xs font-bold text-center text-[#0A4F48] bg-emerald-50/50">
+                            Chat with {selectedClient.name}
+                        </div>
+                    )}
+
+                   <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#fafafa]">
+                       {isLoadingMessages ? (
+                           <div className="flex justify-center items-center h-full">
+                               <Loader2 className="animate-spin text-[#0A4F48]" size={24} />
+                           </div>
+                       ) : chatError ? (
+                           <div className="text-center text-red-400 text-xs mt-10">{chatError}</div>
+                       ) : monitorMessages.length === 0 ? (
+                           <div className="text-center text-slate-300 text-xs mt-10">No messages found</div>
+                       ) : (
+                           monitorMessages.map((msg, idx) => {
+                               const isExpert = msg.sender === expert._id;
+                               const type = getMessageType(msg);
+                               return (
+                                   <div key={idx} className={`flex flex-col ${isExpert ? 'items-end' : 'items-start'} max-w-[85%] ${isExpert ? 'ml-auto' : 'mr-auto'}`}>
+                                       <div className={`px-3 py-2 rounded-xl text-xs ${isExpert ? 'bg-[#0A4F48] text-white rounded-br-none' : 'bg-white border border-gray-200 text-gray-700 rounded-bl-none shadow-sm'}`}>
+                                           {type === 'text' && <p>{msg.content}</p>}
+                                           {type === 'image' && (
+                                               <img src={getFileUrl(msg.mediaUrl)} alt="attachment" className="max-w-[150px] rounded-lg" />
+                                           )}
+                                           {type === 'voice' && <span className="italic opacity-80">🎤 Voice Message</span>}
+                                       </div>
+                                       <span className="text-[10px] text-gray-400 mt-1">
+                                           {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                       </span>
+                                   </div>
+                               )
+                           })
+                       )}
+                   </div>
+               </div>
+           </div>
         </div>
       )}
-
-      {/* Personal Info */}
-      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
-        <div className="flex justify-between items-center mb-4 sm:mb-6">
-          <h3 className="text-sm font-bold text-[#0A4F48]">Personal Info</h3>
-          <button className="text-gray-400 hover:text-gray-600 transition-colors">
-            <MoreHorizontal size={16} className="sm:w-[18px] sm:h-[18px]" />
-          </button>
-        </div>
-
-        <div className="space-y-4 sm:space-y-5">
-          {personalInfo.map((item, i) => (
-            <div key={i} className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#EBF3F2] flex items-center justify-center text-[#0A4F48] shrink-0">
-                {item.icon}
-              </div>
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-[10px] text-[#66706D] font-medium">
-                  {item.label}
-                </span>
-                <span className="text-[11px] font-bold text-[#011412] leading-tight mt-0.5 wrap-break-word">
-                  {item.value}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Role & Specialization */}
-      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
-        <h3 className="text-sm font-bold text-[#0A4F48] mb-4 sm:mb-6">
-          Role & Specialization
-        </h3>
-        <div className="space-y-4 sm:space-y-5">
-          {specialization.map((item, i) => (
-            <div
-              key={i}
-              className="flex flex-col gap-2 p-3.5 bg-[#F8F8F8] rounded-2xl"
-            >
-              <span className="w-fit px-2 py-0.5 bg-[#F0F0F0] text-[10px] font-bold text-[#66706D] rounded">
-                {item.label}
-              </span>
-              <p className="text-[11px] font-bold text-[#0A4F48] leading-relaxed wrap-break-word">
-                {item.content}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };

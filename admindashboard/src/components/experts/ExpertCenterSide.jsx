@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo, useState } from "react";
 import {
   MoreHorizontal,
@@ -5,6 +6,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Star,
+  Activity,
+  MessageCircle
 } from "lucide-react";
 import {
   Chart as ChartJS,
@@ -58,10 +61,11 @@ const ExpertCenterSide = ({ expert }) => {
           backgroundColor: (context) => {
             const index = context.dataIndex;
             if (index === hoveredBarIndex) return "#0A4F48";
-            return "#F4DBC7";
+            return "#E2E8F0"; // Default slate-200
           },
-          borderRadius: 6,
-          barThickness: 50,
+          hoverBackgroundColor: "#0A4F48",
+          borderRadius: 8,
+          barThickness: 40,
         },
       ],
     };
@@ -81,15 +85,15 @@ const ExpertCenterSide = ({ expert }) => {
       legend: { display: false },
       tooltip: {
         enabled: true,
-        backgroundColor: "#fff",
-        titleColor: "#0A4F48",
-        bodyColor: "#0A4F48",
-        borderColor: "#eee",
-        borderWidth: 1,
+        backgroundColor: "#1E293B",
+        titleColor: "#fff",
+        bodyColor: "#fff",
+        padding: 12,
+        cornerRadius: 8,
         displayColors: false,
-        padding: 10,
         callbacks: {
-          label: (context) => `★ ${context.raw}`,
+          title: () => null,
+          label: (context) => `Rating: ${context.raw} / 5.0`,
         },
       },
     },
@@ -97,353 +101,164 @@ const ExpertCenterSide = ({ expert }) => {
       y: {
         beginAtZero: true,
         max: 5,
-        ticks: { stepSize: 1, color: "#66706D", font: { size: 10 } },
-        grid: { color: "#F0F0F0", drawBorder: false },
+        grid: {
+            color: "#F1F5F9",
+            drawBorder: false,
+        },
+        ticks: { stepSize: 1, color: "#94A3B8", font: { size: 10, weight: 'bold' }, padding: 10 },
+        border: { display: false }
       },
       x: {
-        grid: { display: false, drawBorder: false },
-        ticks: { color: "#66706D", font: { size: 10 } },
+        grid: { display: false },
+        ticks: { color: "#64748B", font: { size: 11, weight: '500' } },
+        border: { display: false }
       },
     },
   };
 
-  const feedback = (expert?.feedback || [])
-    .slice()
-    .reverse()
-    .map((item) => ({
-      name: item?.userId?.name || "Anonymous",
-      rating: item?.rating || 0,
-      text: item?.feedback || "-",
-    }));
+  useEffect(() => {
+    if (expert?._id) {
+      dispatch(getCoachRatingGraph({ id: expert._id, duration: ratingDuration }))
+        .unwrap()
+        .then((data) => setRatingGraphData(data))
+        .catch((err) => console.error(err));
+    }
+  }, [expert?._id, ratingDuration, dispatch]);
 
-  const [isFeedbackOpen, setIsFeedbackOpen] = useState(true);
+  // Review Pagination Logic
+  const reviews = expert?.feedback || [];
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [isLimitOpen, setIsLimitOpen] = useState(false);
+  const reviewsPerPage = 4;
+  const totalReviewPages = Math.ceil(reviews.length / reviewsPerPage);
 
-  const totalResults = expert?.assignedUsers?.length || 0;
-  const totalPages = Math.ceil(totalResults / itemsPerPage);
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = (expert?.assignedUsers || []).slice(
-    indexOfFirstItem,
-    indexOfLastItem
+  const displayedReviews = reviews.slice(
+    (currentPage - 1) * reviewsPerPage,
+    currentPage * reviewsPerPage
   );
 
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  const handleLimitChange = (limit) => {
-    setItemsPerPage(limit);
-    setCurrentPage(1);
-    setIsLimitOpen(false);
-  };
-
-  useEffect(() => {
-    if (!expert?._id) return;
-    dispatch(
-      getCoachRatingGraph({ id: expert?._id, duration: ratingDuration }),
-    ).then((res) => {
-      if (res.meta?.requestStatus === "fulfilled") {
-        setRatingGraphData(res.payload?.data ?? res.payload);
-      }
-    });
-  }, [dispatch, expert?._id, ratingDuration]);
-
   return (
-    <div className="w-full flex flex-col gap-4 sm:gap-6  pb-4 sm:pb-6 px-0 sm:px-1">
-      {/* Rating Score Card */}
-      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm sm:text-base font-bold text-[#0A4F48]">
-              Rating Score
-            </h3>
-            <div className="flex items-center gap-1 text-xs font-semibold text-[#0A4F48]">
-              <Star size={14} className="text-[#0A4F48]" />
-              {(expert?.avgRating || 0).toFixed(1)}
-            </div>
-          </div>
-          <div className="relative w-fit">
-            <button
-              className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D]"
-              onClick={() => setShowRatingMenu((prev) => !prev)}
-            >
-              Last {ratingDuration} Months <ChevronDown size={14} />
-            </button>
-            {showRatingMenu && (
-              <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-100 rounded-lg shadow-md z-10">
-                {["3", "6", "12"].map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => {
-                      setRatingDuration(option);
-                      setShowRatingMenu(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs font-medium hover:bg-[#F8F9FA] ${
-                      ratingDuration === option
-                        ? "text-[#0A4F48]"
-                        : "text-[#66706D]"
-                    }`}
-                  >
-                    Last {option} Months
-                  </button>
-                ))}
+    <div className="flex flex-col gap-6 ">
+      
+      {/* 1. Rating Chart Section */}
+      <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden shrink-0">
+        {/* Header */}
+        <div className="px-6 py-5 border-b border-[#F1F5F9] flex items-center justify-between">
+           <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0A4F48]">
+                 <Activity size={20} strokeWidth={2} />
               </div>
-            )}
-          </div>
-        </div>
-        <div className="h-40 sm:h-48 relative">
-          <Bar data={ratingData} options={ratingOptions} />
-          {/* Threshold line */}
-          <div className="absolute top-[18%] left-6 sm:left-10 right-0 border-t border-dashed border-[#45C4A2] opacity-50 pointer-events-none"></div>
-        </div>
-
-        {/* Client Feedback Section */}
-        <div className="mt-6 sm:mt-8">
-          <div
-            className="flex items-center justify-between mb-4 cursor-pointer group"
-            onClick={() => setIsFeedbackOpen(!isFeedbackOpen)}
-          >
-            <h3 className="text-sm font-bold text-[#0A4F48]">
-              Client Feedback
-            </h3>
-            <ChevronDown
-              size={18}
-              className={`text-gray-400 group-hover:text-gray-600 transition-all duration-300 ${
-                isFeedbackOpen ? "rotate-180" : ""
-              }`}
-            />
-          </div>
-          {isFeedbackOpen && (
-            <div className="space-y-4 sm:space-y-6">
-              {feedback.length === 0 && (
-                <p className="text-xs text-[#66706D]">
-                  No feedback yet.
-                </p>
-              )}
-              {feedback.map((item, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col gap-2 pb-4 sm:pb-6 border-b border-gray-50 last:border-0 last:pb-0"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-bold text-[#66706D]">
-                      {item.name}
-                    </span>
-                    <div className="flex text-[#FFD7A8]">
-                      {[...Array(5)].map((_, idx) => (
-                        <Star
-                          key={idx}
-                          size={10}
-                          fill={idx < item.rating ? "currentColor" : "none"}
-                          stroke={idx < item.rating ? "none" : "currentColor"}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-[#011412] leading-relaxed">
-                    {item.text}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Programs & Chat Monitoring Row */}
-
-      <div className="gap-4 sm:gap-6">
-        {/* Programs */}
-        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-sm font-bold text-[#0A4F48]">Programs</h3>
-            <MoreHorizontal size={18} className="text-gray-400" />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {expert?.assignedPrograms?.map((prog, i) => (
-              <span
-                key={i}
-                className="px-4 sm:px-5 py-2 sm:py-2.5 bg-[#F8F9FA] rounded-xl text-xs font-medium text-[#011412]"
+              <div>
+                 <h2 className="text-[#1E293B] font-bold text-lg tracking-tight leading-none">Average Rating</h2>
+                 <p className="text-[11px] text-[#64748B] font-medium mt-1">Client satisfaction over time</p>
+              </div>
+           </div>
+           
+           {/* Dropdown for Duration */}
+           <div className="relative">
+              <button 
+                onClick={() => setShowRatingMenu(!showRatingMenu)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs font-bold text-[#475569] hover:bg-[#F8FAFC] transition-all"
               >
-                {prog.title}
-              </span>
-            )) ||
-              ["PCOD", "Weight Loss", "Thyroid"].map((tag, i) => (
-                <span
-                  key={i}
-                  className="px-4 sm:px-5 py-2 bg-[#F8F9FA] rounded-lg text-xs font-medium text-[#011412]"
-                >
-                  {tag}
-                </span>
-              ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Assigned Clients Table */}
-      <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm flex flex-col">
-        <div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 border-b border-gray-50">
-          <div className="flex items-center gap-3">
-            <h3 className="text-sm sm:text-base font-bold text-[#0A4F48]">
-              Assigned Clients
-            </h3>
-            <span className="text-xs text-[#66706D] font-medium">
-              {totalResults} <span className="mx-1 text-gray-300">|</span> Max{" "}
-              {expert?.maxClient}
-            </span>
-          </div>
-          <MoreHorizontal size={20} className="text-gray-400 hidden sm:block" />
-        </div>
-
-        {/* Desktop Table View */}
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-[#F8F9FA] text-[10px] uppercase font-bold text-[#66706D] tracking-wider">
-                <th className="px-4 lg:px-6 py-4">Client Name</th>
-                <th className="px-4 lg:px-6 py-4">Program</th>
-                <th className="px-4 lg:px-6 py-4">Compliance</th>
-                <th className="px-4 lg:px-6 py-4">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {currentItems.map((client, i) => (
-                <tr key={i} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 lg:px-6 py-4 text-xs font-medium text-[#011412]">
-                    {client.name}
-                  </td>
-                  <td className="px-4 lg:px-6 py-4 text-xs text-[#011412]">
-                    {client.programType?.title || "N/A"}
-                  </td>
-                  <td className="px-4 lg:px-6 py-4 text-xs font-bold text-[#011412]">
-                    {client.compliance ?? "N/A"}
-                  </td>
-                  <td className="px-4 lg:px-6 py-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-bold ${
-                        client.status === "Active"
-                          ? "bg-[#E7F9F4] text-[#00A389]"
-                          : "bg-[#66706D] text-white"
-                      }`}
-                    >
-                      {client.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Mobile Card View */}
-        <div className="md:hidden divide-y divide-gray-50">
-          {currentItems.map((client, i) => (
-            <div key={i} className="p-4 hover:bg-gray-50 transition-colors">
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex-1">
-                  <h4 className="text-sm font-bold text-[#011412] mb-1">
-                    {client.name}
-                  </h4>
-                  <p className="text-xs text-[#66706D]">
-                    {client.programType?.title || "N/A"}
-                  </p>
-                </div>
-                <span
-                  className={`px-2.5 py-1 rounded-full text-[9px] font-bold shrink-0 ${
-                    client.status === "Active"
-                      ? "bg-[#E7F9F4] text-[#00A389]"
-                      : "bg-[#66706D] text-white"
-                  }`}
-                >
-                  {client.status}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-[#66706D] font-medium">
-                  Compliance:
-                </span>
-                <span className="text-xs font-bold text-[#011412]">
-                  {client.compliance ?? "N/A"}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Pagination */}
-        <div className="p-4 sm:p-6 border-t border-gray-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-xs text-[#66706D]">Show</span>
-            <div className="relative">
-              <div
-                className="flex items-center gap-2 px-2 py-1 bg-[#F8F9FA] border border-gray-100 rounded text-xs font-medium text-[#66706D] cursor-pointer"
-                onClick={() => setIsLimitOpen(!isLimitOpen)}
-              >
-                {itemsPerPage} <ChevronDown size={12} />
-              </div>
-              {isLimitOpen && (
-                <div className="absolute bottom-full mb-2 bg-white border border-gray-100 rounded shadow-lg z-10 w-full overflow-hidden">
-                  {[5, 10, 20, 50].map((limit) => (
-                    <div
-                      key={limit}
-                      className="px-2 py-1.5 text-xs text-[#66706D] hover:bg-[#F8F9FA] cursor-pointer"
-                      onClick={() => handleLimitChange(limit)}
-                    >
-                      {limit}
-                    </div>
-                  ))}
-                </div>
+                  <span>{ratingDuration} Months</span>
+                  <ChevronDown size={14} />
+              </button>
+              
+              {showRatingMenu && (
+                 <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-lg border border-[#E2E8F0] shadow-lg z-20 py-1">
+                    {[3, 6, 12].map((m) => (
+                       <button
+                         key={m}
+                         onClick={() => {
+                            setRatingDuration(String(m));
+                            setShowRatingMenu(false);
+                         }}
+                         className="w-full text-left px-4 py-2 text-xs font-medium text-[#475569] hover:bg-[#F8FAFC] hover:text-[#0A4F48]"
+                       >
+                           Last {m} Months
+                       </button>
+                    ))}
+                 </div>
               )}
-            </div>
-            <span className="text-xs text-[#66706D] whitespace-nowrap">
-              of {totalResults} results
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              className={`p-1.5 transition-colors ${
-                currentPage === 1
-                  ? "text-gray-300 pointer-events-none"
-                  : "text-gray-400 hover:text-[#0A4F48]"
-              }`}
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <div className="flex items-center gap-1 max-w-[200px] overflow-x-auto">
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i + 1}
-                  className={`w-7 h-7 sm:w-8 sm:h-8 rounded-md text-xs font-bold transition-colors shrink-0 ${
-                    currentPage === i + 1
-                      ? "bg-[#0A4F48] text-white"
-                      : "text-[#66706D] hover:bg-gray-50"
-                  }`}
-                  onClick={() => handlePageChange(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-            <button
-              className={`p-1.5 transition-colors ${
-                currentPage === totalPages || totalPages === 0
-                  ? "text-gray-300 pointer-events-none"
-                  : "text-[#0A4F48] hover:text-[#083a35]"
-              }`}
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
+           </div>
+        </div>
+
+        {/* Chart Area */}
+        <div className="p-6 h-[200px] w-full">
+           <Bar data={ratingData} options={ratingOptions} />
         </div>
       </div>
+
+      {/* 2. Client Feedback Section */}
+      <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden shrink-0">
+          {/* Header */}
+          <div className="px-6 py-5 border-b border-[#F1F5F9] flex items-center justify-between sticky top-0 bg-white z-10 ">
+             <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
+                   <MessageCircle size={20} strokeWidth={2} />
+                </div>
+                <div>
+                   <h2 className="text-[#1E293B] font-bold text-lg tracking-tight leading-none">Client Feedback</h2>
+                   <p className="text-[11px] text-[#64748B] font-medium mt-1">Recent reviews & comments</p>
+                </div>
+             </div>
+             
+             {/* Pagination Controls */}
+             {totalReviewPages > 1 && (
+                 <div className="flex items-center gap-2 ">
+                    <button 
+                       disabled={currentPage === 1}
+                       onClick={() => setCurrentPage(c => Math.max(1, c - 1))}
+                       className="p-1.5 rounded-lg border border-[#E2E8F0] disabled:opacity-50 hover:bg-[#F8FAFC] text-slate-500"
+                    >
+                        <ChevronLeft size={16}/>
+                    </button>
+                    <span className="text-xs font-bold text-slate-600">
+                        {currentPage} / {totalReviewPages}
+                    </span>
+                    <button 
+                       disabled={currentPage === totalReviewPages}
+                       onClick={() => setCurrentPage(c => Math.min(totalReviewPages, c + 1))}
+                       className="p-1.5 rounded-lg border border-[#E2E8F0] disabled:opacity-50 hover:bg-[#F8FAFC] text-slate-500"
+                    >
+                        <ChevronRight size={16}/>
+                    </button>
+                 </div>
+             )}
+          </div>
+
+          <div className="overflow-y-visible p-4 space-y-3">
+             {reviews.length === 0 ? (
+                 <div className="flex flex-col items-center justify-center h-40 text-center">
+                    <div className="w-12 h-12 rounded-full bg-slate-50 flex items-center justify-center mb-3">
+                        <MessageCircle size={20} className="text-slate-300" />
+                    </div>
+                    <p className="text-sm font-medium text-slate-400">No feedbacks yet</p>
+                 </div>
+             ) : (
+                displayedReviews.map((review, i) => (
+                   <div key={i} className="p-4 rounded-2xl bg-[#F8FAFC] border border-transparent hover:border-[#E2E8F0] hover:shadow-sm transition-all duration-200 ">
+                       <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-sm font-bold text-[#334155]">{review?.userId?.name || review?.clientName || "Anonymous Client"}</h4>
+                          <div className="flex items-center gap-0.5">
+                             {[1,2,3,4,5].map(star => (
+                                <Star 
+                                  key={star} 
+                                  size={12} 
+                                  className={star <= (review?.rating || 0) ? "fill-amber-400 text-amber-400" : "text-slate-200"}
+                                />
+                             ))}
+                          </div>
+                       </div>
+                       <p className="text-xs text-[#64748B] leading-relaxed italic">"{review?.feedback || review?.comment || "No comment provided."}"</p>
+                       <p className="text-[10px] text-[#94A3B8] font-medium mt-2 text-right">
+                          {review?.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'Recent'}
+                       </p>
+                   </div>
+                ))
+             )}
+          </div>
+      </div>
+
     </div>
   );
 };
