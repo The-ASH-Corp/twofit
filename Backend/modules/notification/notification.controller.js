@@ -37,6 +37,23 @@ export const getRecentNotifications = async (req, res) => {
   }
 };
 
+export const getAllNotifications = async (req, res) => {
+  try {
+    const result = await notificationService.getAllNotifications(
+      req.user,
+      req.query,
+    );
+
+    res.status(200).json({
+      success: true,
+      data: result.notifications,
+      pagination: result.pagination
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 export const markNotificationAsRead = async (req, res) => {
   try {
     const notification = await notificationService.markNotificationAsRead(

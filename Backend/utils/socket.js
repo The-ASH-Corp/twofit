@@ -1,4 +1,5 @@
 import { ChatModel } from "../modules/chat/chat.model.js";
+import { createNotification } from "../modules/notification/notification.service.js";
 let ioInstance;
 
 
@@ -88,6 +89,24 @@ const messageHandler = (io, socket) => {
       io.to(socket.userId).to(receiverId).emit("new_message", msg);
 
       ack?.({ ok: true });
+
+      // Notify the receiver (persistent notification)
+   
+
+      if (receiverId !== socket.userId) {
+         createNotification({
+            type: "chat",
+            title: "New Message",
+            message: `You have a new message from a user`, 
+            recipientId: receiverId,
+            recipientRole: "all", 
+            metadata: {
+               chatId: roomId,
+               senderId: socket.userId
+            }
+         }).catch(err => console.error("Chat notification failed", err));
+      }
+
     } catch (error) {
       console.error("send_message error:", error);
       ack?.({ ok: false, error: "Message failed" });

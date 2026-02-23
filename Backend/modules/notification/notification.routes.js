@@ -4,6 +4,7 @@ import * as notificationController from "./notification.controller.js";
 
 const router = express.Router();
 
+router.get("/", authMiddleware, notificationController.getAllNotifications);
 router.get("/recent", authMiddleware, notificationController.getRecentNotifications);
 router.post("/", authMiddleware, notificationController.createNotification);
 router.patch("/:id/read", authMiddleware, notificationController.markNotificationAsRead);
