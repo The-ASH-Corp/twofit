@@ -1,4 +1,3 @@
-import { assets } from "@/assets/asset";
 import KpiCard from "@/components/cards/KpiCard";
 import React, { useState } from "react";
 import PayrollMenu from "./PayrollMenu";

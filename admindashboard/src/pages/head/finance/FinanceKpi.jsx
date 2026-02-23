@@ -1,4 +1,3 @@
-import { assets } from '@/assets/asset'
 import KpiCard from '@/components/cards/KpiCard'
 import { selectUser } from '@/redux/features/auth/auth.selectores';
 import React from 'react'
