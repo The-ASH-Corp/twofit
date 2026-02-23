@@ -53,29 +53,23 @@ const ExpertProfile = () => {
           </div>
         </div>
         
-        {/* <button
-          onClick={() => navigate(`/founder/experts/edit/${id}`)}
-          className="group w-full sm:w-auto px-5 py-2.5 bg-[#0A4F48] text-white rounded-xl text-sm font-bold shadow-[0_4px_14px_-4px_rgba(10,79,72,0.5)] hover:bg-[#093E39] hover:shadow-[0_6px_20px_-4px_rgba(10,79,72,0.6)] active:scale-95 transition-all duration-200 flex items-center justify-center gap-2.5"
-        >
-          <UserCog size={18} className="group-hover:rotate-12 transition-transform" />
-          <span>Edit Profile</span>
-        </button> */}
+   
       </div>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-0 overflow-visible lg:overflow-hidden pb-2">
         {/* Left Column (Profile Card) - 30% */}
-        <div className="lg:col-span-4 h-auto lg:h-full lg:overflow-y-auto no-scrollbar">
+        <div className="lg:col-span-4 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
           <ExpertLeftSide expert={expert} />
         </div>
         
         {/* Center Column (Details) - 40% */}
-        <div className="lg:col-span-5 h-auto lg:h-full lg:overflow-y-auto no-scrollbar">
+        <div className="lg:col-span-5 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
           <ExpertCenterSide expert={expert} />
         </div>
         
         {/* Right Column (Stats) - 30% */}
-        <div className="lg:col-span-3 h-auto lg:h-full lg:overflow-y-auto no-scrollbar">
+        <div className="lg:col-span-3 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
           <ExpertRightSide expert={expert} />
         </div>
       </div>

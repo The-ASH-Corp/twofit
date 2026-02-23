@@ -136,7 +136,7 @@ const ExpertLeftSide = ({ expert }) => {
   ];
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden transition-all hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.05)] group relative">
+    <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden transition-all hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.05)] group relative">
       
       {/* Header Background */}
       <div className="relative h-28 bg-linear-to-r from-[#0A4F48] to-[#116D63] overflow-hidden shrink-0">
@@ -190,7 +190,7 @@ const ExpertLeftSide = ({ expert }) => {
       </div>
 
        {/* Details List */}
-       <div className="px-6 pb-6 flex-1 overflow-y-auto no-scrollbar">
+       <div className="px-6 pb-6 overflow-y-visible">
           <div className="space-y-6">
             
             {/* Stats Grid */}

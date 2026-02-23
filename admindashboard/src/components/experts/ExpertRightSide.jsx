@@ -122,10 +122,10 @@ const ExpertRightSide = ({ expert }) => {
   }, [expert]);
 
   return (
-    <div className="flex flex-col h-full gap-6">
+    <div className="flex flex-col gap-6">
        
        {/* 1. Compliance Chart Section */}
-       <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden">
+       <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden shrink-0">
           <div className="px-6 py-5 border-b border-[#F1F5F9] bg-[#FAFCFF] flex items-center justify-between">
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white border border-[#E2E8F0] shadow-sm flex items-center justify-center text-[#0A4F48]">
@@ -175,7 +175,7 @@ const ExpertRightSide = ({ expert }) => {
        </div>
 
        {/* 2. Documents Section */}
-       <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden flex-1">
+       <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden shrink-0">
           <div className="px-6 py-5 border-b border-[#F1F5F9] bg-[#FAFCFF] flex items-center justify-between">
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white border border-[#E2E8F0] shadow-sm flex items-center justify-center text-[#0A4F48]">
@@ -188,7 +188,7 @@ const ExpertRightSide = ({ expert }) => {
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 no-scrollbar">
+          <div className="overflow-y-visible p-4 space-y-3">
              {documents.length > 0 ? (
                  documents.map((doc, i) => (
                     <div key={i} className="group flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC] border border-transparent hover:border-[#E2E8F0] hover:bg-white hover:shadow-sm transition-all duration-200">
