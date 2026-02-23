@@ -3,9 +3,9 @@ import { SyncLoader } from "react-spinners";
 
 import {
   Users,
-  UserCheck,
-  FileText,
-  Layout,
+  UserRoundPen,
+  UserStar,
+  BicepsFlexed,
   MoreHorizontal,
   ChevronDown,
 } from "lucide-react";
@@ -444,393 +444,476 @@ const Dashboard = () => {
 
   return (
     <>
-    <BackgroundAnimation />
-    <div className="flex flex-col gap-4 md:gap-6 p-3 md:p-5 lg:p-8 bg-transparent min-h-full font-sans max-w-[1600px] mx-auto relative z-10">
-      
-      {/* Welcome Header */}
-      <div className="flex flex-col gap-1 mb-2">
-        <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#0A4F48] tracking-tight">Overview</h1>
-        <p className="text-xs md:text-sm text-[#66706D]">Track your platform's growth and performance metrics.</p>
-      </div>
+      <BackgroundAnimation />
+      <div className="flex flex-col gap-4 md:gap-6 p-3 md:p-5 lg:p-8 bg-transparent min-h-full font-sans max-w-[1600px] mx-auto relative z-10">
+        {/* Welcome Header */}
+        <div className="flex flex-col gap-1 mb-2">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#0A4F48] tracking-tight">
+            Overview
+          </h1>
+          <p className="text-xs md:text-sm text-[#66706D]">
+            Track your platform's growth and performance metrics.
+          </p>
+        </div>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
-        {[
-          {
-            label: "Total Clients",
-            value: founder?.data?.totalClient || 0,
-            icon: <Users size={20} className="text-white md:w-6 md:h-6" />,
-            bg: "bg-linear-to-br from-[#0A4F48] to-[#128a7e] text-white",
-            iconBg: "bg-white/20",
-            border: "border-transparent",
-            textColor: "text-white",
-            subTextColor: "text-white/80"
-          },
-          {
-            label: "Heads",
-            value: founder?.data?.totalHeads || 0,
-            icon: <UserCheck size={20} className="text-[#DAA520] md:w-6 md:h-6" />,
-            bg: "bg-white hover:bg-[#FAF3E0]/30",
-            border: "border-[#DAA520]/20",
-            iconBg: "bg-[#FAF3E0]",
-            textColor: "text-[#0A4F48]",
-            subTextColor: "text-[#66706D]"
-          },
-          {
-            label: "Admins",
-            value: founder?.data?.totalAdmins || 0,
-            icon: <FileText size={20} className="text-[#0A4F48] md:w-6 md:h-6" />,
-            bg: "bg-white hover:bg-[#EBF3F2]/50",
-            border: "border-[#0A4F48]/10",
-            iconBg: "bg-[#EBF3F2]",
-            textColor: "text-[#0A4F48]",
-            subTextColor: "text-[#66706D]"
-          },
-          {
-            label: "Total Programs",
-            value: founder?.data?.totalPrograms || 0,
-            icon: <Layout size={20} className="text-[#DAA520] md:w-6 md:h-6" />,
-            bg: "bg-white hover:bg-[#FAF3E0]/30",
-             border: "border-[#DAA520]/20",
-            iconBg: "bg-[#FAF3E0]",
-            textColor: "text-[#0A4F48]",
-            subTextColor: "text-[#66706D]"
-          },
-        ].map((card, i) => (
-          <div
-            key={i}
-            className={`${card.bg} ${card.border ? `border ${card.border}` : ''} p-5 md:p-6 rounded-[20px] shadow-[0_2px_10px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group cursor-default relative overflow-hidden`}
-          >
-             {/* Subtle pattern for the first card */}
-             {i === 0 && (
-               <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
-             )}
-             
-            <div className="flex flex-col gap-1 z-10">
-              <span className={`text-[10px] md:text-[11px] font-bold uppercase tracking-wider ${card.subTextColor}`}>
-                {card.label}
-              </span>
-              <span className={`text-2xl md:text-3xl font-black tracking-tight ${card.textColor}`}>
-                {card.value}
-              </span>
-            </div>
-            <div className={`${card.iconBg} p-3 md:p-3.5 rounded-xl shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 z-10`}>
-                {card.icon}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="flex gap-4 md:gap-6 lg:flex-row flex-col">
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col gap-4 md:gap-6 min-w-0">
-          
-          {/* Row 2: Charts */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <DashboardCard
-              title="Client Growth"
-              subTitle={`Last ${growthDuration} Months`}
-              onToggle={() => toggleDuration(growthDuration, setGrowthDuration)}
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+          {[
+            {
+              label: "Total Clients",
+              value: founder?.data?.totalClient || 0,
+              icon: <Users size={20} className="text-white md:w-6 md:h-6" />,
+              bg: "bg-linear-to-br from-[#0A4F48] to-[#128a7e] text-white",
+              iconBg: "bg-white/20",
+              border: "border-transparent",
+              textColor: "text-white",
+              subTextColor: "text-white/80",
+            },
+            {
+              label: "Heads",
+              value: founder?.data?.totalHeads || 0,
+              icon: (
+                <UserRoundPen
+                  size={20}
+                  className="text-[#DAA520] md:w-6 md:h-6"
+                />
+              ),
+              bg: "bg-white hover:bg-[#FAF3E0]/30",
+              border: "border-[#DAA520]/20",
+              iconBg: "bg-[#FAF3E0]",
+              textColor: "text-[#0A4F48]",
+              subTextColor: "text-[#66706D]",
+            },
+            {
+              label: "Admins",
+              value: founder?.data?.totalAdmins || 0,
+              icon: (
+                <UserStar size={20} className="text-[#0A4F48] md:w-6 md:h-6" />
+              ),
+              bg: "bg-white hover:bg-[#EBF3F2]/50",
+              border: "border-[#0A4F48]/10",
+              iconBg: "bg-[#EBF3F2]",
+              textColor: "text-[#0A4F48]",
+              subTextColor: "text-[#66706D]",
+            },
+            {
+              label: "Total Programs",
+              value: founder?.data?.totalPrograms || 0,
+              icon: (
+                <BicepsFlexed
+                  size={20}
+                  className="text-[#DAA520] md:w-6 md:h-6"
+                />
+              ),
+              bg: "bg-white hover:bg-[#FAF3E0]/30",
+              border: "border-[#DAA520]/20",
+              iconBg: "bg-[#FAF3E0]",
+              textColor: "text-[#0A4F48]",
+              subTextColor: "text-[#66706D]",
+            },
+          ].map((card, i) => (
+            <div
+              key={i}
+              className={`${card.bg} ${card.border ? `border ${card.border}` : ""} p-5 md:p-6 rounded-[20px] shadow-[0_2px_10px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group cursor-default relative overflow-hidden`}
             >
-              <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-4 md:mb-6">
-                <LegendItem color="#F4DBC7" label="Active" />
-                <LegendItem color="#DBDEDD" label="Inactive" />
-                <LegendItem color="#0A4F48" label="New" />
-              </div>
-              <div className="h-56 md:h-64 relative">
-                {growthData?.labels?.length > 0 ? (
-                  <Bar data={growthData} options={growthOptions} />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-400 text-sm">
-                    No data available
-                  </div>
-                )}
-              </div>
-            </DashboardCard>
+              {/* Subtle pattern for the first card */}
+              {i === 0 && (
+                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+              )}
 
-            <DashboardCard
-              title="Client Compliance"
-              subTitle={`Last ${complianceDuration} Months`}
-              onToggle={() =>
-                toggleDuration(complianceDuration, setComplianceDuration)
-              }
-            >
-               <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-4 md:mb-6">
-                <LegendItem color="#EBF3F2" label="Diet" />
-                <LegendItem color="#F4DBC7" label="Workout" />
-                <LegendItem color="#0A4F48" label="Therapy" />
-              </div>
-              <div className="h-56 md:h-64">
-                {complianceData?.labels?.length > 0 ? (
-                  <Bar data={complianceData} options={stackedOptions} />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-400 text-sm">
-                    No data available
-                  </div>
-                )}
-              </div>
-            </DashboardCard>
-          </div>
-
-          {/* Row 3: Admin & Expert Performance */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <DashboardCard
-              title="Admin Performance"
-              subTitle={
-                adminPerformanceDuration === 12
-                  ? "Last Year"
-                  : `Last ${adminPerformanceDuration} M`
-              }
-              onToggle={() =>
-                toggleDuration(
-                  adminPerformanceDuration,
-                  setAdminPerformanceDuration,
-                )
-              }
-            >
-              <div className="h-56 md:h-64 relative flex items-center justify-center py-2">
-                {!subAdminPerformanceData.isZero ? (
-                  <Doughnut
-                    data={subAdminPerformanceData}
-                    options={performanceOptions}
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-400 text-sm">
-                    No data available
-                  </div>
-                )}
-              </div>
-              <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-dashed border-gray-100">
-                {[
-                    { label: "Programs", val: subAdminPerformanceData.raw.programs, color: "bg-[#0A4F48]" },
-                    { label: "Experts", val: subAdminPerformanceData.raw.experts, color: "bg-[#EBF3F2]" },
-                    { label: "Clients", val: subAdminPerformanceData.raw.clients, color: "bg-[#F4DBC7]" },
-                ].map((item, idx) => (
-                    <div key={idx} className="flex flex-col items-center gap-1 group cursor-default">
-                         <div className="flex items-center gap-1.5">
-                            <span className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${item.color}`}></span>
-                            <span className="text-[9px] md:text-[10px] uppercase text-[#94A3B8] font-bold">{item.label}</span>
-                         </div>
-                        <span className="text-base md:text-lg font-bold text-[#0A4F48] group-hover:scale-110 transition-transform">{item.val}%</span>
-                    </div>
-                ))}
-              </div>
-            </DashboardCard>
-
-
-            <DashboardCard
-              title="Expert Performance"
-              subTitle={
-                expertPerformanceDuration === 12
-                  ? "Last Year"
-                  : `Last ${expertPerformanceDuration} M`
-              }
-              onToggle={() =>
-                toggleDuration(
-                  expertPerformanceDuration,
-                  setExpertPerformanceDuration,
-                )
-              }
-            >
-              <div className="h-56 md:h-64 relative flex items-center justify-center py-2">
-                {!expertPerformanceData.isZero ? (
-                    <Doughnut
-                        data={expertPerformanceData}
-                        options={performanceOptions}
-                    />
-                    ) : (
-                    <div className="flex items-center justify-center h-full text-gray-400 text-sm">
-                        No data available
-                    </div>
-                )}
-              </div>
-              <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-dashed border-gray-100">
-                {[
-                    { label: "Tasks", val: `${expertPerformanceData?.raw?.taskCompletion}%`, color: "bg-[#0A4F48]" },
-                    { label: "Rating", val: expertPerformanceData?.raw?.rating, color: "bg-[#EBF3F2]" },
-                    { label: "Assigned", val: expertPerformanceData?.raw?.clientsAssigned, color: "bg-[#F4DBC7]" },
-                ].map((item, idx) => (
-                    <div key={idx} className="flex flex-col items-center gap-1 group cursor-default">
-                         <div className="flex items-center gap-1.5">
-                            <span className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${item.color}`}></span>
-                            <span className="text-[9px] md:text-[10px] uppercase text-[#94A3B8] font-bold">{item.label}</span>
-                         </div>
-                        <span className="text-base md:text-lg font-bold text-[#0A4F48] group-hover:scale-110 transition-transform">{item.val}</span>
-                    </div>
-                ))}
-              </div>
-            </DashboardCard>
-          </div>
-
-          {/* Row 4: Latest Progress Reports */}
-          <div className="bg-white rounded-[24px] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] flex flex-col min-h-[400px] overflow-hidden transition-shadow duration-300">
-            <div className="p-4 md:p-6 lg:p-8 flex items-center justify-between border-b border-[#F1F5F9]">
-              <div className="flex items-center gap-2 md:gap-3">
-                 <div className="w-1 h-4 md:h-5 bg-[#DAA520] rounded-full"></div>
-                 <h3 className="text-[15px] md:text-[17px] font-bold text-[#1E293B] tracking-tight">
-                    Latest Progress Reports
-                 </h3>
-              </div>
-              
-              <div className="relative">
-                <button
-                  onClick={() => setShowFilter(!showFilter)}
-                  className="flex items-center gap-2 px-2.5 py-1.5 md:px-3 bg-white hover:bg-gray-50 border border-[#E2E8F0] rounded-lg text-[9px] md:text-[10px] font-bold text-[#64748B] uppercase tracking-wider transition-all shadow-sm"
+              <div className="flex flex-col gap-1 z-10">
+                <span
+                  className={`text-[10px] md:text-[11px] font-bold uppercase tracking-wider ${card.subTextColor}`}
                 >
-                  <span className="hidden sm:inline">{filterCategory}</span>
-                  <span className="sm:hidden">{filterCategory === "All Categories" ? "All" : filterCategory}</span>
-                   <ChevronDown size={14} className={`transition-transform duration-200 ${showFilter ? 'rotate-180':''}`} />
-                </button>
-                {showFilter && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white border border-[#F1F5F9] rounded-xl shadow-xl z-20 overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-200">
-                    {["All Categories", "Diet", "Workout", "Therapy"].map(
-                      (cat) => (
-                        <button
-                          key={cat}
-                          onClick={() => {
-                            setFilterCategory(cat);
-                            setShowFilter(false);
-                          }}
-                          className={`w-full text-left px-5 py-2.5 text-xs font-semibold transition-colors ${filterCategory === cat ? 'bg-[#F0FDF4] text-[#0A4F48]' : 'text-[#64748B] hover:bg-[#F8FAFC]'}`}
-                        >
-                          {cat}
-                        </button>
-                      ),
-                    )}
-                  </div>
-                )}
+                  {card.label}
+                </span>
+                <span
+                  className={`text-2xl md:text-3xl font-black tracking-tight ${card.textColor}`}
+                >
+                  {card.value}
+                </span>
+              </div>
+              <div
+                className={`${card.iconBg} p-3 md:p-3.5 rounded-xl shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 z-10`}
+              >
+                {card.icon}
               </div>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse min-w-[600px]">
-                <thead>
-                  <tr className="bg-[#F8FAFC] text-[10px] md:text-[11px] uppercase tracking-wider text-[#94A3B8] font-bold border-b border-[#F1F5F9]">
-                    <th className="px-4 py-3 md:px-6 md:py-4 md:pl-8">Client</th>
-                    <th className="px-4 py-3 md:px-6 md:py-4">Type</th>
-                    <th className="px-4 py-3 md:px-6 md:py-4">Expert</th>
-                    <th className="px-4 py-3 md:px-6 md:py-4">Submitted By</th>
-                    <th className="px-4 py-3 md:px-6 md:py-4">Time</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#F1F5F9]">
-                  {progressReports.length > 0 ? (
-                    progressReports.map((report, i) => (
-                      <tr
-                        key={i}
-                        className="hover:bg-[#F8FAFC]/50 transition-colors group cursor-default"
-                      >
-                        <td className="px-4 py-3 md:px-6 md:py-4 md:pl-8 text-[12px] md:text-[13px] font-bold text-[#1E293B] group-hover:text-[#0A4F48] transition-colors">
-                          {report.name}
-                        </td>
-                        <td className="px-4 py-3 md:px-6 md:py-4 text-[12px] md:text-[13px] text-[#475569] font-medium">
-                          {report.type}
-                        </td>
-                        <td className="px-4 py-3 md:px-6 md:py-4 text-sm">
-                          <span
-                             className={`px-2 py-0.5 md:px-2.5 md:py-1 rounded-md text-[9px] md:text-[10px] font-bold border ${
-                              report.expert === "Dietitian"
-                                ? "bg-amber-50 text-amber-700 border-amber-100"
-                                : report.expert === "Trainer"
-                                  ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                                  : "bg-indigo-50 text-indigo-700 border-indigo-100"
-                            }`}
+          ))}
+        </div>
+
+        <div className="flex gap-4 md:gap-6 lg:flex-row flex-col">
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-col gap-4 md:gap-6 min-w-0">
+            {/* Row 2: Charts */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <DashboardCard
+                title="Client Growth"
+                subTitle={`Last ${growthDuration} Months`}
+                onToggle={() =>
+                  toggleDuration(growthDuration, setGrowthDuration)
+                }
+              >
+                <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-4 md:mb-6">
+                  <LegendItem color="#F4DBC7" label="Active" />
+                  <LegendItem color="#DBDEDD" label="Inactive" />
+                  <LegendItem color="#0A4F48" label="New" />
+                </div>
+                <div className="h-56 md:h-64 relative">
+                  {growthData?.labels?.length > 0 ? (
+                    <Bar data={growthData} options={growthOptions} />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                      No data available
+                    </div>
+                  )}
+                </div>
+              </DashboardCard>
+
+              <DashboardCard
+                title="Client Compliance"
+                subTitle={`Last ${complianceDuration} Months`}
+                onToggle={() =>
+                  toggleDuration(complianceDuration, setComplianceDuration)
+                }
+              >
+                <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-4 md:mb-6">
+                  <LegendItem color="#EBF3F2" label="Diet" />
+                  <LegendItem color="#F4DBC7" label="Workout" />
+                  <LegendItem color="#0A4F48" label="Therapy" />
+                </div>
+                <div className="h-56 md:h-64">
+                  {complianceData?.labels?.length > 0 ? (
+                    <Bar data={complianceData} options={stackedOptions} />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                      No data available
+                    </div>
+                  )}
+                </div>
+              </DashboardCard>
+            </div>
+
+            {/* Row 3: Admin & Expert Performance */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <DashboardCard
+                title="Admin Performance"
+                subTitle={
+                  adminPerformanceDuration === 12
+                    ? "Last Year"
+                    : `Last ${adminPerformanceDuration} M`
+                }
+                onToggle={() =>
+                  toggleDuration(
+                    adminPerformanceDuration,
+                    setAdminPerformanceDuration,
+                  )
+                }
+              >
+                <div className="h-56 md:h-64 relative flex items-center justify-center py-2">
+                  {!subAdminPerformanceData.isZero ? (
+                    <Doughnut
+                      data={subAdminPerformanceData}
+                      options={performanceOptions}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                      No data available
+                    </div>
+                  )}
+                </div>
+                <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-dashed border-gray-100">
+                  {[
+                    {
+                      label: "Programs",
+                      val: subAdminPerformanceData.raw.programs,
+                      color: "bg-[#0A4F48]",
+                    },
+                    {
+                      label: "Experts",
+                      val: subAdminPerformanceData.raw.experts,
+                      color: "bg-[#EBF3F2]",
+                    },
+                    {
+                      label: "Clients",
+                      val: subAdminPerformanceData.raw.clients,
+                      color: "bg-[#F4DBC7]",
+                    },
+                  ].map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex flex-col items-center gap-1 group cursor-default"
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${item.color}`}
+                        ></span>
+                        <span className="text-[9px] md:text-[10px] uppercase text-[#94A3B8] font-bold">
+                          {item.label}
+                        </span>
+                      </div>
+                      <span className="text-base md:text-lg font-bold text-[#0A4F48] group-hover:scale-110 transition-transform">
+                        {item.val}%
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </DashboardCard>
+
+              <DashboardCard
+                title="Expert Performance"
+                subTitle={
+                  expertPerformanceDuration === 12
+                    ? "Last Year"
+                    : `Last ${expertPerformanceDuration} M`
+                }
+                onToggle={() =>
+                  toggleDuration(
+                    expertPerformanceDuration,
+                    setExpertPerformanceDuration,
+                  )
+                }
+              >
+                <div className="h-56 md:h-64 relative flex items-center justify-center py-2">
+                  {!expertPerformanceData.isZero ? (
+                    <Doughnut
+                      data={expertPerformanceData}
+                      options={performanceOptions}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                      No data available
+                    </div>
+                  )}
+                </div>
+                <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-dashed border-gray-100">
+                  {[
+                    {
+                      label: "Tasks",
+                      val: `${expertPerformanceData?.raw?.taskCompletion}%`,
+                      color: "bg-[#0A4F48]",
+                    },
+                    {
+                      label: "Rating",
+                      val: expertPerformanceData?.raw?.rating,
+                      color: "bg-[#EBF3F2]",
+                    },
+                    {
+                      label: "Assigned",
+                      val: expertPerformanceData?.raw?.clientsAssigned,
+                      color: "bg-[#F4DBC7]",
+                    },
+                  ].map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="flex flex-col items-center gap-1 group cursor-default"
+                    >
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${item.color}`}
+                        ></span>
+                        <span className="text-[9px] md:text-[10px] uppercase text-[#94A3B8] font-bold">
+                          {item.label}
+                        </span>
+                      </div>
+                      <span className="text-base md:text-lg font-bold text-[#0A4F48] group-hover:scale-110 transition-transform">
+                        {item.val}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </DashboardCard>
+            </div>
+
+            {/* Row 4: Latest Progress Reports */}
+            <div className="bg-white rounded-[24px] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] flex flex-col min-h-[400px] overflow-hidden transition-shadow duration-300">
+              <div className="p-4 md:p-6 lg:p-8 flex items-center justify-between border-b border-[#F1F5F9]">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="w-1 h-4 md:h-5 bg-[#DAA520] rounded-full"></div>
+                  <h3 className="text-[15px] md:text-[17px] font-bold text-[#1E293B] tracking-tight">
+                    Latest Progress Reports
+                  </h3>
+                </div>
+
+                <div className="relative">
+                  <button
+                    onClick={() => setShowFilter(!showFilter)}
+                    className="flex items-center gap-2 px-2.5 py-1.5 md:px-3 bg-white hover:bg-gray-50 border border-[#E2E8F0] rounded-lg text-[9px] md:text-[10px] font-bold text-[#64748B] uppercase tracking-wider transition-all shadow-sm"
+                  >
+                    <span className="hidden sm:inline">{filterCategory}</span>
+                    <span className="sm:hidden">
+                      {filterCategory === "All Categories"
+                        ? "All"
+                        : filterCategory}
+                    </span>
+                    <ChevronDown
+                      size={14}
+                      className={`transition-transform duration-200 ${showFilter ? "rotate-180" : ""}`}
+                    />
+                  </button>
+                  {showFilter && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white border border-[#F1F5F9] rounded-xl shadow-xl z-20 overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-200">
+                      {["All Categories", "Diet", "Workout", "Therapy"].map(
+                        (cat) => (
+                          <button
+                            key={cat}
+                            onClick={() => {
+                              setFilterCategory(cat);
+                              setShowFilter(false);
+                            }}
+                            className={`w-full text-left px-5 py-2.5 text-xs font-semibold transition-colors ${filterCategory === cat ? "bg-[#F0FDF4] text-[#0A4F48]" : "text-[#64748B] hover:bg-[#F8FAFC]"}`}
                           >
-                            {report.expert}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 md:px-6 md:py-4 text-[12px] md:text-[13px] text-[#475569]">
-                          {report.submittedBy}
-                        </td>
-                        <td className="px-4 py-3 md:px-6 md:py-4 text-[11px] md:text-[12px] text-[#94A3B8] font-medium group-hover:text-[#64748B]">
-                          {report.time}
+                            {cat}
+                          </button>
+                        ),
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse min-w-[600px]">
+                  <thead>
+                    <tr className="bg-[#F8FAFC] text-[10px] md:text-[11px] uppercase tracking-wider text-[#94A3B8] font-bold border-b border-[#F1F5F9]">
+                      <th className="px-4 py-3 md:px-6 md:py-4 md:pl-8">
+                        Client
+                      </th>
+                      <th className="px-4 py-3 md:px-6 md:py-4">Type</th>
+                      <th className="px-4 py-3 md:px-6 md:py-4">Expert</th>
+                      <th className="px-4 py-3 md:px-6 md:py-4">
+                        Submitted By
+                      </th>
+                      <th className="px-4 py-3 md:px-6 md:py-4">Time</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#F1F5F9]">
+                    {progressReports.length > 0 ? (
+                      progressReports.map((report, i) => (
+                        <tr
+                          key={i}
+                          className="hover:bg-[#F8FAFC]/50 transition-colors group cursor-default"
+                        >
+                          <td className="px-4 py-3 md:px-6 md:py-4 md:pl-8 text-[12px] md:text-[13px] font-bold text-[#1E293B] group-hover:text-[#0A4F48] transition-colors">
+                            {report.name}
+                          </td>
+                          <td className="px-4 py-3 md:px-6 md:py-4 text-[12px] md:text-[13px] text-[#475569] font-medium">
+                            {report.type}
+                          </td>
+                          <td className="px-4 py-3 md:px-6 md:py-4 text-sm">
+                            <span
+                              className={`px-2 py-0.5 md:px-2.5 md:py-1 rounded-md text-[9px] md:text-[10px] font-bold border ${
+                                report.expert === "Dietitian"
+                                  ? "bg-amber-50 text-amber-700 border-amber-100"
+                                  : report.expert === "Trainer"
+                                    ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                                    : "bg-indigo-50 text-indigo-700 border-indigo-100"
+                              }`}
+                            >
+                              {report.expert}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 md:px-6 md:py-4 text-[12px] md:text-[13px] text-[#475569]">
+                            {report.submittedBy}
+                          </td>
+                          <td className="px-4 py-3 md:px-6 md:py-4 text-[11px] md:text-[12px] text-[#94A3B8] font-medium group-hover:text-[#64748B]">
+                            {report.time}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td
+                          colSpan="5"
+                          className="px-6 py-12 text-center text-sm text-[#94A3B8] italic"
+                        >
+                          No progress reports found.
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="5"
-                        className="px-6 py-12 text-center text-sm text-[#94A3B8] italic"
-                      >
-                        No progress reports found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Sidebar */}
-        <div className="lg:w-80 flex flex-col gap-4 md:gap-6 shrink-0">
-          {/* Experts Gauge Card */}
-          <div className="bg-white p-5 md:p-6 rounded-[24px] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] transition-all duration-300 border border-[#EEF2F6] flex flex-col group hover:border-[#E2E8F0]">
-            <div className="flex items-center justify-between mb-2 md:mb-4">
-              <h3 className="text-[15px] md:text-[17px] font-bold text-[#1E293B] tracking-tight">Experts Overview</h3>
-              <MoreHorizontal size={20} className="text-[#94A3B8] group-hover:text-[#0A4F48] transition-colors cursor-pointer" />
-            </div>
-            <div className="h-40 md:h-48 relative flex items-center justify-center my-2 md:my-4">
-              <Doughnut
-                data={expertsSummaryData}
-                options={{
-                  plugins: { legend: { display: false } },
-                  maintainAspectRatio: false,
-                  cutout: "85%",
-                }}
-              />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[10%] flex flex-col items-center">
-                <span className="text-[9px] md:text-[10px] uppercase tracking-wide text-[#94A3B8] font-bold">
-                  Total
-                </span>
-                <span className="text-3xl md:text-4xl font-black text-[#1E293B] tracking-tighter">
-                  {founder?.data?.totalExperts || 0}
-                </span>
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
-            <div className="flex flex-col gap-1 md:gap-2">
-              {[
-                {
-                  label: "Trainers",
-                  count: founder?.data?.Trainers || 0,
-                  color: "bg-[#0A4F48]",
-                },
-                {
-                  label: "Dietitians",
-                  count: founder?.data?.Dietitians || 0,
-                  color: "bg-[#EBF3F2]",
-                },
-                {
-                  label: "Therapists",
-                  count: founder?.data?.Therapists || 0,
-                  color: "bg-[#FFD7A8]",
-                },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between p-2 md:p-3 rounded-xl hover:bg-[#F8FAFC] transition-colors cursor-default group/item">
-                  <div className="flex items-center gap-2 md:gap-3">
-                    <div className={`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full ${item.color} shadow-sm ring-1 ring-white`}></div>
-                    <span className="text-[11px] md:text-[12px] text-[#64748B] font-bold uppercase tracking-wide group-hover/item:text-[#334155] transition-colors">
-                      {item.label}
-                    </span>
-                  </div>
-                  <span className="text-[13px] md:text-[14px] font-bold text-[#1E293B]">
-                    {item.count}
-                  </span>
-                </div>
-              ))}
-            </div>
           </div>
 
-          {/* Recent Notifications */}
-          <RecentNotificationsCard
-            notifications={notifications}
-            loading={notificationsLoading}
-            className="min-h-0"
-          />
-        </div>
+          {/* Right Sidebar */}
+          <div className="lg:w-80 flex flex-col gap-4 md:gap-6 shrink-0">
+            {/* Experts Gauge Card */}
+            <div className="bg-white p-5 md:p-6 rounded-[24px] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] transition-all duration-300 border border-[#EEF2F6] flex flex-col group hover:border-[#E2E8F0]">
+              <div className="flex items-center justify-between mb-2 md:mb-4">
+                <h3 className="text-[15px] md:text-[17px] font-bold text-[#1E293B] tracking-tight">
+                  Experts Overview
+                </h3>
+                <MoreHorizontal
+                  size={20}
+                  className="text-[#94A3B8] group-hover:text-[#0A4F48] transition-colors cursor-pointer"
+                />
+              </div>
+              <div className="h-40 md:h-48 relative flex items-center justify-center my-2 md:my-4">
+                <Doughnut
+                  data={expertsSummaryData}
+                  options={{
+                    plugins: { legend: { display: false } },
+                    maintainAspectRatio: false,
+                    cutout: "85%",
+                  }}
+                />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[10%] flex flex-col items-center">
+                  <span className="text-[9px] md:text-[10px] uppercase tracking-wide text-[#94A3B8] font-bold">
+                    Total
+                  </span>
+                  <span className="text-3xl md:text-4xl font-black text-[#1E293B] tracking-tighter">
+                    {founder?.data?.totalExperts || 0}
+                  </span>
+                </div>
+              </div>
+              <div className="flex flex-col gap-1 md:gap-2">
+                {[
+                  {
+                    label: "Trainers",
+                    count: founder?.data?.Trainers || 0,
+                    color: "bg-[#0A4F48]",
+                  },
+                  {
+                    label: "Dietitians",
+                    count: founder?.data?.Dietitians || 0,
+                    color: "bg-[#EBF3F2]",
+                  },
+                  {
+                    label: "Therapists",
+                    count: founder?.data?.Therapists || 0,
+                    color: "bg-[#FFD7A8]",
+                  },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between p-2 md:p-3 rounded-xl hover:bg-[#F8FAFC] transition-colors cursor-default group/item"
+                  >
+                    <div className="flex items-center gap-2 md:gap-3">
+                      <div
+                        className={`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full ${item.color} shadow-sm ring-1 ring-white`}
+                      ></div>
+                      <span className="text-[11px] md:text-[12px] text-[#64748B] font-bold uppercase tracking-wide group-hover/item:text-[#334155] transition-colors">
+                        {item.label}
+                      </span>
+                    </div>
+                    <span className="text-[13px] md:text-[14px] font-bold text-[#1E293B]">
+                      {item.count}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
 
+            {/* Recent Notifications */}
+            <RecentNotificationsCard
+              notifications={notifications}
+              loading={notificationsLoading}
+              className="min-h-0"
+            />
+          </div>
+        </div>
       </div>
-    </div>
     </>
   );
 };

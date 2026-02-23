@@ -16,12 +16,15 @@ export default function KpiCard({ title, value, icon, bg, iconColor, cardBg }) {
         className="w-12 h-12 flex items-center justify-center rounded-[22px]"
         style={{ backgroundColor: bg }}
       >
-        <img
+        {/* <img
           src={icon}
           alt={title}
           className="w-6 h-6"
           style={{ filter: iconColor ? "brightness(0) invert(1)" : "none" }}
-        />
+        /> */}
+        <div>
+          {icon}
+        </div>
       </div>
     </div>
   );
