@@ -3,7 +3,18 @@ import KpiCard from "@/components/cards/KpiCard";
 import React, { useState } from "react";
 import PayrollMenu from "./PayrollMenu";
 import { useAppSelector } from "@/redux/store/hooks";
-import { selectEmployeeCount, selectTotalBaseSalary, selectTotalIncentive, selectTotalSalary } from "@/redux/features/finance/finance.selector";
+import {
+  IdCardLanyard,
+  Banknote,
+  BadgePercent,
+  BanknoteArrowUp,
+} from "lucide-react";
+import {
+  selectEmployeeCount,
+  selectTotalBaseSalary,
+  selectTotalIncentive,
+  selectTotalSalary,
+} from "@/redux/features/finance/finance.selector";
 
 export default function FinanceKpi() {
   const [payrollOpen, setPayrollOpen] = useState(false);
@@ -11,8 +22,6 @@ export default function FinanceKpi() {
   const totalPayroll = useAppSelector(selectTotalSalary);
   const totalBaseSalary = useAppSelector(selectTotalBaseSalary);
   const totalIncentive = useAppSelector(selectTotalIncentive);
-
-
 
   return (
     <div className="relative flex flex-col items-center gap-8 md:gap-4 w-full bg-white p-5 rounded-xl mb-4 h-[calc()]">
@@ -33,28 +42,37 @@ export default function FinanceKpi() {
         <KpiCard
           title="Total Employees"
           value={count}
-          icon={assets.totalEmploy}
+          icon={
+            <IdCardLanyard size={20} className="text-[#ffffff] md:w-6 md:h-6" />
+          }
           iconClass="bg-[#0A4F48]"
           bg="#0A4F48"
         />
         <KpiCard
           title="Total Incentive"
           value={`₹ ${totalIncentive?.toLocaleString("en-IN")}`}
-          icon={assets.totalPayroll}
+          icon={
+            <BadgePercent size={20} className="text-[#0A4F48] md:w-6 md:h-6" />
+          }
           iconClass="bg-[#F4DBC7]"
           bg="#F4DBC7"
         />
         <KpiCard
           title="Total Base Salary"
           value={`₹ ${totalBaseSalary?.toLocaleString("en-IN")}`}
-          icon={assets.pendingPayroll}
+          icon={<Banknote size={20} className="text-[#ffffff] md:w-6 md:h-6" />}
           iconClass="bg-[#0A4F48]"
           bg="#0A4F48"
         />
         <KpiCard
           title="Total Payroll"
           value={`₹ ${totalPayroll?.toLocaleString("en-IN")}`}
-          icon={assets.totalPayroll}
+          icon={
+            <BanknoteArrowUp
+              size={20}
+              className="text-[#0A4F48] md:w-6 md:h-6"
+            />
+          }
           iconClass="bg-[#F4DBC7]"
           bg="#F4DBC7"
         />

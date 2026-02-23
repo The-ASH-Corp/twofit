@@ -4,6 +4,7 @@ import { selectUser } from '@/redux/features/auth/auth.selectores';
 import { refreshProfile } from '@/redux/features/auth/auth.thunk';
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
+import { BanknoteArrowDown, Banknote, BadgePercent } from "lucide-react";
 
 export default function FinanceKpi() {
   const dispatch = useDispatch();
@@ -20,19 +21,26 @@ export default function FinanceKpi() {
         <KpiCard
           title="Base Salary"
           value={`₹ ${user?.salary?.toLocaleString("en-IN")}`}
-          icon={assets.totalEmploy}
+          icon={<Banknote size={20} className="text-[#ffffff] md:w-6 md:h-6" />}
           bg="#0A4F48"
         />
         <KpiCard
           title="Total Incentives"
           value={`₹ ${user?.incentives?.toLocaleString("en-IN")}`}
-          icon={assets.totalPayroll}
+          icon={
+            <BadgePercent size={20} className="text-[#0A4F48] md:w-6 md:h-6" />
+          }
           bg="#F4DBC7"
         />
         <KpiCard
           title="Net Salary"
           value={`₹ ${netSalary?.toLocaleString("en-IN")}`}
-          icon={assets.pendingPayroll}
+          icon={
+            <BanknoteArrowDown
+              size={20}
+              className="text-[#ffffff] md:w-6 md:h-6"
+            />
+          }
           bg="#0A4F48"
         />
       </div>
