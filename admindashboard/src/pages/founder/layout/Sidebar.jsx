@@ -87,12 +87,17 @@ export default function Sidebar({ isOpen, onClose }) {
         {/* Logo and Mobile Close */}
         <div className="flex items-center justify-between lg:justify-center mb-8 px-2">
           <div className="flex justify-center">
-            <img src={assets.logo} alt="logo" className="h-8 cursor-pointer" onClick={() => navigate("/founder")} />
+            <img
+              src={assets.logo}
+              alt="logo"
+              className="h-8 cursor-pointer"
+              onClick={() => navigate("/founder")}
+            />
           </div>
           {/* Close button for mobile */}
           <button
             onClick={onClose}
-            className="p-1 lg:hidden text-gray-500 hover:bg-gray-100 rounded-lg"
+            className=" p-1 lg:hidden text-gray-500 hover:bg-gray-100 rounded-bl-lg"
           >
             <X size={24} />
           </button>
@@ -129,8 +134,8 @@ export default function Sidebar({ isOpen, onClose }) {
                     to={item.path}
                     end={item.path === "/founder"}
                     onClick={() => {
-                        if (window.innerWidth < 1024) onClose();
-                      }}
+                      if (window.innerWidth < 1024) onClose();
+                    }}
                     className={({ isActive }) =>
                       `flex items-center gap-3 w-full px-4 py-3 text-sm font-medium rounded-xl transition-colors duration-300 
                     ${
@@ -140,13 +145,16 @@ export default function Sidebar({ isOpen, onClose }) {
                     }`
                     }
                   >
-                   {({ isActive }) => (
-                    <>
-                    <img src={item.icon} className={`w-5 h-5 object-contain transition-all ${
-                      isActive ? "brightness-0 invert" : ""
-                    }`} />
-                    {item.label}
-                    </>
+                    {({ isActive }) => (
+                      <>
+                        <img
+                          src={item.icon}
+                          className={`w-5 h-5 object-contain transition-all ${
+                            isActive ? "brightness-0 invert" : ""
+                          }`}
+                        />
+                        {item.label}
+                      </>
                     )}
                   </NavLink>
                 )}
@@ -156,9 +164,7 @@ export default function Sidebar({ isOpen, onClose }) {
                   <div
                     className={`ml-6 pl-2 border-l border-l-[#DBDEDD] overflow-hidden transition-all duration-400 ease-in-out
                     ${
-                      isOpen
-                        ? "max-h-40 opacity-100 mt-2"
-                        : "max-h-0 opacity-0"
+                      isOpen ? "max-h-40 opacity-100 mt-2" : "max-h-0 opacity-0"
                     }`}
                   >
                     <div className="flex flex-col gap-2 ">
