@@ -125,7 +125,13 @@ const ExpertLeftSide = ({ expert }) => {
     { label: "Experience", value: `${expert?.experience || 0} Years`, icon: Clock },
     { label: "Clients", value: expert?.assignedUsers?.length || 0, icon: User },
     { label: "Rating", value: `${expert?.avgRating?.toFixed(1) || 0} / 5.0`, icon: Star },
-    { label: "Category", value: expert?.specialization?.join(", ") || "N/A", icon: Layers },
+    { 
+      label: "Specialisation", 
+      value: Array.isArray(expert?.specialization) 
+        ? expert.specialization.map(s => (typeof s === 'object' ? s.title : s)).join(", ") 
+        : (expert?.specialization || "N/A"), 
+      icon: Layers 
+    },
   ];
 
   const contactDetails = [
@@ -203,7 +209,7 @@ const ExpertLeftSide = ({ expert }) => {
                           <item.icon size={12} className="text-[#64748B]" />
                           <span className="text-[10px] text-[#64748B] font-medium">{item.label}</span>
                        </div>
-                       <p className="text-sm font-bold text-[#334155]">{item.value}</p>
+                       <p className="text-sm font-bold text-[#334155] line-clamp-2">{item.value}</p>
                     </div>
                   ))}
                </div>
