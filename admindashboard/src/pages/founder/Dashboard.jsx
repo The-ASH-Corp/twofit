@@ -31,7 +31,8 @@ import {
   selectFounderStatus,
 } from "@/redux/features/founder/founder.selector";
 import useRecentNotifications from "@/hooks/useRecentNotifications";
-import RecentNotificationsCard from "@/components/notifications/RecentNotificationsCard";
+import RecentNotificationsCard from "@/components/notifications/FounderRecentNotificationsCard";
+import BackgroundAnimation from "@/components/ui/BackgroundAnimation";
 
 ChartJS.register(
   CategoryScale,
@@ -111,8 +112,9 @@ const Dashboard = () => {
           growthDuration,
         ),
         backgroundColor: "#F4DBC7",
-        borderRadius: 4,
-        barThickness: 12,
+        hoverBackgroundColor: "#F7E6D7",
+        borderRadius: 8,
+        barThickness: 14,
       },
       {
         label: "Inactive",
@@ -121,8 +123,9 @@ const Dashboard = () => {
           growthDuration,
         ),
         backgroundColor: "#EBF3F2",
-        borderRadius: 4,
-        barThickness: 12,
+        hoverBackgroundColor: "#F0F6F5",
+        borderRadius: 8,
+        barThickness: 14,
       },
       {
         label: "New",
@@ -131,8 +134,9 @@ const Dashboard = () => {
           growthDuration,
         ),
         backgroundColor: "#0A4F48",
-        borderRadius: 4,
-        barThickness: 12,
+        hoverBackgroundColor: "#0D6159",
+        borderRadius: 8,
+        barThickness: 14,
       },
     ],
   };
@@ -158,12 +162,13 @@ const Dashboard = () => {
           (v) => v / 3,
         ),
         backgroundColor: color,
-        borderRadius: 8,
+        borderRadius: 12,
         borderSkipped: false,
-        barThickness: 30,
-        maxBarThickness: 30,
-        borderWidth: 2,
+        barThickness: 32,
+        maxBarThickness: 32,
+        borderWidth: 3,
         borderColor: "#FFFFFF",
+        hoverBorderWidth: 0,
       };
     }),
   };
@@ -438,68 +443,101 @@ const Dashboard = () => {
     );
 
   return (
-    <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA] h-[calc(100vh-120px)] overflow-auto  no-scrollbar">
-      {/* Summary Cards */}
+    <>
+    <BackgroundAnimation />
+    <div className="flex flex-col gap-4 md:gap-6 p-3 md:p-5 lg:p-8 bg-transparent min-h-full font-sans max-w-[1600px] mx-auto relative z-10">
+      
+      {/* Welcome Header */}
+      <div className="flex flex-col gap-1 mb-2">
+        <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#0A4F48] tracking-tight">Overview</h1>
+        <p className="text-xs md:text-sm text-[#66706D]">Track your platform's growth and performance metrics.</p>
+      </div>
 
-      <div className="flex gap-6 lg:flex-row flex-col">
-        {/* Main Content Area */}
-        <div className="flex-1 flex flex-col gap-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              {
-                label: "Total Clients",
-                value: founder?.data?.totalClient || 0,
-                icon: <Users size={20} className="text-[#0A4F48]" />,
-                bg: "bg-[#EBF3F2]",
-              },
-              {
-                label: "Headers",
-                value: founder?.data?.totalHeads || 0,
-                icon: <UserCheck size={20} className="text-[#DAA520]" />,
-                bg: "bg-[#FAF3E0]",
-              },
-              {
-                label: "Admins",
-                value: founder?.data?.totalAdmins || 0,
-                icon: <FileText size={20} className="text-[#0A4F48]" />,
-                bg: "bg-[#EBF3F2]",
-              },
-              {
-                label: "Total Programs",
-                value: founder?.data?.totalPrograms || 0,
-                icon: <Layout size={20} className="text-[#DAA520]" />,
-                bg: "bg-[#FAF3E0]",
-              },
-            ].map((card, i) => (
-              <div
-                key={i}
-                className="bg-white p-5 rounded-2xl flex items-center justify-between shadow-sm"
-              >
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm text-[#66706D] font-medium">
-                    {card.label}
-                  </span>
-                  <span className="text-2xl font-bold text-[#0A4F48]">
-                    {card.value}
-                  </span>
-                </div>
-                <div className={`${card.bg} p-3 rounded-full`}>{card.icon}</div>
-              </div>
-            ))}
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+        {[
+          {
+            label: "Total Clients",
+            value: founder?.data?.totalClient || 0,
+            icon: <Users size={20} className="text-white md:w-6 md:h-6" />,
+            bg: "bg-linear-to-br from-[#0A4F48] to-[#128a7e] text-white",
+            iconBg: "bg-white/20",
+            border: "border-transparent",
+            textColor: "text-white",
+            subTextColor: "text-white/80"
+          },
+          {
+            label: "Heads",
+            value: founder?.data?.totalHeads || 0,
+            icon: <UserCheck size={20} className="text-[#DAA520] md:w-6 md:h-6" />,
+            bg: "bg-white hover:bg-[#FAF3E0]/30",
+            border: "border-[#DAA520]/20",
+            iconBg: "bg-[#FAF3E0]",
+            textColor: "text-[#0A4F48]",
+            subTextColor: "text-[#66706D]"
+          },
+          {
+            label: "Admins",
+            value: founder?.data?.totalAdmins || 0,
+            icon: <FileText size={20} className="text-[#0A4F48] md:w-6 md:h-6" />,
+            bg: "bg-white hover:bg-[#EBF3F2]/50",
+            border: "border-[#0A4F48]/10",
+            iconBg: "bg-[#EBF3F2]",
+            textColor: "text-[#0A4F48]",
+            subTextColor: "text-[#66706D]"
+          },
+          {
+            label: "Total Programs",
+            value: founder?.data?.totalPrograms || 0,
+            icon: <Layout size={20} className="text-[#DAA520] md:w-6 md:h-6" />,
+            bg: "bg-white hover:bg-[#FAF3E0]/30",
+             border: "border-[#DAA520]/20",
+            iconBg: "bg-[#FAF3E0]",
+            textColor: "text-[#0A4F48]",
+            subTextColor: "text-[#66706D]"
+          },
+        ].map((card, i) => (
+          <div
+            key={i}
+            className={`${card.bg} ${card.border ? `border ${card.border}` : ''} p-5 md:p-6 rounded-[20px] shadow-[0_2px_10px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group cursor-default relative overflow-hidden`}
+          >
+             {/* Subtle pattern for the first card */}
+             {i === 0 && (
+               <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+             )}
+             
+            <div className="flex flex-col gap-1 z-10">
+              <span className={`text-[10px] md:text-[11px] font-bold uppercase tracking-wider ${card.subTextColor}`}>
+                {card.label}
+              </span>
+              <span className={`text-2xl md:text-3xl font-black tracking-tight ${card.textColor}`}>
+                {card.value}
+              </span>
+            </div>
+            <div className={`${card.iconBg} p-3 md:p-3.5 rounded-xl shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 z-10`}>
+                {card.icon}
+            </div>
           </div>
-          {/* Row 2: Client Growth & Client Compliance */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        ))}
+      </div>
+
+      <div className="flex gap-4 md:gap-6 lg:flex-row flex-col">
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col gap-4 md:gap-6 min-w-0">
+          
+          {/* Row 2: Charts */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <DashboardCard
               title="Client Growth"
               subTitle={`Last ${growthDuration} Months`}
               onToggle={() => toggleDuration(growthDuration, setGrowthDuration)}
             >
-              <div className="flex items-center gap-4 mb-4">
+              <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-4 md:mb-6">
                 <LegendItem color="#F4DBC7" label="Active" />
                 <LegendItem color="#DBDEDD" label="Inactive" />
                 <LegendItem color="#0A4F48" label="New" />
               </div>
-              <div className="h-64 relative">
+              <div className="h-56 md:h-64 relative">
                 {growthData?.labels?.length > 0 ? (
                   <Bar data={growthData} options={growthOptions} />
                 ) : (
@@ -517,12 +555,12 @@ const Dashboard = () => {
                 toggleDuration(complianceDuration, setComplianceDuration)
               }
             >
-              <div className="flex items-center gap-4 mb-4">
+               <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-4 md:mb-6">
                 <LegendItem color="#EBF3F2" label="Diet" />
                 <LegendItem color="#F4DBC7" label="Workout" />
                 <LegendItem color="#0A4F48" label="Therapy" />
               </div>
-              <div className="h-64">
+              <div className="h-56 md:h-64">
                 {complianceData?.labels?.length > 0 ? (
                   <Bar data={complianceData} options={stackedOptions} />
                 ) : (
@@ -534,14 +572,14 @@ const Dashboard = () => {
             </DashboardCard>
           </div>
 
-          {/* Row 3: New Clients Joined & Expert Performance */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Row 3: Admin & Expert Performance */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <DashboardCard
               title="Admin Performance"
               subTitle={
                 adminPerformanceDuration === 12
                   ? "Last Year"
-                  : `Last ${adminPerformanceDuration} Months`
+                  : `Last ${adminPerformanceDuration} M`
               }
               onToggle={() =>
                 toggleDuration(
@@ -550,7 +588,7 @@ const Dashboard = () => {
                 )
               }
             >
-              <div className="h-64 relative flex items-center justify-center">
+              <div className="h-56 md:h-64 relative flex items-center justify-center py-2">
                 {!subAdminPerformanceData.isZero ? (
                   <Doughnut
                     data={subAdminPerformanceData}
@@ -562,43 +600,30 @@ const Dashboard = () => {
                   </div>
                 )}
               </div>
-              <div className="flex justify-between mt-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-xs bg-[#0A4F48]"></div>
-                  <span className="text-[11px] text-[#66706D]">
-                    Programs{" "}
-                    <strong className="text-[#0A4F48] text-[12px]">
-                      {subAdminPerformanceData.raw.programs}%
-                    </strong>
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-xs bg-[#EBF3F2]"></div>
-                  <span className="text-[11px] text-[#66706D]">
-                    Experts{" "}
-                    <strong className="text-[#0A4F48] text-[12px]">
-                      {subAdminPerformanceData.raw.experts}%
-                    </strong>
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-xs bg-[#F4DBC7]"></div>
-                  <span className="text-[11px] text-[#66706D]">
-                    Clients{" "}
-                    <strong className="text-[#0A4F48] text-[12px]">
-                      {subAdminPerformanceData.raw.clients}%
-                    </strong>
-                  </span>
-                </div>
+              <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-dashed border-gray-100">
+                {[
+                    { label: "Programs", val: subAdminPerformanceData.raw.programs, color: "bg-[#0A4F48]" },
+                    { label: "Experts", val: subAdminPerformanceData.raw.experts, color: "bg-[#EBF3F2]" },
+                    { label: "Clients", val: subAdminPerformanceData.raw.clients, color: "bg-[#F4DBC7]" },
+                ].map((item, idx) => (
+                    <div key={idx} className="flex flex-col items-center gap-1 group cursor-default">
+                         <div className="flex items-center gap-1.5">
+                            <span className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${item.color}`}></span>
+                            <span className="text-[9px] md:text-[10px] uppercase text-[#94A3B8] font-bold">{item.label}</span>
+                         </div>
+                        <span className="text-base md:text-lg font-bold text-[#0A4F48] group-hover:scale-110 transition-transform">{item.val}%</span>
+                    </div>
+                ))}
               </div>
             </DashboardCard>
+
 
             <DashboardCard
               title="Expert Performance"
               subTitle={
                 expertPerformanceDuration === 12
                   ? "Last Year"
-                  : `Last ${expertPerformanceDuration} Months`
+                  : `Last ${expertPerformanceDuration} M`
               }
               onToggle={() =>
                 toggleDuration(
@@ -607,65 +632,57 @@ const Dashboard = () => {
                 )
               }
             >
-              <div className="h-64 relative flex items-center justify-center">
+              <div className="h-56 md:h-64 relative flex items-center justify-center py-2">
                 {!expertPerformanceData.isZero ? (
-                  <Doughnut
-                    data={expertPerformanceData}
-                    options={performanceOptions}
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-gray-400 text-sm">
-                    No data available
-                  </div>
+                    <Doughnut
+                        data={expertPerformanceData}
+                        options={performanceOptions}
+                    />
+                    ) : (
+                    <div className="flex items-center justify-center h-full text-gray-400 text-sm">
+                        No data available
+                    </div>
                 )}
               </div>
-              <div className="flex justify-between mt-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-xs bg-[#0A4F48]"></div>
-                  <span className="text-[12px] text-[#66706D]">
-                    Task Completion{" "}
-                    <strong className="text-[#0A4F48] text-[12px]">
-                      {expertPerformanceData?.raw?.taskCompletion}%
-                    </strong>
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-xs bg-[#EBF3F2]"></div>
-                  <span className="text-[12px] text-[#66706D]">
-                    Rating{" "}
-                    <strong className="text-[#0A4F48] text-[12px]">
-                      {expertPerformanceData?.raw?.rating}
-                    </strong>
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-xs bg-[#F4DBC7]"></div>
-                  <span className="text-[12px] text-[#66706D]">
-                    Clients Assigned{" "}
-                    <strong className="text-[#0A4F48] text-[12px]">
-                      {expertPerformanceData?.raw?.clientsAssigned}%
-                    </strong>
-                  </span>
-                </div>
+              <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-dashed border-gray-100">
+                {[
+                    { label: "Tasks", val: `${expertPerformanceData?.raw?.taskCompletion}%`, color: "bg-[#0A4F48]" },
+                    { label: "Rating", val: expertPerformanceData?.raw?.rating, color: "bg-[#EBF3F2]" },
+                    { label: "Assigned", val: expertPerformanceData?.raw?.clientsAssigned, color: "bg-[#F4DBC7]" },
+                ].map((item, idx) => (
+                    <div key={idx} className="flex flex-col items-center gap-1 group cursor-default">
+                         <div className="flex items-center gap-1.5">
+                            <span className={`w-1.5 h-1.5 md:w-2 md:h-2 rounded-full ${item.color}`}></span>
+                            <span className="text-[9px] md:text-[10px] uppercase text-[#94A3B8] font-bold">{item.label}</span>
+                         </div>
+                        <span className="text-base md:text-lg font-bold text-[#0A4F48] group-hover:scale-110 transition-transform">{item.val}</span>
+                    </div>
+                ))}
               </div>
             </DashboardCard>
           </div>
 
           {/* Row 4: Latest Progress Reports */}
-          <div className="bg-white rounded-2xl shadow-sm flex flex-col min-h-[400px]">
-            <div className="p-6 border-b border-gray-50 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-[#0A4F48]">
-                Latest Progress Reports
-              </h3>
+          <div className="bg-white rounded-[24px] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] flex flex-col min-h-[400px] overflow-hidden transition-shadow duration-300">
+            <div className="p-4 md:p-6 lg:p-8 flex items-center justify-between border-b border-[#F1F5F9]">
+              <div className="flex items-center gap-2 md:gap-3">
+                 <div className="w-1 h-4 md:h-5 bg-[#DAA520] rounded-full"></div>
+                 <h3 className="text-[15px] md:text-[17px] font-bold text-[#1E293B] tracking-tight">
+                    Latest Progress Reports
+                 </h3>
+              </div>
+              
               <div className="relative">
                 <button
                   onClick={() => setShowFilter(!showFilter)}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D]"
+                  className="flex items-center gap-2 px-2.5 py-1.5 md:px-3 bg-white hover:bg-gray-50 border border-[#E2E8F0] rounded-lg text-[9px] md:text-[10px] font-bold text-[#64748B] uppercase tracking-wider transition-all shadow-sm"
                 >
-                  {filterCategory} <ChevronDown size={14} />
+                  <span className="hidden sm:inline">{filterCategory}</span>
+                  <span className="sm:hidden">{filterCategory === "All Categories" ? "All" : filterCategory}</span>
+                   <ChevronDown size={14} className={`transition-transform duration-200 ${showFilter ? 'rotate-180':''}`} />
                 </button>
                 {showFilter && (
-                  <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-100 rounded-lg shadow-lg z-10 py-1">
+                  <div className="absolute right-0 mt-2 w-48 bg-white border border-[#F1F5F9] rounded-xl shadow-xl z-20 overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-200">
                     {["All Categories", "Diet", "Workout", "Therapy"].map(
                       (cat) => (
                         <button
@@ -674,7 +691,7 @@ const Dashboard = () => {
                             setFilterCategory(cat);
                             setShowFilter(false);
                           }}
-                          className="w-full text-left px-4 py-2 text-xs hover:bg-gray-50 text-[#66706D]"
+                          className={`w-full text-left px-5 py-2.5 text-xs font-semibold transition-colors ${filterCategory === cat ? 'bg-[#F0FDF4] text-[#0A4F48]' : 'text-[#64748B] hover:bg-[#F8FAFC]'}`}
                         >
                           {cat}
                         </button>
@@ -685,62 +702,55 @@ const Dashboard = () => {
               </div>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left">
+              <table className="w-full text-left border-collapse min-w-[600px]">
                 <thead>
-                  <tr className="bg-[#F8F9FA] text-[11px] uppercase tracking-wider text-[#66706D] font-bold">
-                    <th className="px-6 py-4">Client Name</th>
-                    <th className="px-6 py-4">Report Type</th>
-                    <th className="px-6 py-4">Expert</th>
-                    <th className="px-6 py-4">Submitted To</th>
-                    <th className="px-6 py-4">Date & Time</th>
-                    {/* <th className="px-6 py-4">Action</th> */}
+                  <tr className="bg-[#F8FAFC] text-[10px] md:text-[11px] uppercase tracking-wider text-[#94A3B8] font-bold border-b border-[#F1F5F9]">
+                    <th className="px-4 py-3 md:px-6 md:py-4 md:pl-8">Client</th>
+                    <th className="px-4 py-3 md:px-6 md:py-4">Type</th>
+                    <th className="px-4 py-3 md:px-6 md:py-4">Expert</th>
+                    <th className="px-4 py-3 md:px-6 md:py-4">Submitted By</th>
+                    <th className="px-4 py-3 md:px-6 md:py-4">Time</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-50">
+                <tbody className="divide-y divide-[#F1F5F9]">
                   {progressReports.length > 0 ? (
                     progressReports.map((report, i) => (
                       <tr
                         key={i}
-                        className="hover:bg-gray-50 transition-colors"
+                        className="hover:bg-[#F8FAFC]/50 transition-colors group cursor-default"
                       >
-                        <td className="px-6 py-4 text-sm font-medium text-[#0A4F48]">
+                        <td className="px-4 py-3 md:px-6 md:py-4 md:pl-8 text-[12px] md:text-[13px] font-bold text-[#1E293B] group-hover:text-[#0A4F48] transition-colors">
                           {report.name}
                         </td>
-                        <td className="px-6 py-4 text-sm text-[#011412]">
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-[12px] md:text-[13px] text-[#475569] font-medium">
                           {report.type}
                         </td>
-                        <td className="px-6 py-4 text-sm">
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-sm">
                           <span
-                            className={`px-3 py-1 rounded-md text-[10px] font-bold ${
+                             className={`px-2 py-0.5 md:px-2.5 md:py-1 rounded-md text-[9px] md:text-[10px] font-bold border ${
                               report.expert === "Dietitian"
-                                ? "bg-[#FAF3E0] text-[#DAA520]"
+                                ? "bg-amber-50 text-amber-700 border-amber-100"
                                 : report.expert === "Trainer"
-                                  ? "bg-[#EBF3F2] text-[#0A4F48]"
-                                  : "bg-[#F0FDF4] text-[#15803D]"
+                                  ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                                  : "bg-indigo-50 text-indigo-700 border-indigo-100"
                             }`}
                           >
                             {report.expert}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-sm text-[#011412]">
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-[12px] md:text-[13px] text-[#475569]">
                           {report.submittedBy}
                         </td>
-                        <td className="px-6 py-4 text-sm text-[#66706D]">
+                        <td className="px-4 py-3 md:px-6 md:py-4 text-[11px] md:text-[12px] text-[#94A3B8] font-medium group-hover:text-[#64748B]">
                           {report.time}
                         </td>
-                        {/* <td className="px-6 py-4 text-sm text-[#66706D]">
-                        <MoreHorizontal
-                          size={18}
-                          className="cursor-pointer hover:text-gray-900"
-                        />
-                      </td> */}
                       </tr>
                     ))
                   ) : (
                     <tr>
                       <td
                         colSpan="5"
-                        className="px-6 py-4 text-center text-sm text-[#66706D]"
+                        className="px-6 py-12 text-center text-sm text-[#94A3B8] italic"
                       >
                         No progress reports found.
                       </td>
@@ -753,32 +763,32 @@ const Dashboard = () => {
         </div>
 
         {/* Right Sidebar */}
-        <div className="lg:w-80 flex flex-col gap-6">
+        <div className="lg:w-80 flex flex-col gap-4 md:gap-6 shrink-0">
           {/* Experts Gauge Card */}
-          <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-lg font-bold text-[#0A4F48]">Experts</h3>
-              <MoreHorizontal size={20} className="text-gray-400" />
+          <div className="bg-white p-5 md:p-6 rounded-[24px] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] transition-all duration-300 border border-[#EEF2F6] flex flex-col group hover:border-[#E2E8F0]">
+            <div className="flex items-center justify-between mb-2 md:mb-4">
+              <h3 className="text-[15px] md:text-[17px] font-bold text-[#1E293B] tracking-tight">Experts Overview</h3>
+              <MoreHorizontal size={20} className="text-[#94A3B8] group-hover:text-[#0A4F48] transition-colors cursor-pointer" />
             </div>
-            <div className="h-48 relative flex items-center justify-center">
+            <div className="h-40 md:h-48 relative flex items-center justify-center my-2 md:my-4">
               <Doughnut
                 data={expertsSummaryData}
                 options={{
                   plugins: { legend: { display: false } },
                   maintainAspectRatio: false,
-                  cutout: "80%",
+                  cutout: "85%",
                 }}
               />
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[10%] flex flex-col items-center">
-                <span className="text-[10px] text-[#66706D] font-medium">
-                  Total Experts
+                <span className="text-[9px] md:text-[10px] uppercase tracking-wide text-[#94A3B8] font-bold">
+                  Total
                 </span>
-                <span className="text-3xl font-bold text-[#0A4F48]">
+                <span className="text-3xl md:text-4xl font-black text-[#1E293B] tracking-tighter">
                   {founder?.data?.totalExperts || 0}
                 </span>
               </div>
             </div>
-            <div className="flex flex-col gap-3 mt-4">
+            <div className="flex flex-col gap-1 md:gap-2">
               {[
                 {
                   label: "Trainers",
@@ -796,14 +806,14 @@ const Dashboard = () => {
                   color: "bg-[#FFD7A8]",
                 },
               ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-sm ${item.color}`}></div>
-                    <span className="text-xs text-[#66706D] font-medium">
+                <div key={i} className="flex items-center justify-between p-2 md:p-3 rounded-xl hover:bg-[#F8FAFC] transition-colors cursor-default group/item">
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <div className={`w-2 h-2 md:w-2.5 md:h-2.5 rounded-full ${item.color} shadow-sm ring-1 ring-white`}></div>
+                    <span className="text-[11px] md:text-[12px] text-[#64748B] font-bold uppercase tracking-wide group-hover/item:text-[#334155] transition-colors">
                       {item.label}
                     </span>
                   </div>
-                  <span className="text-xs font-bold text-[#0A4F48]">
+                  <span className="text-[13px] md:text-[14px] font-bold text-[#1E293B]">
                     {item.count}
                   </span>
                 </div>
@@ -818,19 +828,27 @@ const Dashboard = () => {
             className="min-h-0"
           />
         </div>
+
       </div>
     </div>
+    </>
   );
 };
 
 const DashboardCard = ({ title, subTitle, children, onToggle }) => (
-  <div className="bg-white p-6 rounded-2xl shadow-sm flex flex-col">
-    <div className="flex items-center justify-between mb-6">
-      <h3 className="text-base font-bold text-[#0A4F48]">{title}</h3>
+  <div className="bg-white p-5 md:p-6 rounded-[24px] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] transition-all duration-300 border border-[#Eef2f6] flex flex-col group h-full hover:border-[#E2E8F0]">
+    <div className="flex items-center justify-between mb-4 md:mb-6">
+      <div className="flex items-center gap-2 md:gap-3">
+         <div className="w-1 h-4 md:h-5 bg-[#DAA520] rounded-full group-hover:h-6 md:group-hover:h-8 group-hover:bg-[#0A4F48] transition-all duration-500 ease-out"></div>
+         <div>
+            <h3 className="text-[15px] md:text-[17px] font-bold text-[#1E293B] tracking-tight">{title}</h3>
+            {/* Optional tiny line or dot if needed */}
+         </div>
+      </div>
       <button
         type="button"
         onClick={onToggle}
-        className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-[10px] font-semibold text-[#66706D] uppercase tracking-wider"
+        className="flex items-center gap-2 px-2.5 py-1 md:px-3 md:py-1.5 bg-[#F8FAFC] hover:bg-[#EFF6FF] hover:text-[#0A4F48] border border-[#F1F5F9] rounded-lg text-[9px] md:text-[10px] font-bold text-[#64748B] uppercase tracking-wider transition-all duration-300"
       >
         {subTitle} <ChevronDown size={14} />
       </button>
@@ -842,10 +860,10 @@ const DashboardCard = ({ title, subTitle, children, onToggle }) => (
 const LegendItem = ({ color, label }) => (
   <div className="flex items-center gap-2">
     <div
-      className="w-2.5 h-2.5 rounded-sm"
+      className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full shadow-sm ring-1 ring-white"
       style={{ backgroundColor: color }}
     ></div>
-    <span className="text-xs text-[#66706D] font-medium">{label}</span>
+    <span className="text-[11px] md:text-xs text-[#66706D] font-medium">{label}</span>
   </div>
 );
 
