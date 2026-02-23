@@ -107,10 +107,12 @@ export default function Sidebar({ isOpen, onClose }) {
           <nav className="space-y-1.5">
             {menuItems.map((item) => {
               const isMenuOpen = openMenu === item.label;
+             
               const hasChildren = !!item.children;
               const isChildActive =
                 hasChildren &&
                 item.children.some((child) => location.pathname === child.path);
+                
 
               if (hasChildren) {
                 return (
@@ -121,7 +123,7 @@ export default function Sidebar({ isOpen, onClose }) {
                         w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group relative
                         ${
                           isMenuOpen || isChildActive
-                            ? "bg-emerald-50 text-emerald-900"
+                            ? "bg-gray-100 text-emerald-900"
                             : "text-gray-500 hover:bg-gray-50 hover:text-emerald-700"
                         }
                       `}
@@ -135,10 +137,10 @@ export default function Sidebar({ isOpen, onClose }) {
                         >
                           <img
                             src={item.icon}
-                            className={`w-4 h-4 transition-all duration-300 
+                            className={`w-4 h-4 object-contain transition-all duration-300 
                               ${
                                 isMenuOpen || isChildActive
-                                  ? "  invert-26 sepia-30 saturate-666 hue-rotate-124 brightness-97 contrast-92"
+                                  ? "grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
                                   : "grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100"
                               }
                             `}
@@ -151,7 +153,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
                       <ChevronDown
                         size={16}
-                        className={`transition-transform duration-300 text-gray-400 ${isMenuOpen ? "rotate-180 text-emerald-600" : ""}`}
+                        className={`transition-transform duration-300  ${isMenuOpen ? "rotate-180 text-[#0A4F48]" : "text-gray-400"}`}
                       />
                     </button>
 
@@ -173,8 +175,8 @@ export default function Sidebar({ isOpen, onClose }) {
                               block px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 relative
                               ${
                                 isActive
-                                  ? "text-emerald-700 bg-emerald-50/80 before:absolute before:right-2 before:animate-pulse before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:rounded-full before:bg-emerald-500"
-                                  : "text-gray-500 hover:text-emerald-600 hover:bg-gray-50"
+                                  ? "bg-linear-to-r from-[#0A4F48] to-[#116D63] text-white shadow-sm shadow-emerald-900/20 before:absolute before:right-2 before:animate-pulse before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:rounded-full before:bg-white/40"
+                                  : "text-gray-500 hover:text-emerald-800 hover:bg-gray-50"
                               }
                             `}
                           >
@@ -211,8 +213,8 @@ export default function Sidebar({ isOpen, onClose }) {
                       `}
                       >
                         <img
-                          src={item.icon}
-                          className={`w-4 h-4 object-contain transition-all duration-300 
+                          src={item.icon} cxcvcb
+                          className={`w-4 h-4 object-contain transition-all duration-300  
                             ${
                               isActive
                                 ? "brightness-0 invert"
