@@ -1,31 +1,12 @@
 import ActionMenu from "@/components/actionMenu/ActionMenu";
 
 const statusColors = {
-  Active: "bg-[#45C4A2] text-white",
-  Inactive: "bg-[#66706D] text-white",
-  Suspended: "bg-[#FB5858] text-white",
+  Active: "bg-emerald-100 text-emerald-700 border border-emerald-200",
+  Inactive: "bg-slate-100 text-slate-600 border border-slate-200",
+  Suspended: "bg-rose-100 text-rose-700 border border-rose-200",
 };
 
 export const therapyColumns = () => [
-  // {
-  //   id: "select",
-  //   header: ({ table }) => (
-  //     <input
-  //       type="checkbox"
-  //       checked={table.getIsAllRowsSelected()}
-  //       onChange={table.getToggleAllRowsSelectedHandler()}
-  //       className="w-3 h-3 cursor-pointer"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <input
-  //       type="checkbox"
-  //       checked={row.getIsSelected()}
-  //       onChange={row.getToggleSelectedHandler()}
-  //       className="w-3 h-3 cursor-pointer"
-  //     />
-  //   ),
-  // },
   { accessorKey: "headName", header: "Head Name" },
   { accessorKey: "categoryName", header: "Assigned Category" },
   { accessorKey: "programCount", header: "Programs" },
@@ -36,11 +17,11 @@ export const therapyColumns = () => [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.original.status;
-      const colorClass = statusColors[status] || "bg-gray-200 text-gray-700";
+      const status = row.original.status || "Active";
+      const colorClass = statusColors[status] || "bg-slate-100 text-slate-600";
 
       return (
-        <span className={`px-2 py-1 text-[11px] rounded-xl ${colorClass}`}>
+        <span className={`px-2.5 py-1 text-[11px] font-bold rounded-full ${colorClass}`}>
           {status}
         </span>
       );
@@ -48,13 +29,15 @@ export const therapyColumns = () => [
   },
   {
     id: "actions",
-    header: "actions",
+    header: () => <div className="text-right pr-4">Action</div>,
     cell: ({ row }) => (
+      <div className="flex justify-end pr-2">
       <ActionMenu
         row={row}
         editActionPath="/founder/heads/edit/"
         deleteActionPath="/founder/heads/delete/"
       />
+      </div>
     ),
   },
 ];

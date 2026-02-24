@@ -4,6 +4,7 @@ import { therapyColumns } from "./Therapycolumns";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { fetchTherapyPlans } from "@/redux/features/therapy/therapy.thunk";
+import { SyncLoader } from "react-spinners";
 
 const TherapyTable = () => {
   const navigate = useNavigate();
@@ -28,7 +29,11 @@ const TherapyTable = () => {
 
     loadPlans();
   }, [dispatch]);
-
+if (plans.length<=0) return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+      </div>
+    );
   return (
     <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
