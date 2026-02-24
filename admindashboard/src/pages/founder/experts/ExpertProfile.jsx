@@ -59,19 +59,19 @@ const ExpertProfile = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-0 overflow-visible lg:overflow-hidden pb-2">
+      <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 flex-1 min-h-0 overflow-visible lg:overflow-hidden pb-2">
         {/* Left Column (Profile Card) - 30% */}
-        <div className="lg:col-span-3 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
+        <div className="lg:col-span-2 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
           <ExpertLeftSide expert={expert} />
         </div>
 
         {/* Center Column (Details) - 40% */}
-        <div className="lg:col-span-6 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
+        <div className="lg:col-span-4 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
           <ExpertCenterSide expert={expert} />
         </div>
 
         {/* Right Column (Stats) - 30% */}
-        <div className="lg:col-span-3 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
+        <div className="lg:col-span-4 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
           <ExpertRightSide expert={expert} />
         </div>
       </div>
