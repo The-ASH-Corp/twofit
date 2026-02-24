@@ -542,11 +542,11 @@ const Dashboard = () => {
           ))}
         </div>
 
-        <div className="flex gap-4 md:gap-6 lg:flex-row flex-col">
+        <div className="flex gap-4 md:gap-6 xl:flex-row flex-col">
           {/* Main Content Area */}
           <div className="flex-1 flex flex-col gap-4 md:gap-6 min-w-0">
             {/* Row 2: Charts */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
               <DashboardCard
                 title="Client Growth"
                 subTitle={`Last ${growthDuration} Months`}
@@ -726,7 +726,7 @@ const Dashboard = () => {
             </div>
 
             {/* Row 4: Latest Progress Reports */}
-            <div className="bg-white rounded-[24px] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] flex flex-col min-h-[400px] overflow-hidden transition-shadow duration-300">
+            <div className="bg-white rounded-3xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] flex flex-col min-h-[400px] overflow-hidden transition-shadow duration-300">
               <div className="p-4 md:p-6 lg:p-8 flex items-center justify-between border-b border-[#F1F5F9]">
                 <div className="flex items-center gap-2 md:gap-3">
                   <div className="w-1 h-4 md:h-5 bg-[#DAA520] rounded-full"></div>
@@ -837,9 +837,9 @@ const Dashboard = () => {
           </div>
 
           {/* Right Sidebar */}
-          <div className="lg:w-80 flex flex-col gap-4 md:gap-6 shrink-0">
+          <div className="xl:w-80 flex flex-col gap-4 md:gap-6 shrink-0">
             {/* Experts Gauge Card */}
-            <div className="bg-white p-5 md:p-6 rounded-[24px] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] transition-all duration-300 border border-[#EEF2F6] flex flex-col group hover:border-[#E2E8F0]">
+            <div className="bg-white p-5 md:p-6 rounded-3xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] transition-all duration-300 border border-[#EEF2F6] flex flex-col group hover:border-[#E2E8F0]">
               <div className="flex items-center justify-between mb-2 md:mb-4">
                 <h3 className="text-[15px] md:text-[17px] font-bold text-[#1E293B] tracking-tight">
                   Experts Overview
@@ -919,14 +919,16 @@ const Dashboard = () => {
 };
 
 const DashboardCard = ({ title, subTitle, children, onToggle }) => (
-  <div className="bg-white p-5 md:p-6 rounded-[24px] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] transition-all duration-300 border border-[#Eef2f6] flex flex-col group h-full hover:border-[#E2E8F0]">
+  <div className="bg-white p-5 md:p-6 rounded-3xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] transition-all duration-300 border border-[#Eef2f6] flex flex-col group h-full hover:border-[#E2E8F0]">
     <div className="flex items-center justify-between mb-4 md:mb-6">
       <div className="flex items-center gap-2 md:gap-3">
-         <div className="w-1 h-4 md:h-5 bg-[#DAA520] rounded-full group-hover:h-6 md:group-hover:h-8 group-hover:bg-[#0A4F48] transition-all duration-500 ease-out"></div>
-         <div>
-            <h3 className="text-[15px] md:text-[17px] font-bold text-[#1E293B] tracking-tight">{title}</h3>
-            {/* Optional tiny line or dot if needed */}
-         </div>
+        <div className="w-1 h-4 md:h-5 bg-[#DAA520] rounded-full group-hover:h-6 md:group-hover:h-8 group-hover:bg-[#0A4F48] transition-all duration-500 ease-out"></div>
+        <div>
+          <h3 className="text-[15px] md:text-[17px] font-bold text-[#1E293B] tracking-tight">
+            {title}
+          </h3>
+          {/* Optional tiny line or dot if needed */}
+        </div>
       </div>
       <button
         type="button"

@@ -17,63 +17,63 @@ const ProfileLeftSide = ({ client, complianceStats }) => {
     });
   };
 
-  const profileInfo = [
-    {
-      img: assets.GenderVector,
-      title: "Gender",
-      data: client?.gender,
-    },
-    {
-      img: assets.AgeVector,
-      title: "Age",
-      data: age + " y/o",
-    },
-    {
-      img: assets.EmailVector,
-      title: "Email Address",
-      data: client?.email,
-    },
-    {
-      img: assets.PhoneVector,
-      title: "Phone Number",
-      data: client?.phone,
-    },
-    {
-      img: assets.HomeVector,
-      title: "Address",
-      data: client?.address,
-    },
-  ];
+  // const profileInfo = [
+  //   {
+  //     img: assets.GenderVector,
+  //     title: "Gender",
+  //     data: client?.gender,
+  //   },
+  //   {
+  //     img: assets.AgeVector,
+  //     title: "Age",
+  //     data: age + " y/o",
+  //   },
+  //   {
+  //     img: assets.EmailVector,
+  //     title: "Email Address",
+  //     data: client?.email,
+  //   },
+  //   {
+  //     img: assets.PhoneVector,
+  //     title: "Phone Number",
+  //     data: client?.phone,
+  //   },
+  //   {
+  //     img: assets.HomeVector,
+  //     title: "Address",
+  //     data: client?.address,
+  //   },
+  // ];
 
-  const compliance = [
-    {
-      title: "Diet",
-      Missed: `Missed Diet: ${
-        (complianceStats?.stats?.missedCount || 0) +
-        (complianceStats?.stats?.skippedCount || 0)
-      }`,
-      percentage: `${(() => {
-        const missed = complianceStats?.stats?.missedCount || 0;
-        const skipped = complianceStats?.stats?.skippedCount || 0;
-        const expected = complianceStats?.stats?.expectedMeals || 0;
-        if (expected === 0) return 0;
-        return (((missed + skipped) / expected) * 100).toFixed(0);
-      })()}%`,
-      color: "#0A4F48",
-    },
-    {
-      title: "Workout",
-      Missed: "Missed Workout: 0",
-      percentage: "0%",
-      color: "#EBF3F2",
-    },
-    {
-      title: "Therapy",
-      Missed: "Missed Therapy: 0",
-      percentage: "0%",
-      color: "#F4DBC7",
-    },
-  ];
+  // const compliance = [
+  //   {
+  //     title: "Diet",
+  //     Missed: `Missed Diet: ${
+  //       (complianceStats?.stats?.missedCount || 0) +
+  //       (complianceStats?.stats?.skippedCount || 0)
+  //     }`,
+  //     percentage: `${(() => {
+  //       const missed = complianceStats?.stats?.missedCount || 0;
+  //       const skipped = complianceStats?.stats?.skippedCount || 0;
+  //       const expected = complianceStats?.stats?.expectedMeals || 0;
+  //       if (expected === 0) return 0;
+  //       return (((missed + skipped) / expected) * 100).toFixed(0);
+  //     })()}%`,
+  //     color: "#0A4F48",
+  //   },
+  //   {
+  //     title: "Workout",
+  //     Missed: "Missed Workout: 0",
+  //     percentage: "0%",
+  //     color: "#EBF3F2",
+  //   },
+  //   {
+  //     title: "Therapy",
+  //     Missed: "Missed Therapy: 0",
+  //     percentage: "0%",
+  //     color: "#F4DBC7",
+  //   },
+  // ];
 
   const assignedExperts = [
     {
