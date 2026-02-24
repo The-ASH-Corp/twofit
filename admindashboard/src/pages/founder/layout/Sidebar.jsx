@@ -140,8 +140,8 @@ export default function Sidebar({ isOpen, onClose }) {
                             className={`w-4 h-4 object-contain transition-all duration-300 
                               ${
                                 isMenuOpen || isChildActive
-                                  ? "grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
-                                  : "grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100"
+                                  ? "grayscale opacity-100   scale-110"
+                                  : "grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
                               }
                             `}
                           />
@@ -213,11 +213,11 @@ export default function Sidebar({ isOpen, onClose }) {
                       `}
                       >
                         <img
-                          src={item.icon} cxcvcb
+                          src={item.icon}
                           className={`w-4 h-4 object-contain transition-all duration-300  
                             ${
                               isActive
-                                ? "brightness-0 invert"
+                                ? "brightness-0 invert scale-115 opacity-100"
                                 : "grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
                             }
                           `}
