@@ -1,3 +1,4 @@
+
 import React, { useEffect, useMemo, useState } from "react";
 import {
   MoreHorizontal,
@@ -5,6 +6,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Star,
+  Activity,
+  MessageCircle,
+  Layers,
+  Users
 } from "lucide-react";
 import {
   Chart as ChartJS,
@@ -35,6 +40,37 @@ const ExpertCenterSide = ({ expert }) => {
   const [showRatingMenu, setShowRatingMenu] = useState(false);
   const [hoveredBarIndex, setHoveredBarIndex] = useState(null);
 
+  // Mock programs logic if not available in expert object
+  const expertPrograms = useMemo(() => {
+    // If expert has programs array, use it. Otherwise, extract from assigned users or show mock.
+    if (expert?.specialization && expert.specialization.length > 0) {
+      return expert.specialization.map(s => ({
+         title: s,
+         count: expert.assignedUsers?.filter(u => u.programType?.title === s).length || 0
+      }));
+    }
+    return [
+      { title: "Weight Loss", count: 12 },
+      { title: "PCOD", count: 5 },
+      { title: "Thyroid", count: 3 },
+    ];
+  }, [expert]);
+
+  const assignedClientsList = useMemo(() => {
+     return expert?.assignedUsers || [];
+  }, [expert]);
+
+  // Pagination for Assigned Clients
+  const [clientPage, setClientPage] = useState(1);
+  const clientsPerPage = 5;
+  const totalClientPages = Math.ceil((assignedClientsList?.length || 0) / clientsPerPage);
+  
+  const displayedClients = useMemo(() => {
+      const list = assignedClientsList || [];
+      const start = (clientPage - 1) * clientsPerPage;
+      return list.slice(start, start + clientsPerPage);
+  }, [assignedClientsList, clientPage]);
+
   const ratingData = useMemo(() => {
     if (!ratingGraphData?.ratingData?.length) {
       return {
@@ -58,10 +94,11 @@ const ExpertCenterSide = ({ expert }) => {
           backgroundColor: (context) => {
             const index = context.dataIndex;
             if (index === hoveredBarIndex) return "#0A4F48";
-            return "#F4DBC7";
+            return "#E2E8F0"; // Default slate-200
           },
-          borderRadius: 6,
-          barThickness: 50,
+          hoverBackgroundColor: "#0A4F48",
+          borderRadius: 8,
+          barThickness: 40,
         },
       ],
     };
@@ -81,15 +118,15 @@ const ExpertCenterSide = ({ expert }) => {
       legend: { display: false },
       tooltip: {
         enabled: true,
-        backgroundColor: "#fff",
-        titleColor: "#0A4F48",
-        bodyColor: "#0A4F48",
-        borderColor: "#eee",
-        borderWidth: 1,
+        backgroundColor: "#1E293B",
+        titleColor: "#fff",
+        bodyColor: "#fff",
+        padding: 12,
+        cornerRadius: 8,
         displayColors: false,
-        padding: 10,
         callbacks: {
-          label: (context) => `★ ${context.raw}`,
+          title: () => null,
+          label: (context) => `Rating: ${context.raw} / 5.0`,
         },
       },
     },
@@ -97,353 +134,249 @@ const ExpertCenterSide = ({ expert }) => {
       y: {
         beginAtZero: true,
         max: 5,
-        ticks: { stepSize: 1, color: "#66706D", font: { size: 10 } },
-        grid: { color: "#F0F0F0", drawBorder: false },
+        grid: {
+            color: "#F1F5F9",
+            drawBorder: false,
+        },
+        ticks: { stepSize: 1, color: "#94A3B8", font: { size: 10, weight: 'bold' }, padding: 10 },
+        border: { display: false }
       },
       x: {
-        grid: { display: false, drawBorder: false },
-        ticks: { color: "#66706D", font: { size: 10 } },
+        grid: { display: false },
+        ticks: { color: "#64748B", font: { size: 11, weight: '500' } },
+        border: { display: false }
       },
     },
   };
 
-  const feedback = (expert?.feedback || [])
-    .slice()
-    .reverse()
-    .map((item) => ({
-      name: item?.userId?.name || "Anonymous",
-      rating: item?.rating || 0,
-      text: item?.feedback || "-",
-    }));
-
-  const [isFeedbackOpen, setIsFeedbackOpen] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [isLimitOpen, setIsLimitOpen] = useState(false);
-
-  const totalResults = expert?.assignedUsers?.length || 0;
-  const totalPages = Math.ceil(totalResults / itemsPerPage);
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = (expert?.assignedUsers || []).slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
-
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
-
-  const handleLimitChange = (limit) => {
-    setItemsPerPage(limit);
-    setCurrentPage(1);
-    setIsLimitOpen(false);
-  };
-
   useEffect(() => {
-    if (!expert?._id) return;
-    dispatch(
-      getCoachRatingGraph({ id: expert?._id, duration: ratingDuration }),
-    ).then((res) => {
-      if (res.meta?.requestStatus === "fulfilled") {
-        setRatingGraphData(res.payload?.data ?? res.payload);
-      }
-    });
-  }, [dispatch, expert?._id, ratingDuration]);
+    if (expert?._id) {
+      dispatch(getCoachRatingGraph({ id: expert._id, duration: ratingDuration }))
+        .unwrap()
+        .then((data) => setRatingGraphData(data))
+        .catch((err) => console.error(err));
+    }
+  }, [expert?._id, ratingDuration, dispatch]);
+
 
   return (
-    <div className="w-full flex flex-col gap-4 sm:gap-6  pb-4 sm:pb-6 px-0 sm:px-1">
-      {/* Rating Score Card */}
-      <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm sm:text-base font-bold text-[#0A4F48]">
-              Rating Score
-            </h3>
-            <div className="flex items-center gap-1 text-xs font-semibold text-[#0A4F48]">
-              <Star size={14} className="text-[#0A4F48]" />
-              {(expert?.avgRating || 0).toFixed(1)}
-            </div>
-          </div>
-          <div className="relative w-fit">
-            <button
-              className="flex items-center gap-2 px-3 py-1.5 bg-[#F8F9FA] border border-gray-100 rounded-lg text-xs font-medium text-[#66706D]"
-              onClick={() => setShowRatingMenu((prev) => !prev)}
-            >
-              Last {ratingDuration} Months <ChevronDown size={14} />
-            </button>
-            {showRatingMenu && (
-              <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-100 rounded-lg shadow-md z-10">
-                {["3", "6", "12"].map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => {
-                      setRatingDuration(option);
-                      setShowRatingMenu(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 text-xs font-medium hover:bg-[#F8F9FA] ${
-                      ratingDuration === option
-                        ? "text-[#0A4F48]"
-                        : "text-[#66706D]"
-                    }`}
-                  >
-                    Last {option} Months
-                  </button>
-                ))}
+    <div className="flex flex-col gap-5 h-full min-h-0 pb-6">
+      
+      {/* 1. Rating Overview */}
+      <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden shrink-0 min-h-[320px]">
+        <div className="px-6 py-5 border-b border-[#F1F5F9] flex items-center justify-between">
+           <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0A4F48]">
+                 <Activity size={20} className="stroke-2" />
               </div>
-            )}
-          </div>
-        </div>
-        <div className="h-40 sm:h-48 relative">
-          <Bar data={ratingData} options={ratingOptions} />
-          {/* Threshold line */}
-          <div className="absolute top-[18%] left-6 sm:left-10 right-0 border-t border-dashed border-[#45C4A2] opacity-50 pointer-events-none"></div>
-        </div>
-
-        {/* Client Feedback Section */}
-        <div className="mt-6 sm:mt-8">
-          <div
-            className="flex items-center justify-between mb-4 cursor-pointer group"
-            onClick={() => setIsFeedbackOpen(!isFeedbackOpen)}
-          >
-            <h3 className="text-sm font-bold text-[#0A4F48]">
-              Client Feedback
-            </h3>
-            <ChevronDown
-              size={18}
-              className={`text-gray-400 group-hover:text-gray-600 transition-all duration-300 ${
-                isFeedbackOpen ? "rotate-180" : ""
-              }`}
-            />
-          </div>
-          {isFeedbackOpen && (
-            <div className="space-y-4 sm:space-y-6">
-              {feedback.length === 0 && (
-                <p className="text-xs text-[#66706D]">
-                  No feedback yet.
-                </p>
-              )}
-              {feedback.map((item, i) => (
-                <div
-                  key={i}
-                  className="flex flex-col gap-2 pb-4 sm:pb-6 border-b border-gray-50 last:border-0 last:pb-0"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] font-bold text-[#66706D]">
-                      {item.name}
-                    </span>
-                    <div className="flex text-[#FFD7A8]">
-                      {[...Array(5)].map((_, idx) => (
-                        <Star
-                          key={idx}
-                          size={10}
-                          fill={idx < item.rating ? "currentColor" : "none"}
-                          stroke={idx < item.rating ? "none" : "currentColor"}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <p className="text-[11px] text-[#011412] leading-relaxed">
-                    {item.text}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Programs & Chat Monitoring Row */}
-
-      <div className="gap-4 sm:gap-6">
-        {/* Programs */}
-        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-sm font-bold text-[#0A4F48]">Programs</h3>
-            <MoreHorizontal size={18} className="text-gray-400" />
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {expert?.assignedPrograms?.map((prog, i) => (
-              <span
-                key={i}
-                className="px-4 sm:px-5 py-2 sm:py-2.5 bg-[#F8F9FA] rounded-xl text-xs font-medium text-[#011412]"
+              <div>
+                 <h2 className="text-[#1E293B] font-bold text-lg tracking-tight leading-none">Rating Overview</h2>
+                 <p className="text-[11px] text-[#64748B] font-medium mt-1">Average client satisfaction over time</p>
+              </div>
+           </div>
+           
+           <div className="relative">
+              <button 
+                onClick={() => setShowRatingMenu(!showRatingMenu)}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs font-bold text-[#475569] hover:bg-[#F8FAFC] transition-all"
               >
-                {prog.title}
-              </span>
-            )) ||
-              ["PCOD", "Weight Loss", "Thyroid"].map((tag, i) => (
-                <span
-                  key={i}
-                  className="px-4 sm:px-5 py-2 bg-[#F8F9FA] rounded-lg text-xs font-medium text-[#011412]"
-                >
-                  {tag}
-                </span>
-              ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Assigned Clients Table */}
-      <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm flex flex-col">
-        <div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 border-b border-gray-50">
-          <div className="flex items-center gap-3">
-            <h3 className="text-sm sm:text-base font-bold text-[#0A4F48]">
-              Assigned Clients
-            </h3>
-            <span className="text-xs text-[#66706D] font-medium">
-              {totalResults} <span className="mx-1 text-gray-300">|</span> Max{" "}
-              {expert?.maxClient}
-            </span>
-          </div>
-          <MoreHorizontal size={20} className="text-gray-400 hidden sm:block" />
-        </div>
-
-        {/* Desktop Table View */}
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-[#F8F9FA] text-[10px] uppercase font-bold text-[#66706D] tracking-wider">
-                <th className="px-4 lg:px-6 py-4">Client Name</th>
-                <th className="px-4 lg:px-6 py-4">Program</th>
-                <th className="px-4 lg:px-6 py-4">Compliance</th>
-                <th className="px-4 lg:px-6 py-4">Status</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {currentItems.map((client, i) => (
-                <tr key={i} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 lg:px-6 py-4 text-xs font-medium text-[#011412]">
-                    {client.name}
-                  </td>
-                  <td className="px-4 lg:px-6 py-4 text-xs text-[#011412]">
-                    {client.programType?.title || "N/A"}
-                  </td>
-                  <td className="px-4 lg:px-6 py-4 text-xs font-bold text-[#011412]">
-                    {client.compliance ?? "N/A"}
-                  </td>
-                  <td className="px-4 lg:px-6 py-4">
-                    <span
-                      className={`px-3 py-1 rounded-full text-[10px] font-bold ${
-                        client.status === "Active"
-                          ? "bg-[#E7F9F4] text-[#00A389]"
-                          : "bg-[#66706D] text-white"
-                      }`}
-                    >
-                      {client.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Mobile Card View */}
-        <div className="md:hidden divide-y divide-gray-50">
-          {currentItems.map((client, i) => (
-            <div key={i} className="p-4 hover:bg-gray-50 transition-colors">
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex-1">
-                  <h4 className="text-sm font-bold text-[#011412] mb-1">
-                    {client.name}
-                  </h4>
-                  <p className="text-xs text-[#66706D]">
-                    {client.programType?.title || "N/A"}
-                  </p>
-                </div>
-                <span
-                  className={`px-2.5 py-1 rounded-full text-[9px] font-bold shrink-0 ${
-                    client.status === "Active"
-                      ? "bg-[#E7F9F4] text-[#00A389]"
-                      : "bg-[#66706D] text-white"
-                  }`}
-                >
-                  {client.status}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-[#66706D] font-medium">
-                  Compliance:
-                </span>
-                <span className="text-xs font-bold text-[#011412]">
-                  {client.compliance ?? "N/A"}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Pagination */}
-        <div className="p-4 sm:p-6 border-t border-gray-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sm:gap-0">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <span className="text-xs text-[#66706D]">Show</span>
-            <div className="relative">
-              <div
-                className="flex items-center gap-2 px-2 py-1 bg-[#F8F9FA] border border-gray-100 rounded text-xs font-medium text-[#66706D] cursor-pointer"
-                onClick={() => setIsLimitOpen(!isLimitOpen)}
-              >
-                {itemsPerPage} <ChevronDown size={12} />
-              </div>
-              {isLimitOpen && (
-                <div className="absolute bottom-full mb-2 bg-white border border-gray-100 rounded shadow-lg z-10 w-full overflow-hidden">
-                  {[5, 10, 20, 50].map((limit) => (
-                    <div
-                      key={limit}
-                      className="px-2 py-1.5 text-xs text-[#66706D] hover:bg-[#F8F9FA] cursor-pointer"
-                      onClick={() => handleLimitChange(limit)}
-                    >
-                      {limit}
+                  <span>Last {ratingDuration} Months</span>
+                  <ChevronDown size={14} />
+              </button>
+              
+              {showRatingMenu && (
+                 <>
+                    <div className="fixed inset-0 z-10" onClick={() => setShowRatingMenu(false)} />
+                    <div className="absolute right-0 top-full mt-1 w-32 bg-white rounded-lg border border-[#E2E8F0] shadow-xl z-20 py-1 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        {["3", "6", "12"].map((m) => (
+                        <button
+                            key={m}
+                            onClick={() => {
+                                setRatingDuration(m);
+                                setShowRatingMenu(false);
+                            }}
+                            className={`w-full text-left px-4 py-2 text-xs font-medium hover:bg-[#F8FAFC] transition-colors ${ratingDuration === m ? "text-[#0A4F48] bg-emerald-50" : "text-[#475569]"}`}
+                        >
+                            Last {m} Months
+                        </button>
+                        ))}
                     </div>
-                  ))}
-                </div>
+                 </>
               )}
-            </div>
-            <span className="text-xs text-[#66706D] whitespace-nowrap">
-              of {totalResults} results
-            </span>
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              className={`p-1.5 transition-colors ${
-                currentPage === 1
-                  ? "text-gray-300 pointer-events-none"
-                  : "text-gray-400 hover:text-[#0A4F48]"
-              }`}
-              onClick={() => handlePageChange(currentPage - 1)}
-            >
-              <ChevronLeft size={16} />
-            </button>
-            <div className="flex items-center gap-1 max-w-[200px] overflow-x-auto">
-              {[...Array(totalPages)].map((_, i) => (
-                <button
-                  key={i + 1}
-                  className={`w-7 h-7 sm:w-8 sm:h-8 rounded-md text-xs font-bold transition-colors shrink-0 ${
-                    currentPage === i + 1
-                      ? "bg-[#0A4F48] text-white"
-                      : "text-[#66706D] hover:bg-gray-50"
-                  }`}
-                  onClick={() => handlePageChange(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              ))}
-            </div>
-            <button
-              className={`p-1.5 transition-colors ${
-                currentPage === totalPages || totalPages === 0
-                  ? "text-gray-300 pointer-events-none"
-                  : "text-[#0A4F48] hover:text-[#083a35]"
-              }`}
-              onClick={() => handlePageChange(currentPage + 1)}
-            >
-              <ChevronRight size={16} />
-            </button>
-          </div>
+           </div>
+        </div>
+
+        <div className="p-6 flex-1 w-full min-h-[220px]">
+           <Bar data={ratingData} options={ratingOptions} />
         </div>
       </div>
+
+      {/* 2. Programs */}
+      <div className="bg-white rounded-3xl p-6 border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+         <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+                    <Layers size={18} />
+                </div>
+                <h3 className="font-bold text-[#1E293B] text-lg">Programs</h3>
+            </div>
+            <button className="p-1.5 rounded-lg text-slate-400 hover:text-[#0A4F48] hover:bg-slate-50 transition-colors">
+               <MoreHorizontal size={18} />
+            </button>
+         </div>
+         <div className="flex flex-wrap gap-3">
+             {expertPrograms.map((prog, i) => {
+                 const title = typeof prog === 'string' ? prog : (prog.title || "Program");
+                 const count = typeof prog === 'object' && prog.count ? prog.count : null;
+                 
+                 return (
+                    <div key={i} className="flex-1 min-w-[140px] p-4 bg-[#F8FAFC] border border-[#F1F5F9] rounded-2xl flex flex-col items-center justify-center text-center hover:border-[#E2E8F0] hover:shadow-sm transition-all cursor-default group">
+                        <span className="text-sm font-bold text-[#334155] mb-1 group-hover:text-[#0A4F48] transition-colors">{title}</span>
+                        {count && <span className="text-[10px] font-medium text-[#94A3B8]">{count} Active Clients</span>}
+                    </div>
+                 );
+             })}
+         </div>
+      </div>
+
+      {/* 3. Assigned Clients */}
+      <div className="bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] flex-1 min-h-[400px] overflow-hidden flex flex-col">
+         <div className="px-6 py-5 border-b border-[#F1F5F9] flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-3">
+               <div className="w-8 h-8 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600">
+                    <Users size={18} />
+               </div>
+               <div className="flex items-baseline gap-2">
+                    <h3 className="font-bold text-[#1E293B] text-lg">Assigned Clients</h3>
+                    <span className="bg-[#F1F5F9] text-[#64748B] text-[10px] font-bold px-2 py-0.5 rounded-full border border-[#E2E8F0]">
+                        {assignedClientsList.length} Total
+                    </span>
+               </div>
+            </div>
+            <button className="p-1.5 rounded-lg text-slate-400 hover:text-[#0A4F48] hover:bg-slate-50 transition-colors">
+               <MoreHorizontal size={18} />
+            </button>
+         </div>
+
+         <div className="flex-1 overflow-auto h-0 min-h-0">
+            <table className="w-full min-w-[600px] border-collapse relative">
+               <thead className="sticky top-0 z-10 bg-[#F8FAFC]">
+                  <tr className="border-b border-[#F1F5F9]">
+                     <th className="text-left text-[11px] font-bold text-[#64748B] uppercase tracking-wider py-3 px-6 pl-8">Client Name</th>
+                     <th className="text-left text-[11px] font-bold text-[#64748B] uppercase tracking-wider py-3 px-4">Program</th>
+                     <th className="text-center text-[11px] font-bold text-[#64748B] uppercase tracking-wider py-3 px-4">Compliance</th>
+                     <th className="text-right text-[11px] font-bold text-[#64748B] uppercase tracking-wider py-3 px-6 pr-8">Status</th>
+                  </tr>
+               </thead>
+               <tbody className="divide-y divide-[#F1F5F9]">
+                  {displayedClients.length === 0 ? (
+                      <tr>
+                          <td colSpan="4" className="text-center py-12">
+                              <div className="flex flex-col items-center justify-center text-slate-400">
+                                  <Users size={24} className="mb-2 opacity-50" />
+                                  <span className="text-xs font-medium">No clients assigned yet</span>
+                              </div>
+                          </td>
+                      </tr>
+                  ) : (
+                    displayedClients.map((client, i) => (
+                         <tr key={i} className="group hover:bg-[#F8FAFC] transition-colors">
+                            <td className="py-4 px-6 pl-8">
+                               <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 rounded-full bg-[#E2E8F0] border-2 border-white shadow-sm flex items-center justify-center text-xs font-bold text-[#475569] shrink-0">
+                                     {client.name?.[0]?.toUpperCase() || "U"}
+                                  </div>
+                                  <div>
+                                      <p className="text-sm font-bold text-[#334155] group-hover:text-[#0A4F48] transition-colors">{client.name || "Unknown"}</p>
+                                      <p className="text-[10px] text-[#94A3B8]">{client.email || "No email"}</p>
+                                  </div>
+                               </div>
+                            </td>
+                            <td className="py-4 px-4">
+                               <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-slate-50 border border-slate-100 text-xs font-medium text-slate-600">
+                                   {client.programType?.title || client.program || "Standard Plan"}
+                               </span>
+                            </td>
+                            <td className="py-4 px-4 text-center">
+                               <div className="inline-flex flex-col items-center">
+                                   <span className={`text-sm font-bold ${
+                                       (client.compliance || 0) > 75 ? "text-emerald-600" : 
+                                       (client.compliance || 0) > 40 ? "text-amber-500" : "text-rose-500"
+                                   }`}>
+                                       {client.compliance || 0}%
+                                   </span>
+                                   <div className="w-12 h-1 bg-slate-100 rounded-full mt-1 overflow-hidden">
+                                       <div 
+                                          className={`h-full rounded-full ${
+                                            (client.compliance || 0) > 75 ? "bg-emerald-500" : 
+                                            (client.compliance || 0) > 40 ? "bg-amber-400" : "bg-rose-400"
+                                          }`} 
+                                          style={{ width: `${client.compliance || 0}%` }}
+                                       />
+                                   </div>
+                               </div>
+                            </td>
+                            <td className="py-4 px-6 pr-8 text-right">
+                               <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${
+                                   (client.status?.toLowerCase() === 'active' || client.isActive === true || !client.status) 
+                                   ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
+                                   : 'bg-slate-50 text-slate-500 border-slate-100'
+                               }`}>
+                                  <span className={`w-1.5 h-1.5 rounded-full ${
+                                      (client.status?.toLowerCase() === 'active' || client.isActive === true || !client.status) ? "bg-emerald-500" : "bg-slate-400"
+                                  }`} />
+                                  {(client.status?.toLowerCase() === 'active' || client.isActive === true || !client.status) ? "Active" : "Inactive"}
+                               </span>
+                            </td>
+                         </tr>
+                      ))
+                  )}
+               </tbody>
+            </table>
+         </div>
+         
+         {/* Pagination */}
+         {totalClientPages > 1 && (
+             <div className="flex items-center justify-between px-6 py-4 border-t border-[#F1F5F9] bg-white shrink-0">
+                 <div className="flex items-center gap-2">
+                    <span className="text-xs font-medium text-[#64748B]">
+                        Showing {((clientPage - 1) * clientsPerPage) + 1}-{Math.min(clientPage * clientsPerPage, assignedClientsList.length)} of {assignedClientsList.length}
+                    </span>
+                 </div>
+                 
+                 <div className="flex items-center gap-1">
+                     <button 
+                        onClick={() => setClientPage(c => Math.max(1, c - 1))}
+                        disabled={clientPage === 1}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                     >
+                        <ChevronLeft size={16} />
+                     </button>
+                     {Array.from({ length: totalClientPages }).slice(0, 5).map((_, idx) => (
+                        <button 
+                            key={idx}
+                            onClick={() => setClientPage(idx + 1)}
+                            className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all ${
+                                clientPage === idx + 1 
+                                ? "bg-[#0A4F48] text-white shadow-md shadow-emerald-900/10" 
+                                : "border border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC]"
+                            }`}
+                        >
+                            {idx + 1}
+                        </button>
+                     ))}
+                     <button 
+                        onClick={() => setClientPage(c => Math.min(totalClientPages, c + 1))}
+                        disabled={clientPage === totalClientPages}
+                        className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                     >
+                        <ChevronRight size={16} />
+                     </button>
+                 </div>
+             </div>
+         )}
+      </div>
+
     </div>
   );
 };

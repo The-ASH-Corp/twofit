@@ -1,40 +1,28 @@
 /* eslint-disable react-hooks/preserve-manual-memoization */
-import { assets } from "@/assets/asset";
 import React, { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUserSubmissions } from "@/redux/features/tasks/task.thunk";
+import { 
+  Activity, 
+  Apple, 
+  Target, 
+  Scale, 
+  Files, 
+  CheckCircle2, 
+  XCircle, 
+  AlertCircle, 
+  Clock,
+  Dumbbell,
+  Utensils
+} from "lucide-react";
 
-const statusStyles = {
-  Completed: {
-    bg: "#E6F4F1",
-    textsColor: "#137528",
-    border: "#B7DFBA",
-  },
-  Verified: {
-    bg: "#E6F4F1",
-    textsColor: "#137528",
-    border: "#B7DFBA",
-  },
-  Skipped: {
-    bg: "#FFFAE0",
-    textsColor: "#936900",
-    border: "#F8D87B",
-  },
-  Missed: {
-    bg: "#FFF0ED",
-    textsColor: "#B13116",
-    border: "#FAC6BD",
-  },
-  Rejected: {
-    bg: "#FFF0ED",
-    textsColor: "#B13116",
-    border: "#FAC6BD",
-  },
-  Pending: {
-    bg: "#F2F3F5",
-    textsColor: "#54595D",
-    border: "#D7DCDF",
-  },
+const statusConfig = {
+  Completed: { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", icon: CheckCircle2 },
+  Verified: { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", icon: CheckCircle2 },
+  Skipped: { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", icon: AlertCircle },
+  Missed: { bg: "bg-rose-50", text: "text-rose-700", border: "border-rose-200", icon: XCircle },
+  Rejected: { bg: "bg-rose-50", text: "text-rose-700", border: "border-rose-200", icon: XCircle },
+  Pending: { bg: "bg-slate-50", text: "text-slate-600", border: "border-slate-200", icon: Clock },
 };
 
 const ProfileCenterSide = ({ client }) => {
@@ -59,12 +47,10 @@ const ProfileCenterSide = ({ client }) => {
       let status = "Pending";
       if (task.status === "verified") status = "Completed";
       else if (task.status === "skipped") status = "Skipped";
-      else if (task.status === "rejected")
-        status = "Missed"; // Or Rejected
+      else if (task.status === "rejected") status = "Missed"; 
       else if (task.status === "missed") status = "Missed";
 
       return {
-        img: assets.tickVector, // specific icon per type?
         heading: task.taskType || "Task",
         contend:
           task.notes ||
@@ -80,181 +66,176 @@ const ProfileCenterSide = ({ client }) => {
     {
       heading: "Medical Conditions",
       data: client?.medicalConditions,
+      icon: Activity,
+      color: "text-rose-500",
+      bg: "bg-rose-50"
     },
     {
       heading: "Allergies",
       data: client?.allergies,
+      icon: AlertCircle,
+      color: "text-amber-500",
+      bg: "bg-amber-50"
     },
     {
       heading: "Food Preference",
       data: [client?.foodPreferences],
+      icon: Apple,
+      color: "text-emerald-500",
+      bg: "bg-emerald-50"
     },
     {
       heading: "Fitness Goal",
       data: [client?.goals || client?.programType?.title],
+      icon: Target,
+      color: "text-blue-500",
+      bg: "bg-blue-50"
     },
     {
       heading: "Current Weight",
       data: [`${client?.currentWeight} kg`],
+      icon: Scale,
+      color: "text-indigo-500",
+      bg: "bg-indigo-50"
     },
     {
       heading: "Target Weight",
       data: [`${client?.targetWeight} kg`],
+      icon: Target,
+      color: "text-purple-500",
+      bg: "bg-purple-50"
     },
   ];
 
-  return (
-    <div className=" flex flex-col items-center gap-4 pb-4">
-      {/* Health Details */}
-      <div className="p-4 flex flex-col items-center gap-4 w-full bg-white rounded-lg">
-        <div className="w-full flex justify-between items-center">
-          <h2 className="font-bold text-[16px] text-[#0A4F48]">
-            Health Details
-          </h2>
-          <button>
-            <img src={assets.threeDotVector} alt="dot menu" className="w-3.5" />
-          </button>
-        </div>
-        <div className="grid grid-cols-2 gap-2.5 w-full">
-          {healthDetails.map((items, i) => (
-            <div key={i} className="p-3.5 bg-[#F8F8F8] rounded-lg w-full">
-              <div className="w-full flex flex-col items-start gap-2">
-                <span className="px-1.5 py-1 bg-[#F0F0F0] text-[11px] rounded-sm">
-                  {items.heading}
-                </span>
-                <span className="text-[12px] text-[#0A4F48] ">
-                  {items?.data?.join(", ")}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      {/* Program Summary */}
-      <div className="flex flex-col items-center gap-4 w-full">
-        <div className="w-full flex justify-between items-center">
-          <h2 className="font-bold text-[16px] text-[#0A4F48]">
-            Health Details
-          </h2>
-          <button>
-            <img src={assets.threeDotVector} alt="dot menu" className="w-3.5" />
-          </button>
-        </div>
-      </div>
-      <div className="flex items-center  gap-[7.5px] w-full">
-        <div className="p-4 bg-white rounded-2xl w-[50%]">
-          <div className="flex flex-col items-start gap-1 ">
-            <span className="text-[11px] text-[#66706D]">Program Type</span>
-            <span className="font-bold text-[12px]">
-              {client?.programType?.title}
-            </span>
-          </div>
-        </div>
+  // Calculate progress percentage safely
+  const progressPercent = useMemo(() => {
+     if (!client?.programType?.plan?.duration) return 0;
+     const totalDays = parseInt(client.programType.plan.duration.split(" ")[0]);
+     if (!totalDays) return 0;
+     return Math.min(100, Math.max(0, (client.currentGlobalDay / totalDays) * 100));
+  }, [client]);
 
-        <div className="flex items-center gap-6 p-4 bg-white rounded-2xl w-[50%]">
-          <div className="flex flex-col items-start gap-1 w-full">
-            <span className="text-[11px] text-[#66706D]">Plan Duration</span>
-            <span className="font-bold text-[12px]">
-              {client?.programType?.plan?.duration}
-            </span>
-          </div>
-          <div className="flex flex-col items-end gap-1 w-full">
-            <p className="text-[12px] text-[#66706D]">
-              <span className="text-[#0A4F48] font-bold">
-                {client?.programType?.plan?.duration
-                  ? (
-                      (client?.currentGlobalDay /
-                        client?.programType?.plan?.duration.split(" ")[0]) *
-                      100
-                    ).toFixed(0)
-                  : 0}
-                %
-              </span>{" "}
-              / 100%
-            </p>
-            <div className="relative w-25 bg-gray-200 rounded-full h-2 overflow-visible">
-              <div
-                className="h-full bg-[#F4DBC7] transition-all duration-500 ease-out rounded-l-full"
-                style={{
-                  width:
-                    (client?.currentGlobalDay /
-                      client?.programType?.plan?.duration.split(" ")[0]) *
-                    100,
-                }}
-              />
-              <span
-                className={`absolute  -top-0.5 w-0.5 h-3 bg-[#0A4F48]`}
-                style={{
-                  left: `${(client?.currentGlobalDay / client?.programType?.plan?.duration.split(" ")[0]) * 100}%`,
-                }}
-              ></span>
-            </div>
-          </div>
+  return (
+    <div className="flex flex-col gap-6">
+
+      {/* 1. Health Stats Grid */}
+      <div className="bg-white rounded-3xl p-6 border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+        <div className="flex items-center justify-between mb-5">
+           <div className="flex items-center gap-2">
+              <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+                <Activity size={18} />
+              </div>
+              <h2 className="font-bold text-[#1E293B] text-lg">Health Snapshot</h2>
+           </div>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-4">
+          {healthDetails.map((item, i) => {
+            const Icon = item.icon || Activity;
+            return (
+              <div key={i} className={`p-4 rounded-2xl border flex flex-col gap-2 transition-all hover:shadow-md ${item.bg ? item.bg : 'bg-slate-50'} border-transparent`}>
+                 <div className="flex items-center gap-2 mb-1">
+                    <Icon size={16} className={item.color || "text-slate-500"} />
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{item.heading}</span>
+                 </div>
+                 <div className="text-sm font-bold text-[#1E293B] leading-tight break-words">
+                    {item.data && item.data.length > 0 && item.data[0] ? item.data.join(", ") : "N/A"}
+                 </div>
+              </div>
+            );
+          })}
         </div>
       </div>
-      {/* Today’s Task */}
-      <div className="w-full flex flex-col items-center gap-4 p-4 bg-white rounded-lg">
-        <div className="w-full flex justify-between items-center">
-          <h2 className="font-bold text-[16px] text-[#0A4F48]">Today’s Task</h2>
-          <button>
-            <img src={assets.threeDotVector} alt="dot menu" className="w-3.5" />
-          </button>
-        </div>
-        <div className="w-full flex flex-col items-center">
-          {todaysTasks.length === 0 ? (
-            <div className="py-4 text-center w-full">
-              <span className="text-[13px] text-[#66706D]">
-                No tasks logged for today yet.
-              </span>
-            </div>
-          ) : (
-            todaysTasks.map((items, i) => {
-              const styles = statusStyles[items.status] || statusStyles.Pending;
-              return (
-                <div
-                  key={i}
-                  className="flex items-center justify-between w-full py-4 border-b border-b-[#DBDEDD]"
-                >
-                  <div className="flex items-start gap-4">
-                    <div
-                      className="p-3 rounded-full "
-                      style={{ backgroundColor: styles.bg }}
-                    >
-                      <img
-                        src={items.img}
-                        alt=""
-                        className="w-[17px] h-[17px]"
-                      />
-                    </div>
-                    <div className="flex flex-col items-start">
-                      <span className="text-[11px] text-[#0A4F48] font-bold">
-                        {items.heading}
-                      </span>
-                      <span className="text-[12px]">{items.contend}</span>
-                    </div>
-                  </div>
-                  <div
-                    className="border  px-2 py-0.5 rounded-full flex items-center"
-                    style={{
-                      background: styles.bg,
-                      borderColor: styles.border,
-                    }}
-                  >
-                    <span
-                      className=" text-[11px] "
-                      style={{ color: styles.textsColor }}
-                    >
-                      {items.status}
-                    </span>
-                  </div>
+
+      {/* 2. Current Program Progress */}
+      <div className="bg-white p-6 rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+          <div className="flex items-center justify-between mb-6">
+             <div className="flex items-center gap-2">
+                <div className="p-2 bg-blue-50 rounded-lg text-blue-600">
+                   <Target size={18} />
                 </div>
-              );
-            })
-          )}
-        </div>
+                <h2 className="font-bold text-[#1E293B] text-lg">Current Plan</h2>
+             </div>
+          </div>
+
+          <div className="flex flex-col gap-6">
+             {/* Info */}
+             <div className="flex flex-wrap gap-4 justify-between items-center p-4 bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0]">
+                <div>
+                   <span className="text-[10px] uppercase font-bold text-[#64748B] block mb-1">Program</span>
+                   <span className="text-sm font-bold text-[#1E293B]">{client?.programType?.title || "No Program"}</span>
+                </div>
+                <div className="text-right">
+                   <span className="text-[10px] uppercase font-bold text-[#64748B] block mb-1">Duration</span>
+                   <span className="text-sm font-bold text-[#1E293B]">{client?.programType?.plan?.duration || "N/A"}</span>
+                </div>
+             </div>
+
+             {/* Progress Bar */}
+             <div>
+                <div className="flex justify-between items-end mb-2">
+                   <span className="text-xs font-bold text-[#334155]">Overall Progress</span>
+                   <span className="text-xl font-black text-[#0A4F48]">{progressPercent.toFixed(0)}%</span>
+                </div>
+                <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                   <div 
+                     className="h-full bg-linear-to-r from-[#0A4F48] to-[#116D63] rounded-full transition-all duration-1000 ease-out"
+                     style={{ width: `${progressPercent}%` }}
+                   />
+                </div>
+                <div className="mt-2 text-right">
+                   <span className="text-[10px] font-medium text-[#64748B]">Day {client?.currentGlobalDay || 0} of {parseInt(client?.programType?.plan?.duration?.split(" ")[0] || 0)}</span>
+                </div>
+             </div>
+          </div>
       </div>
+
+      {/* 3. Today's Tasks */}
+      <div className="bg-white p-6 rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] flex-1">
+         <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-amber-50 rounded-lg text-amber-600">
+                <Files size={18} />
+              </div>
+              <h2 className="font-bold text-[#1E293B] text-lg">Today's Tasks</h2>
+            </div>
+            <span className="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg text-xs font-bold">
+               {todaysTasks.length}
+            </span>
+         </div>
+
+         <div className="flex flex-col gap-3">
+            {todaysTasks.length === 0 ? (
+               <div className="flex flex-col items-center justify-center py-12 text-slate-400 gap-3 border-2 border-dashed border-slate-100 rounded-2xl">
+                  <Files size={32} strokeWidth={1.5} />
+                  <span className="text-sm font-medium">No tasks scheduled for today</span>
+               </div>
+            ) : (
+               todaysTasks.map((task, i) => {
+                  const style = statusConfig[task.status] || statusConfig.Pending;
+                  const StatusIcon = style.icon;
+                  
+                  return (
+                    <div key={i} className="flex items-start gap-4 p-4 rounded-xl border border-[#F1F5F9] bg-white hover:border-[#E2E8F0] transition-colors group">
+                       <div className={`p-2.5 rounded-xl shrink-0 ${style.bg} ${style.text}`}>
+                          <StatusIcon size={20} />
+                       </div>
+                       <div className="flex-1 min-w-0 pt-0.5">
+                          <h4 className="text-sm font-bold text-[#1E293B] truncate mb-0.5">{task.heading}</h4>
+                          <p className="text-xs text-[#64748B] line-clamp-2">{task.contend}</p>
+                       </div>
+                       <div className={`px-2.5 py-1 rounded-lg border ${style.bg} ${style.border} ${style.text} shrink-0`}>
+                          <span className="text-[10px] font-bold uppercase tracking-wider">{task.status}</span>
+                       </div>
+                    </div>
+                  );
+               })
+            )}
+         </div>
+      </div>
+
     </div>
   );
 };
+
 
 export default ProfileCenterSide;
