@@ -9,9 +9,17 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
+import { ENV } from "@/utils/env";
 
 
 const TemplateSummary = () => {
+  const getFileUrl = (path) => {
+      if (!path) return "";
+      if (path.startsWith("http") || path.startsWith("blob:")) return path;
+      const baseUrl = (ENV.API_BASE_URL || "").replace(/\/api\/v1\/?$/, "").replace(/\/api\/?$/, "");
+      const cleanPath = path.startsWith("/") ? path : `/${path}`;
+      return `${baseUrl}${cleanPath}`;
+    };
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams();
@@ -19,6 +27,7 @@ const TemplateSummary = () => {
   const broadcast = useSelector(selectBroadcast);
   const status = useSelector(selectBroadcastStatus);
   const error = useSelector(selectBroadcastError);
+  const path = getFileUrl(broadcast?.attachment);
 
   useEffect(() => {
     if (id) {
@@ -67,22 +76,26 @@ const TemplateSummary = () => {
             <p className="text-[#66706D] text-[12px]">Attachments</p>
             <div className="flex items-center flex-wrap  gap-2 w-full">
               {broadcast?.attachment ? (
-                <div className="p-4 bg-[#F8F8F8] rounded-lg">
-                  <div className="flex items-center gap-4">
-                    <div className="p-2.5 bg-[#F4DBC7] rounded-md">
-                      <BsFileEarmarkText size={20} />
-                    </div>
-                    <div className="flex flex-col items-start">
-                      <p className="text-[12px] line-clamp-1">
-                        {broadcast?.attachment.split("/").pop()}
-                      </p>
-                      <div className="flex gap-1 items-center">
-                        <span className="p-0.5 bg-[#DBDEDD] rounded-full"></span>
-                        <p className="text-[#66706D] text-[11px]">{fileExt}</p>
+                <a href={path}>
+                  <div className="p-4 bg-[#F8F8F8] rounded-lg">
+                    <div className="flex items-center gap-4">
+                      <div className="p-2.5 bg-[#F4DBC7] rounded-md">
+                        <BsFileEarmarkText size={20} />
+                      </div>
+                      <div className="flex flex-col items-start">
+                        <p className="text-[12px] line-clamp-1">
+                          {broadcast?.attachment.split("/").pop()}
+                        </p>
+                        <div className="flex gap-1 items-center">
+                          <span className="p-0.5 bg-[#DBDEDD] rounded-full"></span>
+                          <p className="text-[#66706D] text-[11px]">
+                            {fileExt}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </a>
               ) : (
                 <p className="text-[#000000] text-[12px]">
                   Attachment not added

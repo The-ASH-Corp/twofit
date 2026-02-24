@@ -43,7 +43,7 @@ const ClientProfile = () => {
   if (error) return <p className="text-red-500 p-8 text-center">{error}</p>;
 
   return (
-    <div className="flex flex-col gap-6 w-full min-h-[calc(100dvh-32px)] lg:h-[calc(100vh-32px)] overflow-y-auto lg:overflow-hidden font-sans bg-[#F8FAFC] p-4 sm:p-6 rounded-3xl">
+    <div className="flex flex-col gap-6 w-full h-[calc(100vh-156px)]  font-sans bg-[#F8FAFC] p-4 sm:p-6 rounded-3xl">
       {/* Header with Breadcrumb-like feel */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
         <div className="flex items-center gap-4">

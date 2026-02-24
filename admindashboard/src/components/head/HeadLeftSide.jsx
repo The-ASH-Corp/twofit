@@ -1,5 +1,13 @@
 import React from "react";
-import { Briefcase, MapPin, Award, DollarSign, Layers, Clock, ShieldCheck, User } from "lucide-react";
+import {
+  Briefcase,
+  Award,
+  IndianRupee,
+  Layers,
+  Clock,
+  ShieldCheck,
+  User,
+} from "lucide-react";
 
 const HeadLeftSide = ({ Head }) => {
   const profileDetails = [
@@ -11,7 +19,7 @@ const HeadLeftSide = ({ Head }) => {
     {
       title: "Base Salary",
       content: `₹${Head?.salary?.toLocaleString() || "0"}/m`,
-      icon: DollarSign,
+      icon: IndianRupee,
     },
     {
       title: "Specialization",
