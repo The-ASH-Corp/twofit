@@ -4,12 +4,8 @@ import { ClientColumns } from "./ClientColumns";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import {
-  selectAllClients,
-  selectClientStatus,
   selectClientError,
-  selectTotalClientCount,
 } from "@/redux/features/client/client.selectors";
-import { getAllClients } from "@/redux/features/client/client.thunk";
 import { useNavigate } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
 import { getAllUsersByHead } from "@/redux/features/head/head.thunk";
@@ -18,7 +14,6 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 export default function ClientsTable() {
   const user =useAppSelector(selectUser)
   const navigate = useNavigate();
-  const status = useAppSelector(selectClientStatus);
   const error = useAppSelector(selectClientError);
   const [clients, setClients] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -61,11 +56,11 @@ export default function ClientsTable() {
     fetchClientData();
   }, [page, limit, dispatch]);
 
-  if (status === "loading") return (
-      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
-        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
-      </div>
-    );
+  if (clients.length<=0) return (
+        <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+          <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+        </div>
+      );
   if (error) return <p>{error}</p>;
 
   return (

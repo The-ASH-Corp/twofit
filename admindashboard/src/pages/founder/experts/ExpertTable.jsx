@@ -25,7 +25,6 @@ export default function ExpertTable() {
 
   const data = useAppSelector(selectFounderAllCoaches);
   const totalCount = useAppSelector(selectCoachCount);
-  // const error = useAppSelector(selectCoachError);
   const status = useAppSelector(selectCoachStatus);
 
   const [coaches, setCoaches] = useState([]);
