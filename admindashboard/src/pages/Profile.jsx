@@ -176,7 +176,7 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-36 relative z-10 transition-all duration-500">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-56 relative z-10 transition-all duration-500">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
           {/* Left Column: Interactive Profile Card */}
           <div className="lg:w-[380px] flex-shrink-0 flex flex-col gap-6">
