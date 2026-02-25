@@ -16,6 +16,16 @@ const toUtcDateOnly = (dateLike) => {
 const addDaysUtc = (date, days) => new Date(date.getTime() + days * MS_PER_DAY);
 
 const formatDateYYYYMMDD = (date) => date.toISOString().split("T")[0];
+const getProgramDayDateUtc = (programStartDate, globalDayIndex) => {
+    const startDateUtc = toUtcDateOnly(programStartDate);
+    const dayIndex = Number(globalDayIndex);
+
+    if (!startDateUtc || !Number.isFinite(dayIndex) || dayIndex <= 0) {
+        return null;
+    }
+
+    return addDaysUtc(startDateUtc, dayIndex - 1);
+};
 
 // Helper to calculate unlock date (Strict Next Midnight Rule)
 export const calculateUnlockDate = (completionDate) => {
@@ -141,12 +151,35 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
 
     const hasSkippedWorkout = completedTasks.some(ex => ex.taskType === "Workout" && ex.status === "skipped");
     if (hasSkippedWorkout) return false; // Strict rule: Workouts cannot be skipped.
+    const hasRejectedWorkoutHistory = daySubmission.exercises.some(
+        ex => ex.taskType === "Workout" && ex.wasRejectedOnce === true
+    );
 
     if (completedCount >= totalExercises) {
         if (user.currentGlobalDay === Number(globalDayIndex)) {
             // Check if we already have a completion time for this day? 
             if (!user.lastDayCompletionTime) {
-                user.lastDayCompletionTime = new Date(); // Record completion time
+                const now = new Date();
+                const todayUtc = toUtcDateOnly(now);
+                const scheduledDayUtc = getProgramDayDateUtc(
+                    user.programStartDate,
+                    Number(globalDayIndex)
+                );
+                const completedAfterScheduledDay = Boolean(
+                    scheduledDayUtc && todayUtc && todayUtc > scheduledDayUtc
+                );
+
+                // If a rejected task is completed after its scheduled day,
+                // do not add an extra cooldown from "today". Advance immediately
+                // based on the original program day timeline.
+                if (completedAfterScheduledDay && hasRejectedWorkoutHistory) {
+                    user.lastDayCompletionTime = scheduledDayUtc;
+                    await user.save();
+                    await attemptDayAdvancement(userId);
+                    return true;
+                }
+
+                user.lastDayCompletionTime = now; // Record completion time
                 await user.save();
 
                 // Notify the client that they've completed the day
@@ -195,6 +228,10 @@ export const attemptDayAdvancement = async (userId) => {
                     if (ex.status === 'pending') {
                         ex.status = 'verified';
                         // ex.updatedAt = Date.now();
+                        hasChanges = true;
+                    }
+                    if (ex.wasRejectedOnce) {
+                        ex.wasRejectedOnce = false;
                         hasChanges = true;
                     }
                 });
@@ -834,6 +871,7 @@ export const rejectTaskSubmission = async (submissionId, comment) => {
                 if (ex && ex.status !== 'verified') {
                     ex.status = "rejected";
                     ex.adminComment = comment || "Rejected by expert";
+                    ex.wasRejectedOnce = true;
                     ex.updatedAt = Date.now();
 
                     // If it's a Workout, we must revoke day completion (cooldown) to force resubmission
