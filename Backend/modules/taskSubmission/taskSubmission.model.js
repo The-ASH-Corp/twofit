@@ -51,6 +51,10 @@ const taskSubmissionSchema = new mongoose.Schema(
                         adminComment: {
                             type: String,
                         },
+                        wasRejectedOnce: {
+                            type: Boolean,
+                            default: false,
+                        },
                         createdAt: {
                             type: Date,
                             default: Date.now,
