@@ -14,18 +14,21 @@ import { useDispatch } from "react-redux";
 import { getProgramById } from "@/redux/features/program/program.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { fetchClientComplianceStats } from "@/redux/features/client/client.thunk";
+import { SyncLoader } from "react-spinners";
 
 export default function Progress() {
   const [program, setProgram] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [panelType, setPanelType] = useState(null);
   const [complianceData, setComplianceData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const user = useAppSelector(selectUser);
   const dispatch = useDispatch();
 
   const fetchDashboardData = useCallback(async () => {
     try {
+      setIsLoading(true);
       const programId =
         typeof user?.programType === "object"
           ? user?.programType?._id
@@ -36,6 +39,8 @@ export default function Progress() {
       setProgram(program.data);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, [user, dispatch]);
 
@@ -180,9 +185,10 @@ export default function Progress() {
           },
           afterBody: (tooltipItems) => {
             const current = tooltipItems[0].parsed.y;
-            const start = user.measurementHistory[0][
-              tooltipItems[0].dataset.label.toLowerCase()
-            ];
+            const start =
+              user.measurementHistory[0][
+                tooltipItems[0].dataset.label.toLowerCase()
+              ];
             const change = current - start;
             return [
               `Current         ${current} cm`,
@@ -221,7 +227,16 @@ export default function Progress() {
     },
   };
   const lastWeightUpdateDate = user?.weightHistory?.at(-1)?.date || "";
-  const lastMeasurementUpdateDate = user?.measurementHistory?.at(-1)?.date || "";
+  const lastMeasurementUpdateDate =
+    user?.measurementHistory?.at(-1)?.date || "";
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+      </div>
+    );
+  }
 
   return (
     <>

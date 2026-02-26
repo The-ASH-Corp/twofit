@@ -24,6 +24,8 @@ const getHomeByRole = () => {
       return "/admin";
     case "expert":
       return "/expert";
+    case "user":
+      return "/client";
     default:
       return "/login";
   }
