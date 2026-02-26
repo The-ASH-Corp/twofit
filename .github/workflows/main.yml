@@ -1,4 +1,4 @@
-name: Twofit 
+name: Twofit
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Setup SSH
@@ -28,14 +28,24 @@ jobs:
             echo "📥 Pull latest code"
             git pull origin master
 
-            echo "🛑 Stop containers"
-            docker-compose down
+            echo "🛑 Stop containers (keep volumes safe)"
+            docker-compose down --remove-orphans
 
-            echo "🏗️ Build containers"
-            docker-compose build
+            echo "🧹 Remove unused containers"
+            docker container prune -f
+
+            echo "🧹 Remove unused images"
+            docker image prune -af
+
+            echo "🧹 Remove build cache"
+            docker builder prune -af
+
+            echo "🏗️ Build fresh containers"
+            docker-compose build --no-cache
 
             echo "🚀 Start containers"
             docker-compose up -d
 
             echo "✅ Deployment successful"
+
           EOF
