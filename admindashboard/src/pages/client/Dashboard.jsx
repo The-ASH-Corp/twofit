@@ -21,6 +21,7 @@ import {
   getClient,
 } from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
+import { CalendarDays, ChartPie, Flame, IdCardLanyard, Weight } from "lucide-react";
 
 export default function Dashboard() {
   const [program, setProgram] = useState(null);
@@ -81,9 +82,12 @@ export default function Dashboard() {
   if (clientStatus === "Inactive") {
     return (
       <div className="flex flex-col items-center justify-center h-[80vh] text-center p-8 bg-white rounded-lg shadow-sm">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">Account Inactive</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-4">
+          Account Inactive
+        </h1>
         <p className="text-gray-600 text-lg">
-          You are currently inactive. Please contact the admin to reactivate your account and resume your program.
+          You are currently inactive. Please contact the admin to reactivate
+          your account and resume your program.
         </p>
       </div>
     );
@@ -92,7 +96,9 @@ export default function Dashboard() {
   if (clientStatus === "Completed") {
     return (
       <div className="flex flex-col items-center justify-center h-[80vh] text-center p-8 bg-white rounded-lg shadow-sm">
-        <h1 className="text-3xl font-bold text-[#0A4F48] mb-4">Program Completed!</h1>
+        <h1 className="text-3xl font-bold text-[#0A4F48] mb-4">
+          Program Completed!
+        </h1>
         <p className="text-gray-600 text-lg">
           Congratulations! You have successfully completed your program.
         </p>
@@ -118,7 +124,12 @@ export default function Dashboard() {
                         program?.plan?.duration || 0
                       }`
                 }
-                icon={assets.website}
+                icon={
+                  <CalendarDays
+                    size={20}
+                    className="text-[#ffffff] md:w-6 md:h-6"
+                  />
+                }
                 bg="#0A4F48"
                 iconColor="white"
                 cardBg="white"
@@ -126,7 +137,12 @@ export default function Dashboard() {
               <KpiCard
                 title="Overall Compliance"
                 value={`${complianceData?.overall || 0}%`}
-                icon={assets.website}
+                icon={
+                  <ChartPie
+                    size={20}
+                    className="text-[#ffffff] md:w-6 md:h-6"
+                  />
+                }
                 bg="#0A4F48"
                 iconColor="white"
                 cardBg="white"
@@ -134,14 +150,22 @@ export default function Dashboard() {
               <KpiCard
                 title="Weight Progress"
                 value={user?.currentWeight || 0}
-                icon={assets.website}
+                icon={
+                  <Weight size={20} className="text-[#0A4F48] md:w-6 md:h-6" />
+                }
                 bg="#F4DBC7"
                 cardBg="white"
               />
               <KpiCard
                 title="Active Streak"
                 value={`${complianceData?.streaks?.activeStreak || 0} Days`}
-                icon={assets.website}
+                icon={
+                  <Flame
+                    Lanyard
+                    size={20}
+                    className="text-[#0A4F48] md:w-6 md:h-6"
+                  />
+                }
                 bg="#F4DBC7"
                 cardBg="white"
               />
@@ -211,7 +235,6 @@ export default function Dashboard() {
           <ExpertsList expert={coaches} />
           <Measeurement />
           <NotificationsList />
-          
         </div>
       </div>
 
