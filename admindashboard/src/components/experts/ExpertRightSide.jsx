@@ -146,7 +146,7 @@ const ExpertRightSide = ({ expert }) => {
 
           <div className="p-6 relative">
              <div className="relative w-full aspect-square max-h-[180px] flex items-center justify-center mb-6">
-                <div className="relative w-[160px] h-[160px]">
+                <div className="relative w-40 h-40">
                     <Doughnut data={complianceData} options={complianceOptions} />
                     {/* Center Text */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">

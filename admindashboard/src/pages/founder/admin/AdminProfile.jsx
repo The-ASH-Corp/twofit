@@ -61,13 +61,13 @@ const AdminProfile = () => {
         </div>
         
         {/* Edit Action */}
-        <button
+        {/* <button
           className="group px-4 py-2 sm:px-5 sm:py-2.5 bg-[#0A4F48] text-white rounded-xl text-xs sm:text-sm font-bold shadow-[0_4px_14px_-4px_rgba(10,79,72,0.5)] hover:bg-[#093E39] hover:shadow-[0_6px_20px_-4px_rgba(10,79,72,0.6)] active:scale-95 transition-all duration-200 flex items-center gap-2"
         >
           <UserCog size={16} className="group-hover:rotate-12 transition-transform sm:w-[18px] sm:h-[18px]" />
           <span className="hidden sm:inline">Edit Profile</span>
           <span className="sm:hidden">Edit</span>
-        </button>
+        </button> */}
       </div>
 
       {/* Main Content Grid - Responsive Layout */}

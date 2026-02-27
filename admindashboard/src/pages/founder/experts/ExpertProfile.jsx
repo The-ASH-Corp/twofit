@@ -37,39 +37,41 @@ const ExpertProfile = () => {
   if (error) return <p className="text-red-500 p-8 text-center">{error}</p>;
 
   return (
-    <div className="flex flex-col gap-6 w-full min-h-[calc(100dvh-32px)] lg:h-[calc(100vh-32px)] overflow-y-auto lg:overflow-hidden font-sans bg-[#F8FAFC] p-4 sm:p-6 rounded-3xl">
+    <div className="flex flex-col gap-6 w-full h-[calc(100vh-156px)] font-sans bg-[#F8FAFC] p-4 sm:p-6 rounded-3xl">
       {/* Header with Breadcrumb-like feel */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
         <div className="flex items-center gap-4">
-          <button 
+          <button
             onClick={() => navigate(-1)}
             className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-[#0A4F48] hover:border-[#0A4F48] transition-all shadow-sm hover:shadow-md shrink-0"
           >
             <ArrowLeft size={20} />
           </button>
           <div className="flex flex-col">
-            <h1 className="text-2xl font-black text-[#0F172A] tracking-tight leading-none">Expert Profile</h1>
-            <p className="text-sm text-[#64748B] font-medium mt-1">Manage and view detailed information</p>
+            <h1 className="text-2xl font-black text-[#0F172A] tracking-tight leading-none">
+              Expert Profile
+            </h1>
+            <p className="text-sm text-[#64748B] font-medium mt-1">
+              Manage and view detailed information
+            </p>
           </div>
         </div>
-        
-   
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-0 overflow-visible lg:overflow-hidden pb-2">
+      <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 flex-1 min-h-0 overflow-visible lg:overflow-hidden pb-2">
         {/* Left Column (Profile Card) - 30% */}
-        <div className="lg:col-span-4 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
+        <div className="lg:col-span-2 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
           <ExpertLeftSide expert={expert} />
         </div>
-        
+
         {/* Center Column (Details) - 40% */}
-        <div className="lg:col-span-5 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
+        <div className="lg:col-span-4 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
           <ExpertCenterSide expert={expert} />
         </div>
-        
+
         {/* Right Column (Stats) - 30% */}
-        <div className="lg:col-span-3 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
+        <div className="lg:col-span-4 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
           <ExpertRightSide expert={expert} />
         </div>
       </div>

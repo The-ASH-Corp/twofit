@@ -39,7 +39,7 @@ export const allEmployees = async (page, limit) => {
     })),
     ...experts.map((c) => ({
       ...c,
-      role: "Expert",
+      // role: "Expert",
       incentives: `₹ ${c.incentives.toLocaleString("en-IN")}`,
       netSalary: Number(c.salary || 0) + Number(c.incentives || 0),
       months: getCurrentMonthName(),

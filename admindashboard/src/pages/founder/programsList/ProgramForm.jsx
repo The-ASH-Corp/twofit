@@ -133,6 +133,7 @@ export default function ProgramForm() {
         initialValues={initialValues}
         validationSchema={validationSchema}
         heading={"Add Program"}
+        submitButton={"Save"}
         onSubmit={(values) => {
           handleProgramCreation(values);
         }}

@@ -18,6 +18,7 @@ const StatusCell = ({ row, onRefresh }) => {
   const [loading, setLoading] = useState(false);
 
   const handleStatusChange = async (e) => {
+    e.stopPropagation();
     const newStatus = e.target.value;
     if (newStatus === currentStatus) return;
 
@@ -41,6 +42,7 @@ const StatusCell = ({ row, onRefresh }) => {
     <div className="relative inline-block w-[50%]"> 
     <IoIosArrowDown className="absolute right-1 top-1/2 transform -translate-y-1/2 text-white"/>
       <select
+        onClick={(e)=>e.stopPropagation()}
         value={currentStatus}
         onChange={handleStatusChange}
         disabled={loading}

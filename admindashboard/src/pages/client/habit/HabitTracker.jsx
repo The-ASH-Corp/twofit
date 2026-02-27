@@ -5,6 +5,7 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 import HabitRow from "./HabitRow";
 import { IoClose } from "react-icons/io5";
 import { TiTick } from "react-icons/ti";
+import { SyncLoader } from "react-spinners";
 
 export default function HabitTracker() {
   const dispatch = useDispatch();
@@ -20,16 +21,20 @@ export default function HabitTracker() {
     }
   }, [clientId, dispatch]);
 
-  if (loading) return <p>Loading habits...</p>;
-  if (!habits || !habits.habits?.length)
-    return <p>No habits assigned</p>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={15} />
+      </div>
+    );
+  if (!habits || !habits.habits?.length) return <p>No habits assigned</p>;
 
   // ✅ Calculate today's status
   const today = new Date().toDateString();
 
   const doneCount = habits.habits.filter((habit) => {
     const todayLog = habit.logs.find(
-      (log) => new Date(log.date).toDateString() === today
+      (log) => new Date(log.date).toDateString() === today,
     );
     return todayLog?.status === "done";
   }).length;
@@ -45,33 +50,25 @@ export default function HabitTracker() {
       <table className="w-full border-gray-200 border rounded-xl">
         <thead>
           <tr className="bg-gray-100">
-            <th className="text-left p-2 text-[#0A4F48]">
-              Habit
-            </th>
-            <th className="text-center p-2">
-              Today
-            </th>
+            <th className="text-left p-2 text-[#0A4F48]">Habit</th>
+            <th className="text-center p-2">Today</th>
           </tr>
         </thead>
 
         <tbody>
           {habits.habits.map((habit) => (
-            <HabitRow
-              key={habit._id}    
-              habit={habit}
-              clientId={clientId}
-            />
+            <HabitRow key={habit._id} habit={habit} clientId={clientId} />
           ))}
         </tbody>
       </table>
 
-       <div className="mt-4 flex justify-between bg-gray-100 p-3 rounded">
+      <div className="mt-4 flex justify-between bg-gray-100 p-3 rounded">
         <p className="text-green-600 font-semibold flex">
-        <TiTick  className="text-2xl"/> Done: {doneCount}
+          <TiTick className="text-2xl" /> Done: {doneCount}
         </p>
 
         <p className="text-red-500 font-semibold flex ">
-         <IoClose className="text-2xl"/> Missed: {missedCount}
+          <IoClose className="text-2xl" /> Missed: {missedCount}
         </p>
       </div>
 

@@ -67,6 +67,7 @@ export default function CategoryForm() {
         initialValues={initialValues}
         validationSchema={validationSchema}
         heading={"Add Category"}
+        submitButton={"Save"}
         onSubmit={(value) => handelSubmit(value)}
       />
     </div>

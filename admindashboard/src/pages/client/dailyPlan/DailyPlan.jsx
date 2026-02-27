@@ -3,7 +3,10 @@ import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
 import DailyTaskDrawer from "./DailyTaskDrawer";
 import MobileBottomNav from "../components/MobileBottomNav";
 import { useDispatch } from "react-redux";
-import { getUserTaskStatus, uploadTask } from "@/redux/features/tasks/task.thunk";
+import {
+  getUserTaskStatus,
+  uploadTask,
+} from "@/redux/features/tasks/task.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { getProgramById } from "@/redux/features/program/program.thunk";
@@ -11,6 +14,7 @@ import { getClient } from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { assets } from "@/assets/asset";
 import { toast } from "react-toastify";
+import { SyncLoader } from "react-spinners";
 
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -28,11 +32,13 @@ export default function DailyPlan() {
   const [program, setProgram] = useState(null);
   const [therapyPlan, setTherapyPlan] = useState(null);
   const [calendarData, setCalendarData] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch program, therapy plan and tasks on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoading(true);
         await dispatch(getClient({ id: user?._id }));
 
         if (user?.programType) {
@@ -49,6 +55,8 @@ export default function DailyPlan() {
         await dispatch(getUserTaskStatus()).unwrap();
       } catch (error) {
         console.error("Error fetching daily plan data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -59,10 +67,10 @@ export default function DailyPlan() {
 
   // Set therapy plan when clientUser is populated
   useEffect(() => {
-    if (clientUser?.therapyType && typeof clientUser.therapyType === 'object') {
-       if (clientUser.therapyType.weeks) {
-         setTherapyPlan(clientUser.therapyType);
-       }
+    if (clientUser?.therapyType && typeof clientUser.therapyType === "object") {
+      if (clientUser.therapyType.weeks) {
+        setTherapyPlan(clientUser.therapyType);
+      }
     }
   }, [clientUser]);
 
@@ -100,14 +108,16 @@ export default function DailyPlan() {
 
     // Flatten and sort program days
     const sortedDays =
-      program?.plan?.weeks?.flatMap((week, weekIndex) =>
-        week.days.map((day, dayIndex) => ({
-          ...day,
-          weekIndex: weekIndex + 1,
-          dayIndex: dayIndex + 1,
-          globalIndex: weekIndex * 7 + dayIndex + 1,
-        })),
-      ).sort((a, b) => a.globalIndex - b.globalIndex) || [];
+      program?.plan?.weeks
+        ?.flatMap((week, weekIndex) =>
+          week.days.map((day, dayIndex) => ({
+            ...day,
+            weekIndex: weekIndex + 1,
+            dayIndex: dayIndex + 1,
+            globalIndex: weekIndex * 7 + dayIndex + 1,
+          })),
+        )
+        .sort((a, b) => a.globalIndex - b.globalIndex) || [];
 
     // Flatten therapy days if available
     const sortedTherapyDays =
@@ -128,8 +138,10 @@ export default function DailyPlan() {
     while (programIndex < sortedDays.length && loopCount < MAX_DAYS) {
       loopCount++;
       const currentPDay = sortedDays[programIndex];
-      const currentTherapyDay = sortedTherapyDays.find(d => d.globalIndex === currentPDay.globalIndex);
-      
+      const currentTherapyDay = sortedTherapyDays.find(
+        (d) => d.globalIndex === currentPDay.globalIndex,
+      );
+
       const dateKey = getDateKey(iteratorDate);
       const isBeforeToday = iteratorDate < today;
 
@@ -154,7 +166,6 @@ export default function DailyPlan() {
         if (hasActivityOnDate) {
           mapDayToDate = true;
         } else {
-
           mapDayToDate = false;
         }
       } else {
@@ -164,9 +175,14 @@ export default function DailyPlan() {
       if (mapDayToDate) {
         // Build the task list for this day
         const taskList = [];
-        const isWeightLoss = program?.title?.toLowerCase().includes("weight loss");
+        const isWeightLoss = program?.title
+          ?.toLowerCase()
+          .includes("weight loss");
         const defaultMealCount = isWeightLoss ? 5 : 6;
-        const mealCount = clientUser?.dietPlanMealCount || user?.dietPlanMealCount || defaultMealCount;
+        const mealCount =
+          clientUser?.dietPlanMealCount ||
+          user?.dietPlanMealCount ||
+          defaultMealCount;
 
         const workoutCount = currentPDay.exercises?.length || 0;
         const therapyCount = currentTherapyDay?.therapies?.length || 0;
@@ -175,15 +191,11 @@ export default function DailyPlan() {
         // Helper to process individual task items
         const processItem = (idx, type, name, meta = {}) => {
           const submission = dayTasks.find(
-            (t) =>
-              t.exerciseIndex === idx &&
-              t.taskType === type,
+            (t) => t.exerciseIndex === idx && t.taskType === type,
           );
-          
+
           let status = submission ? submission.status : "todo";
-          
-    
-          
+
           taskList.push({
             name: name,
             status: status,
@@ -193,7 +205,7 @@ export default function DailyPlan() {
             dayIndex: currentPDay.dayIndex,
             exerciseIndex: idx,
             programId: program?._id,
-            ...meta
+            ...meta,
           });
         };
 
@@ -204,15 +216,15 @@ export default function DailyPlan() {
         for (let i = 0; i < mealCount; i++) {
           processItem(100 + i, "Meal", `Meal ${i + 1}`);
         }
-        
+
         // Process Therapy Tasks
         if (currentTherapyDay && currentTherapyDay.therapies) {
-           currentTherapyDay.therapies.forEach((therapy, idx) => {
-              processItem(idx, "Therapy", therapy.type || "Therapy Task", {
-                  notes: therapy.notes,
-                  mediaUrl: therapy.url
-              });
-           });
+          currentTherapyDay.therapies.forEach((therapy, idx) => {
+            processItem(idx, "Therapy", therapy.type || "Therapy Task", {
+              notes: therapy.notes,
+              mediaUrl: therapy.url,
+            });
+          });
         }
 
         // Calculate stats
@@ -265,9 +277,23 @@ export default function DailyPlan() {
       // Always advance calendar date
       iteratorDate.setDate(iteratorDate.getDate() + 1);
     }
-    
+
     setCalendarData(newCalendarData);
-  }, [program, therapyPlan, tasks, user?.programStartDate, clientUser?.programStartDate]);
+  }, [
+    program,
+    therapyPlan,
+    tasks,
+    user?.programStartDate,
+    clientUser?.programStartDate,
+  ]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={15} />
+      </div>
+    );
+  }
 
   if (!isProgramStarted) {
     const startDate = clientUser?.programStartDate || user?.programStartDate;
@@ -287,13 +313,15 @@ export default function DailyPlan() {
           </h2>
           <p className="text-gray-500 max-w-md">
             Your program is scheduled to start on{" "}
-            <b>{new Date(startDate).toLocaleDateString("en-US", {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}</b>.
-            Your daily plan will be available then.
+            <b>
+              {new Date(startDate).toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </b>
+            . Your daily plan will be available then.
           </p>
         </div>
         <MobileBottomNav />
@@ -516,11 +544,10 @@ export default function DailyPlan() {
                         badgeClasses =
                           "bg-orange-50 border-orange-200 text-orange-700";
                       } else if (task.type === "not_logged_in") {
-                         badgeClasses =
-                          "bg-red-50 border-red-200 text-red-700";
+                        badgeClasses = "bg-red-50 border-red-200 text-red-700";
                       } else if (task.type === "todo") {
                         badgeClasses =
-                           "bg-blue-50 border-blue-200 text-blue-700";
+                          "bg-blue-50 border-blue-200 text-blue-700";
                       }
 
                       return (
@@ -529,10 +556,14 @@ export default function DailyPlan() {
                           className={`text-[9px] lg:text-[11px] font-medium px-1.5 lg:px-2 py-0.5 lg:py-1 rounded border truncate ${badgeClasses}`}
                         >
                           <span className="hidden lg:inline">
-                            {task.type === "not_logged_in" ? "You were not logged in" : `${task.count} Task - ${task.type.charAt(0).toUpperCase() + task.type.slice(1)}`}
+                            {task.type === "not_logged_in"
+                              ? "You were not logged in"
+                              : `${task.count} Task - ${task.type.charAt(0).toUpperCase() + task.type.slice(1)}`}
                           </span>
                           <span className="lg:hidden">
-                             {task.type === "not_logged_in" ? "Not Logged In" : `${task.type.charAt(0).toUpperCase() + task.type.slice(1).substring(0, 5)}...`}
+                            {task.type === "not_logged_in"
+                              ? "Not Logged In"
+                              : `${task.type.charAt(0).toUpperCase() + task.type.slice(1).substring(0, 5)}...`}
                           </span>
                         </div>
                       );

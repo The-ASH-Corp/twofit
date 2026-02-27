@@ -25,7 +25,6 @@ export default function ExpertTable() {
 
   const data = useAppSelector(selectFounderAllCoaches);
   const totalCount = useAppSelector(selectCoachCount);
-  // const error = useAppSelector(selectCoachError);
   const status = useAppSelector(selectCoachStatus);
 
   const [coaches, setCoaches] = useState([]);
@@ -51,7 +50,7 @@ export default function ExpertTable() {
 
   if (status === "loading")
     return (
-      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+      <div className="flex justify-center items-center h-[calc(100vh-156px)]">
         <SyncLoader color="#0A4F48" loading margin={2} size={20} />
       </div>
     );

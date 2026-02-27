@@ -1,5 +1,5 @@
 import React from "react";
-import { Briefcase, Award, DollarSign, Layers, Clock, UserCheck } from "lucide-react";
+import { Briefcase, Award, IndianRupee, Layers, Clock, UserCheck } from "lucide-react";
 
 const AdminLeftSide = ({ admin }) => {
 
@@ -7,17 +7,17 @@ const AdminLeftSide = ({ admin }) => {
     {
       title: "Programs",
       content: admin?.program?.map((p) => p.title).join(" | ") || "N/A",
-      icon: Layers
+      icon: Layers,
     },
     {
       title: "Base Salary",
       content: `₹${admin?.salary?.toLocaleString() || "0"}/m`,
-      icon: DollarSign
+      icon: IndianRupee,
     },
     {
       title: "Specialization",
       content: admin?.specialization?.join(", ") || "N/A",
-      icon: Award
+      icon: Award,
     },
     {
       title: "Experience",
@@ -26,12 +26,12 @@ const AdminLeftSide = ({ admin }) => {
           ? admin.experience
           : `${admin.experience} Years`
         : "0 Years",
-      icon: Clock
+      icon: Clock,
     },
     {
       title: "Certifications",
       content: admin?.qualification || "N/A",
-      icon: UserCheck
+      icon: UserCheck,
     },
   ];
 

@@ -1,7 +1,9 @@
 const expertColors = {
   Head: "bg-[#FFF5ED] text-black",
   Admin: "bg-[#E7F9F4] text-black",
-  Expert: "bg-[#EBF2FE] text-black",
+  Trainer: "bg-[#EBF2FE] text-black",
+  Dietician: "bg-[#EBF2FE] text-black",
+  Therapist: "bg-[#EBF2FE] text-black",
 };
 const formatINR = (amount) =>
   `₹ ${amount.toLocaleString("en-IN")}`;
