@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { assets } from "@/assets/asset";
 import KpiCard from "@/components/cards/KpiCard";
 import HeroCard from "./components/HeroCard";
 import ComplianceChart from "@/components/chart/ComplianceChart";

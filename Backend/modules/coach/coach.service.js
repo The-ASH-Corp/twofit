@@ -1,6 +1,6 @@
 import { generatePassword, hashPassword } from "../../utils/password.js";
 import { AdminModel } from "../admin/admin.model.js";
-import { calculateRatingIncentive } from "../incentive/incentive.service.js";
+import { calculateExtraClientIncentive, calculateRatingIncentive } from "../incentive/incentive.service.js";
 import { CoachModel } from "./coach.model.js";
 import User from "../auth/auth.model.js";
 import mongoose from "mongoose";
@@ -262,8 +262,13 @@ export const updateCoachById = async (coachId, updatedData) => {
     delete updatedData.chooseTherapy;
   }
 
+  calculateExtraClientIncentive(coachId)
 
-  return await CoachModel.updateOne({ _id: coachId }, { $set: updatedData });
+  const updated = await CoachModel.updateOne({ _id: coachId }, { $set: updatedData });
+
+  calculateExtraClientIncentive(coachId);
+  
+  return updated;
 };
 
 export const deleteCoachById = async (coachId) => {

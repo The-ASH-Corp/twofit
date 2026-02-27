@@ -1,4 +1,3 @@
-<<<<<<< .merge_file_2WiYNO
 import {
   useReactTable,
   getCoreRowModel,
@@ -123,10 +122,12 @@ export default function BaseTable({
       {/* Header Section */}
       <div className="p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white">
         <div>
-           <h2 className="text-[#0F172A] font-black text-2xl tracking-tight mb-2">
-             {pageLabel}
-           </h2>
-           <p className="text-slate-500 text-sm font-medium">Manage and view your {pageLabel.toLowerCase() || 'data'} here</p>
+          <h2 className="text-[#0F172A] font-black text-2xl tracking-tight mb-2">
+            {pageLabel}
+          </h2>
+          <p className="text-slate-500 text-sm font-medium">
+            Manage and view your {pageLabel.toLowerCase() || "data"} here
+          </p>
         </div>
 
         {/* Controls Section */}
@@ -134,7 +135,11 @@ export default function BaseTable({
           {/* Search Bar */}
           <div className="relative flex-1 sm:flex-initial group">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0A4F48] transition-colors">
-                 <img src={assets.search} className="w-5 h-5 opacity-60" alt="search" />
+              <img
+                src={assets.search}
+                className="w-5 h-5 opacity-60"
+                alt="search"
+              />
             </div>
             <input
               type="text"
@@ -197,47 +202,47 @@ export default function BaseTable({
       </div>
 
       {/* Table Content */}
-      <div className="flex-1 overflow-x-auto overflow-y-visible px-6 md:px-8 pb-32"> 
-          {data?.length > 0 ? (
-            <table className="w-full text-left border-separate border-spacing-y-3">
-              <thead className="hidden md:table-header-group">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th
-                        key={header.id}
-                        className="py-2 px-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap pl-6"
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
+      <div className="flex-1 overflow-x-auto overflow-y-visible px-6 md:px-8 pb-32">
+        {data?.length > 0 ? (
+          <table className="w-full text-left border-separate border-spacing-y-3">
+            <thead className="hidden md:table-header-group">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th
+                      key={header.id}
+                      className="py-2 px-4 text-[11px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap pl-6"
+                    >
+                      {flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
 
-              <tbody className="bg-transparent">
-                {table.getRowModel().rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="group transition-all duration-300 cursor-pointer flex flex-col md:table-row relative bg-[#F8FAFC] hover:bg-white hover:shadow-xl hover:shadow-slate-200/40 hover:-translate-y-1 rounded-2xl z-0 hover:z-50 has-[div[role='menu']]:z-[60]"
-                    onClick={() => {
-                      if (profilePath) {
-                        profilePath(row.original?._id);
-                      }
-                    }}
-                    style={{ borderRadius: '1rem' }}
-                  >
-                    {row.getVisibleCells().map((cell, index) => {
-                       const isFirst = index === 0;
-                       const isLast = index === row.getVisibleCells().length - 1;
-                       
-                       return (
+            <tbody className="bg-transparent">
+              {table.getRowModel().rows.map((row) => (
+                <tr
+                  key={row.id}
+                  className="group transition-all duration-300 cursor-pointer flex flex-col md:table-row relative bg-[#F8FAFC] hover:bg-white hover:shadow-xl hover:shadow-slate-200/40 hover:-translate-y-1 rounded-2xl z-0 hover:z-50 has-[div[role='menu']]:z-60"
+                  onClick={() => {
+                    if (profilePath) {
+                      profilePath(row.original?._id);
+                    }
+                  }}
+                  style={{ borderRadius: "1rem" }}
+                >
+                  {row.getVisibleCells().map((cell, index) => {
+                    const isFirst = index === 0;
+                    const isLast = index === row.getVisibleCells().length - 1;
+
+                    return (
                       <td
                         key={cell.id}
-                        className={`py-5 px-6 text-sm font-bold text-slate-700 flex md:table-cell items-center justify-between md:justify-start ${isFirst ? 'rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none' : ''} ${isLast ? 'rounded-b-2xl md:rounded-r-2xl md:rounded-bl-none' : ''}`}
+                        className={`py-5 px-6 text-sm font-bold text-slate-700 flex md:table-cell items-center justify-between md:justify-start ${isFirst ? "rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none" : ""} ${isLast ? "rounded-b-2xl md:rounded-r-2xl md:rounded-bl-none" : ""}`}
                         data-label={
                           table.getHeaderGroups()[0]?.headers[index]?.column
                             ?.columnDef?.header
@@ -261,30 +266,38 @@ export default function BaseTable({
                           )}
                         </div>
                       </td>
-                    )})}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 gap-4 bg-[#F8FAFC] rounded-3xl border-2 border-dashed border-slate-200 mx-4 md:mx-6 mb-4 md:mb-6 min-h-[300px]">
-              <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center mb-2 shadow-sm">
-                  <BsDatabaseAdd size={24} className="text-slate-300 md:w-7 md:h-7" />
-              </div>
-              <div className="text-center px-4">
-                  <h3 className="text-base md:text-lg font-bold text-slate-700 mb-1">No data found</h3>
-                  <p className="text-xs md:text-sm font-medium text-slate-400">Get started by creating a new entry.</p>
-              </div>
-              {actionPath && (
-                   <button 
-                      onClick={() => navigate(actionPath)}
-                      className="mt-2 px-6 py-2.5 bg-white border border-slate-200 hover:border-[#0A4F48] text-[#0A4F48] rounded-xl text-sm font-bold transition-all shadow-sm hover:shadow-md"
-                   >
-                       Add Record
-                   </button>
-              )}
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center text-slate-400 gap-4 bg-[#F8FAFC] rounded-3xl border-2 border-dashed border-slate-200 mx-4 md:mx-6 mb-4 md:mb-6 min-h-[300px]">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center mb-2 shadow-sm">
+              <BsDatabaseAdd
+                size={24}
+                className="text-slate-300 md:w-7 md:h-7"
+              />
             </div>
-          )}
+            <div className="text-center px-4">
+              <h3 className="text-base md:text-lg font-bold text-slate-700 mb-1">
+                No data found
+              </h3>
+              <p className="text-xs md:text-sm font-medium text-slate-400">
+                Get started by creating a new entry.
+              </p>
+            </div>
+            {actionPath && (
+              <button
+                onClick={() => navigate(actionPath)}
+                className="mt-2 px-6 py-2.5 bg-white border border-slate-200 hover:border-[#0A4F48] text-[#0A4F48] rounded-xl text-sm font-bold transition-all shadow-sm hover:shadow-md"
+              >
+                Add Record
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Pagination Footer */}
@@ -309,13 +322,11 @@ export default function BaseTable({
               </select>
               <MdOutlineKeyboardArrowDown className="w-4 h-4 absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
-            <span className="hidden sm:inline">
-                 per page
-            </span>
+            <span className="hidden sm:inline">per page</span>
           </div>
 
           <div className="text-slate-400 text-xs font-bold uppercase tracking-wider">
-               Page {page} of {totalPages}
+            Page {page} of {totalPages}
           </div>
 
           {/* Page Navigation */}
@@ -332,7 +343,12 @@ export default function BaseTable({
               {paginationRange.map((pageNumber, idx) => {
                 if (pageNumber === "...") {
                   return (
-                    <span key={idx} className="text-slate-300 text-xs px-1 font-black">•••</span>
+                    <span
+                      key={idx}
+                      className="text-slate-300 text-xs px-1 font-black"
+                    >
+                      •••
+                    </span>
                   );
                 }
                 return (
@@ -354,7 +370,7 @@ export default function BaseTable({
             <button
               onClick={() => handlePageChange(Math.min(totalPages, page + 1))}
               disabled={page === totalPages}
-               className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#F8FAFC] text-slate-500 hover:bg-[#0A4F48] hover:text-white disabled:opacity-30 disabled:hover:bg-[#F8FAFC] disabled:hover:text-slate-500 transition-all shadow-sm"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-[#F8FAFC] text-slate-500 hover:bg-[#0A4F48] hover:text-white disabled:opacity-30 disabled:hover:bg-[#F8FAFC] disabled:hover:text-slate-500 transition-all shadow-sm"
             >
               <MdOutlineKeyboardArrowRight className="w-5 h-5" />
             </button>
@@ -364,99 +380,3 @@ export default function BaseTable({
     </div>
   );
 }
-=======
-import {
-  useReactTable,
-  getCoreRowModel,
-  flexRender,
-  // getPaginationRowModel,
-} from "@tanstack/react-table";
-import { assets } from "../../assets/asset";
-import {useNavigate} from 'react-router-dom'
-
-import { useState } from "react";
-export default function BaseTable({ columns, data,actionLabel ,actionPath,pageLabel}) {
-  
-  const [rowSelection, setRowSelection] = useState({});
-
-  const navigate=useNavigate()
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    state: { rowSelection },
-    onRowSelectionChange: setRowSelection,
-    // getPaginationRowModel,
-    enableRowSelection: true,
-  });
-
-  return (
-    <div className="bg-white p-[16px] rounded-xl   ">
-      <div className="mb-6 flex justify-between">
-        <h2 className="text-[#0A4F48] font-bold text-[16px]">{pageLabel}</h2>
-        <div className="flex gap-3">
-          <div className="flex items-center bg-[#F8F8F8] px-3 rounded-lg">
-            <img src={assets.search} className="  w-5 h-5  " />
-            <input
-              type="text"
-              placeholder="Search anything"
-              className=" w-72 px-[10px] py-[12px] border border-none rounded-xl  w-[250px]"
-            />
-            <img src={assets.filter} className="  w-4 h-4" />
-          </div>
-          <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0">
-            All Status
-          </button>
-          <button className="bg-[#EBF3F2] rounded-md text-[12px] font-semibold px-3 py-0">
-            Bulk Actions
-          </button>
-          <button
-            onClick={() => navigate(actionPath)}
-            className="bg-[#0A4F48] text-white rounded-md text-[12px] font-semibold px-3 py-0"
-          >
-            {actionLabel}
-          </button>
-        </div>
-      </div>
-      <table className="w-full text-sm border-collapse">
-        <thead className="bg-[#F8F8F8] ">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <th
-                  key={header.id}
-                  className="text-left py-3 px-2 font-semibold text-black"
-                >
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                </th>
-              ))}
-            </tr>
-          ))}
-        </thead>
-
-        <tbody>
-          {table.getRowModel().rows.map((row) => (
-            <tr
-              key={row.id}
-              className="border-b border-[#DBDEDD] hover:bg-gray-50 transition"
-              onClick={() => navigate("/clients/clientProfile/:clientId")}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <td
-                  key={cell.id}
-                  className="py-5 px-2 text-[11px] font-medium text-black"
-                >
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
->>>>>>> .merge_file_HstayL

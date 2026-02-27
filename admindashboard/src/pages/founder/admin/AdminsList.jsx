@@ -54,14 +54,14 @@ export default function AdminsList() {
 
   if (status === "loading")
     return (
-      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+      <div className="flex justify-center items-center h-[calc(100vh-156px)]">
         <SyncLoader color="#0A4F48" loading margin={2} size={20} />
       </div>
     );
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="h-[calc(100vh-130px)] pb-4 overflow-auto no-scrollbar">
+    <div className="h-[calc(100vh-156px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         columns={AdminColumns}
         data={admins}

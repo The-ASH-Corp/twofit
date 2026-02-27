@@ -2,6 +2,7 @@ import User from "../auth/auth.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import mongoose from "mongoose";
 import HabitModel from "../habit/habit.model.js";
+import { calculateExtraClientIncentive } from "../incentive/incentive.service.js";
 
 export const getAllClient = async (page, limit) => {
   const skip = (page - 1) * limit;
@@ -31,6 +32,12 @@ export const updateOneClient = async (userData, id) => {
     { $set: userData },
     { new: true },
   ).select("-password");
+  const coaches = [client.dietition, client.trainer, client.therapist].filter(
+    Boolean,
+  );
+  for (const coachId of coaches) {
+    await calculateExtraClientIncentive(coachId);
+  }
   return client;
 };
 
