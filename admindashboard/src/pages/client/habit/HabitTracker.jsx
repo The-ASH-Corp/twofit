@@ -74,6 +74,10 @@ export default function HabitTracker() {
          <IoClose className="text-2xl"/> Missed: {missedCount}
         </p>
       </div>
+
+      <div>
+        add notes
+      </div>
     </div>
   );
 }
