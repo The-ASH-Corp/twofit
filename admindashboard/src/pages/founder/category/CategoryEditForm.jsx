@@ -87,6 +87,7 @@ const CategoryEditForm = () => {
         initialValues={initialValues}
         enableReinitialize
         heading={"Update Category"}
+        submitButton={"Update Changes"}
         onSubmit={(value) => handelSubmit(value)}
       />
     </div>

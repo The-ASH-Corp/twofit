@@ -169,6 +169,7 @@ const HeadEditForm = () => {
         initialValues={initialValues}
         enableReinitialize
         heading={"Update Head"}
+        submitButton={"Update Changes"}
         onSubmit={(value) => handelSubmit(value)}
       />
     </div>

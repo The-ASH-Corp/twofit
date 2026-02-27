@@ -17,7 +17,7 @@ export default function AppLayout() {
       <div className="flex-1 flex flex-col px-4 pt-4 md:px-8 md:pt-6 overflow-hidden min-w-0 transition-all duration-300 ease-in-out">
         <TopBar onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
 
-        <div className="mt-14 md:mt-8 flex-1 overflow-auto no-scrollbar pb-6">
+        <div className="md:mt-8 flex-1 overflow-auto no-scrollbar ">
           <Outlet />
         </div>
       </div>
