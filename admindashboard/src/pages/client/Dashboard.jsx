@@ -20,12 +20,20 @@ import {
   getClient,
 } from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
-import { CalendarDays, ChartPie, Flame, IdCardLanyard, Weight } from "lucide-react";
+import {
+  CalendarDays,
+  ChartPie,
+  Flame,
+  IdCardLanyard,
+  Weight,
+} from "lucide-react";
+import { SyncLoader } from "react-spinners";
 
 export default function Dashboard() {
   const [program, setProgram] = useState(null);
   const [coaches, setCoaches] = useState([]);
   const [complianceData, setComplianceData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const user = useAppSelector(selectUser);
   const clientUser = useAppSelector(selectSelectedClient);
   const dispatch = useDispatch();
@@ -38,6 +46,7 @@ export default function Dashboard() {
 
   const fetchDashboardData = useCallback(async () => {
     try {
+      setIsLoading(true);
       const programId =
         typeof user?.programType === "object"
           ? user?.programType?._id
@@ -52,6 +61,8 @@ export default function Dashboard() {
       setComplianceData(compliance);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
+    } finally {
+      setIsLoading(false);
     }
   }, [user, dispatch]);
 
@@ -77,6 +88,14 @@ export default function Dashboard() {
   }, [user?.programStartDate, clientUser?.programStartDate]);
 
   const clientStatus = clientUser?.status || user?.status;
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-[60vh]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+      </div>
+    );
+  }
 
   if (clientStatus === "Inactive") {
     return (
@@ -190,9 +209,7 @@ export default function Dashboard() {
                 <ComplianceChart data={complianceData.weeklyData} />
               ) : (
                 <div className="h-[220px] flex items-center justify-center">
-                  <p className="text-gray-400 text-sm">
-                    Loading compliance data...
-                  </p>
+                  <SyncLoader color="#0A4F48" loading margin={2} size={10} />
                 </div>
               )}
             </div>
