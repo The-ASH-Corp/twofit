@@ -145,17 +145,17 @@ export default function Topbar({ onToggleSidebar }) {
         </div> */}
 
         {/* Action icons */}
-        <div className="flex items-center gap-3 md:gap-4 shrink-0">
+        <div className="flex items-center  md:gap-4 shrink-0">
           <button
-            className="p-2.5 text-gray-400 hover:text-[#0A4F48] hover:bg-[#EBF3F2] rounded-full transition-all duration-300 relative group overflow-hidden"
+            className="sm:p-2.5 p-1 text-gray-400 hover:text-[#0A4F48] hover:bg-[#EBF3F2] rounded-full transition-all duration-300 relative group overflow-hidden"
             onClick={() => navigate("/founder/notifications")}
           >
             <Bell size={20} className="group-hover:animate-swing" />
-            <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white group-hover:scale-105 transition-transform"></span>
+            <span className="absolute top-1 right-1 sm:top-2.5 sm:right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white group-hover:scale-105 transition-transform"></span>
           </button>
 
           <div
-            className="flex items-center gap-3 pl-4 border-l border-gray-100 cursor-pointer hover:opacity-90 transition-opacity group"
+            className="flex items-center gap-3 pl-1 sm:pl-4 border-l border-gray-100 cursor-pointer hover:opacity-90 transition-opacity group"
             onClick={() => navigate("/founder/profile")}
           >
             <div className="hidden md:block text-right">

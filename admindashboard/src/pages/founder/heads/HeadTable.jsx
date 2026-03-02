@@ -56,14 +56,14 @@ const HeadTable = () => {
 
   if (status === "loading")
     return (
-      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+      <div className="flex justify-center items-center h-[calc(100vh-156px)]">
         <SyncLoader color="#0A4F48" loading margin={2} size={20} />
       </div>
     );
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className={`h-[calc(100vh-130px)] ${heads?.length > 0 ? "pb-32" : "pb-0"} overflow-y-auto overflow-x-hidden no-scrollbar px-1`}>
+    <div className={`h-[calc(100vh-156px)] ${heads?.length > 0 ? "pb-32" : "pb-0"} overflow-y-auto overflow-x-hidden no-scrollbar px-1`}>
       <BaseTable
         data={heads}
         columns={therapyColumns()}

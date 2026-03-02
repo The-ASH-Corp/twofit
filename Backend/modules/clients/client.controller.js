@@ -63,6 +63,7 @@ export const getSingleClient = async (req, res) => {
     
     if (endDate < today && client.status === "Active") {
          client = await service.updateOneClient({ status: "Completed" }, id);
+         
          return res.status(200).json({
              success: true,
              data: { ...client.toObject() },

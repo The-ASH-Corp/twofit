@@ -1,3 +1,4 @@
+import User from "../auth/auth.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import  incentiveModel  from "./incentive.model.js";
 
@@ -38,6 +39,8 @@ export const calculateExtraClientIncentive = async (coachId) => {
     "assignedUsers maxClient ratingIncentiveAmount"
   );
 
+  console.log(coach)
+
   if (!coach) return;
 
   const payroll = await incentiveModel.findOne({
@@ -46,7 +49,10 @@ export const calculateExtraClientIncentive = async (coachId) => {
 
   if (!payroll) return;
 
-  const totalClients = coach.assignedUsers.length;
+  const totalClients = await User.countDocuments({
+    _id: { $in: coach.assignedUsers },
+    status: "Active",
+  });
 
   if (totalClients <= coach.maxClient) {
     await CoachModel.findByIdAndUpdate(coachId, {
