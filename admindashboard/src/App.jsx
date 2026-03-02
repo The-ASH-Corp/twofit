@@ -67,6 +67,7 @@ import HeadTherapyPlan from "./pages/head/therapy/TherapyViewPlan";
 import AppLayout from "./pages/admin/layout/AppLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminChats from "./pages/admin/chats/Chats";
+import ExpertTasks from "./pages/admin/checklist/ExpertTasks";
 import AdminClientsTable from "./pages/admin/clients/ClientsTable";
 import AdminExpertTable from "./pages/admin/experts/ExpertTable";
 import AdminFinance from "./pages/admin/finance/FinanceTable";
@@ -107,7 +108,7 @@ import Habit from "./pages/expert/habit/Habit";
 import HabitTracker from "./pages/client/habit/HabitTracker";
 import HabitDisplay from "./pages/expert/habit/HabitDisplay";
 import WeeklyHabit from "./pages/expert/habit/WeeklyHabit";
-
+import ExpertDailyTasks from "./pages/expert/daily/DailyTasks";
 
 function App() {
   return (
@@ -274,6 +275,7 @@ function App() {
           <Route path="notifications" element={<Notifications />} />
           <Route path="therapy" element={<AdminTherapyList />} />
           <Route path="finance" element={<AdminFinance />} />
+          <Route path="expert-tasks" element={<ExpertTasks />} />
           <Route
             path="therapy/plan/:id"
             element={<AdminTherapyPlanDetails />}
@@ -293,6 +295,7 @@ function App() {
           <Route path="clients" element={<ExpertClientsTable />} />
           <Route path="clients/profile/:id" element={<ExpertClientProfile />} />
           <Route path="weekly-habit" element={<WeeklyHabit />} />
+          <Route path="daily-tasks" element={<ExpertDailyTasks />} />
           <Route path="chats" element={<ExpertChats />} />
           <Route path="programs" element={<ExpertPrograms />} />
           <Route path="programs/viewPlan" element={<ExpertPlanDetails />} />
