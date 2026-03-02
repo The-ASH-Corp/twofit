@@ -18,6 +18,7 @@ import { selectCoachDashboardStats } from "@/redux/features/coach/coach.selector
 import { getAllUserSubmissions } from "@/redux/features/tasks/task.thunk";
 import AssignDietPlanDrawer from "./AssignDietPlanDrawer";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { ENV } from "@/utils/env";
 
 const ClientProfile = () => {
   const dispatch = useDispatch();
@@ -27,11 +28,20 @@ const ClientProfile = () => {
 
   const user = useSelector(selectUser);
 
-  const client = useSelector(selectSelectedClient);  
+  const client = useSelector(selectSelectedClient);
   const status = useSelector(selectClientStatus);
   const error = useSelector(selectClientError);
   const dashboardStats = useSelector(selectCoachDashboardStats);
   const { selectedUserTasks } = useSelector((state) => state.tasks);
+
+  const handleViewDietPlan = () => {
+    if (!client?.dietPlanPdf) return;
+    const baseUrl = ENV.API_BASE_URL?.replace("/api/v1", "");
+    const pdfUrl = client.dietPlanPdf.startsWith("http")
+      ? client.dietPlanPdf
+      : `${baseUrl}${client.dietPlanPdf}`;
+    window.open(pdfUrl, "_blank");
+  };
 
   useEffect(() => {
     if (id) {
@@ -62,6 +72,14 @@ const ClientProfile = () => {
             className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg"
           >
             Add Diet Plan
+          </button>
+        )}
+        {client?.dietPlanPdf && (
+          <button
+            onClick={handleViewDietPlan}
+            className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg"
+          >
+            View Diet Plan
           </button>
         )}
       </div>
