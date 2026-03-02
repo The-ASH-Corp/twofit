@@ -11,6 +11,7 @@ const menuItems = [
     path: "/admin",
   },
   { label: "Programs", icon: assets.programs, path: "/admin/programs" },
+  { label: "Expert Tasks", icon: assets.programs, path: "/admin/expert-tasks" },
   { label: "Therapy", icon: assets.therapy, path: "/admin/therapy" },
   { label: "Experts", icon: assets.experts, path: "/admin/experts" },
   { label: "Clients", icon: assets.clients, path: "/admin/clients" },
