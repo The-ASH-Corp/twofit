@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 import React, {
   useEffect,
   useState,
@@ -69,13 +68,19 @@ export default function Dashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [user, dispatch]);
+  }, [
+    dispatch,
+    user?.dietition,
+    user?.programType,
+    user?.therapist,
+    user?.trainer,
+  ]);
 
   useEffect(() => {
     if (user?._id && user?.programType) {
       fetchDashboardData();
     }
-  }, [user?._id, user?.programType]);
+  }, [fetchDashboardData, user?._id, user?.programType]);
 
   const isProgramStarted = useMemo(() => {
    
@@ -227,7 +232,7 @@ export default function Dashboard() {
           <WaterIntake />
 
           {/* Bottom Section: My Tasks */}
-          <div className="lg:order-4 order-2">
+          <div className="lg:order-5 order-2">
             <h2 className="text-[#0A4F48] font-bold text-lg">My Tasks</h2>
             <TaskList
               plans={program?.plan}

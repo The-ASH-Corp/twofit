@@ -1,6 +1,52 @@
 import { Button } from "@/components/ui/button";
 import { Droplets, Minus, Plus } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { useAppSelector } from "@/redux/store/hooks";
+
+const WATER_STORAGE_VERSION = 1;
+
+function getTodayKey() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getWaterStorageKey(userId) {
+  if (!userId) return null;
+  return `twofit.water-intake.v${WATER_STORAGE_VERSION}.${userId}`;
+}
+
+function readStoredWaterIntake(storageKey) {
+  if (!storageKey) return 0;
+
+  try {
+    const raw = localStorage.getItem(storageKey);
+    if (!raw) return 0;
+    const parsed = JSON.parse(raw);
+    const value = parsed?.[getTodayKey()];
+    return Number.isFinite(value) ? value : 0;
+  } catch (error) {
+    console.error("Failed to parse stored water intake:", error);
+    return 0;
+  }
+}
+
+function persistWaterIntake(storageKey, intakeMl) {
+  if (!storageKey) return;
+
+  try {
+    const todayKey = getTodayKey();
+    const raw = localStorage.getItem(storageKey);
+    const parsed = raw ? JSON.parse(raw) : {};
+    parsed[todayKey] = intakeMl;
+    localStorage.setItem(storageKey, JSON.stringify(parsed));
+  } catch (error) {
+    console.error("Failed to save water intake:", error);
+  }
+}
 
 function formatLiters(ml) {
   const liters = ml / 1000;
@@ -12,6 +58,8 @@ const WaterIntake = () => {
   const [showWaterCompletionBurst, setShowWaterCompletionBurst] =
     useState(false);
   const previousWaterProgressRef = useRef(0);
+  const user = useAppSelector(selectUser);
+  const storageKey = useMemo(() => getWaterStorageKey(user?._id), [user?._id]);
 
   const waterGoalMl = 2000;
   const waterStepMl = 250;
@@ -52,6 +100,14 @@ const WaterIntake = () => {
       }
     };
   }, [waterProgressPercent]);
+
+  useEffect(() => {
+    setWaterIntakeMl(readStoredWaterIntake(storageKey));
+  }, [storageKey]);
+
+  useEffect(() => {
+    persistWaterIntake(storageKey, waterIntakeMl);
+  }, [storageKey, waterIntakeMl]);
 
   return (
     <>
@@ -126,7 +182,7 @@ const WaterIntake = () => {
               ].map((particle, idx) => (
                 <span
                   key={idx}
-                  className="absolute rounded-full bg-[#0a4f16]"
+                  className="absolute rounded-full bg-[#0A4F48]"
                   style={{
                     width: `${particle.size}px`,
                     height: `${particle.size}px`,
