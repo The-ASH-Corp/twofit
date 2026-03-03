@@ -1,5 +1,11 @@
 import HabitModel from "./habit.model.js";
 
+const normalizeDate = (date = new Date()) => {
+  const normalized = new Date(date);
+  normalized.setHours(0, 0, 0, 0);
+  return normalized;
+};
+
 export const createHabitsService = async (clientId, habitNames) => {
   const existing = await HabitModel.findOne({ clientId });
 
@@ -34,6 +40,67 @@ export const getHabitByIdService = async (habitId) => {
   return await HabitModel.findOne({ _id: habitId });
 };
 
+export const getTodayReflectionService = async (clientId) => {
+  const habitDoc = await HabitModel.findOne({ clientId });
+
+  if (!habitDoc) {
+    throw new Error("Habits not found for this client");
+  }
+
+  const today = normalizeDate();
+  const todayReflection = habitDoc.reflectionLogs?.find((entry) => {
+    const reflectionDate = normalizeDate(entry.date);
+    return reflectionDate.getTime() === today.getTime();
+  });
+
+  return {
+    note: todayReflection?.note || "",
+    date: todayReflection?.date || null,
+  };
+};
+
+export const upsertTodayReflectionService = async (clientId, note = "") => {
+  if (typeof note !== "string") {
+    throw new Error("note must be a string");
+  }
+
+  if (note.length > 500) {
+    throw new Error("Reflection note must be 500 characters or fewer");
+  }
+
+  const habitDoc = await HabitModel.findOne({ clientId });
+
+  if (!habitDoc) {
+    throw new Error("Habits not found for this client");
+  }
+
+  const today = normalizeDate();
+  const existingReflection = habitDoc.reflectionLogs?.find((entry) => {
+    const reflectionDate = normalizeDate(entry.date);
+    return reflectionDate.getTime() === today.getTime();
+  });
+
+  if (existingReflection) {
+    existingReflection.note = note;
+  } else {
+    habitDoc.reflectionLogs.push({
+      date: new Date(),
+      note,
+    });
+  }
+
+  await habitDoc.save();
+
+  const updatedReflection = habitDoc.reflectionLogs?.find((entry) => {
+    const reflectionDate = normalizeDate(entry.date);
+    return reflectionDate.getTime() === today.getTime();
+  });
+
+  return {
+    note: updatedReflection?.note || "",
+    date: updatedReflection?.date || null,
+  };
+};
 
 // export const updateHabitStatusService = async (clientId, habitName, status) => {
 //   const habitDoc = await HabitModel.findOne({ clientId });
@@ -79,38 +146,30 @@ export const getHabitByIdService = async (habitId) => {
 //   return habit;
 // };
 
+export const updateHabitStatusService = async (clientId, habitId, status) => {
+  const today = normalizeDate();
 
- 
-export const updateHabitStatusService = async (
-  clientId,
-  habitId,
-  status
-) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-   const habitDoc = await HabitModel.findOne({ clientId });
+  const habitDoc = await HabitModel.findOne({ clientId });
 
   if (!habitDoc) {
     throw new Error("Habit document not found");
   }
 
-   const habit = habitDoc.habits.id(habitId);
+  const habit = habitDoc.habits.id(habitId);
 
   if (!habit) {
     throw new Error("Habit not found");
   }
 
-   const existingLog = habit.logs.find((log) => {
-    const logDate = new Date(log.date);
-    logDate.setHours(0, 0, 0, 0);
+  const existingLog = habit.logs.find((log) => {
+    const logDate = normalizeDate(log.date);
     return logDate.getTime() === today.getTime();
   });
 
   if (existingLog) {
-     existingLog.status = status;
+    existingLog.status = status;
   } else {
-     habit.logs.push({
+    habit.logs.push({
       date: new Date(),
       status,
     });
@@ -121,38 +180,34 @@ export const updateHabitStatusService = async (
   return habit;
 };
 
-
- 
 export const getDailyClientHabitSummary = async () => {
-  const habits = await HabitModel.find()
-    .populate("clientId", "name email");
+  const habits = await HabitModel.find().populate("clientId", "name email");
 
   const todayString = new Date().toDateString();
 
   const summary = habits.map((doc) => {
     let done = 0;
     let missed = 0;
+    const todayReflection = doc.reflectionLogs?.find(
+      (log) => new Date(log.date).toDateString() === todayString,
+    );
 
     doc.habits.forEach((habit) => {
       const todayLog = habit.logs.find(
-        (log) =>
-          new Date(log.date).toDateString() === todayString
+        (log) => new Date(log.date).toDateString() === todayString,
       );
 
       if (todayLog) {
         if (todayLog.status === "done") done++;
         if (todayLog.status === "missed") missed++;
       } else {
-         missed++;
+        missed++;
       }
     });
 
     const total = doc.habits.length;
 
-    const percentage =
-      total > 0
-        ? Math.round((done / total) * 100)
-        : 0;
+    const percentage = total > 0 ? Math.round((done / total) * 100) : 0;
 
     return {
       clientId: doc.clientId._id,
@@ -161,6 +216,7 @@ export const getDailyClientHabitSummary = async () => {
       missed,
       total,
       percentage,
+      reflectionNote: todayReflection?.note || "",
     };
   });
 
@@ -168,16 +224,13 @@ export const getDailyClientHabitSummary = async () => {
 };
 
 
-
- 
 export const getWeeklyClientHabitSummaryService = async () => {
-  const habits = await HabitModel.find()
-    .populate("clientId", "name");
+  const habits = await HabitModel.find().populate("clientId", "name");
 
-   const today = new Date();
+  const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-   const day = today.getDay(); 
+  const day = today.getDay();
   const diff = today.getDate() - day + (day === 0 ? -6 : 1);
 
   const startOfWeek = new Date(today);
@@ -195,31 +248,22 @@ export const getWeeklyClientHabitSummaryService = async () => {
     let done = 0;
     let missed = 0;
 
-   doc.habits.forEach((habit) => {
-  habit.logs.forEach((log) => {
-    const logDate = new Date(log.date);
-    logDate.setHours(0, 0, 0, 0);
+    doc.habits.forEach((habit) => {
+      habit.logs.forEach((log) => {
+        const logDate = new Date(log.date);
+        logDate.setHours(0, 0, 0, 0);
 
-    if (
-      logDate >= startOfWeek &&
-      logDate <= endOfWeek
-    ) {
-      if (log.status === "done") done++;
-      else if (log.status === "missed") missed++;
-    }
-  });
-});
+        if (logDate >= startOfWeek && logDate <= endOfWeek) {
+          if (log.status === "done") done++;
+          else if (log.status === "missed") missed++;
+        }
+      });
+    });
 
-const total = doc.habits.length * 7;
-missed = total - done;
+    const total = doc.habits.length * 7;
+    missed = total - done;
 
-
-   
-
-    const percentage =
-      total > 0
-        ? Math.round((done / total) * 100)
-        : 0;
+    const percentage = total > 0 ? Math.round((done / total) * 100) : 0;
 
     return {
       clientId: doc.clientId._id,
@@ -233,4 +277,3 @@ missed = total - done;
 
   return summary;
 };
-

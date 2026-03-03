@@ -27,6 +27,19 @@ const habitSchema = new mongoose.Schema(
           },
         ],
     }],
+    reflectionLogs: [
+      {
+        date: {
+          type: Date,
+          default: Date.now,
+        },
+        note: {
+          type: String,
+          trim: true,
+          maxlength: 500,
+        },
+      },
+    ],
     },
     {
         timestamps: true,

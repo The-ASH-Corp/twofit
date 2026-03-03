@@ -37,6 +37,7 @@ console.log(dailySummary)
         <thead className="">
           <tr className="border-b border-gray-100 ">
             <th className="p-2 text-left text-gray-400   font-semibold">Client</th>
+            <th className="p-2 text-left text-gray-400 font-semibold">Reflection</th>
             <th className="p-2 text-center text-gray-400 font-semibold">Done</th>
             <th className="p-2 text-center text-gray-400 font-semibold">Missed</th>
             <th className="p-2 text-center text-gray-400 font-semibold">Progress</th>
@@ -47,6 +48,11 @@ console.log(dailySummary)
           {dailySummary.map((client) => (
             <tr key={client.clientId} className="border-gray-200 ">
               <td className="p-2">{client.clientName}</td>
+              <td className="p-2 text-sm text-gray-600 max-w-[260px]">
+                <p className="truncate" title={client.reflectionNote || "No note"}>
+                  {client.reflectionNote || "No note"}
+                </p>
+              </td>
               <td className="p-2 text-center text-[#0A4F48] font-semibold">
                 {client.done}
               </td>

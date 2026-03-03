@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  getHabitReflectionThunk,
   getClientHabitsThunk,
+  updateHabitReflectionThunk,
   updateHabitStatusThunk,
 } from "@/redux/features/habit/habit.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
@@ -21,8 +23,15 @@ export default function HabitTracker() {
   useEffect(() => {
     if (clientId) {
       dispatch(getClientHabitsThunk(clientId));
+      dispatch(getHabitReflectionThunk(clientId));
     }
   }, [clientId, dispatch]);
+
+  const { reflectionNote, reflectionSaving } = useSelector((state) => state.habit);
+
+  useEffect(() => {
+    setReflectionNotes(reflectionNote || "");
+  }, [reflectionNote]);
 
   if (loading)
     return (
@@ -56,6 +65,16 @@ export default function HabitTracker() {
         clientId,
         habitId: habit._id,
         status: newStatus,
+      }),
+    );
+  };
+
+  const handleSaveReflection = () => {
+    if (!clientId) return;
+    dispatch(
+      updateHabitReflectionThunk({
+        clientId,
+        note: reflectionNotes,
       }),
     );
   };
@@ -125,7 +144,13 @@ export default function HabitTracker() {
         <p className="text-xs text-gray-500 mt-2">
           {reflectionNotes.length}/500 characters
         </p>
-
+        <button
+          onClick={handleSaveReflection}
+          disabled={reflectionSaving}
+          className="mt-3 px-4 py-2 rounded-lg bg-[#0A4F48] text-white text-sm font-medium disabled:opacity-60"
+        >
+          {reflectionSaving ? "Saving..." : "Save Notes"}
+        </button>
       </div>
     </div>
   );
