@@ -1,4 +1,6 @@
+import ActionMenu from "@/components/actionMenu/ActionMenu";
 import BaseTable from "@/components/table/BaseTable";
+import { SquarePen, Trash } from "lucide-react";
 import React, { useState } from "react";
 import { BiPlus } from "react-icons/bi";
 
@@ -11,7 +13,7 @@ const initialTasks = [
     description:
       "Review breakfast uploads, approve or correct mistakes, clear doubts, mark 'Breakfast Checked'.",
     timeOfDay: "Morning",
-    status: "Pending",
+    status: "Completed",
     requiresInput: false,
   },
   {
@@ -20,7 +22,7 @@ const initialTasks = [
     description:
       "Review lunch meals, portion corrections, compliance check, mark 'Lunch Checked'.",
     timeOfDay: "Lunch",
-    status: "Pending",
+    status: "Completed",
     requiresInput: false,
   },
   {
@@ -55,7 +57,7 @@ const initialTasks = [
 ];
 
 const ExpertTasks = () => {
-  const [tasks, setTasks] = useState(initialTasks);
+  
       const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   
       // In a real app, we'd fetch from backend here based on `date`
@@ -71,44 +73,44 @@ const ExpertTasks = () => {
       //     }));
       // };
   
-      const handleNoteChange = (taskId, note) => {
-          setTasks(prev => prev.map(t => 
-              t.taskId === taskId ? { ...t, notes: note } : t
-          ));
-      };
+      // const handleNoteChange = (taskId, note) => {
+      //     setTasks(prev => prev.map(t => 
+      //         t.taskId === taskId ? { ...t, notes: note } : t
+      //     ));
+      // };
   
-      const handleOutcomeChange = (taskId, outcome) => {
-          setTasks(prev => prev.map(t => 
-              t.taskId === taskId ? { ...t, outcome: outcome } : t
-          ));
-      };
+      // const handleOutcomeChange = (taskId, outcome) => {
+      //     setTasks(prev => prev.map(t => 
+      //         t.taskId === taskId ? { ...t, outcome: outcome } : t
+      //     ));
+      // };
   
-      const groupTasks = (tasksList) => {
-          const groups = {
-              Morning: [],
-              Lunch: [],
-              Evening: [],
-              Night: [],
-              Anytime: []
-          };
-          tasksList.forEach(t => {
-              if (groups[t.timeOfDay]) {
-                  groups[t.timeOfDay].push(t);
-              } else {
-                  groups['Anytime'].push(t);
-              }
-          });
-          return groups;
-      };
+      // const groupTasks = (tasksList) => {
+      //     const groups = {
+      //         Morning: [],
+      //         Lunch: [],
+      //         Evening: [],
+      //         Night: [],
+      //         Anytime: []
+      //     };
+      //     tasksList.forEach(t => {
+      //         if (groups[t.timeOfDay]) {
+      //             groups[t.timeOfDay].push(t);
+      //         } else {
+      //             groups['Anytime'].push(t);
+      //         }
+      //     });
+      //     return groups;
+      // };
   
-      const groupedTasks = groupTasks(tasks);
+      // const groupedTasks = groupTasks(tasks);
   return (
-    <div className="p- max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto">
       <div className="flex justify-between w-full items-start flex-col md:flex-row py-4">
         <div className="flex flex-col">
           <h1 className="text-3xl font-bold mb-2">Daily Duties</h1>
           <p className="text-gray-600 mb-6 ">
-            High priority items for: <strong>{date}</strong>
+            Date: <strong>{date}</strong>
           </p>
         </div>
         <button className="h-[46px] px-6 bg-[#0A4F48] hover:bg-[#084039] text-white rounded-2xl text-sm font-bold flex items-center gap-2">
@@ -117,48 +119,29 @@ const ExpertTasks = () => {
         </button>
       </div>
 
-      {Object.entries(groupedTasks).map(
-        ([time, taskList]) =>
-          taskList.length > 0 && (
+      {initialTasks.map((task, i) => (
+        <div
+          key={i}
+          className=" mb-8 bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
+        >
+          <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-green-100 ">
+            <h2 className="font-semibold text-lg text-[#0A4F48]">{task.timeOfDay}</h2>
+            <div className="flex items-center gap-2">
+              <button className="bg-[#0A4F48] text-white p-1 rounded-md">
+                <SquarePen size={17} />
+              </button>
+              <button className="bg-red-400 text-white p-1 rounded-md">
+                <Trash size={17} />
+              </button>
+            </div>
+          </div>
+          <div className="px-1 py-4 space-y-6">
             <div
-              key={time}
-              className="mb-8 bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
-            >
-              <div
-                className={`px-4 py-3 border-b border-gray-100 flex items-center
-                            ${
-                              time === "Morning"
-                                ? "bg-orange-50"
-                                : time === "Lunch"
-                                  ? "bg-green-50"
-                                  : time === "Evening"
-                                    ? "bg-blue-50"
-                                    : "bg-purple-50"
-                            }`}
+                key={task.taskId}
+                className="border-b border-gray-100 pb-4 last:border-0 last:pb-0"
               >
-                <h2
-                  className={`font-semibold text-lg 
-                                ${
-                                  time === "Morning"
-                                    ? "text-orange-800"
-                                    : time === "Lunch"
-                                      ? "text-green-800"
-                                      : time === "Evening"
-                                        ? "text-blue-800"
-                                        : "text-purple-800"
-                                }`}
-                >
-                  {time}
-                </h2>
-              </div>
-              <div className="p-4 space-y-6">
-                {taskList.map((task) => (
-                  <div
-                    key={task.taskId}
-                    className="border-b border-gray-100 pb-4 last:border-0 last:pb-0"
-                  >
-                    <div className="flex items-start">
-                      {/* <div className="flex items-center h-5">
+                <div className="flex items-start">
+                  {/* <div className="flex items-center h-5">
                         <input
                           type="checkbox"
                           checked={task.status === "Completed"}
@@ -166,25 +149,25 @@ const ExpertTasks = () => {
                           className="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
                         />
                       </div> */}
-                      <div className="ml-3 flex-1">
-                        <div className="flex justify-between">
-                          <label
-                            className={`font-medium text-gray-900 ${task.status === "Completed" ? "line-through text-gray-400" : ""}`}
-                          >
-                            {task.title}
-                          </label>
-                          <span
-                            className={`text-xs px-2 py-1 rounded-full border ${task.status === "Completed" ? "bg-green-100 text-green-800 border-green-200" : "bg-gray-50 text-gray-600 border-gray-200"}`}
-                          >
-                            {task.status}
-                          </span>
-                        </div>
-                        <p className="text-gray-500 text-sm mt-1 mb-2">
-                          {task.description}
-                        </p>
+                  <div className="ml-3 flex-1">
+                    <div className="flex justify-between">
+                      <label
+                        className={`font-medium text-gray-900 ${task.status === "Completed" ? "line-through text-gray-400" : ""}`}
+                      >
+                        {task.title}
+                      </label>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full border ${task.status === "Completed" ? "bg-green-100 text-green-800 border-green-200" : "bg-gray-50 text-gray-600 border-gray-200"}`}
+                      >
+                        {task.status}
+                      </span>
+                    </div>
+                    <p className="text-gray-500 text-sm mt-1 mb-2">
+                      {task.description}
+                    </p>
 
-                        {/* Special handling for Night Final Review Status Selection */}
-                        {task.title === "Night Final Review" && (
+                    {/* Special handling for Night Final Review Status Selection */}
+                    {/* {task.title === "Night Final Review" && (
                           <div className="mt-2 mb-3">
                             <label className="block text-xs font-semibold text-gray-500 mb-1">
                               FINAL DAY STATUS:
@@ -206,10 +189,10 @@ const ExpertTasks = () => {
                               </option>
                             </select>
                           </div>
-                        )}
+                        )} */}
 
-                        {/* Notes Area */}
-                        {task.requiresInput && (
+                    {/* Notes Area */}
+                    {/* {task.requiresInput && (
                           <div className="mt-2">
                             <textarea
                               placeholder="Add observations / notes..."
@@ -222,15 +205,13 @@ const ExpertTasks = () => {
                               disabled={task.status === "Completed"}
                             />
                           </div>
-                        )}
-                      </div>
-                    </div>
+                        )} */}
                   </div>
-                ))}
+                </div>
               </div>
-            </div>
-          ),
-      )}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
