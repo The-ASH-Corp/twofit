@@ -88,3 +88,33 @@ export const getWeeklyHabitSummaryThunk = createAsyncThunk(
     }
   }
 );
+
+export const getHabitReflectionThunk = createAsyncThunk(
+  "habit/getReflection",
+  async (clientId, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/habits/${clientId}/reflection`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch reflection note",
+      );
+    }
+  },
+);
+
+export const updateHabitReflectionThunk = createAsyncThunk(
+  "habit/updateReflection",
+  async ({ clientId, note }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.put(`/habits/${clientId}/reflection`, {
+        note,
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to save reflection note",
+      );
+    }
+  },
+);
