@@ -5,6 +5,9 @@ const expertColors = {
 };
 
 import ActionMenu from "@/components/actionMenu/ActionMenu";
+import { useNavigate } from "react-router-dom";
+
+
 
 const statusColors = {
   Active: "bg-[#45C4A2] text-white",
@@ -33,25 +36,28 @@ export const ExpertColumns = [
     ),
   },
   { accessorKey: "name", header: "Expert Name" },
-   { accessorKey: "role", header: "Role",
-    cell:({row})=>{
-        const role=row.original.role
-        const expertColor=expertColors[role] || "bg-gray-200 text-gray-700"
+  {
+    accessorKey: "role",
+    header: "Role",
+    cell: ({ row }) => {
+      const role = row.original.role;
+      const expertColor = expertColors[role] || "bg-gray-200 text-gray-700";
 
-        return (
+      return (
         <span className={`px-2 py-1 text-[11px] rounded-xl ${expertColor}`}>
           {role}
         </span>
       );
-
-    }
-   },
-     { accessorKey: "specialization", header: "Specialisation" },
+    },
+  },
+  { accessorKey: "specialization", header: "Specialisation" },
 
   { accessorKey: "clients", header: "Clients" },
   { accessorKey: "maxClient", header: "Maximum Limit" },
-  { accessorKey: "rating", header: "Rating" },
-  { accessorKey: "responseTime", header: "Response Time" },
+  { accessorKey: "avgRating", header: "Rating" },
+  { id: "tasks", header: "Tasks", cell: ({row})=> 
+    <ViewButton row={row}/>
+   },
 
   {
     accessorKey: "status",
@@ -79,3 +85,18 @@ export const ExpertColumns = [
     ),
   },
 ];
+
+const ViewButton = ({row})=> {
+  const navigate = useNavigate();
+   return (
+     <button
+       onClick={(e) => {
+         e.stopPropagation();
+         navigate(`/admin/experts/expert-tasks/${row.id}`);
+       }}
+       className="px-2 py-1 text-white bg-[#0A4F48] rounded-md text-[11px]"
+     >
+       View
+     </button>
+   );
+}

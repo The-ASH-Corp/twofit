@@ -18,7 +18,7 @@ const menuItems = [
     path: "/expert",
   },
   { label: "Clients", icon: assets.clients, path: "/expert/clients" },
-  { label: "Daily Duties", icon: assets.programs, path: "/expert/daily-tasks" },
+  { label: "Daily Tasks", icon: assets.dailyTasks, path: "/expert/daily-tasks" },
   ...(user?.role?.toLowerCase() !== "therapist"
     ? [
         {
