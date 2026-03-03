@@ -67,7 +67,7 @@ import HeadTherapyPlan from "./pages/head/therapy/TherapyViewPlan";
 import AppLayout from "./pages/admin/layout/AppLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminChats from "./pages/admin/chats/Chats";
-import ExpertTasks from "./pages/admin/checklist/ExpertTasks";
+import ExpertTasks from "./pages/admin/experts/ExpertTasks";
 import AdminClientsTable from "./pages/admin/clients/ClientsTable";
 import AdminExpertTable from "./pages/admin/experts/ExpertTable";
 import AdminFinance from "./pages/admin/finance/FinanceTable";
@@ -208,7 +208,10 @@ function App() {
             path="broadcast/add-Template"
             element={<FounderBroadcastCreate />}
           />
-          <Route path="auto-remainder" element={<FounderBroadcastAutoReminder />} />
+          <Route
+            path="auto-remainder"
+            element={<FounderBroadcastAutoReminder />}
+          />
           <Route path="profile" element={<Profile />} />
           <Route path="notifications" element={<Notifications />} />
         </Route>
@@ -255,10 +258,11 @@ function App() {
           <Route path="clients" element={<AdminClientsTable />} />
           <Route path="experts" element={<AdminExpertTable />} />
           <Route path="chats" element={<AdminChats />} />
-         
+
           <Route path="experts/edit/:id" element={<AdminExpertEdit />} />
           <Route path="experts/delete/:id" element={<AdminExpertDelete />} />
           <Route path="experts/addexpert" element={<AdminAddExpert />} />
+          <Route path="experts/expert-tasks/:id" element={<ExpertTasks />} />
           <Route
             path="experts/profile/:expertId"
             element={<AdminExpertProfile />}
@@ -275,7 +279,7 @@ function App() {
           <Route path="notifications" element={<Notifications />} />
           <Route path="therapy" element={<AdminTherapyList />} />
           <Route path="finance" element={<AdminFinance />} />
-          <Route path="expert-tasks" element={<ExpertTasks />} />
+
           <Route
             path="therapy/plan/:id"
             element={<AdminTherapyPlanDetails />}

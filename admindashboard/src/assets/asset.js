@@ -41,7 +41,7 @@ import pdfVector from "./pdfVector.svg"
 import totalEmploy from "./totalExpert.svg"
 import totalPayroll from "./totalPayroll.svg"
 import pendingPayroll from "./pendingPayroll.svg"
-
+import dailyTasks from "./list-todo.svg"
 import wl from "./wl.jpg";
 import Workout from "./Workout.png";
 import MealPlaceholder from "./MealPlaceholder.png";
@@ -95,6 +95,7 @@ export const assets = {
   Workout,
   MealPlaceholder,
   breakfast,
+  dailyTasks,
 };
 
 //Users,

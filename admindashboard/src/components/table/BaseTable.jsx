@@ -29,6 +29,7 @@ export default function BaseTable({
   page,
   limit,
   totalCount,
+  pagination
 }) {
   const [rowSelection, setRowSelection] = useState({});
   const [statusFilter, setStatusFilter] = useState("All Status");
@@ -120,8 +121,8 @@ export default function BaseTable({
       style={data?.length > 0 ? { height: "fit-content" } : { height: "100%" }}
     >
       {/* Header Section */}
-      <div className="p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white">
-        <div>
+      <div className="py-6 px-2 md:px-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 md:gap-6 bg-white">
+        <div className="mx-1 md:mx-0">
           <h2 className="text-[#0F172A] font-black text-2xl tracking-tight mb-2">
             {pageLabel}
           </h2>
@@ -202,7 +203,7 @@ export default function BaseTable({
       </div>
 
       {/* Table Content */}
-      <div className="flex-1 overflow-x-auto overflow-y-visible px-6 md:px-8 pb-32">
+      <div className="flex-1 overflow-x-auto overflow-y-visible px-2 md:px-8 pb-32">
         {data?.length > 0 ? (
           <table className="w-full text-left border-separate border-spacing-y-3">
             <thead className="hidden md:table-header-group">
@@ -301,7 +302,7 @@ export default function BaseTable({
       </div>
 
       {/* Pagination Footer */}
-      {data?.length > 0 && (
+      {data?.length > 0 && !pagination && (
         <div className="px-8 pb-8 pt-2 flex flex-col md:flex-row items-center justify-between gap-4">
           {/* Results Per Page */}
           <div className="flex items-center gap-3 text-sm text-slate-500 font-medium bg-[#F8FAFC] px-4 py-2 rounded-xl">
