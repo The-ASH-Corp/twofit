@@ -5,7 +5,9 @@ import {
   updateHabit,
   getHabitByIdService,
   getDailyClientHabitSummary,
-  getWeeklyClientHabitSummaryService
+  getWeeklyClientHabitSummaryService,
+  getTodayReflectionService,
+  upsertTodayReflectionService
 } from "./habit.service.js";
 
 export const createHabitsController = async (req, res) => {
@@ -83,6 +85,53 @@ export const getHabitByIdController=async(req,res)=>{
     })
   }
 }
+
+export const getTodayReflectionController = async (req, res) => {
+  try {
+    const { clientId } = req.params;
+    const reflection = await getTodayReflectionService(clientId);
+
+    return res.status(200).json({
+      data: reflection,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to fetch reflection note",
+      error: error.message,
+    });
+  }
+};
+
+export const upsertTodayReflectionController = async (req, res) => {
+  try {
+    const { clientId } = req.params;
+    const { note } = req.body;
+
+    if (typeof note !== "string") {
+      return res.status(400).json({
+        message: "note is required and must be a string",
+      });
+    }
+
+    if (note.length > 500) {
+      return res.status(400).json({
+        message: "Reflection note must be 500 characters or fewer",
+      });
+    }
+
+    const reflection = await upsertTodayReflectionService(clientId, note);
+
+    return res.status(200).json({
+      message: "Reflection note saved successfully",
+      data: reflection,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Failed to save reflection note",
+      error: error.message,
+    });
+  }
+};
 export const updateHabitById = async (req, res) => {
   try {
     const { habitId } = req.params;

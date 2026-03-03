@@ -4,7 +4,9 @@ import {
   getClientHabitByHabitId,
   getClientHabitsThunk,
   getDailyHabitSummaryThunk,
+  getHabitReflectionThunk,
   getWeeklyHabitSummaryThunk,
+  updateHabitReflectionThunk,
   updateHabitStatusThunk,
 } from "./habit.thunk";
 
@@ -13,6 +15,9 @@ const initialState = {
   habitDetails: null,
   dailySummary: [],
   weeklySummary: [],
+  reflectionNote: "",
+  reflectionLoading: false,
+  reflectionSaving: false,
   loading: false,
   error: null,
 };
@@ -99,6 +104,30 @@ const habitSlice = createSlice({
       })
       .addCase(getWeeklyHabitSummaryThunk.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getHabitReflectionThunk.pending, (state) => {
+        state.reflectionLoading = true;
+        state.error = null;
+      })
+      .addCase(getHabitReflectionThunk.fulfilled, (state, action) => {
+        state.reflectionLoading = false;
+        state.reflectionNote = action.payload?.note || "";
+      })
+      .addCase(getHabitReflectionThunk.rejected, (state, action) => {
+        state.reflectionLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateHabitReflectionThunk.pending, (state) => {
+        state.reflectionSaving = true;
+        state.error = null;
+      })
+      .addCase(updateHabitReflectionThunk.fulfilled, (state, action) => {
+        state.reflectionSaving = false;
+        state.reflectionNote = action.payload?.note || "";
+      })
+      .addCase(updateHabitReflectionThunk.rejected, (state, action) => {
+        state.reflectionSaving = false;
         state.error = action.payload;
       });
   },
