@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { cn } from "@/lib/utils";
 import { useAppSelector } from "@/redux/store/hooks";
 import { getClientHabitsThunk } from "@/redux/features/habit/habit.thunk";
-import { getUserTaskStatus } from "@/redux/features/tasks/task.thunk";
+import { fetchWaterIntake, getUserTaskStatus } from "@/redux/features/tasks/task.thunk";
 import {
   CheckCircle2,
   Droplets,
@@ -14,7 +14,6 @@ import {
 const MILESTONE_DAYS = [7, 21, 50, 100];
 const WATER_GOAL_ML = 2000;
 const STORAGE_VERSION = 1;
-const WATER_STORAGE_VERSION = 1;
 
 const STREAK_TYPES = [
   {
@@ -139,27 +138,6 @@ function getAdherenceStorageKey(userId) {
   return `twofit.adherence.v${STORAGE_VERSION}.${userId}`;
 }
 
-function getWaterStorageKey(userId) {
-  if (!userId) return null;
-  return `twofit.water-intake.v${WATER_STORAGE_VERSION}.${userId}`;
-}
-
-function getStoredWaterIntake(storageKey) {
-  if (!storageKey) return 0;
-
-  try {
-    const todayKey = getTodayKey();
-    const raw = localStorage.getItem(storageKey);
-    if (!raw) return 0;
-    const parsed = JSON.parse(raw);
-    const value = parsed?.[todayKey];
-    return Number.isFinite(value) ? value : 0;
-  } catch (error) {
-    console.error("Failed to parse water intake data:", error);
-    return 0;
-  }
-}
-
 function isSubmitted(status) {
   return ["pending", "verified"].includes(String(status || "").toLowerCase());
 }
@@ -167,24 +145,22 @@ function isSubmitted(status) {
 export default function AdherenceStreaks({ user, program, className }) {
   const dispatch = useDispatch();
   const tasks = useAppSelector((state) => state.tasks.tasks);
+  const waterIntakeByDay = useAppSelector((state) => state.tasks.waterIntakeByDay);
   const habits = useAppSelector((state) => state.habit.habits);
   const [tracker, setTracker] = useState(createEmptyTracker);
   const [hasHydrated, setHasHydrated] = useState(false);
-  const [waterIntakeMl, setWaterIntakeMl] = useState(0);
 
   const userId = user?._id;
   const storageKey = useMemo(() => getAdherenceStorageKey(userId), [userId]);
-  const waterStorageKey = useMemo(() => getWaterStorageKey(userId), [userId]);
+  const currentGlobalDay = user?.currentGlobalDay || 1;
+  const waterIntakeMl = Number(waterIntakeByDay[currentGlobalDay] || 0);
 
   useEffect(() => {
     if (!userId) return;
     dispatch(getUserTaskStatus());
+    dispatch(fetchWaterIntake(currentGlobalDay));
     dispatch(getClientHabitsThunk(userId));
-  }, [dispatch, userId]);
-
-  useEffect(() => {
-    setWaterIntakeMl(getStoredWaterIntake(waterStorageKey));
-  }, [waterStorageKey]);
+  }, [currentGlobalDay, dispatch, userId]);
 
   useEffect(() => {
     setHasHydrated(false);
