@@ -260,43 +260,41 @@ export default function Chats() {
   }, [client]);
 
   return (
-    <div className="flex h-[calc(100vh-120px)] gap-5">
-      <>
-        <div
-          className={`${
-            showChatWindow ? "hidden lg:block" : "block"
-          } w-full lg:w-80`}
-        >
-          <ChastList
-            clients={clients}
-            chatClient={chatClient}
-            client={client}
-            onlineUsers={onlineUsers}
-            unreadCounts={unreadCounts}
-          />
-        </div>
+    <>
+      <div className="h-[calc(100vh-120px)] pb-24 lg:pb-4 min-h-0">
+        <div className="grid h-full min-h-0 grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
+          <div
+            className={`${showChatWindow ? "hidden lg:block" : "block"} min-h-0`}
+          >
+            <ChastList
+              clients={clients}
+              chatClient={chatClient}
+              client={client}
+              onlineUsers={onlineUsers}
+              unreadCounts={unreadCounts}
+            />
+          </div>
 
-        <div
-          className={`${
-            showChatWindow ? "block" : "hidden lg:block"
-          } w-full lg:flex-1`}
-        >
-          <ChatWindow
-            client={client}
-            messages={messages}
-            message={message}
-            setMessage={setMessage}
-            messageHandlers={messageHandlers}
-            user={user}
-            onlineUsers={onlineUsers}
-            onBack={handleBackToList}
-            handleImageUpload={handleImageUpload}
-            handleVoiceUpload={handleVoiceUpload}
-            isUploadingMedia={isUploadingMedia}
-          />
+          <div
+            className={`${showChatWindow ? "block" : "hidden lg:block"} min-h-0`}
+          >
+            <ChatWindow
+              client={client}
+              messages={messages}
+              message={message}
+              setMessage={setMessage}
+              messageHandlers={messageHandlers}
+              user={user}
+              onlineUsers={onlineUsers}
+              onBack={handleBackToList}
+              handleImageUpload={handleImageUpload}
+              handleVoiceUpload={handleVoiceUpload}
+              isUploadingMedia={isUploadingMedia}
+            />
+          </div>
         </div>
-      </>
+      </div>
       <MobileBottomNav />
-    </div>
+    </>
   );
 }
