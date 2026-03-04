@@ -165,7 +165,7 @@ const BroadcastEdit = () => {
                       Media
                     </h3>
 
-                    {!values.attachment && !initialValues.attachmentName ? (
+                    {!values.attachment && !values.attachmentName ? (
                       <div className="relative">
                         <input
                           type="file"
@@ -210,11 +210,7 @@ const BroadcastEdit = () => {
                           type="button"
                           onClick={() => {
                             setFieldValue("attachment", null);
-          
-                            if (!values.attachment) {
-                             
-                              setFieldValue("attachmentName", "");
-                            }
+                            setFieldValue("attachmentName", "");
                           }}
                           className="text-slate-400 hover:text-red-500 transition-colors"
                         >

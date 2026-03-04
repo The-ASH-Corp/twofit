@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 // Mock data (matches the defaults created in admin side)
 const initialTasks = [

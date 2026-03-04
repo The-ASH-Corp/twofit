@@ -171,8 +171,8 @@ const Templates = () => {
                 key={i}
                 className="group bg-white rounded-2xl border border-slate-200/60 p-5 flex flex-col gap-4 hover:border-[#0A4F48]/20 transition-all duration-300 relative"
               >
-                <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                  <div className="bg-white rounded-full shadow-sm p-1 border border-slate-100">
+                <div className="absolute top-4 right-4  z-10">
+                  <div >
                     <BroadcastMenu data={template} />
                   </div>
                 </div>
