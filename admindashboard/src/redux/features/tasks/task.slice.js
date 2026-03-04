@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { uploadTask, getUserTaskStatus, getPendingSubmissions, verifyTask, rejectTask, getAllUserSubmissions } from "./task.thunk";
+import { uploadTask, getUserTaskStatus, getPendingSubmissions, verifyTask, rejectTask, getAllUserSubmissions, upsertWaterIntake, fetchWaterIntake } from "./task.thunk";
 
 const initialState = {
     tasks: [], // List of submitted tasks for client
     pendingTasks: [], // For expert review
     selectedUserTasks: [], // For expert viewing specific client history
+    waterIntakeByDay: {},
     loading: false,
     error: null,
 };
@@ -55,6 +56,22 @@ const taskSlice = createSlice({
             })
             .addCase(getUserTaskStatus.rejected, (state, action) => {
                 state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(upsertWaterIntake.fulfilled, (state, action) => {
+                const payload = action.payload;
+                if (!payload?.globalDayIndex) return;
+                state.waterIntakeByDay[payload.globalDayIndex] = payload.waterIntakeMl ?? 0;
+            })
+            .addCase(upsertWaterIntake.rejected, (state, action) => {
+                state.error = action.payload;
+            })
+            .addCase(fetchWaterIntake.fulfilled, (state, action) => {
+                const payload = action.payload;
+                if (!payload?.globalDayIndex) return;
+                state.waterIntakeByDay[payload.globalDayIndex] = payload.waterIntakeMl ?? 0;
+            })
+            .addCase(fetchWaterIntake.rejected, (state, action) => {
                 state.error = action.payload;
             })
             // Get Pending Submissions

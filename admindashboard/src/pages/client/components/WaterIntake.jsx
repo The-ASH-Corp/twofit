@@ -1,52 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Droplets, Minus, Plus } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useAppSelector } from "@/redux/store/hooks";
-
-const WATER_STORAGE_VERSION = 1;
-
-function getTodayKey() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function getWaterStorageKey(userId) {
-  if (!userId) return null;
-  return `twofit.water-intake.v${WATER_STORAGE_VERSION}.${userId}`;
-}
-
-function readStoredWaterIntake(storageKey) {
-  if (!storageKey) return 0;
-
-  try {
-    const raw = localStorage.getItem(storageKey);
-    if (!raw) return 0;
-    const parsed = JSON.parse(raw);
-    const value = parsed?.[getTodayKey()];
-    return Number.isFinite(value) ? value : 0;
-  } catch (error) {
-    console.error("Failed to parse stored water intake:", error);
-    return 0;
-  }
-}
-
-function persistWaterIntake(storageKey, intakeMl) {
-  if (!storageKey) return;
-
-  try {
-    const todayKey = getTodayKey();
-    const raw = localStorage.getItem(storageKey);
-    const parsed = raw ? JSON.parse(raw) : {};
-    parsed[todayKey] = intakeMl;
-    localStorage.setItem(storageKey, JSON.stringify(parsed));
-  } catch (error) {
-    console.error("Failed to save water intake:", error);
-  }
-}
+import {
+  fetchWaterIntake,
+  upsertWaterIntake,
+} from "@/redux/features/tasks/task.thunk";
 
 function formatLiters(ml) {
   const liters = ml / 1000;
@@ -54,31 +15,47 @@ function formatLiters(ml) {
 }
 
 const WaterIntake = () => {
-  const [waterIntakeMl, setWaterIntakeMl] = useState(0);
+  const [waterStepMl, setWaterStepMl] = useState(250);
   const [showWaterCompletionBurst, setShowWaterCompletionBurst] =
     useState(false);
+  const [isWaterSyncing, setIsWaterSyncing] = useState(false);
+  const [isWaterLoading, setIsWaterLoading] = useState(true);
   const previousWaterProgressRef = useRef(0);
+
+  const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
-  const storageKey = useMemo(() => getWaterStorageKey(user?._id), [user?._id]);
+  const waterIntakeByDay = useAppSelector((state) => state.tasks.waterIntakeByDay);
 
   const waterGoalMl = 2000;
-  const waterStepMl = 250;
+  const visualGlassMl = 250;
+  const currentGlobalDay = user?.currentGlobalDay || 1;
+  const waterIntakeMl = Number(waterIntakeByDay[currentGlobalDay] || 0);
 
   const waterProgressPercent = useMemo(() => {
     const pct = (waterIntakeMl / waterGoalMl) * 100;
     if (!Number.isFinite(pct)) return 0;
-    return Math.max(0, Math.min(100, pct));
+    return Math.max(0, pct);
   }, [waterIntakeMl, waterGoalMl]);
 
+  const waterProgressBarPercent = useMemo(
+    () => Math.min(100, waterProgressPercent),
+    [waterProgressPercent],
+  );
+
   const waterGlassesTotal = useMemo(
-    () => Math.max(1, Math.round(waterGoalMl / waterStepMl)),
-    [waterGoalMl, waterStepMl],
+    () => Math.max(1, Math.round(waterGoalMl / visualGlassMl)),
+    [waterGoalMl, visualGlassMl],
   );
 
   const waterGlassesDone = useMemo(() => {
-    const done = Math.floor(waterIntakeMl / waterStepMl);
+    const done = Math.floor(Math.min(waterIntakeMl, waterGoalMl) / visualGlassMl);
     return Math.max(0, Math.min(waterGlassesTotal, done));
-  }, [waterIntakeMl, waterStepMl, waterGlassesTotal]);
+  }, [waterIntakeMl, waterGoalMl, visualGlassMl, waterGlassesTotal]);
+
+  const extraWaterMl = useMemo(
+    () => Math.max(0, waterIntakeMl - waterGoalMl),
+    [waterIntakeMl, waterGoalMl],
+  );
 
   useEffect(() => {
     const wasComplete = previousWaterProgressRef.current >= 100;
@@ -89,7 +66,7 @@ const WaterIntake = () => {
       setShowWaterCompletionBurst(true);
       burstTimer = window.setTimeout(() => {
         setShowWaterCompletionBurst(false);
-      }, 850);
+      }, 1400);
     }
 
     previousWaterProgressRef.current = waterProgressPercent;
@@ -102,16 +79,49 @@ const WaterIntake = () => {
   }, [waterProgressPercent]);
 
   useEffect(() => {
-    setWaterIntakeMl(readStoredWaterIntake(storageKey));
-  }, [storageKey]);
+    if (!user?._id) return;
 
-  useEffect(() => {
-    persistWaterIntake(storageKey, waterIntakeMl);
-  }, [storageKey, waterIntakeMl]);
+    setIsWaterLoading(true);
+    dispatch(fetchWaterIntake(currentGlobalDay))
+      .unwrap()
+      .catch((error) => {
+        console.error("Failed to fetch water intake:", error);
+      })
+      .finally(() => {
+        setIsWaterLoading(false);
+      });
+  }, [currentGlobalDay, dispatch, user?._id]);
+
+  const syncWaterIntake = async (nextIntake) => {
+    if (!user?._id || isWaterSyncing) return;
+
+    setIsWaterSyncing(true);
+    await dispatch(
+      upsertWaterIntake({
+        waterIntakeMl: nextIntake,
+        globalDayIndex: currentGlobalDay,
+      }),
+    )
+      .unwrap()
+      .catch((error) => {
+        console.error("Failed to sync water intake:", error);
+      })
+      .finally(() => {
+        setIsWaterSyncing(false);
+      });
+  };
+
+  const adjustWaterIntake = (deltaMl) => {
+    const nextIntake = Math.max(0, waterIntakeMl + deltaMl);
+    if (nextIntake === waterIntakeMl) return;
+
+     syncWaterIntake(nextIntake);
+  };
+
+  const disableControls = isWaterLoading || isWaterSyncing;
 
   return (
     <>
-      {/* Water Intake Tracker (static UI for now) */}
       <div className="bg-white p-6 rounded-2xl shadow-sm lg:order-3 order-4">
         <div className="flex items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-2">
@@ -127,24 +137,35 @@ const WaterIntake = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-lg border border-slate-200 px-2 py-1">
+              <label
+                htmlFor="water-step"
+                className="text-[11px] font-semibold text-slate-500"
+              >
+                Per tap
+              </label>
+              <select
+                id="water-step"
+                value={waterStepMl}
+                onChange={(event) => setWaterStepMl(Number(event.target.value))}
+                className="bg-transparent text-xs font-bold text-[#0A4F48] outline-none"
+                aria-label="Water intake amount per tap"
+                disabled={disableControls}
+              >
+                {Array.from({ length: 9 }, (_, idx) => 100 + idx * 50).map(
+                  (step) => (
+                    <option key={step} value={step}>
+                      {step} ml
+                    </option>
+                  ),
+                )}
+              </select>
+            </div>
             <Button
               variant="outline"
               size="icon-sm"
-              onClick={() =>
-                setWaterIntakeMl((prev) => Math.max(0, prev - waterStepMl))
-              }
-              aria-label="Decrease water intake"
-            >
-              <Minus size={16} />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon-sm"
-              onClick={() =>
-                setWaterIntakeMl((prev) =>
-                  Math.min(waterGoalMl, prev + waterStepMl),
-                )
-              }
+              onClick={() => adjustWaterIntake(waterStepMl)}
+              disabled={disableControls}
               aria-label="Increase water intake"
             >
               <Plus size={16} />
@@ -165,20 +186,27 @@ const WaterIntake = () => {
           <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
             <div
               className="h-full bg-linear-to-r from-[#0A4F48] to-[#116D63] rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${waterProgressPercent}%` }}
+              style={{ width: `${waterProgressBarPercent}%` }}
             />
           </div>
+          {waterProgressPercent >= 100 && (
+            <div className="pointer-events-none absolute inset-0 rounded-full border border-[#0A4F48]/40 animate-[goal-pulse_1.2s_ease-out_infinite]" />
+          )}
           {showWaterCompletionBurst && (
             <div className="pointer-events-none absolute right-0 top-1/2">
               {[
-                { x: "-56px", y: "-28px", size: 5, delay: 0 },
-                { x: "-42px", y: "-36px", size: 6, delay: 35 },
-                { x: "-30px", y: "-22px", size: 4, delay: 70 },
-                { x: "-20px", y: "-42px", size: 5, delay: 105 },
-                { x: "-66px", y: "-12px", size: 5, delay: 140 },
-                { x: "-50px", y: "8px", size: 6, delay: 175 },
-                { x: "-36px", y: "16px", size: 4, delay: 210 },
-                { x: "-22px", y: "6px", size: 5, delay: 245 },
+                { x: "-84px", y: "-34px", size: 6, delay: 0 },
+                { x: "-64px", y: "-48px", size: 7, delay: 35 },
+                { x: "-40px", y: "-28px", size: 5, delay: 70 },
+                { x: "-18px", y: "-56px", size: 6, delay: 105 },
+                { x: "-94px", y: "-10px", size: 6, delay: 140 },
+                { x: "-76px", y: "18px", size: 7, delay: 175 },
+                { x: "-50px", y: "28px", size: 5, delay: 210 },
+                { x: "-22px", y: "14px", size: 6, delay: 245 },
+                { x: "-100px", y: "-54px", size: 5, delay: 280 },
+                { x: "-58px", y: "-72px", size: 5, delay: 315 },
+                { x: "-12px", y: "-30px", size: 4, delay: 350 },
+                { x: "-8px", y: "22px", size: 4, delay: 385 },
               ].map((particle, idx) => (
                 <span
                   key={idx}
@@ -196,6 +224,12 @@ const WaterIntake = () => {
           )}
         </div>
 
+        {waterProgressPercent >= 100 && (
+          <p className="mt-2 text-xs font-semibold text-[#0A4F48] animate-[goal-message_1.2s_ease-in-out_infinite]">
+            Goal achieved. Keep going.
+          </p>
+        )}
+
         <div className="mt-4">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
@@ -205,6 +239,12 @@ const WaterIntake = () => {
               {waterGlassesDone}/{waterGlassesTotal}
             </span>
           </div>
+
+          {extraWaterMl > 0 && (
+            <p className="mb-2 text-[11px] font-semibold text-[#0A4F48]">
+              Extra after target: +{formatLiters(extraWaterMl)}
+            </p>
+          )}
 
           <div className="grid grid-cols-8 gap-2">
             {Array.from({ length: waterGlassesTotal }).map((_, idx) => {
@@ -225,12 +265,38 @@ const WaterIntake = () => {
           </div>
 
           <p className="mt-2 text-[11px] text-slate-500">
-            Tap + / − to update (local only).
+            Tap +  to update by {waterStepMl} ml (server synced).
           </p>
         </div>
       </div>
       <style>
         {`
+          @keyframes goal-pulse {
+            0% {
+              opacity: 0;
+              transform: scale(1);
+            }
+            40% {
+              opacity: 1;
+            }
+            100% {
+              opacity: 0;
+              transform: scale(1.08);
+            }
+          }
+
+          @keyframes goal-message {
+            0%,
+            100% {
+              transform: translateY(0px);
+              opacity: 0.8;
+            }
+            50% {
+              transform: translateY(-2px);
+              opacity: 1;
+            }
+          }
+
           @keyframes water-burst {
             0% {
               opacity: 1;
@@ -241,7 +307,7 @@ const WaterIntake = () => {
               transform: translate(
                 calc(-50% + var(--water-burst-x)),
                 calc(-50% + var(--water-burst-y))
-              ) scale(0.15);
+              ) scale(0.2);
             }
           }
         `}

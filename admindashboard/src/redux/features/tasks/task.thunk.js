@@ -43,6 +43,41 @@ export const getUserTaskStatus = createAsyncThunk(
     }
 );
 
+export const upsertWaterIntake = createAsyncThunk(
+    "tasks/upsertWaterIntake",
+    async ({ waterIntakeMl, globalDayIndex }, { rejectWithValue }) => {
+        try {
+            const body = await axiosInstance.patch("/tasks/water-intake", {
+                waterIntakeMl,
+                globalDayIndex,
+            });
+            return body.data;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to save water intake"
+            );
+        }
+    }
+);
+
+export const fetchWaterIntake = createAsyncThunk(
+    "tasks/fetchWaterIntake",
+    async (globalDayIndex, { rejectWithValue }) => {
+        try {
+            const dayParam =
+                Number.isFinite(Number(globalDayIndex)) && Number(globalDayIndex) > 0
+                    ? `?globalDayIndex=${Number(globalDayIndex)}`
+                    : "";
+            const body = await axiosInstance.get(`/tasks/water-intake${dayParam}`);
+            return body.data;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to fetch water intake"
+            );
+        }
+    }
+);
+
 export const getPendingSubmissions = createAsyncThunk(
     "tasks/getPendingSubmissions",
     async (_, { rejectWithValue }) => {
