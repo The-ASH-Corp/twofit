@@ -1,5 +1,9 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import KpiCard from "@/components/cards/KpiCard";
 import HeroCard from "./components/HeroCard";
 import ComplianceChart from "@/components/chart/ComplianceChart";
@@ -24,10 +28,10 @@ import {
   CalendarDays,
   ChartPie,
   Flame,
-  IdCardLanyard,
   Weight,
 } from "lucide-react";
 import { SyncLoader } from "react-spinners";
+import WaterIntake from "./components/WaterIntake";
 
 export default function Dashboard() {
   const [program, setProgram] = useState(null);
@@ -64,20 +68,25 @@ export default function Dashboard() {
     } finally {
       setIsLoading(false);
     }
-  }, [user, dispatch]);
+  }, [
+    dispatch,
+    user?.dietition,
+    user?.programType,
+    user?.therapist,
+    user?.trainer,
+  ]);
 
   useEffect(() => {
     if (user?._id && user?.programType) {
       fetchDashboardData();
     }
-  }, [user?._id, user?.programType]);
+  }, [fetchDashboardData, user?._id, user?.programType]);
 
   const isProgramStarted = useMemo(() => {
-    // Check both user (auth) and clientUser (fetched) for the start date
-    // The field name in DB is programStartDate
+   
     const startDate = clientUser?.programStartDate || user?.programStartDate;
 
-    if (!startDate) return true; // Fallback if no date found (should ideally be false, but keeping existing behavior for undefined)
+    if (!startDate) return true; // Fallback if no date found
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -220,9 +229,10 @@ export default function Dashboard() {
               <ProgressChart />
             </div>
           </div>
+          <WaterIntake />
 
           {/* Bottom Section: My Tasks */}
-          <div className="lg:order-3 order-2">
+          <div className="lg:order-5 order-2">
             <h2 className="text-[#0A4F48] font-bold text-lg">My Tasks</h2>
             <TaskList
               plans={program?.plan}
