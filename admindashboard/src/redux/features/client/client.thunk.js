@@ -162,6 +162,22 @@ export const fetchClientComplianceStats = createAsyncThunk(
   }
 );
 
+export const fetchClientAdherenceStreaks = createAsyncThunk(
+  "client/fetchClientAdherenceStreaks",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/clients/adherence-streaks?userId=${id}`,
+      );
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to fetch adherence streaks",
+      );
+    }
+  },
+);
+
 export const fetchClientMeasurementHistory = createAsyncThunk(
   "client/fetchClientMeasurementHistory",
   async (_, { rejectWithValue }) => {

@@ -367,6 +367,39 @@ export const getComplianceStats = async (req, res) => {
   }
 };
 
+export const getAdherenceStreaks = async (req, res) => {
+  try {
+    const queryUserId = req.query.userId;
+
+    const userId =
+      queryUserId && mongoose.Types.ObjectId.isValid(queryUserId)
+        ? queryUserId
+        : req.user?._id && mongoose.Types.ObjectId.isValid(req.user._id)
+          ? req.user._id
+          : req.user?.id;
+
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid userId is required",
+      });
+    }
+
+    const streaks = await service.getAdherenceStreaksService(userId);
+
+    return res.status(200).json({
+      success: true,
+      data: streaks,
+    });
+  } catch (error) {
+    console.error("Adherence streaks error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to fetch adherence streaks",
+    });
+  }
+};
+
 
  
 export const getClientsWithHabitPlan = async (req, res) => {
