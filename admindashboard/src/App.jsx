@@ -46,8 +46,10 @@ import FounderBroadcastCreate from "./pages/founder/broadcast/CreateBroadcast";
 import FounderBroadcastAutoReminder from "./pages/founder/broadcast/AutoReminders";
 import FounderBroadcastDelete from "./pages/founder/broadcast/broadcastDeletePopUp";
 import FounderBroadcastEdit from "./pages/founder/broadcast/broadcastEdit";
+import FounderRecipeList from "./pages/founder/recipe/RecipeList";
+import FounderRecipeForm from "./pages/founder/recipe/Recipeform";
 
-//Head Pages Imports
+//Head Pages Imports    
 import HeadLayout from "./pages/head/layout/HeadLayout";
 import HeadDashboard from "./pages/head/Dashboard";
 import HeadClientsTable from "./pages/head/clients/ClientsTable";
@@ -191,6 +193,8 @@ function App() {
           <Route path="therapy/create" element={<FounderTherapyForm />} />
           <Route path="therapy/edit/:id" element={<FounderTherapyForm />} />
           <Route path="therapy/plan/:id" element={<FounderTherapyPlanView />} />
+          <Route path="recipe" element={<FounderRecipeList/>}/>
+          <Route path="recipe/create" element={<FounderRecipeForm/>}/>
           <Route path="broadcasts" element={<FounderBroadcastTemplates />} />
           <Route
             path="broadcasts/delete/:id"
