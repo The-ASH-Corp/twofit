@@ -1,4 +1,5 @@
 import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { refreshProfile } from "@/redux/features/auth/auth.thunk";
 import { updateWeightOfClient } from "@/redux/features/client/client.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
 import {  useState } from "react";
@@ -29,6 +30,7 @@ export default function WeightUpdate({ onClose }) {
           currentWeight: Number(weight),
         })
       ).unwrap();
+      await dispatch(refreshProfile({ id: user?._id, role: user.role })).unwrap();
       toast.success("Weight updated successfully");
       if (onClose) onClose();
     } catch (err) {

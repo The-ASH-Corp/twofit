@@ -13,7 +13,11 @@ import { useAppSelector } from "@/redux/store/hooks";
 import { useDispatch } from "react-redux";
 import { getProgramById } from "@/redux/features/program/program.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { fetchClientComplianceStats } from "@/redux/features/client/client.thunk";
+import {
+  fetchClientComplianceStats,
+  getClient,
+} from "@/redux/features/client/client.thunk";
+import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { SyncLoader } from "react-spinners";
 
 export default function Progress() {
@@ -24,7 +28,9 @@ export default function Progress() {
   const [isLoading, setIsLoading] = useState(true);
 
   const user = useAppSelector(selectUser);
+  const selectedClient = useAppSelector(selectSelectedClient);
   const dispatch = useDispatch();
+  const clientData = selectedClient || user;
 
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -34,6 +40,7 @@ export default function Progress() {
           ? user?.programType?._id
           : user?.programType;
       const program = await dispatch(getProgramById(programId)).unwrap();
+      await dispatch(getClient({ id: user?._id })).unwrap();
       const compliance = await dispatch(fetchClientComplianceStats()).unwrap();
       setComplianceData(compliance);
       setProgram(program.data);
@@ -53,14 +60,14 @@ export default function Progress() {
   const kpiData = [
     {
       title: "Program Days",
-      value: `${user?.currentGlobalDay || 1}/ ${program?.plan?.duration || 0}`,
+      value: `${clientData?.currentGlobalDay || 1}/ ${program?.plan?.duration || 0}`,
       icon: assets.website,
       bg: "#0A4F48",
       iconColor: true,
     },
     {
       title: "Weight Progress",
-      value: `${user?.currentWeight || 0} kg`,
+      value: `${clientData?.currentWeight || 0} kg`,
       icon: assets.website,
       bg: "#F4DBC7",
       iconColor: false,
@@ -103,11 +110,11 @@ export default function Progress() {
   ];
 
   const measurementsData = {
-    labels: user?.measurementHistory?.map((_, i) => `W ${i + 1}`) || [],
+    labels: clientData?.measurementHistory?.map((_, i) => `W ${i + 1}`) || [],
     datasets: [
       {
         label: "Chest",
-        data: user?.measurementHistory?.map((h) => h.chest) || [],
+        data: clientData?.measurementHistory?.map((h) => h.chest) || [],
         backgroundColor: "#F4DBC7",
         borderRadius: {
           topLeft: 6,
@@ -119,7 +126,7 @@ export default function Progress() {
       },
       {
         label: "Waist",
-        data: user?.measurementHistory?.map((h) => h.waist) || [],
+        data: clientData?.measurementHistory?.map((h) => h.waist) || [],
         backgroundColor: "#E8F5F3",
         borderRadius: {
           topLeft: 6,
@@ -131,7 +138,7 @@ export default function Progress() {
       },
       {
         label: "Hip",
-        data: user?.measurementHistory?.map((h) => h.hip) || [],
+        data: clientData?.measurementHistory?.map((h) => h.hip) || [],
         backgroundColor: "#0A4F48",
         borderRadius: {
           topLeft: 6,
@@ -184,7 +191,7 @@ export default function Progress() {
           afterBody: (tooltipItems) => {
             const current = tooltipItems[0].parsed.y;
             const start =
-              user.measurementHistory[0][
+              clientData.measurementHistory[0][
                 tooltipItems[0].dataset.label.toLowerCase()
               ];
             const change = current - start;
@@ -224,9 +231,9 @@ export default function Progress() {
       },
     },
   };
-  const lastWeightUpdateDate = user?.weightHistory?.at(-1)?.date || "";
+  const lastWeightUpdateDate = clientData?.weightHistory?.at(-1)?.date || "";
   const lastMeasurementUpdateDate =
-    user?.measurementHistory?.at(-1)?.date || "";
+    clientData?.measurementHistory?.at(-1)?.date || "";
 
   if (isLoading) {
     return (
