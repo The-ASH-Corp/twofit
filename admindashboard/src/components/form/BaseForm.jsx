@@ -114,6 +114,7 @@ export default function BaseForm({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-3">
             <button
+              type="button"
               onClick={() => navigate(-1)}
               className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-500 hover:text-[#0A4F48] hover:border-[#0A4F48]/30 transition-all shadow-sm group"
             >
@@ -127,19 +128,21 @@ export default function BaseForm({
                 {heading || "Create Entry"}
               </h1>
               <p className="text-sm text-slate-500 font-medium">
-                Fill in the details to create a new record
+                Fill in the details 
               </p>
             </div>
           </div>
 
           <div className="hidden sm:flex items-center gap-3">
             <button
+              type="button"
               onClick={() => navigate(-1)}
               className="px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold text-sm hover:bg-slate-50 hover:text-slate-800 transition-colors shadow-sm"
             >
               Cancel
             </button>
             <button
+              type="button"
               onClick={() =>
                 document.getElementById("base-form-submit")?.click()
               }

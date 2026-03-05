@@ -2,30 +2,28 @@ import { SOP } from "./sop.model.js";
 import { SOPLog } from "./sopLog.model.js";
 import mongoose from "mongoose";
 
-/* ===============================
-   1️⃣ Assign SOP (Admin)
-================================= */
+
+//  1️⃣ Assign SOP (Admin)
+
 export const assignSOP = async (data) => {
   return await SOP.create(data);
 };
 
-/* ===============================
-   2️⃣ Update SOP (Admin)
-================================= */
+//  2️⃣ Update SOP (Admin)
+
 export const updateSOP = async (id, updatedData) => {
   return await SOP.findByIdAndUpdate(id, updatedData, { new: true });
 };
 
-/* ===============================
-   3️⃣ Deactivate SOP (Admin)
-================================= */
-export const deactivateSOP = async (id) => {
-  return await SOP.findByIdAndUpdate(id, { status: "Inactive" }, { new: true });
+//  3️⃣ Delete SOP (Admin)
+
+export const deleteSOP = async (id) => {
+  return await SOP.findByIdAndDelete(id);
 };
 
-/* ===============================
-   4️⃣ Get Today’s SOP Tasks (Coach)
-================================= */
+
+//  4️⃣ Get Today’s SOP Tasks (Coach)
+
 export const getTodaySOP = async (coachId) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -33,8 +31,7 @@ export const getTodaySOP = async (coachId) => {
   const sops = await SOP.find({
     coachId,
     status: "Active",
-  }).sort({ timeSlot: 1 });
-
+  });
   const tasks = [];
 
   for (let sop of sops) {
@@ -44,7 +41,7 @@ export const getTodaySOP = async (coachId) => {
       date: today,
     });
 
-    // If no log exists for today → create one
+// If no log exists for today → create one
     if (!log) {
       log = await SOPLog.create({
         sopId: sop._id,
@@ -52,7 +49,7 @@ export const getTodaySOP = async (coachId) => {
         date: today,
       });
     }
-
+    
     tasks.push({
       sopId: sop._id,
       title: sop.title,
@@ -65,9 +62,9 @@ export const getTodaySOP = async (coachId) => {
   return tasks;
 };
 
-/* ===============================
-   5️⃣ Complete SOP Task (Coach)
-================================= */
+
+//  5️⃣ Complete SOP Task (Coach)
+
 export const completeSOP = async (sopId, coachId) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -82,9 +79,9 @@ export const completeSOP = async (sopId, coachId) => {
   );
 };
 
-/* ===============================
-   6️⃣ Get SOP Completion History (Admin)
-================================= */
+
+//  6️⃣ Get SOP Completion History (Admin)
+
 export const getSOPHistory = async (coachId, month, year) => {
   const startDate = new Date(year, month - 1, 1);
   const endDate = new Date(year, month, 1);
@@ -94,3 +91,7 @@ export const getSOPHistory = async (coachId, month, year) => {
     date: { $gte: startDate, $lt: endDate },
   }).populate("sopId");
 };
+
+export const getSOPById = async (SOPId)=> {
+  return await SOP.findById(SOPId)
+}
