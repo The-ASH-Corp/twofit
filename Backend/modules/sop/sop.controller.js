@@ -61,9 +61,7 @@ export const deactivateSOP = async (req, res) => {
 ================================= */
 export const getTodaySOP = async (req, res) => {
   try {
-    const coachId = req.user._id; // from auth middleware
-
-    const tasks = await sopService.getTodaySOP(coachId);
+    const tasks = await sopService.getTodaySOP(req.params.id);
 
     res.status(200).json({
       success: true,
@@ -115,3 +113,15 @@ export const getSOPHistory = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
+ 
+export const getSOPById = async (req, res) => {
+  try {
+    const sop = await sopService.getSOPById(req.params.id)
+    res.status(200).json({
+      success: true,
+      data: sop,
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+}
