@@ -27,6 +27,14 @@ const getProgramDayDateUtc = (programStartDate, globalDayIndex) => {
     return addDaysUtc(startDateUtc, dayIndex - 1);
 };
 
+const getWeekAndDayIndex = (globalDayIndex) => {
+    const day = Number(globalDayIndex);
+    return {
+        weekIndex: Math.floor((day - 1) / 7) + 1,
+        dayIndex: ((day - 1) % 7) + 1,
+    };
+};
+
 // Helper to calculate unlock date (Strict Next Midnight Rule)
 export const calculateUnlockDate = (completionDate) => {
     const date = new Date(completionDate);
@@ -616,6 +624,113 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
     await checkAndAdvanceDay(userId, gIndex);
 
     return { success: true, message: "All workout tasks submitted successfully" };
+};
+
+export const upsertWaterIntakeForDay = async ({ userId, waterIntakeMl, globalDayIndex }) => {
+    const intake = Number(waterIntakeMl);
+    if (!Number.isFinite(intake) || intake < 0) {
+        throw new Error("waterIntakeMl must be a non-negative number");
+    }
+
+    const user = await User.findById(userId).select("currentGlobalDay programType");
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    const selectedGlobalDay = Number(globalDayIndex);
+    const dayToUpdate =
+        Number.isFinite(selectedGlobalDay) && selectedGlobalDay > 0
+            ? selectedGlobalDay
+            : Number(user.currentGlobalDay || 1);
+
+    const { weekIndex, dayIndex } = getWeekAndDayIndex(dayToUpdate);
+    const roundedIntake = Math.round(intake);
+    const now = new Date();
+
+    let userSubmission = await TaskSubmission.findOne({ userId });
+
+    if (!userSubmission) {
+        userSubmission = new TaskSubmission({
+            userId,
+            programId: mongoose.Types.ObjectId.isValid(user.programType)
+                ? user.programType
+                : undefined,
+            dailySubmissions: [{
+                globalDayIndex: dayToUpdate,
+                weekIndex,
+                dayIndex,
+                waterIntakeMl: roundedIntake,
+                waterIntakeUpdatedAt: now,
+                exercises: [],
+            }],
+        });
+    } else {
+        let day = userSubmission.dailySubmissions.find(
+            (entry) => entry.globalDayIndex === dayToUpdate
+        );
+
+        if (!day) {
+            userSubmission.dailySubmissions.push({
+                globalDayIndex: dayToUpdate,
+                weekIndex,
+                dayIndex,
+                waterIntakeMl: roundedIntake,
+                waterIntakeUpdatedAt: now,
+                exercises: [],
+            });
+            day = userSubmission.dailySubmissions[userSubmission.dailySubmissions.length - 1];
+        } else {
+            day.waterIntakeMl = roundedIntake;
+            day.waterIntakeUpdatedAt = now;
+        }
+
+        if (!userSubmission.programId && mongoose.Types.ObjectId.isValid(user.programType)) {
+            userSubmission.programId = user.programType;
+        }
+    }
+
+    await userSubmission.save();
+
+    return {
+        userId,
+        globalDayIndex: dayToUpdate,
+        weekIndex,
+        dayIndex,
+        waterIntakeMl: roundedIntake,
+        waterIntakeUpdatedAt: now,
+    };
+};
+
+export const getWaterIntakeForDay = async ({ userId, globalDayIndex }) => {
+    const user = await User.findById(userId).select("currentGlobalDay");
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    const selectedGlobalDay = Number(globalDayIndex);
+    const dayToRead =
+        Number.isFinite(selectedGlobalDay) && selectedGlobalDay > 0
+            ? selectedGlobalDay
+            : Number(user.currentGlobalDay || 1);
+
+    const userSubmission = await TaskSubmission.findOne({ userId }).select(
+        "dailySubmissions.globalDayIndex dailySubmissions.weekIndex dailySubmissions.dayIndex dailySubmissions.waterIntakeMl dailySubmissions.waterIntakeUpdatedAt"
+    );
+
+    const day = userSubmission?.dailySubmissions?.find(
+        (entry) => entry.globalDayIndex === dayToRead
+    );
+
+    const fallbackIndex = getWeekAndDayIndex(dayToRead);
+
+    return {
+        userId,
+        globalDayIndex: dayToRead,
+        weekIndex: day?.weekIndex ?? fallbackIndex.weekIndex,
+        dayIndex: day?.dayIndex ?? fallbackIndex.dayIndex,
+        waterIntakeMl: Number(day?.waterIntakeMl || 0),
+        waterIntakeUpdatedAt: day?.waterIntakeUpdatedAt || null,
+    };
 };
 
 

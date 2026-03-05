@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 import { assets } from "@/assets/asset";
 import React, { useCallback, useEffect, useState } from "react";
 import ProgressChart from "../components/ProgressChart";
@@ -9,6 +8,7 @@ import ExtendPlan from "./ExtendPlan";
 import { X } from "lucide-react";
 import { Bar } from "react-chartjs-2";
 import MobileBottomNav from "../components/MobileBottomNav";
+import AdherenceStreaks from "../components/AdherenceStreaks";
 import { useAppSelector } from "@/redux/store/hooks";
 import { useDispatch } from "react-redux";
 import { getProgramById } from "@/redux/features/program/program.thunk";
@@ -42,13 +42,13 @@ export default function Progress() {
     } finally {
       setIsLoading(false);
     }
-  }, [user, dispatch]);
+  }, [dispatch, user?.programType]);
 
   useEffect(() => {
     if (user?._id && user?.programType) {
       fetchDashboardData();
     }
-  }, [user?._id, user?.programType]);
+  }, [fetchDashboardData, user?._id, user?.programType]);
 
   const kpiData = [
     {
@@ -180,9 +180,7 @@ export default function Progress() {
           title: (tooltipItems) => {
             return tooltipItems[0].dataset.label;
           },
-          label: (context) => {
-            return "";
-          },
+          label: () => "",
           afterBody: (tooltipItems) => {
             const current = tooltipItems[0].parsed.y;
             const start =
@@ -341,30 +339,7 @@ export default function Progress() {
 
         {/* Right Sidebar */}
         <div className="space-y-6">
-          {/* Streaks */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <h3 className="text-[#0A4F48] font-bold text-[16px] mb-4">
-              Streaks
-            </h3>
-            <div className="space-y-3">
-              <div className="bg-gray-50 rounded-xl p-4 flex justify-between items-center">
-                <p className="text-[13px] font-medium text-gray-700">
-                  Active Streak
-                </p>
-                <p className="text-[#0A4F48] font-bold text-[15px]">
-                  {complianceData?.streaks?.activeStreak} Days
-                </p>
-              </div>
-              <div className="bg-gray-50 rounded-xl p-4 flex justify-between items-center">
-                <p className="text-[13px] font-medium text-gray-700">
-                  Longest Streak
-                </p>
-                <p className="font-bold text-[15px] text-gray-800">
-                  {complianceData?.streaks?.longestStreak} Days
-                </p>
-              </div>
-            </div>
-          </div>
+          <AdherenceStreaks user={user} program={program} />
 
           {/* Compliance */}
           <div className="bg-white rounded-2xl p-6 shadow-sm">
@@ -489,30 +464,11 @@ export default function Progress() {
           </div>
         </div>
 
-        {/* Streaks Card */}
-        <div className="bg-white rounded-xl p-4 shadow-sm">
-          <h3 className="text-[#0A4F48] font-semibold text-[14px] mb-3">
-            Streaks
-          </h3>
-          <div className="space-y-2">
-            <div className="bg-gray-50 rounded-lg p-3 flex justify-between items-center">
-              <p className="text-[12px] font-medium text-gray-700">
-                Active Streak
-              </p>
-              <p className="text-[#0A4F48] font-bold text-[14px]">
-                {complianceData?.streaks?.activeStreak} Days
-              </p>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-3 flex justify-between items-center">
-              <p className="text-[12px] font-medium text-gray-700">
-                Longest Streak
-              </p>
-              <p className="font-bold text-[14px] text-gray-800">
-                {complianceData?.streaks?.longestStreak} Days
-              </p>
-            </div>
-          </div>
-        </div>
+        <AdherenceStreaks
+          user={user}
+          program={program}
+          className="rounded-xl p-4 shadow-sm"
+        />
 
         {/* Compliance Card */}
         <div className="bg-white rounded-xl p-4 shadow-sm">

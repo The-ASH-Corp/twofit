@@ -152,3 +152,47 @@ export const getAllUserSubmissions = async (req, res) => {
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
+export const upsertWaterIntake = async (req, res) => {
+    try {
+        const userId = req.user._id || req.user.id;
+        const { waterIntakeMl, globalDayIndex } = req.body;
+
+        const data = await taskSubmissionService.upsertWaterIntakeForDay({
+            userId,
+            waterIntakeMl,
+            globalDayIndex,
+        });
+
+        res.status(200).json({ success: true, data });
+    } catch (error) {
+        if (
+            error.message === "waterIntakeMl must be a non-negative number" ||
+            error.message === "User not found"
+        ) {
+            return res.status(400).json({ success: false, message: error.message });
+        }
+
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+export const getWaterIntake = async (req, res) => {
+    try {
+        const userId = req.user._id || req.user.id;
+        const { globalDayIndex } = req.query;
+
+        const data = await taskSubmissionService.getWaterIntakeForDay({
+            userId,
+            globalDayIndex,
+        });
+
+        res.status(200).json({ success: true, data });
+    } catch (error) {
+        if (error.message === "User not found") {
+            return res.status(400).json({ success: false, message: error.message });
+        }
+
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
