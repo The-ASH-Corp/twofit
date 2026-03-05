@@ -92,7 +92,7 @@ const ViewButton = ({row})=> {
      <button
        onClick={(e) => {
          e.stopPropagation();
-         navigate(`/admin/experts/expert-tasks/${row.id}`);
+         navigate(`/admin/experts/tasks/${row.id}`);
        }}
        className="px-2 py-1 text-white bg-[#0A4F48] rounded-md text-[11px]"
      >

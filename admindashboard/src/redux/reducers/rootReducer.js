@@ -17,6 +17,7 @@ import financeReducer from "../features/finance/finance.slice"
 import taskReducer from "../features/tasks/task.slice";
 import habitReducer from "../features/habit/habit.slice"
 import broadcastReducer from "../features/broadcast/broadcast.slice";
+import sopReducer from "../features/sop/sop.slice"
 
 export default combineReducers({
   auth: authReducer,
@@ -35,4 +36,5 @@ export default combineReducers({
   tasks: taskReducer,
   habit: habitReducer,
   broadcast: broadcastReducer,
+  sop: sopReducer,
 });
