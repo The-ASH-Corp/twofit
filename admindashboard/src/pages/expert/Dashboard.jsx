@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Users,
   FileText,
@@ -83,7 +83,7 @@ export default function Dashboard() {
     return Object.values(groups);
   }, [pendingTasks]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     dispatch(getCoachDashboardStats(user?._id)).then((res) => {
       if (res.meta?.requestStatus === "fulfilled") {
         setDashboardStats(res.payload);
@@ -102,7 +102,7 @@ export default function Dashboard() {
       }
     });
     dispatch(getPendingSubmissions());
-  };
+  }, [dispatch, user?._id, complianceDuration, ratingDuration]);
 
   useEffect(() => {
     if (user?._id && token) {
@@ -132,7 +132,7 @@ export default function Dashboard() {
         socket.disconnect();
       };
     }
-  }, [dispatch, user?._id, token, complianceDuration, ratingDuration]);
+  }, [fetchData, user?._id, user?.role, token]);
 
   // Compliance Chart Data
   const complianceData = useMemo(() => {
@@ -392,10 +392,10 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-4 bg-[#F8F9FA] h-[calc(100vh-120px)] overflow-auto no-scrollbar">
+    <div className="flex flex-col gap-6 pb-6 h-[calc(100vh-120px)] overflow-auto no-scrollbar">
       {/* Top Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl p-4 sm:p-5 flex items-center gap-4 shadow-sm">
+        <div className="bg-white rounded-3xl p-4 sm:p-5 flex items-center gap-4 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] transition-all duration-300">
           <div className="w-12 h-12 rounded-xl bg-[#EBF3F2] flex items-center justify-center">
             <Users size={20} className="text-[#0A4F48]" />
           </div>
@@ -409,7 +409,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 sm:p-5 flex items-center gap-4 shadow-sm">
+        <div className="bg-white rounded-3xl p-4 sm:p-5 flex items-center gap-4 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] transition-all duration-300">
           <div className="w-12 h-12 rounded-xl bg-[#FAE8E6] flex items-center justify-center">
             <FileText size={20} className="text-[#D4A5A0]" />
           </div>
@@ -423,7 +423,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 sm:p-5 flex items-center gap-4 shadow-sm">
+        <div className="bg-white rounded-3xl p-4 sm:p-5 flex items-center gap-4 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] transition-all duration-300">
           <div className="w-12 h-12 rounded-xl bg-[#E8F5E9] flex items-center justify-center">
             <TrendingUp size={20} className="text-[#45C4A2]" />
           </div>
@@ -437,7 +437,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-4 sm:p-5 flex items-center gap-4 shadow-sm">
+        <div className="bg-white rounded-3xl p-4 sm:p-5 flex items-center gap-4 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] transition-all duration-300">
           <div className="w-12 h-12 rounded-xl bg-[#F0FDF4] flex items-center justify-center">
             <Activity size={20} className="text-[#45C4A2]" />
           </div>
@@ -461,7 +461,7 @@ export default function Dashboard() {
           {/* Charts Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Client Compliance Chart */}
-            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+            <div className="bg-white rounded-3xl p-4 sm:p-6 border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] transition-all duration-300">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-[16px] font-bold text-gray-900">
                   Client Compliance
@@ -488,7 +488,7 @@ export default function Dashboard() {
             </div>
 
             {/* Rating Score Chart */}
-            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+            <div className="bg-white rounded-3xl p-4 sm:p-6 border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] transition-all duration-300">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-[16px] font-bold text-gray-900">
                   Rating Score
@@ -519,7 +519,7 @@ export default function Dashboard() {
           {user?.role?.toLowerCase() === "therapist" && <HabitProgress />}
 
           {/* Pending Reviews Table */}
-          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+          <div className="bg-white rounded-3xl p-4 sm:p-6 border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] transition-all duration-300">
             <h2 className="text-[16px] font-bold text-gray-900 mb-4">
               Pending Reviews
             </h2>
@@ -605,11 +605,15 @@ export default function Dashboard() {
         {/* Right Section - My Performance & Daily Activity */}
         <div className="space-y-6">
           {/* My Performance Card */}
-          <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm flex flex-col border border-gray-50 h-[500px] overflow-hidden">
+          <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] flex flex-col h-[500px] overflow-hidden transition-all duration-300">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-base font-bold text-[#0A4F48]">
                 My Performance
               </h3>
+              <MoreHorizontal
+                size={18}
+                className="text-[#94A3B8] hover:text-[#0A4F48] transition-colors cursor-pointer"
+              />
             </div>
 
             {/* Circular Progress Chart */}
