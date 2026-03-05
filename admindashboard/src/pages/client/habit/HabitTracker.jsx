@@ -40,7 +40,7 @@ export default function HabitTracker() {
       </div>
     );
 
-  if (!habits || !habits.habits?.length) return <p>No habits assigned</p>;
+  if (!habits || !habits.habits?.length) return <p className="flex justify-center items-center w-full h-full text-lg">No habits assigned</p>;
 
   const today = new Date().toDateString();
 

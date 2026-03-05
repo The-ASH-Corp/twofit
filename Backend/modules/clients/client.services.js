@@ -2,7 +2,131 @@ import User from "../auth/auth.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import mongoose from "mongoose";
 import HabitModel from "../habit/habit.model.js";
+import TaskSubmission from "../taskSubmission/taskSubmission.model.js";
 import { calculateExtraClientIncentive } from "../incentive/incentive.service.js";
+
+const ACCEPTED_SUBMISSION_STATUSES = new Set(["pending", "verified"]);
+
+function toDateKey(dateValue) {
+  if (!dateValue) return "";
+  const date = new Date(dateValue);
+  if (Number.isNaN(date.getTime())) return "";
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function addDays(baseDate, offsetDays) {
+  const next = new Date(baseDate);
+  next.setDate(next.getDate() + offsetDays);
+  return next;
+}
+
+function calculateStreakFromDateKeys(dateKeys) {
+  const uniqueSortedDates = Array.from(
+    new Set((dateKeys || []).filter((value) => Boolean(toDateKey(value)))),
+  )
+    .map((value) => toDateKey(value))
+    .sort();
+
+  if (!uniqueSortedDates.length) {
+    return { activeStreak: 0, longestStreak: 0, doneToday: false };
+  }
+
+  let longestStreak = 0;
+  let currentStreak = 0;
+  let previousDate = null;
+  let streakEnd = null;
+
+  uniqueSortedDates.forEach((dateKey) => {
+    const currentDate = new Date(dateKey);
+    currentDate.setHours(0, 0, 0, 0);
+
+    if (previousDate) {
+      const diffTime = Math.abs(currentDate - previousDate);
+      const diffDays = Math.round(diffTime / 86400000);
+
+      if (diffDays === 1) {
+        currentStreak += 1;
+      } else {
+        currentStreak = 1;
+      }
+    } else {
+      currentStreak = 1;
+    }
+
+    longestStreak = Math.max(longestStreak, currentStreak);
+    previousDate = currentDate;
+    streakEnd = dateKey;
+  });
+
+  const today = new Date();
+  const todayStr = toDateKey(today);
+
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = toDateKey(yesterday);
+
+  const doneToday = uniqueSortedDates.includes(todayStr);
+  const activeStreak =
+    streakEnd === todayStr || streakEnd === yesterdayStr ? currentStreak : 0;
+
+  return { activeStreak, longestStreak, doneToday };
+}
+
+function toPositiveInt(value, fallbackValue) {
+  const parsed = Number(value);
+  if (Number.isInteger(parsed) && parsed > 0) {
+    return parsed;
+  }
+
+  return fallbackValue;
+}
+
+function countCompletedTasksByType(exercises, taskType) {
+  const completedIndices = new Set();
+
+  (exercises || []).forEach((exercise) => {
+    const normalizedType = String(exercise?.taskType || "").toLowerCase();
+    const normalizedStatus = String(exercise?.status || "").toLowerCase();
+    const exerciseIndex = Number(exercise?.exerciseIndex);
+
+    if (normalizedType !== String(taskType).toLowerCase()) return;
+    if (!ACCEPTED_SUBMISSION_STATUSES.has(normalizedStatus)) return;
+    if (!Number.isFinite(exerciseIndex)) return;
+
+    completedIndices.add(exerciseIndex);
+  });
+
+  return completedIndices.size;
+}
+
+function getLatestTaskCompletionDateKey(exercises, taskType, fallbackDateKey) {
+  let latestTime = null;
+
+  (exercises || []).forEach((exercise) => {
+    const normalizedType = String(exercise?.taskType || "").toLowerCase();
+    const normalizedStatus = String(exercise?.status || "").toLowerCase();
+
+    if (normalizedType !== String(taskType).toLowerCase()) return;
+    if (!ACCEPTED_SUBMISSION_STATUSES.has(normalizedStatus)) return;
+
+    const updatedAt = exercise?.updatedAt ? new Date(exercise.updatedAt) : null;
+    if (!updatedAt || Number.isNaN(updatedAt.getTime())) return;
+
+    if (latestTime === null || updatedAt.getTime() > latestTime) {
+      latestTime = updatedAt.getTime();
+    }
+  });
+
+  if (latestTime !== null) {
+    return toDateKey(new Date(latestTime));
+  }
+
+  return fallbackDateKey;
+}
 
 export const getAllClient = async (page, limit) => {
   const skip = (page - 1) * limit;
@@ -335,11 +459,10 @@ export const founderClientList = async (page, limit) => {
   }
 };
 
-
 export const fetchClientsWithHabitPlan = async () => {
-   const clients = await User.find({ role: "user" });
+  const clients = await User.find({ role: "user" });
 
-   const clientsWithHabit = await Promise.all(
+  const clientsWithHabit = await Promise.all(
     clients.map(async (client) => {
       const habit = await HabitModel.findOne({ clientId: client._id });
 
@@ -348,8 +471,140 @@ export const fetchClientsWithHabitPlan = async () => {
         hasHabitPlan: Boolean(habit),
         habitId: habit ? habit._id : null,
       };
-    })
+    }),
   );
 
   return clientsWithHabit;
+};
+
+export const getAdherenceStreaksService = async (userId) => {
+  const user = await getSingleClient(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  const currentGlobalDay = Math.max(1, Number(user.currentGlobalDay) || 1);
+  const programPlan = user?.programType?.plan;
+  const programTitle = String(user?.programType?.title || "").toLowerCase();
+
+  const isWeightLoss = programTitle.includes("weight loss");
+  const defaultMealCount = isWeightLoss ? 4 : 5;
+  const mealCountPerDay = toPositiveInt(
+    user?.dietPlanMealCount,
+    defaultMealCount,
+  );
+
+  const planDayMap = new Map();
+  (programPlan?.weeks || []).forEach((week, weekIndex) => {
+    (week.days || []).forEach((day, dayIndex) => {
+      const globalDayIndex = weekIndex * 7 + dayIndex + 1;
+      planDayMap.set(globalDayIndex, day || {});
+    });
+  });
+
+  const taskSubmissionDoc = await TaskSubmission.findOne({ userId }).select(
+    "dailySubmissions.globalDayIndex dailySubmissions.waterIntakeMl dailySubmissions.exercises dailySubmissions.waterIntakeUpdatedAt",
+  );
+
+  const submissionsByDay = new Map(
+    (taskSubmissionDoc?.dailySubmissions || []).map((day) => [
+      Number(day.globalDayIndex),
+      day,
+    ]),
+  );
+
+  const completedWorkoutDays = [];
+  const completedDietDays = [];
+  const completedWaterDays = [];
+  const startDate = user?.programStartDate
+    ? new Date(user.programStartDate)
+    : null;
+
+  if (startDate && !Number.isNaN(startDate.getTime())) {
+    startDate.setHours(0, 0, 0, 0);
+  }
+
+  for (let dayIndex = 1; dayIndex <= currentGlobalDay; dayIndex += 1) {
+    const dayPlan = planDayMap.get(dayIndex) || {};
+    const daySubmission = submissionsByDay.get(dayIndex);
+    const exercises = daySubmission?.exercises || [];
+    const fallbackDateKey =
+      startDate && !Number.isNaN(startDate.getTime())
+        ? toDateKey(addDays(startDate, dayIndex - 1))
+        : "";
+
+    const expectedWorkoutCount = (dayPlan.exercises || []).filter(
+      (exercise) => !exercise?.type || exercise.type === "Workout",
+    ).length;
+
+    const workoutDoneCount = countCompletedTasksByType(exercises, "Workout");
+
+    if (expectedWorkoutCount > 0 && workoutDoneCount >= expectedWorkoutCount) {
+      completedWorkoutDays.push(
+        getLatestTaskCompletionDateKey(exercises, "Workout", fallbackDateKey),
+      );
+    }
+
+    const mealDoneCount = countCompletedTasksByType(exercises, "Meal");
+
+    if (mealCountPerDay > 0 && mealDoneCount >= mealCountPerDay) {
+      completedDietDays.push(
+        getLatestTaskCompletionDateKey(exercises, "Meal", fallbackDateKey),
+      );
+    }
+
+    const waterIntakeMl = Number(daySubmission?.waterIntakeMl || 0);
+    if (waterIntakeMl > 100) {
+      const waterUpdatedAt = daySubmission?.waterIntakeUpdatedAt
+        ? toDateKey(daySubmission.waterIntakeUpdatedAt)
+        : "";
+      completedWaterDays.push(waterUpdatedAt || fallbackDateKey);
+    }
+  }
+
+  const habitDoc = await HabitModel.findOne({ clientId: userId }).select(
+    "habits.logs",
+  );
+  const habitList = habitDoc?.habits || [];
+  const completedHabitDays = [];
+
+  if (habitList.length > 0 && user?.programStartDate) {
+    const startDate = new Date(user.programStartDate);
+
+    if (!Number.isNaN(startDate.getTime())) {
+      startDate.setHours(0, 0, 0, 0);
+
+      for (let dayIndex = 1; dayIndex <= currentGlobalDay; dayIndex += 1) {
+        const dateForDay = addDays(startDate, dayIndex - 1);
+        const dayKey = toDateKey(dateForDay);
+
+        const doneForAllHabits = habitList.every((habit) =>
+          (habit?.logs || []).some(
+            (log) =>
+              toDateKey(log?.date) === dayKey &&
+              String(log?.status || "").toLowerCase() === "done",
+          ),
+        );
+
+        if (doneForAllHabits) {
+          completedHabitDays.push(dayIndex);
+        }
+      }
+    }
+  }
+
+  return {
+    workout: calculateStreakFromDateKeys(completedWorkoutDays),
+    diet: calculateStreakFromDateKeys(completedDietDays),
+    water: calculateStreakFromDateKeys(completedWaterDays),
+    habit: calculateStreakFromDateKeys(
+      completedHabitDays
+        .map((dayIndex) => {
+          if (!startDate || Number.isNaN(startDate.getTime())) return "";
+          return toDateKey(addDays(startDate, dayIndex - 1));
+        })
+        .filter(Boolean),
+    ),
+  };
 };

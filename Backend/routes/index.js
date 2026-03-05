@@ -16,6 +16,7 @@ import taskSubmissionRoutes from "../modules/taskSubmission/taskSubmission.route
 import broadcastRoutes from "../modules/broadcast/broadcast.routes.js"
 import habitRoutes from "../modules/habit/habit.routes.js"
 import notificationRoutes from "../modules/notification/notification.routes.js";
+import sopRoutes from "../modules/sop/sop.route.js";
 
 const router = express.Router();
 
@@ -36,6 +37,7 @@ router.use("/tasks", taskSubmissionRoutes);
 router.use("/broadcast", broadcastRoutes);
 router.use("/habits",habitRoutes)
 router.use("/notifications", notificationRoutes)
+router.use("/sop", sopRoutes);
 
 
 

@@ -69,7 +69,9 @@ import HeadTherapyPlan from "./pages/head/therapy/TherapyViewPlan";
 import AppLayout from "./pages/admin/layout/AppLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminChats from "./pages/admin/chats/Chats";
-import ExpertTasks from "./pages/admin/experts/ExpertTasks";
+import ExpertTasks from "./pages/admin/experts/sop/ExpertTasks";
+import AddExpertTask from "./pages/admin/experts/sop/TaskForm";
+import AddExpertEditTask from "./pages/admin/experts/sop/TaskEditForm";
 import AdminClientsTable from "./pages/admin/clients/ClientsTable";
 import AdminExpertTable from "./pages/admin/experts/ExpertTable";
 import AdminFinance from "./pages/admin/finance/FinanceTable";
@@ -266,7 +268,12 @@ function App() {
           <Route path="experts/edit/:id" element={<AdminExpertEdit />} />
           <Route path="experts/delete/:id" element={<AdminExpertDelete />} />
           <Route path="experts/addexpert" element={<AdminAddExpert />} />
-          <Route path="experts/expert-tasks/:id" element={<ExpertTasks />} />
+          <Route path="experts/tasks/:id" element={<ExpertTasks />} />
+          <Route path="experts/tasks/add/:id" element={<AddExpertTask />} />
+          <Route
+            path="experts/tasks/edit/:id"
+            element={<AddExpertEditTask />}
+          />
           <Route
             path="experts/profile/:expertId"
             element={<AdminExpertProfile />}
