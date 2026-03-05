@@ -593,17 +593,6 @@ export const getAdherenceStreaksService = async (userId) => {
       }
     }
   }
-  console.log(
-    calculateStreakFromDateKeys(completedWorkoutDays),"workout\n",
-    calculateStreakFromDateKeys(completedDietDays),"diet\n",
-    calculateStreakFromDateKeys(completedWaterDays),"water\n",
-    calculateStreakFromDateKeys(
-      completedHabitDays.map((dayIndex) => {
-        if (!startDate || Number.isNaN(startDate.getTime())) return "";
-        return toDateKey(addDays(startDate, dayIndex - 1));
-      }),
-    ),
-  );
 
   return {
     workout: calculateStreakFromDateKeys(completedWorkoutDays),
