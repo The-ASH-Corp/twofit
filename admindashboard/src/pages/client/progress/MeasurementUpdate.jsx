@@ -34,14 +34,13 @@ export default function MeasurementUpdate({ onClose }) {
           hip: Number(hip),
         })
       ).unwrap();
+      await dispatch(refreshProfile({ id: user?._id, role: user.role })).unwrap();
 
       toast.success("Measurements updated successfully");
       if (onClose) onClose();
     } catch (err) {
       console.error(err);
       toast.error("Failed to update measurements");
-    }finally{
-      dispatch(refreshProfile({id: user?._id, role: user.role})) 
     }
   };
 

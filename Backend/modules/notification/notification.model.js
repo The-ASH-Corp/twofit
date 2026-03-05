@@ -1,22 +1,21 @@
 import mongoose from "mongoose";
+import {
+  DASHBOARD_NOTIFICATION_TYPES,
+  DEFAULT_NOTIFICATION_EXPIRY_DAYS,
+  NOTIFICATION_CATEGORIES,
+  NOTIFICATION_CHANNELS,
+  NOTIFICATION_DELIVERY_STATUSES,
+  NOTIFICATION_PRIORITIES,
+  NOTIFICATION_ROLES,
+  getDefaultNotificationCategory,
+  getDefaultNotificationPriority,
+} from "./notification.constants.js";
 
-export const DASHBOARD_NOTIFICATION_TYPES = [
-  "whatsapp_delivery_failed",
-  "feedback_received",
-  "pending_meal_reviews",
-  "expert_change_request",
-  "meal_approved",
-  "meal_skipped",
-  "diet_feedback",
-  "trainer_updated",
-  "generic",
-  "chat",
-  "new_user",
-  "new_admin",
-  "new_coach",
-  "welcome",
-  "system_alert"
-];
+const getDefaultExpiryDate = () => {
+  const expiry = new Date();
+  expiry.setDate(expiry.getDate() + DEFAULT_NOTIFICATION_EXPIRY_DAYS);
+  return expiry;
+};
 
 const notificationSchema = new mongoose.Schema(
   {
@@ -24,6 +23,21 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       enum: DASHBOARD_NOTIFICATION_TYPES,
       default: "generic",
+    },
+    category: {
+      type: String,
+      enum: NOTIFICATION_CATEGORIES,
+      default: "generic",
+    },
+    priority: {
+      type: String,
+      enum: NOTIFICATION_PRIORITIES,
+      default: "normal",
+    },
+    channels: {
+      type: [String],
+      enum: NOTIFICATION_CHANNELS,
+      default: ["in_app"],
     },
     title: {
       type: String,
@@ -37,13 +51,40 @@ const notificationSchema = new mongoose.Schema(
     },
     recipientRole: {
       type: String,
-      enum: ["all", "admin", "head", "founder", "user", "coach", "expert"],
+      enum: NOTIFICATION_ROLES,
       default: "all",
       required: true,
     },
     recipientId: {
       type: mongoose.Schema.Types.ObjectId,
       default: null,
+    },
+    scheduleAt: {
+      type: Date,
+      default: null,
+    },
+    sentAt: {
+      type: Date,
+      default: null,
+    },
+    expiresAt: {
+      type: Date,
+      default: getDefaultExpiryDate,
+    },
+    dedupeKey: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    deepLink: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    deliveryStatus: {
+      type: String,
+      enum: NOTIFICATION_DELIVERY_STATUSES,
+      default: "sent",
     },
     metadata: {
       type: mongoose.Schema.Types.Mixed,
@@ -57,14 +98,51 @@ const notificationSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    dismissedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true },
 );
 
 notificationSchema.index({ recipientRole: 1, createdAt: -1 });
 notificationSchema.index({ recipientId: 1, createdAt: -1 });
-// Auto-delete after 7 days
-notificationSchema.index( { createdAt: 1 }, { expireAfterSeconds: 604800 });
+notificationSchema.index({ recipientId: 1, isRead: 1, createdAt: -1 });
+notificationSchema.index({ deliveryStatus: 1, scheduleAt: 1 });
+notificationSchema.index({
+  dedupeKey: 1,
+  recipientId: 1,
+  recipientRole: 1,
+  createdAt: -1,
+});
+notificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
+notificationSchema.pre("validate", function validateNotificationDefaults(next) {
+  if (!this.category || this.category === "generic") {
+    this.category = getDefaultNotificationCategory(this.type);
+  }
+
+  if (!this.priority || this.priority === "normal") {
+    this.priority = getDefaultNotificationPriority(this.type);
+  }
+
+  const hasFutureSchedule = this.scheduleAt && new Date(this.scheduleAt) > new Date();
+  if (hasFutureSchedule && !this.sentAt) {
+    this.deliveryStatus = "scheduled";
+  } else if (!["failed", "cancelled"].includes(this.deliveryStatus)) {
+    this.deliveryStatus = "sent";
+  }
+
+  next();
+});
+
+notificationSchema.pre("save", function setSentAtIfNeeded(next) {
+  if (this.deliveryStatus === "sent" && !this.sentAt) {
+    this.sentAt = new Date();
+  }
+  next();
+});
 
 const NotificationModel = mongoose.model("Notification", notificationSchema);
 export default NotificationModel;

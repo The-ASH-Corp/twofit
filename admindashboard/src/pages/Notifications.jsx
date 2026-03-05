@@ -28,6 +28,11 @@ const NotificationIcon = ({ type, isRead }) => {
       );
     case "alert":
     case "emergency":
+    case "missed_workout_alert":
+    case "missed_meal_alert":
+    case "risk_alert":
+    case "confidence_drop_alert":
+    case "inactive_client_alert":
       return (
         <div
           className={`${baseClasses} ${isRead ? "bg-rose-50 text-rose-600" : "bg-rose-500 text-white shadow-lg shadow-rose-200"}`}
@@ -36,11 +41,34 @@ const NotificationIcon = ({ type, isRead }) => {
         </div>
       );
     case "reminder":
+    case "daily_reminder":
+    case "review_reminder":
+    case "review_pending":
+    case "pending_meal_reviews":
       return (
         <div
           className={`${baseClasses} ${isRead ? "bg-amber-50 text-amber-600" : "bg-amber-500 text-white shadow-lg shadow-amber-200"}`}
         >
           <Clock size={20} />
+        </div>
+      );
+    case "first_10_day_morning_motivation":
+    case "weekly_encouragement":
+    case "streak_milestone_celebration":
+      return (
+        <div
+          className={`${baseClasses} ${isRead ? "bg-sky-50 text-sky-600" : "bg-sky-500 text-white shadow-lg shadow-sky-200"}`}
+        >
+          <CheckCircle2 size={20} />
+        </div>
+      );
+    case "chat":
+    case "coach_message":
+      return (
+        <div
+          className={`${baseClasses} ${isRead ? "bg-blue-50 text-blue-600" : "bg-blue-500 text-white shadow-lg shadow-blue-200"}`}
+        >
+          <Info size={20} />
         </div>
       );
     default:
@@ -58,6 +86,7 @@ export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 10,
@@ -68,9 +97,10 @@ export default function Notifications() {
   const fetchNotifications = async (page = 1) => {
     try {
       setLoading(true);
-      const res = await axiosInstance.get(
-        `/notifications?page=${page}&limit=10`,
-      );
+      const [res, unreadRes] = await Promise.all([
+        axiosInstance.get(`/notifications?page=${page}&limit=10`),
+        axiosInstance.get(`/notifications/unread-count`),
+      ]);
 
       if (res.success) {
         setNotifications(res.data || []);
@@ -84,6 +114,8 @@ export default function Notifications() {
       } else {
         setNotifications([]);
       }
+
+      setUnreadCount(Number(unreadRes?.data?.totalUnread || 0));
     } catch (error) {
       console.error("Failed to fetch notifications", error);
     } finally {
@@ -109,9 +141,25 @@ export default function Notifications() {
           n._id === notification._id ? { ...n, isRead: true } : n,
         ),
       );
+      setUnreadCount((prev) => Math.max(0, prev - 1));
       axiosInstance
         .patch(`/notifications/${notification._id}/read`)
         .catch(console.error);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await axiosInstance.patch("/notifications/read-all");
+      setNotifications((prev) =>
+        prev.map((notification) => ({ ...notification, isRead: true })),
+      );
+      setUnreadCount(0);
+      if (selectedNotification) {
+        setSelectedNotification({ ...selectedNotification, isRead: true });
+      }
+    } catch (error) {
+      console.error("Failed to mark all notifications as read", error);
     }
   };
 
@@ -127,12 +175,22 @@ export default function Notifications() {
             <div className="flex items-center gap-2 mt-2">
               <span className="w-1.5 h-1.5 bg-teal-500 rounded-full animate-pulse"></span>
               <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">
-                {pagination.total} TOTAL MESSAGES
+                {pagination.total} TOTAL MESSAGES • {unreadCount} UNREAD
               </p>
             </div>
           </div>
-          <div className="p-3 bg-teal-50/50 text-[#0A4F48] rounded-2xl ring-1 ring-teal-100/50 transition-transform hover:rotate-12">
-            <Bell size={20} weight="fill" />
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleMarkAllAsRead}
+              disabled={!unreadCount}
+              className="px-3 py-2 text-[10px] font-black uppercase tracking-widest rounded-xl border border-teal-200 text-teal-700 bg-teal-50/60 hover:bg-teal-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            >
+              Mark All Read
+            </button>
+            <div className="p-3 bg-teal-50/50 text-[#0A4F48] rounded-2xl ring-1 ring-teal-100/50 transition-transform hover:rotate-12">
+              <Bell size={20} weight="fill" />
+            </div>
           </div>
         </div>
 
