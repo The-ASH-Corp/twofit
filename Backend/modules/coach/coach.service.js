@@ -98,22 +98,25 @@ export const createCoach = async (coach) => {
 
   // Notify Admin
   await createNotification({
-    type: "generic",
+    type: "new_coach",
     title: "New Team Member",
     message: `${coachCreated.name} has been employed as a ${coachCreated.role} under your supervision.`,
     recipientRole: "admin",
     recipientId: coach.adminId,
-    metadata: { expertId: coachCreated._id }
+    category: "admin",
+    priority: "high",
+    metadata: { expertId: coachCreated._id },
   });
 
   // Notify Coach
   await createNotification({
-    type: "generic",
+    type: "welcome_message",
     title: "Welcome to the Team",
     message: "Your expert account has been created successfully.",
-    recipientRole: "expert",
+    recipientRole: "coach",
     recipientId: coachCreated._id,
-    metadata: { expertId: coachCreated._id }
+    category: "system",
+    metadata: { expertId: coachCreated._id },
   });
 
   await sendEmail({

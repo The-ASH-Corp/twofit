@@ -62,23 +62,26 @@ export const addNewAdmin = async (adminData) => {
   // Notify Head
   if (adminData.headId) {
     await createNotification({
-       type: "generic",
+       type: "new_admin",
        title: "New Admin",
        message: `${newAdmin.name} has been added as an Admin under your supervision.`,
        recipientRole: "head",
        recipientId: adminData.headId,
-       metadata: { adminId: newAdmin._id }
+       category: "admin",
+       priority: "high",
+       metadata: { adminId: newAdmin._id },
     });
   }
 
    // Notify Admin
    await createNotification({
-      type: "generic",
+      type: "welcome_message",
       title: "Welcome Admin",
       message: "Your Admin account has been activated.",
       recipientRole: "admin",
       recipientId: newAdmin._id,
-      metadata: { adminId: newAdmin._id }
+      category: "admin",
+      metadata: { adminId: newAdmin._id },
    });
 
   await sendEmail({
