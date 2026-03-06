@@ -72,6 +72,24 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
     }
   };
 
+  const normalizeEffortRating = (item) => {
+    const raw = item?.effortRating;
+    if (!raw) return null;
+
+    if (typeof raw === "number") {
+      return { ratingNumber: raw, ratingLabel: "", ratingDescription: "" };
+    }
+
+    const ratingNumber = Number(raw?.ratingNumber);
+    if (!Number.isFinite(ratingNumber)) return null;
+
+    return {
+      ratingNumber,
+      ratingLabel: raw?.ratingLabel || "",
+      ratingDescription: raw?.ratingDescription || "",
+    };
+  };
+
   const handleApprove = async (taskGroup) => {
     setProcessing(`approve-${taskGroup.globalDayIndex}`);
     try {
@@ -325,6 +343,23 @@ const ExpertClientProfileCenterSide = ({ client, pendingTasks }) => {
                         {task.notes && (
                           <div className="bg-[#F8F8F8] p-2 rounded text-[12px] text-[#333] mb-3 leading-relaxed italic">
                             "{task.notes}"
+                          </div>
+                        )}
+
+                        {normalizeEffortRating(task) && (
+                          <div className="bg-[#F3F7F6] p-2 rounded text-[12px] text-[#333] mb-3 border border-[#E2ECEA]">
+                            <p className="text-[11px] text-[#66706D] mb-1">RPE (Effort)</p>
+                            <p className="text-[12px] font-semibold text-[#0A4F48]">
+                              {normalizeEffortRating(task).ratingNumber}
+                              {normalizeEffortRating(task).ratingLabel
+                                ? ` - ${normalizeEffortRating(task).ratingLabel}`
+                                : ""}
+                            </p>
+                            {normalizeEffortRating(task).ratingDescription && (
+                              <p className="text-[11px] text-[#4B5563] mt-1 leading-relaxed">
+                                {normalizeEffortRating(task).ratingDescription}
+                              </p>
+                            )}
                           </div>
                         )}
                         

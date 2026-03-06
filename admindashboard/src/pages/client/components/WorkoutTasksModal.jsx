@@ -11,10 +11,24 @@ export default function WorkoutTasksModal({
   onClose,
   onSuccess,
 }) {
+  const rpeScale = [
+    { value: 10, label: "Maximum Effort", description:"Activity is almost impossible to sustain. You are out of breath and unable to talk." },
+    { value: 9, label: "Extremely Hard", description:"Very challenging. very short bouts only. conversation is impossible." },
+    { value: 8, label: "Very Hard", description:"Intensive activity that you can sustain , but it's challenging to maintain conversation." },
+    { value: 7, label: "Vigorous", description:"Strenuous activity. Conversation is possible, but it's very labored." },
+    { value: 6, label: "Moderately Hard", description:"A step up in effort and intensity. speaking in full sentance is difficult." },
+    { value: 5, label: "Hard", description:"Noticeable increase in effort. Breathing heavily but can maintain activity and short conversation." },
+    { value: 4, label: "Somewhat Hard", description:"Moderate, a comfortable activity level that still feels like you're doing something. "},
+    { value: 3, label: "Moderate", description:"Activity is easy to maintain. can converse with minimal effort." },
+    { value: 2, label: "Light", description:"Feels easy and relaxed. effortless conversation is possible." },
+    { value: 1, label: "Very Light", description:"Minimal effort. no noticeable change in breathing or heart rate." },
+  ];
+
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [fileName, setFileName] = useState("Upload File");
   const [file, setFile] = useState(null);
   const [comment, setComment] = useState("");
+  const [effortRating, setEffortRating] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
@@ -94,11 +108,17 @@ export default function WorkoutTasksModal({
       return;
     }
 
+    if (!effortRating) {
+      toast.info("Please select your RPE effort level (1-10).");
+      return;
+    }
+
     setUploading(true);
     try {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("notes", comment);
+      formData.append("effortRating", JSON.stringify(effortRating));
 
       const exerciseIndices = workoutTasks.map((task) => task.exerciseIndex);
       formData.append("exerciseIndices", JSON.stringify(exerciseIndices));
@@ -332,6 +352,40 @@ export default function WorkoutTasksModal({
 
               <div className="space-y-2">
                 <label className="text-[12px] font-bold text-gray-700 block">
+                  Rate of Perceived Exertion (RPE)
+                </label>
+                <div className="space-y-2 max-h-56 overflow-y-auto rounded-xl border border-gray-100 bg-gray-50/30 p-3">
+                  {rpeScale.map(({ value, label, description }) => (
+                    <label
+                      key={value}
+                      className="flex items-center justify-between gap-3 text-[12px] font-semibold text-gray-700 bg-white border border-gray-100 rounded-lg px-3 py-2"
+                    >
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="workoutEffortRating"
+                          value={value}
+                          checked={effortRating?.ratingNumber === value}
+                          onChange={() => setEffortRating({ ratingNumber: value, ratingLabel: label, ratingDescription: description })}
+                          className="accent-[#0A4F48]"
+                        />
+                        <span className="font-bold text-[#0A4F48]">{value}</span>
+                      </div>
+                      <span className="text-gray-500 text-[11px] uppercase tracking-wide">
+                        {label}
+                      </span>
+                      <span className="text-gray-400 text-[10px]">{description}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="flex justify-between text-[10px] text-gray-400 font-semibold px-1">
+                  <span>1 = Very Light</span>
+                  <span>10 = Maximum Effort</span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[12px] font-bold text-gray-700 block">
                   Exercise Attachment
                 </label>
                 <label className="w-full flex items-center justify-between border border-gray-100 bg-gray-50/30 rounded-xl p-1.5 cursor-pointer hover:bg-white hover:border-gray-200 transition-all">
@@ -375,7 +429,7 @@ export default function WorkoutTasksModal({
 
       {/* Video Modal */}
       {showVideoModal && selectedVideo && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={handleCloseVideoModal}

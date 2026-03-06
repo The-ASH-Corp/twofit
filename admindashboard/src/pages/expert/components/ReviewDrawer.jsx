@@ -35,6 +35,24 @@ export default function ReviewDrawer({ review, onClose }) {
     setExpandedTaskIndex(expandedTaskIndex === index ? null : index);
   };
 
+  const normalizeEffortRating = (item) => {
+    const raw = item?.effortRating;
+    if (!raw) return null;
+
+    if (typeof raw === "number") {
+      return { ratingNumber: raw, ratingLabel: "", ratingDescription: "" };
+    }
+
+    const ratingNumber = Number(raw?.ratingNumber);
+    if (!Number.isFinite(ratingNumber)) return null;
+
+    return {
+      ratingNumber,
+      ratingLabel: raw?.ratingLabel || "",
+      ratingDescription: raw?.ratingDescription || "",
+    };
+  };
+
   const handleApprove = async () => {
     setProcessing(true);
     if (isGroupedTasks) {
@@ -212,6 +230,23 @@ export default function ReviewDrawer({ review, onClose }) {
                               </div>
                             </div>
 
+                            {normalizeEffortRating(task) && (
+                              <div className="bg-[#F3F7F6] rounded-lg p-2 border border-[#E2ECEA]">
+                                <p className="text-[11px] text-gray-500 mb-1">RPE (Effort)</p>
+                                <p className="text-[12px] font-semibold text-[#0A4F48]">
+                                  {normalizeEffortRating(task).ratingNumber}
+                                  {normalizeEffortRating(task).ratingLabel
+                                    ? ` - ${normalizeEffortRating(task).ratingLabel}`
+                                    : ""}
+                                </p>
+                                {normalizeEffortRating(task).ratingDescription && (
+                                  <p className="text-[11px] text-gray-600 mt-1 leading-relaxed">
+                                    {normalizeEffortRating(task).ratingDescription}
+                                  </p>
+                                )}
+                              </div>
+                            )}
+
                             {task.file && (
                               <div className="rounded-lg overflow-hidden border border-gray-100">
                                 {task.file.match(/\.(mp4|webm|ogg)$/i) ? (
@@ -247,6 +282,23 @@ export default function ReviewDrawer({ review, onClose }) {
                         </p>
                       </div>
                     </div>
+
+                    {normalizeEffortRating(review) && (
+                      <div className="bg-[#F3F7F6] rounded-lg p-3 border border-[#E2ECEA]">
+                        <p className="text-[11px] text-gray-500 mb-1">RPE (Effort)</p>
+                        <p className="text-[12px] font-semibold text-[#0A4F48]">
+                          {normalizeEffortRating(review).ratingNumber}
+                          {normalizeEffortRating(review).ratingLabel
+                            ? ` - ${normalizeEffortRating(review).ratingLabel}`
+                            : ""}
+                        </p>
+                        {normalizeEffortRating(review).ratingDescription && (
+                          <p className="text-[11px] text-gray-600 mt-1 leading-relaxed">
+                            {normalizeEffortRating(review).ratingDescription}
+                          </p>
+                        )}
+                      </div>
+                    )}
 
                     {review.file && (
                       <div className="rounded-lg overflow-hidden border border-gray-100">

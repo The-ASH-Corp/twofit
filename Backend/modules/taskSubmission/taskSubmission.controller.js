@@ -30,7 +30,7 @@ export const submitTask = async (req, res) => {
 
 export const submitMultipleWorkoutTasks = async (req, res) => {
     try {
-        const { programId, weekIndex, dayIndex, globalDayIndex, exerciseIndices, notes, taskType } = req.body;
+        const { programId, weekIndex, dayIndex, globalDayIndex, exerciseIndices, notes, taskType, effortRating } = req.body;
         const userId = req.user._id || req.user.id;
         const file = req.file ? "/uploads/" + req.file.filename : null;
 
@@ -50,12 +50,16 @@ export const submitMultipleWorkoutTasks = async (req, res) => {
             exerciseIndices: indices,
             notes,
             file,
-            taskType: taskType || "Workout"
+            taskType: taskType || "Workout",
+            effortRating,
         });
 
         res.status(200).json({ success: true, data: submission });
     } catch (error) {
-        if (error.message === "Task already verified") {
+        if (
+            error.message === "Task already verified" ||
+            error.message === "effortRating must be an integer between 1 and 10"
+        ) {
             return res.status(400).json({ success: false, message: error.message });
         }
         res.status(500).json({ success: false, message: error.message });

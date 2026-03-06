@@ -549,7 +549,8 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
         exerciseIndices,
         notes,
         file,
-        taskType
+        taskType,
+        effortRating,
     } = submissionData;
 
     const gIndex = Number(globalDayIndex);
@@ -558,6 +559,28 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
 
     if (!Array.isArray(exerciseIndices) || exerciseIndices.length === 0) {
         throw new Error("Exercise indices must be a non-empty array");
+    }
+
+    // Parse and validate effortRating
+    let parsedEffortRating = null;
+    if (effortRating) {
+        try {
+            parsedEffortRating = typeof effortRating === 'string' ? JSON.parse(effortRating) : effortRating;
+            
+            // Validate the structure
+            if (!parsedEffortRating.ratingNumber || !parsedEffortRating.ratingLabel) {
+                throw new Error("effortRating must include ratingNumber and ratingLabel");
+            }
+            
+            const ratingNum = Number(parsedEffortRating.ratingNumber);
+            if (!Number.isInteger(ratingNum) || ratingNum < 1 || ratingNum > 10) {
+                throw new Error("ratingNumber must be an integer between 1 and 10");
+            }
+            
+            parsedEffortRating.ratingNumber = ratingNum;
+        } catch (err) {
+            throw new Error(`Invalid effortRating: ${err.message}`);
+        }
     }
 
     let userSubmission = await TaskSubmission.findOne({ userId });
@@ -576,6 +599,7 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
                     status: "pending",
                     file,
                     notes,
+                    effortRating: parsedEffortRating,
                     updatedAt: Date.now()
                 }))
             }]
@@ -595,6 +619,7 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
                     status: "pending",
                     file,
                     notes,
+                    effortRating: parsedEffortRating,
                     updatedAt: Date.now()
                 }))
             });
@@ -612,6 +637,7 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
                     exercise.taskType = targetTaskType;
                     exercise.file = file || exercise.file;
                     exercise.notes = notes || exercise.notes;
+                    exercise.effortRating = parsedEffortRating;
                     exercise.adminComment = "";
                     exercise.updatedAt = Date.now();
                 } else {
@@ -621,6 +647,7 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
                         status: "pending",
                         file,
                         notes,
+                        effortRating: parsedEffortRating,
                         updatedAt: Date.now()
                     });
                 }
@@ -809,6 +836,7 @@ export const getAllUserTaskSubmissions = async (expertId, userRole, targetUserId
                 taskType: "$dailySubmissions.exercises.taskType",
                 file: "$dailySubmissions.exercises.file",
                 notes: "$dailySubmissions.exercises.notes",
+                effortRating: "$dailySubmissions.exercises.effortRating",
                 createdAt: "$dailySubmissions.exercises.createdAt",
                 adminComment: "$dailySubmissions.exercises.adminComment"
             }
@@ -895,6 +923,7 @@ export const getPendingTaskSubmissions = async (expertId, userRole) => {
                 taskType: "$dailySubmissions.exercises.taskType",
                 file: "$dailySubmissions.exercises.file",
                 notes: "$dailySubmissions.exercises.notes",
+                effortRating: "$dailySubmissions.exercises.effortRating",
                 createdAt: "$dailySubmissions.exercises.createdAt"
             }
         },
