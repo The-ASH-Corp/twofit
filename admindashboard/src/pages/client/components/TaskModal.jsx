@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
 import { assets } from "@/assets/asset";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import { uploadTask } from "@/redux/features/tasks/task.thunk";
 import { toast } from "react-toastify";
