@@ -9,25 +9,7 @@ import { useAppSelector } from "@/redux/store/hooks";
 import { useNavigate } from "react-router-dom";
 
 export const ProgramListColumns = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <input
-        type="checkbox"
-        checked={table.getIsAllRowsSelected()}
-        onChange={table.getToggleAllRowsSelectedHandler()}
-        className="w-3 h-3 cursor-pointer"
-      />
-    ),
-    cell: ({ row }) => (
-      <input
-        type="checkbox"
-        checked={row.getIsSelected()}
-        onChange={row.getToggleSelectedHandler()}
-        className="w-3 h-3 cursor-pointer"
-      />
-    ),
-  },
+  
   { accessorKey: "title", header: "Program Name" },
   { accessorKey: "duration", header: "Duration" },
   {

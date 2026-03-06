@@ -95,11 +95,12 @@ const messageHandler = (io, socket) => {
 
       if (receiverId !== socket.userId) {
          createNotification({
-            type: "chat",
+            type: "coach_message",
             title: "New Message",
             message: `You have a new message from a user`, 
             recipientId: receiverId,
             recipientRole: "all", 
+            category: "chat",
             metadata: {
                chatId: roomId,
                senderId: socket.userId

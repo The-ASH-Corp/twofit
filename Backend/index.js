@@ -10,6 +10,8 @@ import http from "http";
 import { Server } from "socket.io";
 import initSocket from "./utils/socket.js";
 import { startImageCleanupTask } from "./utils/cronJobs.js";
+import { startNotificationCron } from "./utils/notification.cron.js";
+import { ensureNotificationIndexes } from "./modules/notification/notification.service.js";
 import "./utils/payroll.cron.js";
 
 
@@ -88,7 +90,9 @@ mongoose
   .then(() => {
     console.log("connected");
     // Start the cleanup scheduler after DB connection
+    ensureNotificationIndexes();
     startImageCleanupTask();
+    startNotificationCron();
   })
   .catch(() => console.log("not connected"));
 

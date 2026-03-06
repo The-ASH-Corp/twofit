@@ -1,9 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { cn } from "@/lib/utils";
-import { useAppSelector } from "@/redux/store/hooks";
-import { getClientHabitsThunk } from "@/redux/features/habit/habit.thunk";
-import { fetchWaterIntake, getUserTaskStatus } from "@/redux/features/tasks/task.thunk";
+import { fetchClientAdherenceStreaks } from "@/redux/features/client/client.thunk";
 import {
   CheckCircle2,
   Droplets,
@@ -12,8 +10,6 @@ import {
 } from "lucide-react";
 
 const MILESTONE_DAYS = [7, 21, 50, 100];
-const WATER_GOAL_ML = 2000;
-const STORAGE_VERSION = 1;
 
 const STREAK_TYPES = [
   {
@@ -50,262 +46,68 @@ function getTodayKey() {
   return `${year}-${month}-${day}`;
 }
 
-function getDateKey(dateValue) {
-  if (!dateValue) return "";
-  const date = new Date(dateValue);
-  if (Number.isNaN(date.getTime())) return "";
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function isValidDateKey(value) {
-  return /^\d{4}-\d{2}-\d{2}$/.test(value);
-}
-
-function toDayNumber(dayKey) {
-  const [year, month, day] = dayKey.split("-").map(Number);
-  return Math.floor(Date.UTC(year, month - 1, day) / 86400000);
-}
-
-function createEmptyTracker() {
+function createDefaultStreakState() {
   return {
-    workout: {},
-    diet: {},
-    water: {},
-    habit: {},
+    workout: { activeStreak: 0, longestStreak: 0, doneToday: false },
+    diet: { activeStreak: 0, longestStreak: 0, doneToday: false },
+    water: { activeStreak: 0, longestStreak: 0, doneToday: false },
+    habit: { activeStreak: 0, longestStreak: 0, doneToday: false },
   };
 }
 
-function sanitizeTracker(rawTracker) {
-  const sanitized = createEmptyTracker();
-  if (!rawTracker || typeof rawTracker !== "object") return sanitized;
-
-  Object.keys(sanitized).forEach((typeKey) => {
-    const entries = rawTracker[typeKey];
-    if (!entries || typeof entries !== "object") return;
-
-    Object.entries(entries).forEach(([dateKey, isDone]) => {
-      if (isDone === true && isValidDateKey(dateKey)) {
-        sanitized[typeKey][dateKey] = true;
-      }
-    });
-  });
-
-  return sanitized;
-}
-
-function calculateStreaks(dateMap, todayKey) {
-  const dayNumbers = Object.keys(dateMap || {})
-    .filter((dateKey) => dateMap[dateKey] === true && isValidDateKey(dateKey))
-    .map(toDayNumber)
-    .filter((dayNumber) => Number.isFinite(dayNumber))
-    .sort((a, b) => a - b);
-
-  if (!dayNumbers.length) {
-    return { current: 0, longest: 0 };
-  }
-
-  let longest = 0;
-  let run = 0;
-  let previous = null;
-
-  dayNumbers.forEach((dayNumber) => {
-    if (previous !== null && dayNumber === previous + 1) {
-      run += 1;
-    } else {
-      run = 1;
-    }
-    longest = Math.max(longest, run);
-    previous = dayNumber;
-  });
-
-  const completedDays = new Set(dayNumbers);
-  let probe = toDayNumber(todayKey);
-  let current = 0;
-
-  while (completedDays.has(probe)) {
-    current += 1;
-    probe -= 1;
-  }
-
-  return { current, longest };
-}
-
-function getAdherenceStorageKey(userId) {
-  if (!userId) return null;
-  return `twofit.adherence.v${STORAGE_VERSION}.${userId}`;
-}
-
-function isSubmitted(status) {
-  return ["pending", "verified"].includes(String(status || "").toLowerCase());
-}
-
-export default function AdherenceStreaks({ user, program, className }) {
+export default function AdherenceStreaks({ user, className }) {
   const dispatch = useDispatch();
-  const tasks = useAppSelector((state) => state.tasks.tasks);
-  const waterIntakeByDay = useAppSelector((state) => state.tasks.waterIntakeByDay);
-  const habits = useAppSelector((state) => state.habit.habits);
-  const [tracker, setTracker] = useState(createEmptyTracker);
-  const [hasHydrated, setHasHydrated] = useState(false);
+  const [streakByType, setStreakByType] = useState(createDefaultStreakState);
 
   const userId = user?._id;
-  const storageKey = useMemo(() => getAdherenceStorageKey(userId), [userId]);
-  const currentGlobalDay = user?.currentGlobalDay || 1;
-  const waterIntakeMl = Number(waterIntakeByDay[currentGlobalDay] || 0);
 
   useEffect(() => {
     if (!userId) return;
-    dispatch(getUserTaskStatus());
-    dispatch(fetchWaterIntake(currentGlobalDay));
-    dispatch(getClientHabitsThunk(userId));
-  }, [currentGlobalDay, dispatch, userId]);
+    dispatch(fetchClientAdherenceStreaks(userId))
+      .unwrap()
+      .then((response) => {
+        const data = response || {};
+        const defaults = createDefaultStreakState();
 
-  useEffect(() => {
-    setHasHydrated(false);
-
-    if (!storageKey) {
-      setTracker(createEmptyTracker());
-      setHasHydrated(true);
-      return;
-    }
-
-    try {
-      const storedValue = localStorage.getItem(storageKey);
-      if (!storedValue) {
-        setTracker(createEmptyTracker());
-        return;
-      }
-
-      const parsed = JSON.parse(storedValue);
-      const records = parsed?.records ?? parsed;
-      setTracker(sanitizeTracker(records));
-    } catch (error) {
-      console.error("Failed to parse adherence tracker data:", error);
-      setTracker(createEmptyTracker());
-    } finally {
-      setHasHydrated(true);
-    }
-  }, [storageKey]);
-
-  useEffect(() => {
-    if (!storageKey || !hasHydrated) return;
-    localStorage.setItem(
-      storageKey,
-      JSON.stringify({
-        version: STORAGE_VERSION,
-        records: tracker,
-      }),
-    );
-  }, [hasHydrated, storageKey, tracker]);
-
-  const autoCompletionByType = useMemo(() => {
-    const currentGlobalDay = user?.currentGlobalDay || 1;
-
-    const planDays =
-      program?.plan?.weeks?.flatMap((week, weekIndex) =>
-        week.days.map((day, dayIndex) => ({
-          ...day,
-          globalIndex: weekIndex * 7 + dayIndex + 1,
-        })),
-      ) || [];
-
-    const currentPlanDay = planDays[currentGlobalDay - 1];
-    const workoutCount = currentPlanDay?.exercises?.length || 0;
-
-    const isWeightLoss = program?.title?.toLowerCase().includes("weight loss");
-    const defaultMealCount = isWeightLoss ? 5 : 6;
-    const mealCount = user?.dietPlanMealCount || defaultMealCount;
-
-    const workoutComplete =
-      workoutCount > 0 &&
-      Array.from({ length: workoutCount }).every((_, exerciseIndex) => {
-        const submission = tasks?.find(
-          (task) =>
-            task.globalDayIndex === currentGlobalDay &&
-            task.exerciseIndex === exerciseIndex &&
-            task.taskType === "Workout",
-        );
-        return isSubmitted(submission?.status);
+        setStreakByType({
+          workout: { ...defaults.workout, ...(data.workout || {}) },
+          diet: { ...defaults.diet, ...(data.diet || {}) },
+          water: { ...defaults.water, ...(data.water || {}) },
+          habit: { ...defaults.habit, ...(data.habit || {}) },
+        });
+      })
+      .catch((error) => {
+        console.error("Failed to fetch adherence streaks:", error);
       });
-
-    const dietComplete =
-      mealCount > 0 &&
-      Array.from({ length: mealCount }).every((_, mealIndex) => {
-        const submission = tasks?.find(
-          (task) =>
-            task.globalDayIndex === currentGlobalDay &&
-            task.exerciseIndex === 100 + mealIndex &&
-            task.taskType === "Meal",
-        );
-        return isSubmitted(submission?.status);
-      });
-
-    const habitList = habits?.habits || [];
-    const todayKey = getTodayKey();
-    const habitComplete =
-      habitList.length > 0 &&
-      habitList.every((habit) => {
-        const todayLog = habit?.logs?.find(
-          (log) => getDateKey(log?.date) === todayKey,
-        );
-        return todayLog?.status === "done";
-      });
-
-    return {
-      workout: workoutComplete,
-      diet: dietComplete,
-      water: waterIntakeMl >= WATER_GOAL_ML,
-      habit: habitComplete,
-    };
-  }, [habits?.habits, program?.plan?.weeks, program?.title, tasks, user, waterIntakeMl]);
-
-  useEffect(() => {
-    if (!hasHydrated) return;
-
-    const todayKey = getTodayKey();
-    setTracker((previous) => {
-      let hasChanges = false;
-      const next = { ...previous };
-
-      Object.entries(autoCompletionByType).forEach(([typeKey, isDone]) => {
-        const typeMap = previous[typeKey] || {};
-        const hasToday = Boolean(typeMap[todayKey]);
-
-        if (isDone && !hasToday) {
-          hasChanges = true;
-          next[typeKey] = { ...typeMap, [todayKey]: true };
-        }
-
-        if (!isDone && hasToday) {
-          hasChanges = true;
-          const updated = { ...typeMap };
-          delete updated[todayKey];
-          next[typeKey] = updated;
-        }
-      });
-
-      return hasChanges ? next : previous;
-    });
-  }, [autoCompletionByType, hasHydrated]);
+  }, [dispatch, userId]);
 
   const todayKey = getTodayKey();
 
-  const streakByType = useMemo(() => {
-    return STREAK_TYPES.reduce((acc, type) => {
-      const typeMap = tracker[type.key] || {};
-      const { current, longest } = calculateStreaks(typeMap, todayKey);
-
-      acc[type.key] = {
-        current,
-        longest,
-        doneToday: Boolean(typeMap[todayKey]),
-      };
-
-      return acc;
-    }, {});
-  }, [todayKey, tracker]);
+  const renderedStreakByType = useMemo(
+    () => ({
+      workout: {
+        current: Number(streakByType?.workout?.activeStreak || 0),
+        longest: Number(streakByType?.workout?.longestStreak || 0),
+        doneToday: Boolean(streakByType?.workout?.doneToday),
+      },
+      diet: {
+        current: Number(streakByType?.diet?.activeStreak || 0),
+        longest: Number(streakByType?.diet?.longestStreak || 0),
+        doneToday: Boolean(streakByType?.diet?.doneToday),
+      },
+      water: {
+        current: Number(streakByType?.water?.activeStreak || 0),
+        longest: Number(streakByType?.water?.longestStreak || 0),
+        doneToday: Boolean(streakByType?.water?.doneToday),
+      },
+      habit: {
+        current: Number(streakByType?.habit?.activeStreak || 0),
+        longest: Number(streakByType?.habit?.longestStreak || 0),
+        doneToday: Boolean(streakByType?.habit?.doneToday),
+      },
+    }),
+    [streakByType],
+  );
 
   return (
     <div className={cn("bg-white p-6 rounded-2xl shadow-sm", className)}>
@@ -315,7 +117,7 @@ export default function AdherenceStreaks({ user, program, className }) {
             Daily Adherence Streaks
           </h2>
           <p className="text-xs text-slate-500 mt-1">
-            Auto-updated from workout, diet, water, and habit completion.
+            Synced from backend streak calculations.
           </p>
         </div>
         <span className="text-[11px] font-bold text-slate-500">{todayKey}</span>
@@ -324,14 +126,17 @@ export default function AdherenceStreaks({ user, program, className }) {
       <div className="space-y-3">
         {STREAK_TYPES.map((type) => {
           const Icon = type.icon;
-          const stats = streakByType[type.key] || {
+          const stats = renderedStreakByType[type.key] || {
             current: 0,
             longest: 0,
             doneToday: false,
           };
 
           return (
-            <div key={type.key} className="border border-slate-100 rounded-xl p-3">
+            <div
+              key={type.key}
+              className="border border-slate-100 rounded-xl p-3"
+            >
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <div

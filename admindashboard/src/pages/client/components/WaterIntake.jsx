@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useAppSelector } from "@/redux/store/hooks";
+import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import {
   fetchWaterIntake,
   upsertWaterIntake,
@@ -24,11 +25,16 @@ const WaterIntake = () => {
 
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
+  const clientUser = useAppSelector(selectSelectedClient);
   const waterIntakeByDay = useAppSelector((state) => state.tasks.waterIntakeByDay);
 
   const waterGoalMl = 2000;
   const visualGlassMl = 250;
-  const currentGlobalDay = user?.currentGlobalDay || 1;
+  const currentGlobalDay = Math.max(
+    Number(clientUser?.currentGlobalDay) || 0,
+    Number(user?.currentGlobalDay) || 0,
+    1,
+  );
   const waterIntakeMl = Number(waterIntakeByDay[currentGlobalDay] || 0);
 
   const waterProgressPercent = useMemo(() => {
