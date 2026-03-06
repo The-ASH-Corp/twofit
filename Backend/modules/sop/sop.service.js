@@ -95,3 +95,13 @@ export const getSOPHistory = async (coachId, month, year) => {
 export const getSOPById = async (SOPId)=> {
   return await SOP.findById(SOPId)
 }
+
+export const getSOPByCoach = async(coachId)=>{
+  try {
+    const sops = await SOP.find({ coachId });
+    return sops;
+  } catch (error) {
+    throw new Error("Failed to fetch SOPs for coach");
+  }
+}
+
