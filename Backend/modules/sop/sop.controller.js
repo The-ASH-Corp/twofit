@@ -40,16 +40,16 @@ export const updateSOP = async (req, res) => {
 /* ===============================
    3️⃣ Deactivate SOP
 ================================= */
-export const deactivateSOP = async (req, res) => {
+export const deleteSOP = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const updated = await sopService.deactivateSOP(id);
+    const deleted = await sopService.deleteSOP(id);
 
     res.status(200).json({
       success: true,
       message: "SOP deactivated successfully",
-      data: updated,
+      data: deleted,
     });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
@@ -77,8 +77,9 @@ export const getTodaySOP = async (req, res) => {
 ================================= */
 export const completeSOP = async (req, res) => {
   try {
-    const { sopId } = req.params;
-    const coachId = req.user._id;
+    const { sopId, coachId } = req.params;
+
+    console.log(sopId, coachId)
 
     const result = await sopService.completeSOP(sopId, coachId);
 
@@ -88,6 +89,7 @@ export const completeSOP = async (req, res) => {
       data: result,
     });
   } catch (error) {
+    console.log(error)
     res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -120,6 +122,18 @@ export const getSOPById = async (req, res) => {
     res.status(200).json({
       success: true,
       data: sop,
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+}
+
+export const getSOPByCoach = async (req, res)=> {
+  try {
+    const SOPs = await sopService.getSOPByCoach(req.params.id)
+    res.status(200).json({
+      success: true,
+      data: SOPs,
     });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
