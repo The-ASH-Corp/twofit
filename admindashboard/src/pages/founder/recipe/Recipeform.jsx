@@ -1,13 +1,8 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
-  Bookmark,
-  Search,
-  Filter,
   Plus,
   X,
   ChefHat,
-  Flame,
-  Dumbbell,
 } from "lucide-react";
 
 const CATEGORY_OPTIONS = [
@@ -131,18 +126,29 @@ const emptyForm = {
   category: CATEGORY_OPTIONS[0],
   calories: "",
   protein: "",
+  image: "",
   ingredients: [""],
   steps: [""],
 };
 
 export default function RecipeForm() {
-  const [recipes, setRecipes] = useState(INITIAL_RECIPES);
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [searchText, setSearchText] = useState("");
-  const [showBookmarkedOnly, setShowBookmarkedOnly] = useState(false);
+  const [, setRecipes] = useState(INITIAL_RECIPES);
   const [formData, setFormData] = useState(emptyForm);
 
- 
+  const handleImageFileChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    const fileReader = new FileReader();
+    fileReader.onloadend = () => {
+      if (typeof fileReader.result === "string") {
+        handleFieldChange("image", fileReader.result);
+      }
+    };
+    fileReader.readAsDataURL(file);
+  };
 
   const handleFieldChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -205,6 +211,7 @@ export default function RecipeForm() {
       category: formData.category,
       calories: Number(formData.calories),
       protein: Number(formData.protein),
+      image: formData.image.trim(),
       ingredients: cleanedIngredients,
       steps: cleanedSteps,
       isBookmarked: false,
@@ -213,8 +220,6 @@ export default function RecipeForm() {
 
     setRecipes((prev) => [createdRecipe, ...prev]);
     setFormData(emptyForm);
-    setActiveCategory("All");
-    setSearchText("");
   };
 
   return (
@@ -320,6 +325,43 @@ export default function RecipeForm() {
                   />
                 </div>
               </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-1 block text-sm font-semibold text-slate-700">
+                    Image URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.image}
+                    onChange={(event) => handleFieldChange("image", event.target.value)}
+                    placeholder="https://example.com/recipe-image.jpg"
+                    className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-1 block text-sm font-semibold text-slate-700">
+                    Upload Image
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageFileChange}
+                    className="w-full rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-600 outline-none transition file:mr-3 file:rounded-lg file:border-0 file:bg-emerald-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-emerald-700 hover:file:bg-emerald-100"
+                  />
+                </div>
+              </div>
+
+              {formData.image ? (
+                <div className="overflow-hidden rounded-2xl border border-slate-200">
+                  <img
+                    src={formData.image}
+                    alt="Recipe preview"
+                    className="h-48 w-full object-cover"
+                  />
+                </div>
+              ) : null}
 
               <div>
                 <div className="mb-2 flex items-center justify-between">
