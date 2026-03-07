@@ -59,6 +59,12 @@ const userSchema = new mongoose.Schema(
 
     targetWeight: { type: Number, required: true },
 
+    height: { type: String },
+    workoutExperience: {
+      type: String,
+      enum: ["beginner", "intermediate", "expert"],
+    },
+
     medicalConditions: { type: Array, required: true },
 
     allergies: { type: Array, required: true },
