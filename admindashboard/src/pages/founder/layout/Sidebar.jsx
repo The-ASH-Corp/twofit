@@ -20,6 +20,7 @@ const menuItems = [
     ],
   },
   { label: "Therapy", icon: assets.therapy, path: "/founder/therapy" },
+  {label:"Recipe Library" ,icon:assets.therapy,path:"/founder/recipe"},
   { label: "Finance", icon: assets.finance, path: "/founder/finance" },
   {
     label: "Broadcast",
