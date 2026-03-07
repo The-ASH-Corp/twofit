@@ -11,11 +11,6 @@ const recipeSchema = new mongoose.Schema(
     steps: [{ type: String, trim: true }],
     isBookmarked: { type: Boolean, default: false },
     isSaved: { type: Boolean, default: true },
-    // createdBy: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Admin",
-    //   default: null,
-    // },
   },
   { timestamps: true },
 );
@@ -23,6 +18,6 @@ const recipeSchema = new mongoose.Schema(
 recipeSchema.index({ createdAt: -1 });
 recipeSchema.index({ name: "text", ingredients: "text", category: "text" });
 
-const Recipe = mongoose.models.Recipe || mongoose.model("Recipe", recipeSchema);
+const Recipe =  mongoose.model("Recipe", recipeSchema);
 
 export default Recipe;

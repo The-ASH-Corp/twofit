@@ -1,7 +1,7 @@
 import Recipe from "./recipe.model.js";
 
-export const createRecipe = async (payload) => {
-  return await Recipe.create(payload);
+export const createRecipe = async (data) => {
+  return await Recipe.create(data);
 };
 
 export const getRecipes = async ({

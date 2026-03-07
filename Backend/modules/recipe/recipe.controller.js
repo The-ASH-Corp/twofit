@@ -4,7 +4,7 @@ export const createRecipeController = async (req, res) => {
   try {
     const data = {
       ...req.body,
-      createdBy: req.user?._id || null,
+      
     };
 
     const recipe = await recipeService.createRecipe(data);
