@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { getSopById, todaySop } from "./sop.thunk";
+import { getSOPByCoach, getSopById, todaySop } from "./sop.thunk";
 
 
 const initialState = {
-  tasks: [],
+  tasks:[],
+  todayTasks: [],
   task: [],
   error: null,
   status: "idle",
@@ -25,7 +26,7 @@ const sopSlice = createSlice({
       })
       .addCase(todaySop.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.tasks = action.payload.data;
+        state.todayTasks = action.payload.data;
         state.error = null;
       })
       .addCase(todaySop.rejected, (state, action) => {
@@ -43,6 +44,20 @@ const sopSlice = createSlice({
         state.error = null;
       })
       .addCase(getSopById.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+
+      .addCase(getSOPByCoach.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(getSOPByCoach.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.tasks = action.payload.data;
+        state.error = null;
+      })
+      .addCase(getSOPByCoach.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       });

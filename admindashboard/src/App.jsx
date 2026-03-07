@@ -70,8 +70,10 @@ import AppLayout from "./pages/admin/layout/AppLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminChats from "./pages/admin/chats/Chats";
 import ExpertTasks from "./pages/admin/experts/sop/ExpertTasks";
+import ExpertTasksHistory from "./pages/admin/experts/sop/ExpertHistory";
 import AddExpertTask from "./pages/admin/experts/sop/TaskForm";
 import AddExpertEditTask from "./pages/admin/experts/sop/TaskEditForm";
+import AddExpertDeleteTask from "./pages/admin/experts/sop/TaskDeletePopUp";
 import AdminClientsTable from "./pages/admin/clients/ClientsTable";
 import AdminExpertTable from "./pages/admin/experts/ExpertTable";
 import AdminFinance from "./pages/admin/finance/FinanceTable";
@@ -269,10 +271,18 @@ function App() {
           <Route path="experts/delete/:id" element={<AdminExpertDelete />} />
           <Route path="experts/addexpert" element={<AdminAddExpert />} />
           <Route path="experts/tasks/:id" element={<ExpertTasks />} />
+          <Route
+            path="experts/tasks/history/:id"
+            element={<ExpertTasksHistory />}
+          />
           <Route path="experts/tasks/add/:id" element={<AddExpertTask />} />
           <Route
             path="experts/tasks/edit/:id"
             element={<AddExpertEditTask />}
+          />
+          <Route
+            path="experts/tasks/delete/:id"
+            element={<AddExpertDeleteTask />}
           />
           <Route
             path="experts/profile/:expertId"

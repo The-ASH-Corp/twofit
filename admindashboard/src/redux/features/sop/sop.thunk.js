@@ -37,7 +37,69 @@ export const getSopById = createAsyncThunk(
       return response;
     } catch (error) {
       return rejectWithValue(
+        error.response?.data?.message || "Failed to get task",
+      );
+    }
+  },
+);
+
+export const updateSOP = createAsyncThunk(
+  "sop/update",
+  async ({ SOPId, updatedData }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.patch(
+        `/sop/update/${SOPId}`,
+        updatedData,
+      );
+      return response;
+    } catch (error) {
+      console.log(error.response);
+      return rejectWithValue(
+        error.response?.data?.status || "Failed to update task",
+      );
+    }
+  },
+);
+
+export const deleteSOP = createAsyncThunk(
+  "sop/delete",
+  async ({ SOPId }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.delete(`/sop/delete/${SOPId}`);
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get task",
+      );
+    }
+  },
+);
+
+export const getSOPByCoach = createAsyncThunk(
+  "sop/getByCoach",
+  async ({ coachId }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/sop/getByCoach/${coachId}`);
+      return response;
+    } catch (error) {
+      return rejectWithValue(
         error.response?.data?.message || "Failed to get tasks",
+      );
+    }
+  },
+);
+
+export const completeSOP = createAsyncThunk(
+  "sop/completeSOP",
+  async ({ SOPId, coachId }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.patch(
+        `/sop/complete/${SOPId}/${coachId}`,
+      );
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to complete tasks",
       );
     }
   },

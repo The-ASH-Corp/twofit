@@ -1,7 +1,7 @@
 import BaseForm from "@/components/form/BaseForm";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { selectSopError, selectSopStatus, selectSopTask } from "@/redux/features/sop/sop.selector";
-import { createSop, getSopById } from "@/redux/features/sop/sop.thunk";
+import { createSop, getSopById, updateSOP } from "@/redux/features/sop/sop.thunk";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -59,23 +59,18 @@ const TaskEditForm = () => {
     timeSlot: task?.timeSlot,
   };
 
-  const user = useSelector(selectUser);
   const navigate = useNavigate();
 
   const handelSubmit = async (value) => {
     try {
-      const payload = {
-        ...value,
-        coachId: id,
-        adminId: user._id, // from auth state
-      };
+       await dispatch(
+        updateSOP({ SOPId: id, updatedData : value}),
+      ).unwrap();
 
-      const task = await dispatch(createSop(payload)).unwrap();
-      console.log(task);
-      toast.success("task created successfully");
+      toast.success("task updated successfully");
       navigate(-1);
     } catch (error) {
-      console.error("Failed to create task:", error);
+      toast.error("Failed to update task:", error);
     }
   };
 

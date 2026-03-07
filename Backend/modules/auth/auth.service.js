@@ -10,7 +10,10 @@ import { FounderModel } from "../../seeds/createAdmin.js";
 import { calculateExtraClientIncentive } from "../incentive/incentive.service.js";
 import { sendEmail } from "../../utils/email.js";
 import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
-import { createNotification } from "../notification/notification.service.js";
+import {
+  createNotification,
+  createNotificationFromEvent,
+} from "../notification/notification.service.js";
 
 export const adminCreateUser = async (userData) => {
  try {
@@ -77,23 +80,32 @@ export const adminCreateUser = async (userData) => {
 
      // Notify Coach
      await createNotification({
-       type: "generic",
+       type: "system_announcement",
        title: "New Client Assigned",
        message: `You have been assigned a new client: ${user.name}`,
-       recipientRole: "expert", // Could be trainer, dietician etc.
+       recipientRole: "coach", // Could be trainer, dietician etc.
        recipientId: coachId,
-       metadata: { userId: user._id }
+       category: "expert",
+       priority: "high",
+       metadata: { userId: user._id },
      });
    }
 
-   // Notify User Welcome
-   await createNotification({
-      type: "generic",
-      title: "Welcome to TwoFit",
-      message: "Your account has been created. Complete your profile setup.",
+   // Notify User: welcome + plan ready
+   await createNotificationFromEvent("welcome_message", {
       recipientRole: "user",
       recipientId: user._id,
-      metadata: { userId: user._id }
+      userName: user.name,
+      metadata: { userId: user._id },
+      dedupeKey: `welcome-message:${user._id}`,
+   });
+
+   await createNotificationFromEvent("plan_ready_message", {
+      recipientRole: "user",
+      recipientId: user._id,
+      userName: user.name,
+      metadata: { userId: user._id },
+      dedupeKey: `plan-ready:${user._id}`,
    });
 
 

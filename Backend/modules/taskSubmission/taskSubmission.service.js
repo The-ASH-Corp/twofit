@@ -312,25 +312,37 @@ const notifyExpertsAndAdmins = async (userId, submissionId, eventType, extraData
         const client = await User.findById(userId).select("name trainer dietition therapist");
 
         if (client) {
-            const expertsToNotify = [
-                client.trainer?.toString(),
-                client.dietition?.toString(),
-                client.therapist?.toString()
-            ].filter(id => id);
-
             const taskType = String(extraData.taskType || "task");
             const normalizedTaskType = taskType.toLowerCase();
             const status = String(extraData.status || "").toLowerCase();
             const clientName = client.name || "A client";
 
-            let type = "generic";
+            const allExperts = [
+                client.trainer?.toString(),
+                client.dietition?.toString(),
+                client.therapist?.toString()
+            ].filter(Boolean);
+
+            let expertsToNotify = allExperts;
+            if (normalizedTaskType === "meal") {
+                expertsToNotify = [client.dietition?.toString()].filter(Boolean);
+            } else if (normalizedTaskType === "workout") {
+                expertsToNotify = [client.trainer?.toString()].filter(Boolean);
+            } else if (normalizedTaskType === "therapy") {
+                expertsToNotify = [client.therapist?.toString()].filter(Boolean);
+            }
+
+            expertsToNotify = Array.from(new Set(expertsToNotify));
+
+            let type = "review_pending";
             let message = `${clientName} has a task update`;
 
             if (eventType === "new_task_submission") {
                 if (normalizedTaskType === "meal") {
-                    type = "pending_meal_reviews";
+                    type = "review_pending";
                     message = `${clientName} submitted a meal that is pending review`;
                 } else {
+                    type = "review_pending";
                     message = `${clientName} submitted a ${normalizedTaskType} task for review`;
                 }
             }
@@ -338,7 +350,9 @@ const notifyExpertsAndAdmins = async (userId, submissionId, eventType, extraData
             if (eventType === "task_updated") {
                 message = `${clientName}'s ${normalizedTaskType} task was ${status || "updated"}`;
                 if (status === "rejected") {
-                    type = "feedback_received";
+                    type = "risk_alert";
+                } else if (status === "verified") {
+                    type = "system_announcement";
                 }
             }
 
@@ -355,6 +369,8 @@ const notifyExpertsAndAdmins = async (userId, submissionId, eventType, extraData
                         message,
                         recipientRole: "coach",
                         recipientId: expertId,
+                        priority: type === "risk_alert" ? "critical" : "high",
+                        dedupeKey: `${eventType}:coach:${expertId}:${submissionId}:${normalizedTaskType}:${status}`,
                         metadata: {
                             eventType,
                             submissionId,
@@ -371,6 +387,8 @@ const notifyExpertsAndAdmins = async (userId, submissionId, eventType, extraData
                         type,
                         message,
                         recipientRole: role,
+                        priority: type === "risk_alert" ? "critical" : "high",
+                        dedupeKey: `${eventType}:${role}:${submissionId}:${normalizedTaskType}:${status}`,
                         metadata: {
                             eventType,
                             submissionId,
@@ -503,10 +521,13 @@ export const createTaskSubmission = async (submissionData) => {
 
     if (taskType === "Meal" && status === "skipped") {
         await safeCreateNotification({
-            type: "meal_skipped",
-            message: "You skipped a meal today",
+            type: "missed_meal_alert",
+            title: "Meal Missed",
+            message: "You skipped a meal today. Update meal adherence to stay consistent.",
             recipientRole: "user",
             recipientId: userId,
+            priority: "high",
+            dedupeKey: `meal-skipped:${userId}:${gIndex}:${eIndex}`,
             metadata: {
                 submissionId: userSubmission._id,
                 globalDayIndex: gIndex,
@@ -528,7 +549,8 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
         exerciseIndices,
         notes,
         file,
-        taskType
+        taskType,
+        effortRating,
     } = submissionData;
 
     const gIndex = Number(globalDayIndex);
@@ -537,6 +559,28 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
 
     if (!Array.isArray(exerciseIndices) || exerciseIndices.length === 0) {
         throw new Error("Exercise indices must be a non-empty array");
+    }
+
+    // Parse and validate effortRating
+    let parsedEffortRating = null;
+    if (effortRating) {
+        try {
+            parsedEffortRating = typeof effortRating === 'string' ? JSON.parse(effortRating) : effortRating;
+            
+            // Validate the structure
+            if (!parsedEffortRating.ratingNumber || !parsedEffortRating.ratingLabel) {
+                throw new Error("effortRating must include ratingNumber and ratingLabel");
+            }
+            
+            const ratingNum = Number(parsedEffortRating.ratingNumber);
+            if (!Number.isInteger(ratingNum) || ratingNum < 1 || ratingNum > 10) {
+                throw new Error("ratingNumber must be an integer between 1 and 10");
+            }
+            
+            parsedEffortRating.ratingNumber = ratingNum;
+        } catch (err) {
+            throw new Error(`Invalid effortRating: ${err.message}`);
+        }
     }
 
     let userSubmission = await TaskSubmission.findOne({ userId });
@@ -555,6 +599,7 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
                     status: "pending",
                     file,
                     notes,
+                    effortRating: parsedEffortRating,
                     updatedAt: Date.now()
                 }))
             }]
@@ -574,6 +619,7 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
                     status: "pending",
                     file,
                     notes,
+                    effortRating: parsedEffortRating,
                     updatedAt: Date.now()
                 }))
             });
@@ -591,6 +637,7 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
                     exercise.taskType = targetTaskType;
                     exercise.file = file || exercise.file;
                     exercise.notes = notes || exercise.notes;
+                    exercise.effortRating = parsedEffortRating;
                     exercise.adminComment = "";
                     exercise.updatedAt = Date.now();
                 } else {
@@ -600,6 +647,7 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
                         status: "pending",
                         file,
                         notes,
+                        effortRating: parsedEffortRating,
                         updatedAt: Date.now()
                     });
                 }
@@ -788,6 +836,7 @@ export const getAllUserTaskSubmissions = async (expertId, userRole, targetUserId
                 taskType: "$dailySubmissions.exercises.taskType",
                 file: "$dailySubmissions.exercises.file",
                 notes: "$dailySubmissions.exercises.notes",
+                effortRating: "$dailySubmissions.exercises.effortRating",
                 createdAt: "$dailySubmissions.exercises.createdAt",
                 adminComment: "$dailySubmissions.exercises.adminComment"
             }
@@ -874,6 +923,7 @@ export const getPendingTaskSubmissions = async (expertId, userRole) => {
                 taskType: "$dailySubmissions.exercises.taskType",
                 file: "$dailySubmissions.exercises.file",
                 notes: "$dailySubmissions.exercises.notes",
+                effortRating: "$dailySubmissions.exercises.effortRating",
                 createdAt: "$dailySubmissions.exercises.createdAt"
             }
         },
@@ -930,7 +980,7 @@ export const verifyTaskSubmission = async (submissionId) => {
     }
 
     let userMessage = "Your task was approved";
-    let userType = "generic";
+    let userType = "system_announcement";
 
     if (foundTaskType === "Meal") {
         userType = "meal_approved";
@@ -943,9 +993,11 @@ export const verifyTaskSubmission = async (submissionId) => {
 
     await safeCreateNotification({
         type: userType,
+        title: "Task Approved",
         message: userMessage,
         recipientRole: "user",
         recipientId: userSubmission.userId,
+        dedupeKey: `task-verified:${userSubmission._id}:${foundExerciseIndex}:${foundGlobalDayIndex}`,
         metadata: {
             submissionId: userSubmission._id,
             globalDayIndex: foundGlobalDayIndex,
@@ -1035,9 +1087,12 @@ export const rejectTaskSubmission = async (submissionId, comment) => {
 
     await safeCreateNotification({
         type: userType,
+        title: "Task Feedback",
         message: userMessage,
         recipientRole: "user",
         recipientId: userSubmission.userId,
+        priority: "high",
+        dedupeKey: `task-rejected:${userSubmission._id}:${foundExerciseIndex}:${foundGlobalDayIndex}`,
         metadata: {
             submissionId: userSubmission._id,
             globalDayIndex: foundGlobalDayIndex,

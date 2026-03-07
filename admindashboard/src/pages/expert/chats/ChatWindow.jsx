@@ -1,4 +1,4 @@
-import { Mic, Paperclip, Square, ChevronLeft } from "lucide-react";
+import { ArrowLeft, Mic, Paperclip, Square } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import chatShimmer from "../../../assets/ChatShimmer.json";
 import Lottie from "lottie-react";
@@ -204,62 +204,75 @@ const ChatWindow = ({
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-hidden">
+    <div className="w-full h-full min-h-0 flex flex-col bg-white rounded-2xl shadow-sm overflow-hidden">
       {client ? (
-        <div className="flex-1 flex flex-col h-full overflow-hidden">
+        <div className="flex-1 min-h-0 flex flex-col">
           {/* Chat Header */}
-          <div className="bg-white rounded-t-lg px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={onBack}
-                className="lg:hidden p-1.5 -ml-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
-                aria-label="Back to chat list"
-              >
-                <ChevronLeft size={24} />
-              </button>
-              <div className="w-12 h-12 rounded-full bg-[#E8B5AD] flex items-center justify-center text-white font-semibold">
+          <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+            <button
+              onClick={onBack}
+              className="lg:hidden p-2 -ml-2 text-[#66706D] hover:bg-[#EBF3F2] hover:text-[#0A4F48] rounded-xl transition-colors"
+              aria-label="Back to message list"
+            >
+              <ArrowLeft size={18} />
+            </button>
+
+            <div className="relative">
+              <div className="w-10 h-10 md:w-11 md:h-11 rounded-full bg-[#EBF3F2] flex items-center justify-center text-[#0A4F48] font-bold">
                 {client?.name?.split(" ")?.[0]?.[0]}
+                {client?.name?.split(" ")?.[1]?.[0]}
               </div>
-              <div>
-                <h1 className="text-[#0A4F48] font-semibold">{client.name}</h1>
-                <p className="text-sm">{client?.role}</p>
-              </div>
+              {isClientOnline && (
+                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
+              )}
             </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 text-xs text-gray-600">
-                <div
+
+            <div className="flex-1 min-w-0">
+              <h1 className="text-[#0A4F48] font-bold truncate">{client.name}</h1>
+              <p className="text-xs text-[#66706D] capitalize truncate">
+                {client?.role}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs text-gray-600 shrink-0">
+              <span
+                className={`inline-flex items-center gap-1 px-2 py-1 rounded-full bg-[#F0F4F8] ${
+                  isClientOnline ? "text-green-700" : "text-gray-600"
+                }`}
+              >
+                <span
                   className={`w-2 h-2 rounded-full ${
                     isClientOnline ? "bg-green-500" : "bg-gray-400"
                   }`}
-                ></div>
-                <span>{isClientOnline ? "Online" : "Offline"}</span>
-              </div>
+                />
+                {isClientOnline ? "Online" : "Offline"}
+              </span>
             </div>
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 border-20 border-white rounded-b-lg">
+          <div className="flex-1 min-h-0 overflow-y-auto p-4 md:p-6 space-y-4 bg-[#F0F4F8]">
             {messages.map((msg, index) => {
               const isMe = msg.sender === user?._id;
+              const messageType = getMessageType(msg);
+              const hasMedia = messageType !== "text";
+              const timestamp = msg?.time ? new Date(msg.time) : null;
 
               return (
                 <div
                   key={`${msg.time || index}-${index}`}
                   className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                 >
-                  {!isMe && (
-                    <div className="w-10 h-10 rounded-full bg-[#D4A5A0] flex items-center justify-center text-white text-sm font-semibold shrink-0">
-                      {client?.name?.split(" ")?.[0]?.[0]}
-                      {client?.name?.split(" ")?.[1]?.[0]}
-                    </div>
-                  )}
-
-                  <div className={`max-w-md ${!isMe ? "ml-3" : ""}`}>
+                  <div className="max-w-[82%] md:max-w-[70%]">
                     <div
-                      className={`px-4 py-3 rounded-2xl text-sm shadow-sm ${
-                        isMe
-                          ? "bg-[#E8F5E9] text-gray-800"
-                          : "bg-white text-gray-800"
+                      className={`px-4 py-3 rounded-2xl text-sm shadow-sm wrap-break-word ${
+                        hasMedia
+                          ? isMe
+                            ? "bg-white text-gray-800 border border-[#0A4F48]/10"
+                            : "bg-white text-gray-800"
+                          : isMe
+                            ? "bg-[#0A4F48] text-white"
+                            : "bg-white text-gray-800"
                       }`}
                     >
                       {renderMessageBody(msg)}
@@ -270,11 +283,13 @@ const ChatWindow = ({
                         isMe ? "text-right" : "text-left"
                       }`}
                     >
-                      {new Date(msg.time).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: true,
-                      })}
+                      {timestamp
+                        ? timestamp.toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: true,
+                          })
+                        : ""}
                     </div>
                   </div>
                 </div>
@@ -283,7 +298,7 @@ const ChatWindow = ({
           </div>
 
           {/* Message Input */}
-          <div className="bg-white rounded-b-lg px-6 py-4">
+          <div className="bg-white px-4 md:px-6 py-3 pb-14 lg:pb-4 border-t border-gray-100">
             <input
               ref={fileInputRef}
               type="file"
@@ -300,10 +315,10 @@ const ChatWindow = ({
               </p>
             )}
 
-            <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-2">
+            <div className="flex items-center gap-2 md:gap-3 bg-[#F0F4F8] rounded-xl p-2">
               <button
                 type="button"
-                className="text-gray-400 hover:text-gray-600 transition"
+                className="text-gray-500 hover:text-[#0A4F48] transition"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploadingMedia || isRecording}
               >
@@ -311,7 +326,7 @@ const ChatWindow = ({
               </button>
               <input
                 type="text"
-                placeholder="Type something..."
+                placeholder="Type something.."
                 value={message}
                 className="flex-1 bg-transparent text-sm text-gray-800 outline-none placeholder-gray-400"
                 onChange={(e) => setMessage(e.target.value)}
@@ -331,19 +346,29 @@ const ChatWindow = ({
                 className={`transition ${
                   isRecording
                     ? "text-red-600 hover:text-red-700"
-                    : "text-gray-400 hover:text-gray-600"
+                    : "text-gray-500 hover:text-[#0A4F48]"
                 }`}
                 onClick={toggleRecording}
                 disabled={isUploadingMedia}
               >
-                {isRecording ? <Square size={20} /> : <Mic size={20} />}
+                {isRecording ? (
+                  <Square
+                    size={20}
+                    className="text-white bg-red-600 rounded-full p-1 w-7 h-7"
+                  />
+                ) : (
+                  <Mic
+                    size={20}
+                    className="text-white bg-[#0A4F48] rounded-full p-1 w-7 h-7"
+                  />
+                )}
               </button>
               <button
                 type="submit"
                 disabled={!message.trim() || isUploadingMedia || isRecording}
-                className={`bg-[#2D7A6D] text-white px-5 py-2 rounded-lg font-medium transition ${
+                className={`bg-[#0A4F48] text-white px-4 md:px-5 py-2 rounded-xl font-semibold transition text-sm ${
                   message.trim() && !isUploadingMedia && !isRecording
-                    ? "hover:bg-[#1f5a4f]"
+                    ? "hover:bg-[#0D6159]"
                     : "opacity-50 cursor-not-allowed"
                 }`}
                 onClick={() => messageHandlers()}
@@ -354,14 +379,18 @@ const ChatWindow = ({
           </div>
         </div>
       ) : (
-        <p className="flex items-center justify-center w-full h-full">
+        <div className="flex items-center justify-center w-full h-full bg-white">
+          <div className="w-full max-w-xl">
           <Lottie
             animationData={chatShimmer}
             loop
-            style={{ width: 600, height: 600 }}
             autoPlay
           />
-        </p>
+            <p className="text-center text-sm text-[#66706D] -mt-6">
+              Select a chat to start messaging.
+            </p>
+          </div>
+        </div>
       )}
     </div>
   );
