@@ -65,15 +65,16 @@ export const getTodaySOP = async (coachId) => {
 
 //  5️⃣ Complete SOP Task (Coach)
 
-export const completeSOP = async (sopId, coachId) => {
+export const completeSOP = async (sopId, coachId, completed) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  // console.log(completed)
 
   return await SOPLog.findOneAndUpdate(
     { sopId, coachId, date: today },
     {
-      completed: true,
-      completedAt: new Date(),
+      completed,
+      completedAt: completed ? new Date() : null,
     },
     { new: true },
   );
@@ -104,4 +105,37 @@ export const getSOPByCoach = async(coachId)=>{
     throw new Error("Failed to fetch SOPs for coach");
   }
 }
+
+export const getSOPStats = async (coachId, month, year) => {
+  const startDate = new Date(year, month - 1, 1);
+  const endDate = new Date(year, month, 1);
+
+ const stats = await SOPLog.aggregate([
+   {
+     $match: {
+       coachId: new mongoose.Types.ObjectId(coachId),
+       date: { $gte: startDate, $lt: endDate },
+     },
+   },
+   {
+     $group: {
+       _id: "$date",
+       total: { $sum: 1 },
+       completed: {
+         $sum: { $cond: ["$completed", 1, 0] },
+       },
+     },
+   },
+   {
+     $addFields: {
+       pending: { $subtract: ["$total", "$completed"] },
+     },
+   },
+   {
+     $sort: { _id: 1 },
+   },
+ ]);
+
+  return stats;
+};
 

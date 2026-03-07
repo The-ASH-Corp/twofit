@@ -50,6 +50,8 @@ export const adminCreateUser = async (userData) => {
      goals: userData.fitnessGoal,
      foodPreferences: userData.foodPreference,
      profileImage: userData?.profileImage || "",
+     height: userData.height || "",
+     workoutExperience: userData.workoutExperience || "beginner",
      programType: userData.programType,
      therapyType: userData.therapyType || null,
      duration: userData.duration,

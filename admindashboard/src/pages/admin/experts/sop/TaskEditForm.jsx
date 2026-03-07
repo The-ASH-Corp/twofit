@@ -1,7 +1,6 @@
 import BaseForm from "@/components/form/BaseForm";
-import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { selectSopError, selectSopStatus, selectSopTask } from "@/redux/features/sop/sop.selector";
-import { createSop, getSopById, updateSOP } from "@/redux/features/sop/sop.thunk";
+import {  getSopById, updateSOP } from "@/redux/features/sop/sop.thunk";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -83,7 +82,7 @@ const TaskEditForm = () => {
    if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div>
+    <div className="h-[calc(100vh-180px)]">
       <BaseForm
         fields={fields}
         initialValues={initialValues}
