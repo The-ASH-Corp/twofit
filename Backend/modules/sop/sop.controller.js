@@ -79,9 +79,13 @@ export const completeSOP = async (req, res) => {
   try {
     const { sopId, coachId } = req.params;
 
-    console.log(sopId, coachId)
+    const result = await sopService.completeSOP(
+      sopId,
+      coachId,
+      req.body.completed,
+    );
 
-    const result = await sopService.completeSOP(sopId, coachId);
+    console.log(result);
 
     res.status(200).json({
       success: true,
@@ -89,7 +93,7 @@ export const completeSOP = async (req, res) => {
       data: result,
     });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -115,10 +119,10 @@ export const getSOPHistory = async (req, res) => {
     res.status(400).json({ success: false, message: error.message });
   }
 };
- 
+
 export const getSOPById = async (req, res) => {
   try {
-    const sop = await sopService.getSOPById(req.params.id)
+    const sop = await sopService.getSOPById(req.params.id);
     res.status(200).json({
       success: true,
       data: sop,
@@ -126,11 +130,11 @@ export const getSOPById = async (req, res) => {
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
-}
+};
 
-export const getSOPByCoach = async (req, res)=> {
+export const getSOPByCoach = async (req, res) => {
   try {
-    const SOPs = await sopService.getSOPByCoach(req.params.id)
+    const SOPs = await sopService.getSOPByCoach(req.params.id);
     res.status(200).json({
       success: true,
       data: SOPs,
@@ -138,4 +142,23 @@ export const getSOPByCoach = async (req, res)=> {
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
-}
+};
+
+export const getSOPStats = async (req, res) => {
+  try {
+    const { coachId, month, year } = req.params;
+
+    const stats = await sopService.getSOPStats(
+      coachId,
+      parseInt(month),
+      parseInt(year),
+    );
+
+    res.status(200).json({
+      success: true,
+      data: stats,
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};

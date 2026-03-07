@@ -11,6 +11,7 @@ router.get("/today/:id", sopController.getTodaySOP);
 router.patch("/complete/:sopId/:coachId", sopController.completeSOP);
 
 router.get("/history/:coachId/:month/:year", sopController.getSOPHistory);
+router.get("/stats/:coachId/:month/:year", sopController.getSOPStats);
 
 router.get("/get/:id", sopController.getSOPById)
 router.get("/getByCoach/:id", sopController.getSOPByCoach);

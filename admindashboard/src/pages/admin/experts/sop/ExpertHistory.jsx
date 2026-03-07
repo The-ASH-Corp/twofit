@@ -1,94 +1,295 @@
-import { selectSopError, selectSopStatus, selectSopTodayTasks } from '@/redux/features/sop/sop.selector';
-import { todaySop } from '@/redux/features/sop/sop.thunk';
-import React, { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
-import { SyncLoader } from 'react-spinners';
+import KpiCard from "@/components/cards/KpiCard";
+import {
+  selectSopError,
+  selectSopHistory,
+  selectSopStats,
+  selectSopStatus,
+  selectSopTodayTasks,
+} from "@/redux/features/sop/sop.selector";
+import { todaySop, getSOPStats, getSOPHistory } from "@/redux/features/sop/sop.thunk";
+import { ClipboardCheck, ClipboardList, SquarePercent } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { SyncLoader } from "react-spinners";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
 
 const ExpertHistory = () => {
-    const { id } = useParams();
-    const dispatch = useDispatch();
+  const { id } = useParams();
+  const dispatch = useDispatch();
 
-    useEffect(() => {
-          dispatch(todaySop({ coachId: id }));
-        }, [dispatch, id]);
+  const todayTasks = useSelector(selectSopTodayTasks);
+  const status = useSelector(selectSopStatus);
+  const error = useSelector(selectSopError);
+  const stats = useSelector(selectSopStats);
+  const history = useSelector(selectSopHistory);
 
-        const tasks = useSelector(selectSopTodayTasks);
-        const status = useSelector(selectSopStatus);
-        const error = useSelector(selectSopError);
+  console.log(stats)
 
-    const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const today = new Date();
+  const currentMonth = today.getMonth() + 1;
+  const currentYear = today.getFullYear();
+  const [month, setMonth] = useState(currentMonth);
+  const [year, setYear] = useState(currentYear);
 
-    if (status === "loading")
-      return (
-        <div className="flex justify-center items-center h-[calc(100vh-120px)]">
-          <SyncLoader color="#0A4F48" loading margin={2} size={20} />
-        </div>
-      );
-    if (error) return <p className="text-red-500">{error}</p>;
+  useEffect(() => {
+    dispatch(todaySop({ coachId: id }));
+    dispatch(
+      getSOPStats({
+        coachId: id,
+        month: currentMonth,
+        year: currentYear,
+      }),
+    );
+
+  }, [dispatch, id, currentMonth, currentYear]);
+
+  useEffect(() => {
+    dispatch(getSOPHistory({ coachId: id, month, year }));
+  }, [dispatch, id, month, year]);
+
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#0A4F48" />
+      </div>
+    );
+  if (error) return <p className="text-red-500">{error}</p>;
+
+  const completedToday = todayTasks.filter((t) => t.completed).length;
+  const totalToday = todayTasks.length;
+
+  const percentage = totalToday
+    ? Math.round((completedToday / totalToday) * 100)
+    : 0;
+    const monthName = new Date(currentYear, currentMonth - 1).toLocaleString(
+      "default",
+      { month: "long" },
+    );
+
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="flex justify-between w-full items-start flex-col md:flex-row py-4">
-        <div className="flex flex-col">
-          <h1 className="text-3xl font-bold mb-2">Daily Duties History</h1>
-          <p>
-            Date: <strong>{date}</strong>
-          </p>
-          <div className="flex items-start gap-2">
-            <label className="text-gray-600 mb-6 ">Select Date:</label>
-            <input
-              type="date"
-              className="border border-black rounded-lg px-1 py-0.5 text-sm"
+    <div className="p-2 pt-4 md:p-4 mx-auto space-y-8 bg-white rounded-2xl">
+      {/* Header */}
+      <div>
+        <h1 className="text-3xl font-bold">Expert Task overview</h1>
+        <p className="text-gray-500">Daily duty performance overview</p>
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3  gap-4">
+        <KpiCard
+          title="Today's Tasks"
+          value={totalToday}
+          icon={
+            <ClipboardList size={20} className="text-[#ffffff] md:w-6 md:h-6" />
+          }
+          bg="#0A4F48"
+        />
+        <KpiCard
+          title="Completed"
+          value={completedToday}
+          icon={
+            <ClipboardCheck
+              size={20}
+              className="text-[#ffffff] md:w-6 md:h-6"
             />
-            <label>TO</label>
-            <input
-              type="date"
-              className="border border-black rounded-lg px-1 py-0.5 text-sm"
-            />
+          }
+          bg="#0A4F48"
+        />
+        <KpiCard
+          title="Completion Rate"
+          value={`${percentage}%`}
+          icon={
+            <SquarePercent size={20} className="text-[#ffffff] md:w-6 md:h-6" />
+          }
+          bg="#0A4F48"
+        />
+      </div>
+
+      <div className="flex flex-col md:flex-row items-start justify-between w-full gap-4">
+        {/* Today Tasks */}
+        <div className="bg-white p-6 shadow rounded-lg w-full md:w-[50%]">
+          <h2 className="text-lg font-semibold mb-4">Today Task Status</h2>
+
+          <div className="space-y-4">
+            {todayTasks.map((task) => (
+              <div
+                key={task.sopId}
+                className="flex justify-between border-b pb-3"
+              >
+                <div>
+                  <p className="font-medium">{task.title}</p>
+                  <p className="text-sm text-gray-500">{task.timeSlot}</p>
+                </div>
+
+                <div>
+                  <span
+                    className={`px-2 py-1 rounded-xl text-sm ${
+                      task.completed
+                        ? "bg-green-100 text-green-700"
+                        : "bg-gray-100 text-gray-600"
+                    }`}
+                  >
+                    {task.completed ? "Completed" : "Pending"}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Graph */}
+        <div className="flex flex-col lg:flex-row items-stretch gap-4 w-full md:w-1/2">
+          <div className="bg-white p-4 sm:p-6 shadow rounded-lg w-full">
+            <h2 className="text-base sm:text-lg font-semibold mb-4">
+              Task Completion for {monthName} {currentYear}
+            </h2>
+
+            <div className="w-full h-[250px] sm:h-[300px]">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={stats}>
+                  <XAxis
+                    dataKey="_id"
+                    tickFormatter={(date) => new Date(date).getDate()}
+                    width={30}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis width={30} tick={{ fontSize: 12 }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#ffffff",
+                      borderRadius: "8px",
+                      border: "1px solid #eee",
+                    }}
+                    formatter={(value, name) => [
+                      value,
+                      name === "completed"
+                        ? "Completed Tasks"
+                        : "Pending Tasks",
+                    ]}
+                    labelFormatter={(label) =>
+                      `Date: ${new Date(label).toLocaleDateString()}`
+                    }
+                  />
+                  <Legend />
+
+                  <Bar dataKey="completed" stackId="a" fill="#0A4F48" />
+                  <Bar dataKey="pending" stackId="a" fill="#F4DBC7" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
       </div>
 
-      {tasks.map((task, i) => (
-        <div
-          key={i}
-          className=" mb-8 bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
-        >
-          <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-green-100 ">
-            <h2 className="font-semibold text-lg text-[#0A4F48]">
-              {task?.timeSlot}
-            </h2>
+      <div className="flex flex-col p-4 rounded-2xl shadow gap-4">
+        <div className="flex justify-between md:items-center gap-4 md:flex-row flex-col">
+          <div>
+            <h1 className="text-3xl font-bold">Task History</h1>
+            <p className="text-gray-500">Monthly task completion status</p>
           </div>
-          <div className="px-1 py-4 space-y-6">
-            <div
-              key={task?.taskId}
-              className="border-b border-gray-100 pb-4 last:border-0 last:pb-0"
+
+          {/* Month Selector */}
+          <div className="flex gap-3">
+            <select
+              value={month}
+              onChange={(e) => setMonth(Number(e.target.value))}
+              className="border rounded px-3 py-2"
             >
-              <div className="flex items-start">
-                <div className="ml-3 flex-1">
-                  <div className="flex justify-between">
-                    <label
-                      className={`font-medium text-gray-900 ${task?.status === "Completed" ? "line-through text-gray-400" : ""}`}
-                    >
-                      {task?.title}
-                    </label>
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full border ${task?.completed ? "bg-green-100 text-green-800 border-green-200" : "bg-gray-50 text-gray-600 border-gray-200"}`}
-                    >
-                      {task?.completed ? "completed" : "pending"}
-                    </span>
-                  </div>
-                  <p className="text-gray-500 text-sm mt-1 mb-2">
-                    {task?.description}
-                  </p>
-                </div>
-              </div>
-            </div>
+              {[
+                "Jan",
+                "Feb",
+                "Mar",
+                "Apr",
+                "May",
+                "Jun",
+                "Jul",
+                "Aug",
+                "Sep",
+                "Oct",
+                "Nov",
+                "Dec",
+              ].map((m, i) => (
+                <option key={i} value={i + 1}>
+                  {m}
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="number"
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value))}
+              className="border rounded px-3 py-2 w-24"
+            />
           </div>
         </div>
-      ))}
+
+        {/* Table */}
+        <div className="bg-white shadow rounded-lg overflow-x-auto">
+          <table className="min-w-[600px] w-full text-left">
+            <thead className="bg-green-100">
+              <tr>
+                <th className="p-3 text-sm font-semibold">Date</th>
+                <th className="p-3 text-sm font-semibold">Task</th>
+                <th className="p-3 text-sm font-semibold">Time Slot</th>
+                <th className="p-3 text-sm font-semibold text-center">
+                  Status
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {history.length === 0 ? (
+                <tr>
+                  <td colSpan="4" className="text-center p-6 text-gray-500">
+                    No history found
+                  </td>
+                </tr>
+              ) : (
+                history.map((log) => (
+                  <tr
+                    key={log._id}
+                    className="border-b hover:bg-gray-50 transition"
+                  >
+                    <td className="p-3 text-sm whitespace-nowrap">
+                      {new Date(log.date).toLocaleDateString()}
+                    </td>
+
+                    <td className="p-3 text-sm font-medium">
+                      {log.sopId?.title}
+                    </td>
+
+                    <td className="p-3 text-sm">{log.sopId?.timeSlot}</td>
+
+                    <td className="p-3 text-center">
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          log.completed
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-600"
+                        }`}
+                      >
+                        {log.completed ? "Completed" : "Not Completed"}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
-}
+};
 
-export default ExpertHistory
+export default ExpertHistory;
