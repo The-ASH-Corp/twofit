@@ -91,15 +91,48 @@ export const getSOPByCoach = createAsyncThunk(
 
 export const completeSOP = createAsyncThunk(
   "sop/completeSOP",
-  async ({ SOPId, coachId }, { rejectWithValue }) => {
+  async ({ SOPId, coachId, completed }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.patch(
         `/sop/complete/${SOPId}/${coachId}`,
+        { completed },
       );
       return response;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to complete tasks",
+      );
+    }
+  },
+);
+
+export const getSOPStats = createAsyncThunk(
+  "sop/stats",
+  async ({ coachId, month, year }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/sop/stats/${coachId}/${month}/${year}`,
+      );
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get stats",
+      );
+    }
+  },
+);
+
+export const getSOPHistory = createAsyncThunk(
+  "sop/history",
+  async ({ coachId, month, year }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/sop/history/${coachId}/${month}/${year}`,
+      );
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch history",
       );
     }
   },
