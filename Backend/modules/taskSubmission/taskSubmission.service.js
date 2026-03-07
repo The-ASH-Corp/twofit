@@ -130,40 +130,74 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
     const isWeightLoss = programTitle.toLowerCase().includes("weight loss");
     const mealCount = isWeightLoss ? 5 : 6;
 
-    // Total exercises = workout exercises from plan + mealCount static meal tasks
-    // NOTE: This assumes meal tasks are static and defined by program type
-    const totalExercises = currentDayConfig.exercises.length + mealCount;
+    // Total exercises = workout exercises from plan
+    const expectedWorkoutCount = currentDayConfig.exercises.length;
 
-    // Count total VERIFIED/SKIPPED exercises for this userId and globalDayIndex
+    // Expected Therapy Count if user has therapy assigned
+    let expectedTherapyCount = 0;
+    if (user.therapyType && user.therapyType.weeks) {
+        let dayCounterT = 0;
+        let therapyDayConfig = null;
+        for (const week of user.therapyType.weeks) {
+            for (const day of week.days) {
+                dayCounterT++;
+                if (dayCounterT === Number(globalDayIndex)) {
+                    therapyDayConfig = day;
+                    break;
+                }
+            }
+            if (therapyDayConfig) break;
+        }
+        if (therapyDayConfig && Array.isArray(therapyDayConfig.therapies)) {
+            expectedTherapyCount = therapyDayConfig.therapies.length;
+        }
+    }
+
     const userSubmission = await TaskSubmission.findOne({ userId });
     if (!userSubmission) return false;
 
     const daySubmission = userSubmission.dailySubmissions.find(d => d.globalDayIndex === Number(globalDayIndex));
     if (!daySubmission) return false;
 
-    // Filter for verified OR skipped
-    // Filter for eligible exercises
-    const completedTasks = daySubmission.exercises.filter(ex => {
-        if (ex.taskType === "Workout") {
-            // Workouts: Verify, Pending. (Skipped/Rejected not allowed to count)
-            return ex.status === "verified" || ex.status === "pending";
+    // Check Workouts
+    let workoutComplete = true;
+    if (expectedWorkoutCount > 0) {
+        let completedWorkouts = 0;
+        for (let i = 0; i < expectedWorkoutCount; i++) {
+            const submission = daySubmission.exercises.find(
+                ex => ex.taskType === "Workout" && Number(ex.exerciseIndex) === i
+            );
+            if (submission && (submission.status === "verified" || submission.status === "pending")) {
+                completedWorkouts++;
+            }
         }
-        // Others: Verify, Pending, Skipped, Rejected all count towards "completion" of the list check
-        return ["verified", "pending", "skipped", "rejected"].includes(ex.status);
-    });
+        if (completedWorkouts < expectedWorkoutCount) {
+            workoutComplete = false;
+        }
+    }
 
-    const completedCount = completedTasks.length;
+    // Check Therapy
+    let therapyComplete = true;
+    if (expectedTherapyCount > 0) {
+        let completedTherapies = 0;
+        for (let i = 0; i < expectedTherapyCount; i++) {
+            const submission = daySubmission.exercises.find(
+                ex => ex.taskType === "Therapy" && Number(ex.exerciseIndex) === i
+            );
+            if (submission && (submission.status === "verified" || submission.status === "pending")) {
+                completedTherapies++;
+            }
+        }
+        if (completedTherapies < expectedTherapyCount) {
+            therapyComplete = false;
+        }
+    }
 
-    // ADDITIONAL CHECK: Workouts CANNOT be skipped.
-    // Ensure all workout tasks are strictly "verified" (not skipped).
-
-    const hasSkippedWorkout = completedTasks.some(ex => ex.taskType === "Workout" && ex.status === "skipped");
-    if (hasSkippedWorkout) return false; // Strict rule: Workouts cannot be skipped.
     const hasRejectedWorkoutHistory = daySubmission.exercises.some(
         ex => ex.taskType === "Workout" && ex.wasRejectedOnce === true
     );
 
-    if (completedCount >= totalExercises) {
+    if (workoutComplete && therapyComplete) {
         if (user.currentGlobalDay === Number(globalDayIndex)) {
             // Check if we already have a completion time for this day? 
             if (!user.lastDayCompletionTime) {
@@ -549,7 +583,8 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
         exerciseIndices,
         notes,
         file,
-        taskType
+        taskType,
+        effortRating,
     } = submissionData;
 
     const gIndex = Number(globalDayIndex);
@@ -558,6 +593,28 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
 
     if (!Array.isArray(exerciseIndices) || exerciseIndices.length === 0) {
         throw new Error("Exercise indices must be a non-empty array");
+    }
+
+    // Parse and validate effortRating
+    let parsedEffortRating = null;
+    if (effortRating) {
+        try {
+            parsedEffortRating = typeof effortRating === 'string' ? JSON.parse(effortRating) : effortRating;
+            
+            // Validate the structure
+            if (!parsedEffortRating.ratingNumber || !parsedEffortRating.ratingLabel) {
+                throw new Error("effortRating must include ratingNumber and ratingLabel");
+            }
+            
+            const ratingNum = Number(parsedEffortRating.ratingNumber);
+            if (!Number.isInteger(ratingNum) || ratingNum < 1 || ratingNum > 10) {
+                throw new Error("ratingNumber must be an integer between 1 and 10");
+            }
+            
+            parsedEffortRating.ratingNumber = ratingNum;
+        } catch (err) {
+            throw new Error(`Invalid effortRating: ${err.message}`);
+        }
     }
 
     let userSubmission = await TaskSubmission.findOne({ userId });
@@ -576,6 +633,7 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
                     status: "pending",
                     file,
                     notes,
+                    effortRating: parsedEffortRating,
                     updatedAt: Date.now()
                 }))
             }]
@@ -595,6 +653,7 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
                     status: "pending",
                     file,
                     notes,
+                    effortRating: parsedEffortRating,
                     updatedAt: Date.now()
                 }))
             });
@@ -612,6 +671,7 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
                     exercise.taskType = targetTaskType;
                     exercise.file = file || exercise.file;
                     exercise.notes = notes || exercise.notes;
+                    exercise.effortRating = parsedEffortRating;
                     exercise.adminComment = "";
                     exercise.updatedAt = Date.now();
                 } else {
@@ -621,6 +681,7 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
                         status: "pending",
                         file,
                         notes,
+                        effortRating: parsedEffortRating,
                         updatedAt: Date.now()
                     });
                 }
@@ -809,6 +870,7 @@ export const getAllUserTaskSubmissions = async (expertId, userRole, targetUserId
                 taskType: "$dailySubmissions.exercises.taskType",
                 file: "$dailySubmissions.exercises.file",
                 notes: "$dailySubmissions.exercises.notes",
+                effortRating: "$dailySubmissions.exercises.effortRating",
                 createdAt: "$dailySubmissions.exercises.createdAt",
                 adminComment: "$dailySubmissions.exercises.adminComment"
             }
@@ -895,6 +957,7 @@ export const getPendingTaskSubmissions = async (expertId, userRole) => {
                 taskType: "$dailySubmissions.exercises.taskType",
                 file: "$dailySubmissions.exercises.file",
                 notes: "$dailySubmissions.exercises.notes",
+                effortRating: "$dailySubmissions.exercises.effortRating",
                 createdAt: "$dailySubmissions.exercises.createdAt"
             }
         },
