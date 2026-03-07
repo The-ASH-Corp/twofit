@@ -18,6 +18,7 @@ import taskReducer from "../features/tasks/task.slice";
 import habitReducer from "../features/habit/habit.slice"
 import broadcastReducer from "../features/broadcast/broadcast.slice";
 import sopReducer from "../features/sop/sop.slice"
+import recipeReducer from "../features/recipe/recipe.slice"
 
 export default combineReducers({
   auth: authReducer,
@@ -37,4 +38,5 @@ export default combineReducers({
   habit: habitReducer,
   broadcast: broadcastReducer,
   sop: sopReducer,
+  recipe:recipeReducer
 });

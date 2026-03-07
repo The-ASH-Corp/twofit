@@ -1,0 +1,97 @@
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  createRecipeThunk,
+  getRecipesThunk,
+  getRecipeByIdThunk,
+  updateRecipeThunk,
+  deleteRecipeThunk,
+  toggleRecipeBookmarkThunk,
+} from "./recipe.thunk";
+
+const initialState = {
+  recipes: [],
+  recipeDetails: null,
+  total: 0,
+  page: 1,
+  totalPages: 1,
+  loading: false,
+  error: null,
+};
+
+const recipeSlice = createSlice({
+  name: "recipe",
+  initialState,
+  reducers: {},
+
+  extraReducers: (builder) => {
+    builder
+
+      // GET RECIPES
+      .addCase(getRecipesThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getRecipesThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.recipes = action.payload.recipes;
+        state.total = action.payload.total;
+        state.page = action.payload.page;
+        state.totalPages = action.payload.totalPages;
+      })
+      .addCase(getRecipesThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // CREATE RECIPE
+      .addCase(createRecipeThunk.fulfilled, (state, action) => {
+        state.recipes.unshift(action.payload);
+      })
+
+      // GET RECIPE BY ID
+      .addCase(getRecipeByIdThunk.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getRecipeByIdThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.recipeDetails = action.payload;
+      })
+      .addCase(getRecipeByIdThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // UPDATE RECIPE
+      .addCase(updateRecipeThunk.fulfilled, (state, action) => {
+        const index = state.recipes.findIndex(
+          (recipe) => recipe._id === action.payload._id
+        );
+
+        if (index !== -1) {
+          state.recipes[index] = action.payload;
+        }
+      })
+
+      // DELETE RECIPE
+      .addCase(deleteRecipeThunk.fulfilled, (state, action) => {
+        state.recipes = state.recipes.filter(
+          (recipe) => recipe._id !== action.payload.recipeId
+        );
+      })
+
+      // TOGGLE BOOKMARK
+      .addCase(toggleRecipeBookmarkThunk.fulfilled, (state, action) => {
+        const updatedRecipe = action.payload;
+
+        const index = state.recipes.findIndex(
+          (recipe) => recipe._id === updatedRecipe._id
+        );
+
+        if (index !== -1) {
+          state.recipes[index] = updatedRecipe;
+        }
+      });
+  },
+});
+
+export default recipeSlice.reducer;

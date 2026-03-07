@@ -1,9 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Plus,
   X,
   ChefHat,
 } from "lucide-react";
+import { toast } from "react-toastify";
+import {
+  createRecipeThunk,
+  getRecipeByIdThunk,
+  uploadRecipeImageThunk,
+  updateRecipeThunk,
+} from "@/redux/features/recipe/recipe.thunk";
+import {
+  selectRecipeDetails,
+  selectRecipeLoading,
+} from "@/redux/features/recipe/recipe.selector";
 
 const CATEGORY_OPTIONS = [
   "Fat loss meals",
@@ -11,114 +24,6 @@ const CATEGORY_OPTIONS = [
   "Vegetarian meals",
   "High-protein snacks",
   "Low-calorie desserts",
-];
-
-const INITIAL_RECIPES = [
-  {
-    id: 1,
-    name: "Greek Chicken Power Bowl",
-    category: "Fat loss meals",
-    calories: 420,
-    protein: 38,
-    ingredients: [
-      "150 g grilled chicken breast",
-      "1 cup mixed greens",
-      "1/2 cup cucumber and tomato",
-      "2 tbsp Greek yogurt dressing",
-      "1 tbsp pumpkin seeds",
-    ],
-    steps: [
-      "Grill seasoned chicken breast and slice.",
-      "Layer greens, veggies, and seeds in a bowl.",
-      "Top with chicken and drizzle yogurt dressing.",
-    ],
-    isBookmarked: false,
-    isSaved: true,
-  },
-  {
-    id: 2,
-    name: "Paneer Quinoa Fuel Plate",
-    category: "Muscle gain meals",
-    calories: 590,
-    protein: 42,
-    ingredients: [
-      "120 g paneer cubes",
-      "1 cup cooked quinoa",
-      "1/2 cup sauteed bell peppers",
-      "1 tsp olive oil",
-      "1 tsp chili garlic spice mix",
-    ],
-    steps: [
-      "Pan sear paneer in olive oil and spices.",
-      "Warm cooked quinoa and vegetables.",
-      "Assemble together and serve hot.",
-    ],
-    isBookmarked: true,
-    isSaved: true,
-  },
-  {
-    id: 3,
-    name: "Chickpea Avocado Crunch Wrap",
-    category: "Vegetarian meals",
-    calories: 465,
-    protein: 24,
-    ingredients: [
-      "1 whole wheat tortilla",
-      "3/4 cup mashed chickpeas",
-      "1/4 avocado, sliced",
-      "1/2 cup shredded lettuce",
-      "1 tbsp lemon tahini sauce",
-    ],
-    steps: [
-      "Season and mash chickpeas with lemon and pepper.",
-      "Spread chickpeas over tortilla and add fillings.",
-      "Wrap tightly, toast lightly, then slice.",
-    ],
-    isBookmarked: false,
-    isSaved: false,
-  },
-  {
-    id: 4,
-    name: "Cottage Cheese Protein Bites",
-    category: "High-protein snacks",
-    calories: 210,
-    protein: 20,
-    ingredients: [
-      "1/2 cup low-fat cottage cheese",
-      "1 tbsp oats flour",
-      "1 tbsp chia seeds",
-      "1 tsp cocoa powder",
-      "1 tsp honey",
-    ],
-    steps: [
-      "Blend all ingredients into a thick mix.",
-      "Roll into small bite-sized balls.",
-      "Chill for 20 minutes before serving.",
-    ],
-    isBookmarked: true,
-    isSaved: false,
-  },
-  {
-    id: 5,
-    name: "Berry Yogurt Cloud Mousse",
-    category: "Low-calorie desserts",
-    calories: 155,
-    protein: 14,
-    ingredients: [
-      "3/4 cup Greek yogurt",
-      "1/2 cup fresh mixed berries",
-      "1 tsp vanilla extract",
-      "1 tsp maple syrup",
-      "1 tbsp crushed pistachios",
-    ],
-    steps: [
-      "Whisk yogurt, vanilla, and maple syrup.",
-      "Fold in half of the berries.",
-      "Top with remaining berries and pistachios.",
-    ],
-    isBookmarked: false,
-    isSaved: true,
-  },
 ];
 
 const emptyForm = {
@@ -132,8 +37,80 @@ const emptyForm = {
 };
 
 export default function RecipeForm() {
-  const [, setRecipes] = useState(INITIAL_RECIPES);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
+  const recipeDetails = useSelector(selectRecipeDetails);
+  const loading = useSelector(selectRecipeLoading);
+
   const [formData, setFormData] = useState(emptyForm);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+
+  const toDisplayText = (item) => {
+    if (typeof item === "string") {
+      return item;
+    }
+
+    if (typeof item === "number") {
+      return String(item);
+    }
+
+    if (!item || typeof item !== "object") {
+      return "";
+    }
+
+    return (
+      item.name ||
+      item.title ||
+      item.value ||
+      item.text ||
+      item.description ||
+      item.step ||
+      item.ingredient ||
+      ""
+    );
+  };
+
+  const normalizeList = (value) => {
+    if (!Array.isArray(value)) {
+      return [];
+    }
+
+    return value
+      .map((item) => toDisplayText(item).trim())
+      .filter(Boolean);
+  };
+
+  useEffect(() => {
+    if (isEditMode) {
+      dispatch(getRecipeByIdThunk(id));
+    }
+  }, [dispatch, id, isEditMode]);
+
+  useEffect(() => {
+    if (!isEditMode || !recipeDetails) {
+      return;
+    }
+
+    const recipe = recipeDetails?.recipe || recipeDetails?.data || recipeDetails;
+    const ingredients = normalizeList(recipe?.ingredients);
+    const steps = normalizeList(recipe?.steps);
+
+    setFormData({
+      name: recipe?.name || "",
+      category: CATEGORY_OPTIONS.includes(recipe?.category)
+        ? recipe.category
+        : CATEGORY_OPTIONS[0],
+      calories: recipe?.calories ?? "",
+      protein: recipe?.protein ?? "",
+      image: recipe?.image || "",
+      ingredients: ingredients.length > 0 ? ingredients : [""],
+      steps: steps.length > 0 ? steps : [""],
+    });
+    setImageFile(null);
+  }, [isEditMode, recipeDetails]);
 
   const handleImageFileChange = (event) => {
     const file = event.target.files?.[0];
@@ -141,13 +118,8 @@ export default function RecipeForm() {
       return;
     }
 
-    const fileReader = new FileReader();
-    fileReader.onloadend = () => {
-      if (typeof fileReader.result === "string") {
-        handleFieldChange("image", fileReader.result);
-      }
-    };
-    fileReader.readAsDataURL(file);
+    setImageFile(file);
+    handleFieldChange("image", URL.createObjectURL(file));
   };
 
   const handleFieldChange = (field, value) => {
@@ -179,15 +151,7 @@ export default function RecipeForm() {
     });
   };
 
-  // const toggleFlag = (id, field) => {
-  //   setRecipes((prev) =>
-  //     prev.map((recipe) =>
-  //       recipe.id === id ? { ...recipe, [field]: !recipe[field] } : recipe
-  //     )
-  //   );
-  // };
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const cleanedIngredients = formData.ingredients
@@ -202,24 +166,52 @@ export default function RecipeForm() {
       cleanedIngredients.length === 0 ||
       cleanedSteps.length === 0
     ) {
+      toast.error("Please fill all required fields");
       return;
     }
 
-    const createdRecipe = {
-      id: Date.now(),
+    let imageUrl = formData.image.trim();
+
+    try {
+      setIsSubmitting(true);
+
+      if (imageFile) {
+        const uploadFormData = new FormData();
+        uploadFormData.append("file", imageFile);
+        const uploadResponse = await dispatch(uploadRecipeImageThunk(uploadFormData)).unwrap();
+        imageUrl = uploadResponse?.url || "";
+
+        if (!imageUrl) {
+          throw new Error("Image upload failed");
+        }
+      }
+
+      const recipePayload = {
       name: formData.name.trim(),
       category: formData.category,
       calories: Number(formData.calories),
       protein: Number(formData.protein),
-      image: formData.image.trim(),
+      image: imageUrl,
       ingredients: cleanedIngredients,
       steps: cleanedSteps,
-      isBookmarked: false,
-      isSaved: true,
-    };
+      };
 
-    setRecipes((prev) => [createdRecipe, ...prev]);
-    setFormData(emptyForm);
+      if (isEditMode) {
+        await dispatch(updateRecipeThunk({ recipeId: id, data: recipePayload })).unwrap();
+        toast.success("Recipe updated successfully");
+      } else {
+        await dispatch(createRecipeThunk(recipePayload)).unwrap();
+        toast.success("Recipe created successfully");
+      }
+
+      setFormData(emptyForm);
+      setImageFile(null);
+      navigate("/founder/recipe");
+    } catch (error) {
+      toast.error(error?.message || error || `Failed to ${isEditMode ? "update" : "create"} recipe`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -260,10 +252,15 @@ export default function RecipeForm() {
             onSubmit={handleSubmit}
             className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8"
           >
-            <h2 className="text-xl font-bold text-slate-900">Create Recipe</h2>
+            <h2 className="text-xl font-bold text-slate-900">
+              {isEditMode ? "Edit Recipe" : "Create Recipe"}
+            </h2>
             <p className="mt-1 text-sm text-slate-500">
               Each recipe includes calories, protein, ingredient list, and preparation steps.
             </p>
+            {isEditMode && loading ? (
+              <p className="mt-2 text-xs text-slate-500">Loading recipe details...</p>
+            ) : null}
 
             <div className="mt-6 space-y-4">
               <div>
@@ -435,9 +432,10 @@ export default function RecipeForm() {
 
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
               >
-                <ChefHat size={16} /> Save Recipe
+                <ChefHat size={16} /> {isSubmitting ? "Saving..." : isEditMode ? "Update Recipe" : "Save Recipe"}
               </button>
             </div>
           </form>
