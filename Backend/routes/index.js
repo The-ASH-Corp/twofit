@@ -17,6 +17,7 @@ import broadcastRoutes from "../modules/broadcast/broadcast.routes.js"
 import habitRoutes from "../modules/habit/habit.routes.js"
 import notificationRoutes from "../modules/notification/notification.routes.js";
 import sopRoutes from "../modules/sop/sop.route.js";
+import recipeRoutes from "../modules/recipe/recipe.route.js";
 
 const router = express.Router();
 
@@ -38,6 +39,7 @@ router.use("/broadcast", broadcastRoutes);
 router.use("/habits",habitRoutes)
 router.use("/notifications", notificationRoutes)
 router.use("/sop", sopRoutes);
+router.use("/recipes", recipeRoutes);
 
 
 
