@@ -3,57 +3,8 @@ import { selectSopError, selectSopStatus, selectSopTodayTasks } from "@/redux/fe
 import { completeSOP, todaySop } from "@/redux/features/sop/sop.thunk";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { SyncLoader } from "react-spinners";
 
-// Mock data (matches the defaults created in admin side)
-const initialTasks = [
-  {
-    taskId: 1,
-    title: "Morning Review",
-    description: "Review breakfast downloads, approve or correct mistakes, clear doubts, mark 'Breakfast Checked'.",
-    timeOfDay: "Morning",
-    requiresInput: false,
-    status: "Pending",
-    notes: ""
-  },
-  {
-    taskId: 2,
-    title: "Lunch Review",
-    description: "Review lunch meals, portion corrections, compliance check, mark 'Lunch Checked'.",
-    timeOfDay: "Lunch",
-    requiresInput: false,
-    status: "Pending",
-    notes: ""
-  },
-  {
-    taskId: 3,
-    title: "Evening Guidance",
-    description: "Snack/Dinner guidance, structured doubt clarification, light motivation support.",
-    timeOfDay: "Evening",
-    requiresInput: false,
-    status: "Pending",
-    notes: ""
-  },
-  {
-    taskId: 4,
-    title: "Night Final Review",
-    description: "Full day compliance check, add daily follow-up note, progress observation.",
-    timeOfDay: "Night",
-    requiresInput: true,
-    inputType: "status_select",
-    status: "Pending", // This tracks "Checked" state in UI usually, but for this specific task, the "Output" is a status
-    outcome: "Completed", // Default outcome
-    notes: ""
-  },
-  {
-    taskId: 5,
-    title: "Daily Follow-up Tracking",
-    description: "Track: Meals, water intake, cravings, energy levels.",
-    timeOfDay: "Night",
-    requiresInput: true,
-    status: "Pending",
-    notes: ""
-  }
-];
 
 const DailyTasks = () => {
 
@@ -68,19 +19,22 @@ const DailyTasks = () => {
      const status = useSelector(selectSopStatus);
      const error = useSelector(selectSopError);
 
-    //  console.log(tasks)
-
-
     const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
 
-    // In a real app, we'd fetch from backend here based on `date`
-    // useEffect(() => { fetchTasks(date); }, [date]);
-
-    const handleToggleComplete = (SOPId) => {
-        dispatch(completeSOP({ SOPId, coachId: user?._id }));
+    const handleToggleComplete = (SOPId, completed) => {
+        dispatch(
+          completeSOP({ SOPId, coachId: user?._id, completed: !completed }),
+        );
         window.location.reload();
     };
 
+    if (status === "loading")
+      return (
+        <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+          <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+        </div>
+      );
+    if (error) return <p className="text-red-500">{error}</p>;
 
     return (
       <div className="p-6 max-w-4xl mx-auto">
@@ -115,7 +69,9 @@ const DailyTasks = () => {
                         <input
                           type="checkbox"
                           checked={task?.completed}
-                          onChange={() => handleToggleComplete(task?.sopId)}
+                          onChange={() =>
+                            handleToggleComplete(task?.sopId, task?.completed)
+                          }
                           className="h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer"
                         />
                       </div>
