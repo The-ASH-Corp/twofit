@@ -202,7 +202,7 @@ export default function Dashboard() {
       : progressReportsRaw.filter((report) => report.type === filterCategory);
 
   return (
-    <div className="flex flex-col gap-6 p-1 bg-[#F8F9FA]">
+    <div className="flex flex-col gap-6 p-1 ">
       <div className="flex gap-6 lg:flex-row flex-col">
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col gap-6">
