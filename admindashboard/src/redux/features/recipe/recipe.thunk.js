@@ -93,10 +93,9 @@ export const deleteRecipeThunk = createAsyncThunk(
   "recipe/delete",
   async (recipeId, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.delete(`/recipes/${recipeId}`);
+      await axiosInstance.delete(`/recipes/${recipeId}`);
       return {
         recipeId,
-        data: response.data,
       };
     } catch (error) {
       return rejectWithValue(
@@ -113,7 +112,7 @@ export const toggleRecipeBookmarkThunk = createAsyncThunk(
   async (recipeId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.patch(
-        `/recipes/${recipeId}/bookmark`
+        `/recipes/${recipeId}/toggle-bookmark`
       );
       return response.data;
     } catch (error) {
