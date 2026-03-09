@@ -15,6 +15,7 @@ import {
   getAdherenceStreaks,
   getClientsWithHabitPlan,
   assignDietPlan,
+  submitWeeklyCheckIn,
 } from "./client.controller.js";
 import { authMiddleware } from "../../middleware/authMiddleware.js";
 import { uploader } from "../../middleware/upload.js";
@@ -46,6 +47,7 @@ router.get("/compliance-stats",authMiddleware, getComplianceStats);
 router.get("/adherence-streaks",authMiddleware, getAdherenceStreaks);
 
 router.get("/clients", getClientsWithHabitPlan);
+router.post("/weekly-checkin", authMiddleware, submitWeeklyCheckIn);
 
 
 export default router;
