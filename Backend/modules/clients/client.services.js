@@ -608,3 +608,30 @@ export const getAdherenceStreaksService = async (userId) => {
     ),
   };
 };
+
+export const submitWeeklyCheckIn = async (userId, weekIndex, responses) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // Check if check-in for this week already exists
+  const existingCheckIn = user.weeklyCheckIns.find(
+    (ci) => ci.weekIndex === Number(weekIndex)
+  );
+  if (existingCheckIn) {
+    throw new Error(`Check-in for week ${weekIndex} already exists`);
+  }
+
+  user.weeklyCheckIns.push({
+    weekIndex: Number(weekIndex),
+    responses: responses.map((r) => ({
+      rating: Number(r.rating),
+      description: r.description,
+    })),
+    date: new Date(),
+  });
+
+  await user.save();
+  return user.weeklyCheckIns;
+};

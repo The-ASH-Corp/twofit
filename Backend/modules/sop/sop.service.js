@@ -3,26 +3,26 @@ import { SOPLog } from "./sopLog.model.js";
 import mongoose from "mongoose";
 
 
-//  1️⃣ Assign SOP (Admin)
+// Assign SOP (Admin)
 
 export const assignSOP = async (data) => {
   return await SOP.create(data);
 };
 
-//  2️⃣ Update SOP (Admin)
+// Update SOP (Admin)
 
 export const updateSOP = async (id, updatedData) => {
   return await SOP.findByIdAndUpdate(id, updatedData, { new: true });
 };
 
-//  3️⃣ Delete SOP (Admin)
+// Delete SOP (Admin)
 
 export const deleteSOP = async (id) => {
   return await SOP.findByIdAndDelete(id);
 };
 
 
-//  4️⃣ Get Today’s SOP Tasks (Coach)
+// Get Today’s SOP Tasks (Coach)
 
 export const getTodaySOP = async (coachId) => {
   const today = new Date();
@@ -62,13 +62,35 @@ export const getTodaySOP = async (coachId) => {
   return tasks;
 };
 
+export const startSOPDailyJob = async() => {
+  const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-//  5️⃣ Complete SOP Task (Coach)
+    const sops = await SOP.find({ status: "Active" });
+
+    for (const sop of sops) {
+      const exists = await SOPLog.findOne({
+        sopId: sop._id,
+        coachId: sop.coachId,
+        date: today,
+      });
+
+      if (!exists) {
+        await SOPLog.create({
+          sopId: sop._id,
+          coachId: sop.coachId,
+          date: today,
+        });
+      }
+    }
+}
+
+
+// Complete SOP Task (Coach)
 
 export const completeSOP = async (sopId, coachId, completed) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  // console.log(completed)
 
   return await SOPLog.findOneAndUpdate(
     { sopId, coachId, date: today },
@@ -81,7 +103,7 @@ export const completeSOP = async (sopId, coachId, completed) => {
 };
 
 
-//  6️⃣ Get SOP Completion History (Admin)
+// Get SOP Completion History (Admin)
 
 export const getSOPHistory = async (coachId, month, year) => {
   const startDate = new Date(year, month - 1, 1);
@@ -105,6 +127,8 @@ export const getSOPByCoach = async(coachId)=>{
     throw new Error("Failed to fetch SOPs for coach");
   }
 }
+
+// get SOP state (Admin) 
 
 export const getSOPStats = async (coachId, month, year) => {
   const startDate = new Date(year, month - 1, 1);

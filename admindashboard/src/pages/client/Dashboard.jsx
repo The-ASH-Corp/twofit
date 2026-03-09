@@ -32,6 +32,9 @@ import {
 } from "lucide-react";
 import { SyncLoader } from "react-spinners";
 import WaterIntake from "./components/WaterIntake";
+import WeeklyCheckInModal from "./components/WeeklyCheckInModal.jsx";
+import { submitWeeklyCheckIn } from "@/redux/features/client/client.thunk";
+import { toast } from "react-toastify";
 
 export default function Dashboard() {
   const [program, setProgram] = useState(null);
@@ -40,6 +43,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const user = useAppSelector(selectUser);
   const clientUser = useAppSelector(selectSelectedClient);
+  const [showCheckInModal, setShowCheckInModal] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -81,6 +85,36 @@ export default function Dashboard() {
       fetchDashboardData();
     }
   }, [fetchDashboardData, user?._id, user?.programType]);
+
+  const currentGlobalDay = clientUser?.currentGlobalDay || user?.currentGlobalDay || 1;
+  const currentWeek = Math.ceil(currentGlobalDay / 7);
+  const isCheckInDay = currentGlobalDay % 7 === 0;
+
+  useEffect(() => {
+    if (isCheckInDay && clientUser) {
+      const hasCheckedIn = clientUser.weeklyCheckIns?.some(
+        (ci) => ci.weekIndex === currentWeek
+      );
+      if (!hasCheckedIn) {
+        setShowCheckInModal(true);
+      }
+    }
+  }, [isCheckInDay, clientUser, currentWeek]);
+
+  const handleWeeklyCheckInSubmit = async (weekIndex, responses) => {
+    try {
+      const result = await dispatch(submitWeeklyCheckIn({ weekIndex, responses }));
+      if (submitWeeklyCheckIn.fulfilled.match(result)) {
+        toast.success("Assessment submitted successfully!");
+        setShowCheckInModal(false);
+        dispatch(getClient({ id: user?._id }));
+      } else {
+        toast.error(result.payload || "Failed to submit assessment");
+      }
+    } catch (error) {
+      toast.error("An error occurred during submission");
+    }
+  };
 
   const isProgramStarted = useMemo(() => {
    
@@ -266,6 +300,13 @@ export default function Dashboard() {
 
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
+
+      {showCheckInModal && (
+        <WeeklyCheckInModal
+          weekIndex={currentWeek}
+          onSubmit={handleWeeklyCheckInSubmit}
+        />
+      )}
     </>
   );
 }
