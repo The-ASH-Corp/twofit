@@ -6,7 +6,6 @@ import React from "react";
 const ExpertClientProfileLeftSide = ({
   client,
   clientComplianceStats,
-  dashboardStats,
 }) => {
   const user = useAppSelector(selectUser);
 
@@ -24,156 +23,145 @@ const ExpertClientProfileLeftSide = ({
     });
   };
 
-  const profileInfo = [
-    {
-      img: assets.GenderVector,
-      title: "Gender",
-      data: client?.gender || "Male",
-    },
-    {
-      img: assets.AgeVector,
-      title: "Age",
-      data: age ? `${age} y/o` : "N/A",
-    },
-    {
-      img: assets.EmailVector,
-      title: "Email Address",
-      data: client?.email || "N/A",
-    },
-    {
-      img: assets.PhoneVector,
-      title: "Phone Number",
-      data: client?.phone || "N/A",
-    },
-    {
-      img: assets.HomeVector,
-      title: "Address",
-      data: client?.address || "N/A",
-    },
-  ];
-
-  const role = {
+  const roleLabels = {
     dietician: "Diet",
     trainer: "Workout",
     therapist: "Therapy",
   };
 
+  const currentRole = user?.role?.toLowerCase() || "";
+  const complianceType = roleLabels[currentRole] || "Total";
+  const complianceValue = clientComplianceStats?.[complianceType.toLowerCase()] || 0;
 
   return (
-    <div className="flex flex-col items-center gap-4 pb-4">
-      {/* Profile Header */}
-      <div className="w-full bg-white rounded-lg p-6">
-        <div className="flex flex-col items-center gap-6">
-          <div className="w-full flex justify-end">
-            <img
-              src={assets.threeDotVector}
-              alt="dot menu"
-              className="w-[18px] cursor-pointer"
-            />
-          </div>
-          <div className="flex flex-col items-center gap-3">
-            <h2 className="font-bold text-[18px]">
-              {client?.name || "Client Name"}
-            </h2>
-            <div className="flex items-center justify-center gap-2 text-[12px]">
-              <span className="px-3 py-1 bg-[#F0F0F0] rounded-full text-[#66706D]">
-                {client?.programType?.title || "Program"}
-              </span>
-              <span className="px-3 py-1 bg-[#F0F0F0] rounded-full text-[#66706D]">
-                {client?.programType?.plan?.duration}
-              </span>
-              <span className="px-3 py-1 bg-[#45C4A2] rounded-full text-white">
-                {client?.status || "Active"}
-              </span>
+    <div className="flex flex-col gap-6">
+      
+      {/* 1. Client Identity Card */}
+      <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden group">
+         {/* Banner/Header */}
+         <div className="h-24 bg-linear-to-r from-[#0A4F48] to-[#116D63] relative overflow-hidden">
+             <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+             <div className="absolute top-3 right-3">
+                 <span className={`px-2.5 py-0.5 rounded-lg text-[10px] uppercase font-bold tracking-wider backdrop-blur-md border shadow-sm ${
+                    client?.status === "Active" 
+                    ? "bg-emerald-400/20 text-emerald-50 border-emerald-400/30" 
+                    : "bg-gray-400/20 text-gray-50 border-gray-400/30"
+                 }`}>
+                   {client?.status || "Inactive"}
+                 </span>
+             </div>
+         </div>
+
+         <div className="px-6 flex flex-col relative pb-6">
+            {/* Avatar */}
+            <div className="-mt-10 mb-3 self-center">
+                 <div className="w-20 h-20 rounded-2xl bg-white p-1.5 shadow-lg group-hover:scale-105 transition-transform duration-300 ease-out">
+                    <div className="w-full h-full bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center border border-gray-100">
+                        {client?.image ? (
+                            <img src={client.image} alt={client.name} className="w-full h-full object-cover" />
+                        ) : (
+                            <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300 font-bold text-2xl">
+                                {client?.name?.charAt(0) || "U"}
+                            </div>
+                        )}
+                    </div>
+                 </div>
             </div>
-          </div>
-          <div className="flex items-center flex-col gap-3 p-4 w-full rounded-lg bg-[#F8F8F8]">
-            <div className="flex items-center justify-between w-full">
-              <span className="text-[#66706D] text-[13px]">Start Date</span>
-              <span className="text-[13px] font-medium">
-                {client?.programStartDate
-                  ? formatDate(client?.programStartDate)
-                  : "N/A"}
-              </span>
+
+            {/* Name & Program */}
+            <div className="text-center mb-6">
+               <h2 className="text-xl font-bold text-[#1E293B] tracking-tight">{client?.name || "Client Name"}</h2>
+               <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
+                  <span className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 text-[11px] font-bold border border-slate-200">
+                     {age ? `${age} yrs` : "N/A"}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-600 text-[11px] font-bold border border-slate-200">
+                     {client?.gender || "N/A"}
+                  </span>
+                  <span className="px-2.5 py-1 rounded-md bg-emerald-50 text-[#0A4F48] text-[11px] font-bold border border-emerald-100">
+                     {client?.programType?.title || "Program"}
+                  </span>
+               </div>
             </div>
-            <div className="flex items-center justify-between w-full">
-              <span className="text-[#66706D] text-[13px]">End Date</span>
-              <span className="text-[13px] font-medium">
-                {client?.programEndDate
-                  ? formatDate(client?.programEndDate)
-                  : "N/A"}
-              </span>
+
+            {/* Dates */}
+            <div className="grid grid-cols-2 gap-3 p-3 bg-[#F8FAFC] rounded-xl border border-dashed border-[#E2E8F0]">
+                <div className="flex flex-col items-center border-r border-slate-200">
+                    <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-1">Start</span>
+                    <span className="text-xs font-bold text-[#334155]">
+                      {client?.programStartDate ? formatDate(client.programStartDate) : "N/A"}
+                    </span>
+                </div>
+                <div className="flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-1">End</span>
+                    <span className="text-xs font-bold text-[#334155]">
+                      {client?.programEndDate ? formatDate(client.programEndDate) : "N/A"}
+                    </span>
+                </div>
             </div>
-          </div>
-        </div>
+         </div>
       </div>
 
-      {/* Personal Info */}
-      <div className="p-6 w-full bg-white rounded-lg flex flex-col items-center gap-5">
-        <div className="flex items-center justify-between w-full">
-          <h2 className="text-[#0A4F48] font-bold text-[16px]">
-            Personal Info
-          </h2>
-          <button>
-            <img
-              src={assets.threeDotVector}
-              alt="dot menu"
-              className="w-[18px]"
-            />
-          </button>
-        </div>
-        <div className="flex flex-col items-start gap-5 w-full">
-          {profileInfo.map((items, i) => (
-            <div className="flex items-start gap-4" key={i}>
-              <div className="p-2 bg-[#F5F5F5] rounded-full w-9 h-9 flex items-center justify-center">
-                <img src={items.img} alt="" className="w-4" />
-              </div>
-              <div className="flex flex-col items-start gap-0.5">
-                <span className="text-[11px] text-[#8C9593]">
-                  {items.title}
-                </span>
-                <span className="text-[13px] font-medium text-[#1E1E1E]">
-                  {items.data}
-                </span>
-              </div>
+      {/* 2. Role Specific Compliance */}
+      <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden">
+         <div className="px-6 py-4 border-b border-[#F1F5F9] bg-[#FAFCFF] flex items-center justify-between">
+            <h3 className="font-bold text-[#1E293B] text-sm">Your Overview</h3>
+         </div>
+         <div className="p-6 flex flex-col gap-6">
+            
+            {/* Compliance Bar */}
+            <div>
+               <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-[#334155]">{complianceType} Compliance</span>
+                  <span className="text-sm font-black text-[#0A4F48]">{complianceValue}%</span>
+               </div>
+               <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                  <div 
+                    className="h-full bg-[#0A4F48] rounded-full transition-all duration-500"
+                    style={{ width: `${complianceValue}%` }}
+                  />
+               </div>
             </div>
-          ))}
-        </div>
+
+            {/* Sub Stats if Dietician */}
+            {currentRole === "dietician" && (
+              <div className="grid grid-cols-2 gap-3">
+                 <div className="p-3 bg-[#F8FAFC] border border-[#F1F5F9] rounded-xl flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-[#94A3B8] uppercase">Missed Meals</span>
+                    <span className="text-sm font-bold text-rose-500">
+                      {(clientComplianceStats?.stats?.missedCount || 0) + (clientComplianceStats?.stats?.skippedCount || 0)}
+                    </span>
+                 </div>
+                 <div className="p-3 bg-[#F8FAFC] border border-[#F1F5F9] rounded-xl flex flex-col items-center">
+                    <span className="text-[10px] font-bold text-[#94A3B8] uppercase">Expected</span>
+                    <span className="text-sm font-bold text-[#334155]">
+                      {clientComplianceStats?.stats?.expectedMeals || 0}
+                    </span>
+                 </div>
+              </div>
+            )}
+         </div>
       </div>
 
-      {/* Therapy Compliance */}
-      <div className="p-6 w-full bg-white rounded-lg flex flex-col items-center gap-4">
-        <div className="flex items-center justify-between w-full">
-          <h2 className="text-[#0A4F48] font-bold text-[16px]">
-            {role[user?.role.toLowerCase()]} Compliance
-          </h2>
-          <button>
-            <img
-              src={assets.threeDotVector}
-              alt="dot menu"
-              className="w-[18px]"
-            />
-          </button>
-        </div>
-        <div className="w-full bg-[#F8F8F8] rounded-lg p-4 flex flex-col gap-3">
-          <div className="flex justify-between items-center w-full">
-            <span className="text-[13px] text-[#1E1E1E] font-medium">
-              {role[user?.role.toLowerCase()]} Compliance
-            </span>
-            <span className="text-[14px] text-[#0A4F48] font-bold">
-              {clientComplianceStats?.[role?.[user?.role.toLowerCase()]?.toLowerCase()]}%
-            </span>
-          </div>
-          <div className="flex justify-between items-center w-full">
-            <span className="text-[13px] text-[#66706D]">Missed Count</span>
-            <span className="text-[13px] text-[#1E1E1E] font-medium">
-              {user?.role.toLowerCase() == "dietician"
-                ? clientComplianceStats?.stats?.missedCount +
-                  clientComplianceStats?.stats?.skippedCount
-                : 0}
-            </span>
-          </div>
-        </div>
+      {/* 3. Personal Details */}
+      <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden">
+         <div className="px-6 py-4 border-b border-[#F1F5F9] bg-[#FAFCFF]">
+            <h3 className="font-bold text-[#1E293B] text-sm">Personal Details</h3>
+         </div>
+         <div className="p-6 flex flex-col gap-4">
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-[#64748B] font-medium">Email</span>
+              <span className="text-[#0F172A] font-bold text-right truncate max-w-[150px]">{client?.email || "N/A"}</span>
+            </div>
+            <div className="flex justify-between items-center text-sm">
+              <span className="text-[#64748B] font-medium">Phone</span>
+              <span className="text-[#0F172A] font-bold">{client?.phone || "N/A"}</span>
+            </div>
+            <div className="flex justify-between items-start text-sm">
+              <span className="text-[#64748B] font-medium">Address</span>
+              <span className="text-[#0F172A] font-bold text-right max-w-[150px] leading-tight">{client?.address || "N/A"}</span>
+            </div>
+         </div>
       </div>
     </div>
   );

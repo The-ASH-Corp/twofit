@@ -255,5 +255,22 @@ export const updateClient = createAsyncThunk(
   }
 );
 
+export const submitWeeklyCheckIn = createAsyncThunk(
+  "client/submitWeeklyCheckIn",
+  async ({ weekIndex, responses }, { rejectWithValue }) => {
+    try {
+      const { data } = await axiosInstance.post("/clients/weekly-checkin", {
+        weekIndex,
+        responses,
+      });
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to submit weekly check-in"
+      );
+    }
+  },
+);
+
 
 

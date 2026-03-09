@@ -17,6 +17,7 @@ const menuItems = [
     icon: assets.habitTracker,
     path: "/client/habit-tracker",
   },
+  {label:"Recipe Library",icon:assets.habitTracker,path:"/client/recipe"},
   { label: "Progress", icon: assets.progress, path: "/client/progress" },
   { label: "Messages", icon: assets.chats, path: "/client/chats" },
   { label: "Feedback", icon: assets.feedback, path: "/client/feedback" },

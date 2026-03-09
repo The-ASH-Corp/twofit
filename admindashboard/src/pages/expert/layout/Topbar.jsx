@@ -62,6 +62,7 @@ export default function Topbar({ onToggleSidebar }) {
           <Menu size={24} />
         </button>
         <div className="min-w-0 flex-1">
+          {/* Desktop Title & Breadcrumbs */}
           <div className="hidden lg:block">
             <h2 className="text-xl md:text-2xl font-bold text-[#0A4F48] truncate tracking-tight">
               {currentPage}
@@ -93,6 +94,7 @@ export default function Topbar({ onToggleSidebar }) {
             )}
           </div>
 
+          {/* Mobile "Minimum Back Page" View */}
           <div className="lg:hidden min-w-0">
             {breadcrumbs.length > 1 ? (
               <div
@@ -122,7 +124,8 @@ export default function Topbar({ onToggleSidebar }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-3 md:gap-4 flex-1 justify-end max-w-full">
+      <div className="flex items-center gap-3 md:gap-6 flex-1 justify-end max-w-full">
+        {/* Action icons */}
         <div className="flex items-center md:gap-4 shrink-0">
           <button
             className="sm:p-2.5 p-1 text-gray-400 hover:text-[#0A4F48] hover:bg-[#EBF3F2] rounded-full transition-all duration-300 relative group overflow-hidden"
