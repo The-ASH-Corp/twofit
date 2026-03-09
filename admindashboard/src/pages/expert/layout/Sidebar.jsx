@@ -103,44 +103,54 @@ const menuItems = [
           </div>
 
           <nav className="space-y-1.5">
-          {menuItems.map((item) => (
-            <NavLink
-              to={item.path}
-              key={item.label}
-              end={item.path === "/expert"}
-              onClick={() => {
-                if (window.innerWidth < 1024) onClose();
-              }}
-              className={({ isActive }) =>
-                `flex items-center gap-3.5 px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 group relative overflow-hidden
-      ${
-        isActive
-          ? "bg-linear-to-r from-[#0A4F48] to-[#116D63] text-white shadow-lg shadow-emerald-900/20 translate-x-1"
-          : "text-gray-500 hover:bg-gray-50 hover:text-emerald-800"
-      }
-    `
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <img
-                    src={item.icon}
-                    className={`w-4 h-4 object-contain transition-all duration-300 ${
-                      isActive
-                        ? "brightness-0 invert scale-115 opacity-100"
-                        : "grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
-                    }`}
-                    alt={item.label}
-                  />
-                  <span className="relative z-10 tracking-wide whitespace-nowrap">{item.label}</span>
+            {menuItems.map((item) => (
+              <NavLink
+                to={item.path}
+                key={item.label}
+                end={item.path === "/expert"}
+                onClick={() => {
+                  if (window.innerWidth < 1024) onClose();
+                }}
+                className={({ isActive }) => `
+                  flex items-center gap-3.5 px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 group relative overflow-hidden
+                  ${
+                    isActive
+                      ? "bg-linear-to-r from-[#0A4F48] to-[#116D63] text-white shadow-lg shadow-emerald-900/20 translate-x-1"
+                      : "text-gray-500 hover:bg-gray-50 hover:text-emerald-800"
+                  }
+                `}
+              >
+                {({ isActive }) => (
+                  <>
+                    <div
+                      className={`
+                      w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-300
+                      ${isActive ? "bg-white/20" : "bg-gray-50 group-hover:bg-white group-hover:shadow-sm"}
+                    `}
+                    >
+                      <img
+                        src={item.icon}
+                        className={`w-4 h-4 object-contain transition-all duration-300  
+                          ${
+                            isActive
+                              ? "brightness-0 invert scale-115 opacity-100"
+                              : "grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
+                          }
+                        `}
+                        alt={item.label}
+                      />
+                    </div>
+                    <span className="relative z-10 tracking-wide whitespace-nowrap">
+                      {item.label}
+                    </span>
 
-                  {isActive && (
-                    <div className="absolute right-3 w-1.5 h-1.5 bg-white/40 rounded-full animate-pulse"></div>
-                  )}
-                </>
-              )}
-            </NavLink>
-          ))}
+                    {isActive && (
+                      <div className="absolute right-3 w-1.5 h-1.5 bg-white/40 rounded-full animate-pulse"></div>
+                    )}
+                  </>
+                )}
+              </NavLink>
+            ))}
           </nav>
         </div>
 
