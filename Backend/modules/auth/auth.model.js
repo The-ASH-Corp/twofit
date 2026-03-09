@@ -115,7 +115,18 @@ const userSchema = new mongoose.Schema(
     dietPlanPdf: { type: String },
 
     dietPlanMealCount: { type: Number, default: 6 },
-
+    weeklyCheckIns: [
+      {
+        weekIndex: { type: Number, required: true },
+        responses: [
+          {
+            rating: { type: Number, required: true, min: 1, max: 5 },
+            description: { type: String, required: true },
+          },
+        ],
+        date: { type: Date, default: Date.now },
+      },
+    ],
   },
   { timestamps: true }
 );

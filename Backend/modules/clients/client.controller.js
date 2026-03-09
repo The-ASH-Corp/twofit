@@ -420,4 +420,32 @@ export const getClientsWithHabitPlan = async (req, res) => {
   }
 };
 
+export const submitWeeklyCheckIn = async (req, res) => {
+  try {
+    const userId = req.user?._id || req.user?.id;
+    const { weekIndex, responses } = req.body;
+
+    if (!weekIndex || !responses || !Array.isArray(responses)) {
+      return res.status(400).json({
+        success: false,
+        message: "weekIndex and responses (array) are required",
+      });
+    }
+
+    const updatedCheckIns = await service.submitWeeklyCheckIn(
+      userId,
+      weekIndex,
+      responses
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Weekly check-in submitted successfully",
+      data: updatedCheckIns,
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message });
+  }
+};
+
 
