@@ -44,7 +44,8 @@ export const deleteSOP = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const deleted = await sopService.deleteSOP(id);
+    const deleted = await sopService.deactivate(id);
+    console.log(deleted)
 
     res.status(200).json({
       success: true,
