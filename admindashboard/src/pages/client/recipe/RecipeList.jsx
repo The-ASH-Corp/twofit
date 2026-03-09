@@ -33,13 +33,12 @@ export default function RecipeList() {
   const [searchText, setSearchText] = useState("");
   const [showBookmarkedOnly, setShowBookmarkedOnly] = useState(false);
 
-
   const CATEGORY_OPTIONS = useMemo(() => {
   const categories = recipes.map((recipe) => recipe.category);
   return [...new Set(categories)].filter(Boolean);
 }, [recipes]);
 
-
+ 
 
   useEffect(() => {
     dispatch(getRecipesThunk());
@@ -135,9 +134,7 @@ export default function RecipeList() {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
 
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700">
-                Founder Dashboard
-              </p>
+              
 
               <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
                 Recipe Library
@@ -174,13 +171,13 @@ export default function RecipeList() {
 
             <div className="flex flex-wrap items-center justify-end gap-2">
 
-              <Link
+              {/* <Link
                 to="create"
                 className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
               >
                 <Plus size={16} />
                 Add Recipe
-              </Link>
+              </Link> */}
 
               <button
                 onClick={() => setShowBookmarkedOnly((prev) => !prev)}
@@ -357,7 +354,7 @@ export default function RecipeList() {
                       </div>
                     </div>
 
-                    <div className="mt-4 flex items-center justify-end gap-2">
+                    {/* <div className="mt-4 flex items-center justify-end gap-2">
                       <Link
                         to={`/founder/recipe/edit/${recipe._id}`}
                         className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100"
@@ -374,7 +371,7 @@ export default function RecipeList() {
                         <Trash2 size={13} />
                         Delete
                       </button>
-                    </div>
+                    </div> */}
 
                   </div>
 

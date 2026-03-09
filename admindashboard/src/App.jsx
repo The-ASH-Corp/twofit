@@ -115,6 +115,7 @@ import HabitTracker from "./pages/client/habit/HabitTracker";
 import HabitDisplay from "./pages/expert/habit/HabitDisplay";
 import WeeklyHabit from "./pages/expert/habit/WeeklyHabit";
 import ExpertDailyTasks from "./pages/expert/daily/DailyTasks";
+import RecipeList from "./pages/client/recipe/RecipeList";
 
 function App() {
   return (
@@ -356,6 +357,7 @@ function App() {
           <Route path="notifications" element={<Notifications />} />
           <Route path="daily-plan" element={<DailyPlan />} />
           <Route path="habit-tracker" element={<HabitTracker />} />
+          <Route path="recipe" element={<RecipeList/>}/>
           <Route path="chats" element={<ClientChat />} />
         </Route>
 
