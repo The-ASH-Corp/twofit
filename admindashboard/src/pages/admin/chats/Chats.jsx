@@ -253,7 +253,7 @@ export default function Chats() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-120px)]  gap-5">
+    <div className="h-[calc(100vh-120px)] pb-24 lg:pb-4 min-h-0">
       {/* Left Sidebar */}
       {/* <ChatSidebar
         clients={clients}
@@ -269,11 +269,11 @@ export default function Chats() {
       ) : sideTab === "Auto Reminders" ? (
         <AutoReminders />
       ) : (
-        <>
+        <div className="grid h-full min-h-0 grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
           <div
             className={`${
               showChatWindow ? "hidden lg:block" : "block"
-            } w-full lg:w-80`}
+            } min-h-0`}
           >
             {/* Center - Chat List */}
             <ChastList
@@ -288,7 +288,7 @@ export default function Chats() {
           <div
             className={`${
               showChatWindow ? "block" : "hidden lg:block"
-            } w-full lg:flex-1`}
+            } min-h-0`}
           >
             {/* Right - Chat Window */}
             <ChatWindow
@@ -305,7 +305,7 @@ export default function Chats() {
               isUploadingMedia={isUploadingMedia}
             />
           </div>
-        </>
+        </div>
       )}
     </div>
   );
