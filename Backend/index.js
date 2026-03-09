@@ -13,6 +13,7 @@ import { startImageCleanupTask } from "./utils/cronJobs.js";
 import { startNotificationCron } from "./utils/notification.cron.js";
 import { ensureNotificationIndexes } from "./modules/notification/notification.service.js";
 import "./utils/payroll.cron.js";
+import "./utils/SOPLog.cron.js";
 
 
 
