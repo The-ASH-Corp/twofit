@@ -32,8 +32,6 @@ const ExpertHistory = () => {
   const stats = useSelector(selectSopStats);
   const history = useSelector(selectSopHistory);
 
-  console.log(stats)
-
   const today = new Date();
   const currentMonth = today.getMonth() + 1;
   const currentYear = today.getFullYear();
@@ -79,7 +77,7 @@ const ExpertHistory = () => {
     <div className="p-2 pt-4 md:p-4 mx-auto space-y-8 bg-white rounded-2xl">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Expert Task overview</h1>
+        <h1 className="text-3xl font-bold">Tasks overview</h1>
         <p className="text-gray-500">Daily duty performance overview</p>
       </div>
 
