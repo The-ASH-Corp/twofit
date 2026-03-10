@@ -105,14 +105,14 @@ const ExpertTasks = () => {
             <div className="px-1 py-4 space-y-6">
               <div className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
                 <div className="flex items-start">
-                  <div className="ml-3 flex-1">
+                  <div className="ml-3 flex-1 min-w-0">
                     <div className="flex justify-between">
-                      <label className="font-medium text-gray-900">
+                      <label className="font-medium text-gray-900 break-words">
                         {task?.title}
                       </label>
                     </div>
 
-                    <p className="text-gray-500 text-sm mt-1 mb-2">
+                    <p className="text-gray-500 text-sm mt-1 mb-2 leading-relaxed break-words">
                       {task?.description}
                     </p>
                   </div>

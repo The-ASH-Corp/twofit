@@ -37,22 +37,51 @@ const ExpertHistory = () => {
   const currentYear = today.getFullYear();
   const [month, setMonth] = useState(currentMonth);
   const [year, setYear] = useState(currentYear);
+  const [graphMonth, setGraphMonth] = useState(currentMonth);
+  const [graphYear, setGraphYear] = useState(currentYear);
 
   useEffect(() => {
     dispatch(todaySop({ coachId: id }));
     dispatch(
       getSOPStats({
         coachId: id,
-        month: currentMonth,
-        year: currentYear,
+        month: graphMonth,
+        year: graphYear,
       }),
     );
-
-  }, [dispatch, id, currentMonth, currentYear]);
+  }, [dispatch, id, graphMonth, graphYear]);
 
   useEffect(() => {
     dispatch(getSOPHistory({ coachId: id, month, year }));
   }, [dispatch, id, month, year]);
+
+  const fillMissingDays = (stats, month, year) => {
+    const daysInMonth = new Date(year, month, 0).getDate();
+
+    const map = {};
+    stats.forEach((s) => {
+      const day = new Date(s._id).getDate();
+      map[day] = s;
+    });
+
+    const filled = [];
+
+    for (let i = 1; i <= daysInMonth; i++) {
+      if (map[i]) {
+        filled.push(map[i]);
+      } else {
+        filled.push({
+          _id: new Date(year, month - 1, i),
+          completed: 0,
+          pending: 0,
+        });
+      }
+    }
+
+    return filled;
+  };
+
+  const chartData = fillMissingDays(stats, currentMonth, currentYear);
 
   if (status === "loading")
     return (
@@ -147,20 +176,64 @@ const ExpertHistory = () => {
         {/* Graph */}
         <div className="flex flex-col lg:flex-row items-stretch gap-4 w-full md:w-1/2">
           <div className="bg-white p-4 sm:p-6 shadow rounded-lg w-full">
-            <h2 className="text-base sm:text-lg font-semibold mb-4">
-              Task Completion for {monthName} {currentYear}
-            </h2>
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              <h2 className="text-base sm:text-lg font-semibold mb-4">
+                Task Completion for {monthName} {currentYear}
+              </h2>
+              <div className="flex gap-3">
+                <select
+                  value={graphMonth}
+                  onChange={(e) => setGraphMonth(Number(e.target.value))}
+                  className="border rounded px-2 py-1"
+                >
+                  {[
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
+                  ].map((m, i) => (
+                    <option key={i} value={i + 1}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+
+                <input
+                  type="number"
+                  value={graphYear}
+                  onChange={(e) => setGraphYear(Number(e.target.value))}
+                  className="border rounded px-2 py-1 w-20"
+                />
+              </div>
+            </div>
 
             <div className="w-full h-[250px] sm:h-[300px]">
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={stats}>
+                <BarChart
+                  margin={{ top: 5, right: 5, left: -10, bottom: 0 }}
+                  data={chartData}
+                >
                   <XAxis
                     dataKey="_id"
                     tickFormatter={(date) => new Date(date).getDate()}
+                    tick={{ fontSize: 12 }}
+                    interval={3}
+                  />
+
+                  <YAxis
                     width={30}
                     tick={{ fontSize: 12 }}
+                    allowDecimals={false}
                   />
-                  <YAxis width={30} tick={{ fontSize: 12 }} />
+
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "#ffffff",
@@ -177,10 +250,21 @@ const ExpertHistory = () => {
                       `Date: ${new Date(label).toLocaleDateString()}`
                     }
                   />
+
                   <Legend />
 
-                  <Bar dataKey="completed" stackId="a" fill="#0A4F48" />
-                  <Bar dataKey="pending" stackId="a" fill="#F4DBC7" />
+                  <Bar
+                    dataKey="completed"
+                    stackId="a"
+                    fill="#0A4F48"
+                    barSize={14}
+                  />
+                  <Bar
+                    dataKey="pending"
+                    stackId="a"
+                    fill="#F4DBC7"
+                    barSize={14}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -200,7 +284,7 @@ const ExpertHistory = () => {
             <select
               value={month}
               onChange={(e) => setMonth(Number(e.target.value))}
-              className="border rounded px-3 py-2"
+              className="border rounded px-2 py-1"
             >
               {[
                 "Jan",
@@ -226,7 +310,7 @@ const ExpertHistory = () => {
               type="number"
               value={year}
               onChange={(e) => setYear(Number(e.target.value))}
-              className="border rounded px-3 py-2 w-24"
+              className="border rounded px-2 py-1 w-20"
             />
           </div>
         </div>
@@ -239,8 +323,9 @@ const ExpertHistory = () => {
                 <th className="p-3 text-sm font-semibold">Date</th>
                 <th className="p-3 text-sm font-semibold">Task</th>
                 <th className="p-3 text-sm font-semibold">Time Slot</th>
+                <th className="p-3 text-sm font-semibold">status</th>
                 <th className="p-3 text-sm font-semibold text-center">
-                  Status
+                  Completion Status
                 </th>
               </tr>
             </thead>
@@ -267,6 +352,18 @@ const ExpertHistory = () => {
                     </td>
 
                     <td className="p-3 text-sm">{log.sopId?.timeSlot}</td>
+
+                    <td className="p-3 text-sm">
+                      <span
+                        className={`px-3 text-xs font-medium ${
+                          log?.sopId?.status === "Active"
+                            ? " text-green-700"
+                            : " text-red-600"
+                        }`}
+                      >
+                        {log.sopId?.status}
+                      </span>
+                    </td>
 
                     <td className="p-3 text-center">
                       <span
