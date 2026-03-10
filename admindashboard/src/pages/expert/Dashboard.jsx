@@ -223,7 +223,7 @@ export default function Dashboard() {
         titleFont: { size: 13, weight: "600" },
         callbacks: {
           title: function (context) {
-            return context[0].label + " 2025";
+            return context[0].label 
           },
           label: function (context) {
             return (
@@ -302,7 +302,7 @@ export default function Dashboard() {
         titleFont: { size: 13, weight: "600" },
         callbacks: {
           title: function (context) {
-            return context[0].label + " 2025";
+            return context[0].label 
           },
           label: function (context) {
             return "⭐ " + context.parsed.y;
