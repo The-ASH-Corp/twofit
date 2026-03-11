@@ -76,6 +76,56 @@ function calculateStreakFromDateKeys(dateKeys) {
   return { activeStreak, longestStreak, doneToday };
 }
 
+function getCompletedHabitDateKeys(habitList) {
+  if (!Array.isArray(habitList) || habitList.length === 0) {
+    return [];
+  }
+
+  let commonDoneDates = null;
+
+  habitList.forEach((habit) => {
+    const latestStatusByDate = new Map();
+
+    (habit?.logs || []).forEach((log) => {
+      const dateKey = toDateKey(log?.date);
+      if (!dateKey) return;
+
+      const parsedDate = new Date(log?.date);
+      if (Number.isNaN(parsedDate.getTime())) return;
+
+      const normalizedStatus = String(log?.status || "").toLowerCase();
+      const currentTime = parsedDate.getTime();
+      const previous = latestStatusByDate.get(dateKey);
+
+      if (!previous || currentTime >= previous.time) {
+        latestStatusByDate.set(dateKey, {
+          status: normalizedStatus,
+          time: currentTime,
+        });
+      }
+    });
+
+    const doneDatesForHabit = new Set(
+      Array.from(latestStatusByDate.entries())
+        .filter(([, value]) => value.status === "done")
+        .map(([dateKey]) => dateKey),
+    );
+
+    if (commonDoneDates === null) {
+      commonDoneDates = doneDatesForHabit;
+      return;
+    }
+
+    commonDoneDates = new Set(
+      Array.from(commonDoneDates).filter((dateKey) =>
+        doneDatesForHabit.has(dateKey),
+      ),
+    );
+  });
+
+  return Array.from(commonDoneDates || []).sort();
+}
+
 function toPositiveInt(value, fallbackValue) {
   const parsed = Number(value);
   if (Number.isInteger(parsed) && parsed > 0) {
@@ -567,45 +617,13 @@ export const getAdherenceStreaksService = async (userId) => {
     "habits.logs",
   );
   const habitList = habitDoc?.habits || [];
-  const completedHabitDays = [];
-
-  if (habitList.length > 0 && user?.programStartDate) {
-    const startDate = new Date(user.programStartDate);
-
-    if (!Number.isNaN(startDate.getTime())) {
-      startDate.setHours(0, 0, 0, 0);
-
-      for (let dayIndex = 1; dayIndex <= currentGlobalDay; dayIndex += 1) {
-        const dateForDay = addDays(startDate, dayIndex - 1);
-        const dayKey = toDateKey(dateForDay);
-
-        const doneForAllHabits = habitList.every((habit) =>
-          (habit?.logs || []).some(
-            (log) =>
-              toDateKey(log?.date) === dayKey &&
-              String(log?.status || "").toLowerCase() === "done",
-          ),
-        );
-
-        if (doneForAllHabits) {
-          completedHabitDays.push(dayIndex);
-        }
-      }
-    }
-  }
+  const completedHabitDateKeys = getCompletedHabitDateKeys(habitList);
 
   return {
     workout: calculateStreakFromDateKeys(completedWorkoutDays),
     diet: calculateStreakFromDateKeys(completedDietDays),
     water: calculateStreakFromDateKeys(completedWaterDays),
-    habit: calculateStreakFromDateKeys(
-      completedHabitDays
-        .map((dayIndex) => {
-          if (!startDate || Number.isNaN(startDate.getTime())) return "";
-          return toDateKey(addDays(startDate, dayIndex - 1));
-        })
-        .filter(Boolean),
-    ),
+    habit: calculateStreakFromDateKeys(completedHabitDateKeys),
   };
 };
 
