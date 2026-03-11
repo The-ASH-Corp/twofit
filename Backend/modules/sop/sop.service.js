@@ -62,6 +62,8 @@ export const getTodaySOP = async (coachId) => {
   return tasks;
 };
 
+// cron SOP daily update
+
 export const startSOPDailyJob = async () => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -167,3 +169,4 @@ export const getSOPStats = async (coachId, month, year) => {
 
   return stats;
 };
+
