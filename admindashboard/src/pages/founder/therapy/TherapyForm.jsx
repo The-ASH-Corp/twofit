@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { ChevronUp } from "lucide-react";
 import { ChevronDown } from "lucide-react";
 import { Trash2 } from "lucide-react";
@@ -13,71 +13,74 @@ import {
   getTherapyPlanById,
   updateTherapyPlan,
 } from "@/redux/features/therapy/therapy.thunk";
-import { selectTherapyPlan } from "@/redux/features/therapy/therapy.selectors";
+
+const INITIAL_WEEKS = [
+  {
+    id: 1,
+    name: "Week 1",
+    title: "",
+    expanded: true,
+    days: [
+      {
+        id: 1,
+        name: "Day 1",
+        expanded: true,
+        therapies: [],
+      },
+      {
+        id: 2,
+        name: "Day2",
+        expanded: true,
+        therapies: [],
+      },
+    ],
+  },
+];
 
 const TherapyForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const dispatch = useDispatch();
-  const fetchedPlan = useSelector(selectTherapyPlan);
 
-  const initialWeeks = [
-    {
-      id: 1,
-      name: "Week 1",
-      title: "",
-      expanded: true,
-      days: [
-        {
-          id: 1,
-          name: "Day 1",
-          expanded: true,
-          therapies: [],
-        },
-        {
-          id: 2,
-          name: "Day2",
-          expanded: true,
-          therapies: [],
-        },
-      ],
-    },
-  ];
-
-  const [weeks, setWeeks] = useState(initialWeeks);
+  const [weeks, setWeeks] = useState(INITIAL_WEEKS);
   const [therapyName, setTherapyName] = useState("");
+  const [isAssignedToClients, setIsAssignedToClients] = useState(false);
 
   useEffect(() => {
-    if (id) {
-      dispatch(getTherapyPlanById(id));
-    }
-  }, [id, dispatch]);
+    if (!id) return;
 
-  useEffect(() => {
-    if (id && fetchedPlan) {
-      // Ensure we are editing the correct plan
-      if (fetchedPlan._id === id) {
-        setTherapyName(fetchedPlan.name || "");
-        
-        const mappedWeeks = (fetchedPlan.weeks || []).map((week, index) => ({
-            id: index + 1,
-            name: week.name || `Week ${index + 1}`,
-            title: week.title || "",
-            expanded: index === 0,
-            days: (week.days || []).map((day, dIndex) => ({
+    const fetchPlan = async () => {
+      const result = await dispatch(getTherapyPlanById(id));
+      if (getTherapyPlanById.fulfilled.match(result)) {
+        const plan = result.payload?.data || result.payload;
+        if (!plan) return;
+
+        setIsAssignedToClients((plan.clients || 0) > 0);
+
+        setTherapyName(plan.name || "");
+
+        const mappedWeeks = (plan.weeks || []).map((week, wIndex) => ({
+          id: wIndex + 1,
+          name: week.name || `Week ${wIndex + 1}`,
+          title: week.title || "",
+          expanded: wIndex === 0,
+          days: (week.days || []).map((day, dIndex) => ({
             id: dIndex + 1,
             name: day.name || `Day ${dIndex + 1}`,
             expanded: dIndex === 0,
             therapies: (day.therapies || []).map((th, tIndex) => ({
-                id: tIndex + 1,
-                ...th
-            }))
-            }))
+              ...th,
+              id: th.id || th._id || `${wIndex + 1}-${dIndex + 1}-${tIndex + 1}`,
+            })),
+          })),
         }));
-        setWeeks(mappedWeeks);
+
+        setWeeks(mappedWeeks.length ? mappedWeeks : INITIAL_WEEKS);
       }
-    }
-  }, [fetchedPlan, id]);
+    };
+
+    fetchPlan();
+  }, [id, dispatch]);
 
   const toggleWeek = (id) => {
     setWeeks(
@@ -191,9 +194,11 @@ const TherapyForm = () => {
               if (day.id === dayId) {
                 return {
                   ...day,
-                  therapies: (day.therapies || []).map((th) =>
-                    th.id === therapy.id ? { ...th, ...therapy } : th,
-                  ),
+                  therapies: (day.therapies || []).map((th) => {
+                    const currentId = th.id || th._id;
+                    const incomingId = therapy.id || therapy._id;
+                    return currentId === incomingId ? { ...th, ...therapy } : th;
+                  }),
                 };
               }
               return day;
@@ -215,9 +220,10 @@ const TherapyForm = () => {
               if (day.id === dayId) {
                 return {
                   ...day,
-                  therapies: (day.therapies || []).filter(
-                    (th) => th.id !== therapyId,
-                  ),
+                  therapies: (day.therapies || []).filter((th) => {
+                    const currentId = th.id || th._id;
+                    return currentId !== therapyId;
+                  }),
                 };
               }
               return day;
@@ -240,7 +246,7 @@ const TherapyForm = () => {
       days: week.days.map((day) => ({
         name: day.name,
         therapies: (day.therapies || []).map((th) => {
-          const { id, ...rest } = th;
+          const { id: _idToStrip, ...rest } = th;
           return rest; // remove frontend-only ID, keep _id if exists or let backend handle it
         }),
       })),
@@ -296,7 +302,7 @@ const TherapyForm = () => {
                 {week.name}
               </h3>
               <div className="flex items-center gap-2">
-                {!(id && fetchedPlan?.clients > 0) && (
+                {!isAssignedToClients && (
                   <button
                     onClick={() => removeWeek(week.id)}
                     className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
@@ -344,7 +350,7 @@ const TherapyForm = () => {
                           {day.name}
                         </span>
                         <div className="flex items-center gap-2">
-                          {!(id && fetchedPlan?.clients > 0) && (
+                          {!isAssignedToClients && (
                             <button
                               onClick={() => removeDay(week.id, day.id)}
                               className="p-1.5 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors"
@@ -380,7 +386,7 @@ const TherapyForm = () => {
                             onRemoveTherapy={(therapyId) =>
                               removeTherapy(week.id, day.id, therapyId)
                             }
-                            readOnly={id && fetchedPlan?.clients > 0}
+                            readOnly={isAssignedToClients}
                           />
                         </div>
                       )}
