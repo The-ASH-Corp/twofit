@@ -32,6 +32,8 @@ const ExpertHistory = () => {
   const stats = useSelector(selectSopStats);
   const history = useSelector(selectSopHistory);
 
+  console.log(stats, todayTasks)
+
   const today = new Date();
   const currentMonth = today.getMonth() + 1;
   const currentYear = today.getFullYear();

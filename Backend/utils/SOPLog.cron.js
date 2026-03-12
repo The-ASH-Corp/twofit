@@ -6,10 +6,12 @@ cron.schedule(
   "0 0 * * *",
   async () => {
     console.log("Running SOP daily log generator...");
+
     await startSOPDailyJob();
+
+    console.log("SOP logs created for today");
   },
   {
     timezone: "Asia/Kolkata",
   },
-  console.log("SOP logs created for today")
 );
