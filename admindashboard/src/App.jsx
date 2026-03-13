@@ -110,6 +110,9 @@ import ClientFeedback from "./pages/client/feedback/Feedback";
 import ClientProgress from "./pages/client/progress/Progress";
 import DailyPlan from "./pages/client/dailyPlan/DailyPlan";
 import ClientChat from "./pages/client/chats/Chats";
+import WorkoutTasksPage from "./pages/client/workout/WorkoutTasksPage";
+import TherapyTasksPage from "./pages/client/therapy/TherapyTasksPage";
+import DietTasksPage from "./pages/client/diet/DietTasksPage";
 import Habit from "./pages/expert/habit/Habit";
 import HabitTracker from "./pages/client/habit/HabitTracker";
 import HabitDisplay from "./pages/expert/habit/HabitDisplay";
@@ -356,6 +359,9 @@ function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="daily-plan" element={<DailyPlan />} />
+          <Route path="workout" element={<WorkoutTasksPage />} />
+          <Route path="therapy" element={<TherapyTasksPage />} />
+          <Route path="diet" element={<DietTasksPage />} />
           <Route path="habit-tracker" element={<HabitTracker />} />
           <Route path="recipe" element={<RecipeList/>}/>
           <Route path="chats" element={<ClientChat />} />
