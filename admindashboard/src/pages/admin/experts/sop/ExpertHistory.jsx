@@ -265,7 +265,7 @@ const ExpertHistory = () => {
                         value,
                         name === "completed"
                           ? "Completed Tasks"
-                          : "Pending Tasks",
+                          : "Not Completed Tasks",
                       ]}
                       labelFormatter={(label) =>
                         `Date: ${new Date(label).toLocaleDateString()}`
