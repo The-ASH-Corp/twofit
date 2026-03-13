@@ -85,12 +85,12 @@ const ExpertHistory = () => {
 
   const chartData = fillMissingDays(stats, currentMonth, currentYear);
 
-  if (status === "loading")
-    return (
-      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
-        <SyncLoader color="#0A4F48" />
-      </div>
-    );
+  // if (status === "loading")
+  //   return (
+  //     <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+  //       <SyncLoader color="#0A4F48" />
+  //     </div>
+  //   );
   if (error) return <p className="text-red-500">{error}</p>;
 
   const completedToday = todayTasks.filter((t) => t.completed).length;
@@ -145,31 +145,45 @@ const ExpertHistory = () => {
 
       <div className="flex flex-col md:flex-row items-start justify-between w-full gap-4">
         {/* Today Tasks */}
-        <div className="bg-white p-6 shadow rounded-lg w-full md:w-[50%]">
-          <h2 className="text-lg font-semibold mb-4">Today Task Status</h2>
+        <div className="bg-white p-6 shadow-lg rounded-2xl w-full md:w-[50%]">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-lg font-semibold">Today's Task Status</h2>
+            <span className="text-sm text-gray-500">
+              {todayTasks.length} Tasks
+            </span>
+          </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3  overflow-y-auto pr-1 pb-1">
             {todayTasks.map((task) => (
               <div
                 key={task.sopId}
-                className="flex justify-between border-b pb-3"
+                className="flex items-center justify-between p-4 rounded-xl shadow-sm hover:bg-gray-50  hover:shadow-md transition-all duration-200"
               >
-                <div>
-                  <p className="font-medium">{task.title}</p>
-                  <p className="text-sm text-gray-500">{task.timeSlot}</p>
+                {/* Left Section */}
+                <div className="flex items-center gap-3">
+                  {/* Status Indicator */}
+                  <div
+                    className={`w-3 h-3 rounded-full ${
+                      task.completed ? "bg-green-500" : "bg-gray-400"
+                    }`}
+                  ></div>
+
+                  <div>
+                    <p className="font-medium text-gray-800">{task.title}</p>
+                    <p className="text-xs text-gray-500">{task.timeSlot}</p>
+                  </div>
                 </div>
 
-                <div>
-                  <span
-                    className={`px-2 py-1 rounded-xl text-sm ${
-                      task.completed
-                        ? "bg-green-100 text-green-700"
-                        : "bg-gray-100 text-gray-600"
-                    }`}
-                  >
-                    {task.completed ? "Completed" : "Pending"}
-                  </span>
-                </div>
+                {/* Right Status Badge */}
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    task.completed
+                      ? "bg-green-100 text-green-700"
+                      : "bg-red-100 text-red-600"
+                  }`}
+                >
+                  {task.completed ? "Completed" : "Pending"}
+                </span>
               </div>
             ))}
           </div>
@@ -218,57 +232,63 @@ const ExpertHistory = () => {
             </div>
 
             <div className="w-full h-[250px] sm:h-[300px]">
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  margin={{ top: 5, right: 5, left: -10, bottom: 0 }}
-                  data={chartData}
-                >
-                  <XAxis
-                    dataKey="_id"
-                    tickFormatter={(date) => new Date(date).getDate()}
-                    tick={{ fontSize: 12 }}
-                    interval={3}
-                  />
+              {status === "loading" ? (
+                <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+                  <SyncLoader color="#0A4F48" />
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    margin={{ top: 5, right: 5, left: -10, bottom: 0 }}
+                    data={chartData}
+                  >
+                    <XAxis
+                      dataKey="_id"
+                      tickFormatter={(date) => new Date(date).getDate()}
+                      tick={{ fontSize: 12 }}
+                      interval={3}
+                    />
 
-                  <YAxis
-                    width={30}
-                    tick={{ fontSize: 12 }}
-                    allowDecimals={false}
-                  />
+                    <YAxis
+                      width={30}
+                      tick={{ fontSize: 12 }}
+                      allowDecimals={false}
+                    />
 
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#ffffff",
-                      borderRadius: "8px",
-                      border: "1px solid #eee",
-                    }}
-                    formatter={(value, name) => [
-                      value,
-                      name === "completed"
-                        ? "Completed Tasks"
-                        : "Pending Tasks",
-                    ]}
-                    labelFormatter={(label) =>
-                      `Date: ${new Date(label).toLocaleDateString()}`
-                    }
-                  />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#ffffff",
+                        borderRadius: "8px",
+                        border: "1px solid #eee",
+                      }}
+                      formatter={(value, name) => [
+                        value,
+                        name === "completed"
+                          ? "Completed Tasks"
+                          : "Pending Tasks",
+                      ]}
+                      labelFormatter={(label) =>
+                        `Date: ${new Date(label).toLocaleDateString()}`
+                      }
+                    />
 
-                  <Legend />
+                    <Legend />
 
-                  <Bar
-                    dataKey="completed"
-                    stackId="a"
-                    fill="#0A4F48"
-                    barSize={14}
-                  />
-                  <Bar
-                    dataKey="pending"
-                    stackId="a"
-                    fill="#F4DBC7"
-                    barSize={14}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+                    <Bar
+                      dataKey="completed"
+                      stackId="a"
+                      fill="#0A4F48"
+                      barSize={14}
+                    />
+                    <Bar
+                      dataKey="pending"
+                      stackId="a"
+                      fill="#F4DBC7"
+                      barSize={14}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
         </div>
