@@ -41,6 +41,7 @@ export default function DietTasksPage() {
   const [skippingMeal, setSkippingMeal] = useState(false);
   const [showSkipConfirm, setShowSkipConfirm] = useState(false);
   const autoSkippedPreviousDayRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchPageData = async () => {
@@ -71,6 +72,7 @@ export default function DietTasksPage() {
 
   const currentGlobalDay =
     clientUser?.currentGlobalDay || user?.currentGlobalDay || 1;
+  const dietPlanPdf = clientUser?.dietPlanPdf || user?.dietPlanPdf;
 
   const isProgramStarted = useMemo(() => {
     const startDate = clientUser?.programStartDate || user?.programStartDate;
@@ -154,10 +156,41 @@ export default function DietTasksPage() {
     },
     skipped: {
       label: "Skipped",
-      pillClass: "bg-slate-100 text-slate-700 border-slate-300",
-      panelClass: "bg-slate-50 border-slate-200",
+      pillClass: "bg-orange-100 text-orange-800 border-orange-300",
+      panelClass: "bg-orange-50 border-orange-200",
       message: "This meal was skipped.",
     },
+  };
+
+  const handleViewAssignedMealPdf = () => {
+    if (!dietPlanPdf) {
+      toast.info("No meal PDF is assigned yet.");
+      return;
+    }
+
+    const fullUrl = `${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}${dietPlanPdf}`;
+    window.open(fullUrl, "_blank");
+  };
+
+  const handleOpenFilePicker = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const selected = e.target.files?.[0];
+    if (!selected) return;
+
+    if (!selected.type.startsWith("image/")) {
+      toast.error("Only image files are allowed for diet submission.");
+      e.target.value = "";
+      return;
+    }
+
+    setFile(selected);
+    setFileName(selected.name);
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   };
 
   const shouldShowSubmissionForm =
@@ -347,12 +380,20 @@ export default function DietTasksPage() {
                 {statusConfig[selectedMealStatus].label}
               </span>
             )}
-            <Link
-              to="/client"
-              className="text-xs font-bold text-[#0A4F48] hover:text-[#083b36]"
-            >
-              Back to Dashboard
-            </Link>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleViewAssignedMealPdf}
+                className="text-xs font-bold px-3 py-1.5 rounded-lg border border-[#0A4F48]/20 text-[#0A4F48] hover:bg-[#E6EEED]"
+              >
+                View Meal PDF
+              </button>
+              <Link
+                to="/client"
+                className="text-xs font-bold text-[#0A4F48] hover:text-[#083b36]"
+              >
+                Back to Dashboard
+              </Link>
+            </div>
           </div>
 
           <div className="rounded-2xl overflow-hidden border border-gray-100 bg-gray-50">
@@ -385,7 +426,7 @@ export default function DietTasksPage() {
                     : taskStatus === "pending"
                       ? "bg-yellow-100 text-yellow-700"
                       : taskStatus === "skipped"
-                        ? "bg-slate-100 text-slate-700"
+                        ? "bg-orange-100 text-orange-800"
                       : taskStatus === "rejected"
                         ? "bg-red-100 text-red-700"
                         : "bg-gray-100 text-gray-600";
@@ -460,30 +501,22 @@ export default function DietTasksPage() {
 
             <div className="mb-6">
               <label className="block text-sm font-bold text-[#0A4F48] mb-2">Upload Meal Photo (Image Only)</label>
-              <label
-                htmlFor="diet-proof-upload"
+              <button
+                type="button"
+                onClick={handleOpenFilePicker}
                 className="flex items-center gap-3 w-full rounded-xl border-2 border-dashed border-[#0A4F48]/30 px-4 py-3 cursor-pointer hover:bg-[#E6EEED]/30 transition-colors"
               >
                 <Upload size={18} className="text-[#0A4F48] shrink-0" />
-                <span className="text-sm font-medium text-gray-600 truncate">{fileName}</span>
-                <input
-                  id="diet-proof-upload"
-                  type="file"
-                  accept="image/*"
-                  className="sr-only"
-                  onChange={(e) => {
-                    const selected = e.target.files?.[0];
-                    if (selected) {
-                      if (!selected.type.startsWith("image/")) {
-                        toast.error("Only image files are allowed for diet submission.");
-                        return;
-                      }
-                      setFile(selected);
-                      setFileName(selected.name);
-                    }
-                  }}
-                />
-              </label>
+                <span className="text-sm font-medium text-gray-600 truncate min-w-0">{fileName}</span>
+              </button>
+              <input
+                ref={fileInputRef}
+                id="diet-proof-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
