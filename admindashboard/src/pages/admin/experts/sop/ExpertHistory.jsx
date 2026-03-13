@@ -145,7 +145,7 @@ const ExpertHistory = () => {
 
       <div className="flex flex-col md:flex-row items-start justify-between w-full gap-4">
         {/* Today Tasks */}
-        <div className="bg-white p-6 shadow-lg rounded-2xl w-full md:w-[50%]">
+        <div className="bg-white p-6 shadow-sm rounded-2xl w-full md:w-[50%]">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-semibold">Today's Task Status</h2>
             <span className="text-sm text-gray-500">
@@ -265,7 +265,7 @@ const ExpertHistory = () => {
                         value,
                         name === "completed"
                           ? "Completed Tasks"
-                          : "Pending Tasks",
+                          : "Not Completed Tasks",
                       ]}
                       labelFormatter={(label) =>
                         `Date: ${new Date(label).toLocaleDateString()}`
