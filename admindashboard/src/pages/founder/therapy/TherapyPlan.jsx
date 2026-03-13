@@ -109,7 +109,7 @@ export default function TherapyPlan({
   /* ================= EDIT ================= */
 
   const handleEdit = (therapy) => {
-    setEditingId(therapy.id);
+    setEditingId(therapy.id || therapy._id);
     setFormState({
       type: therapy.type,
       notes: therapy.notes || "",
@@ -228,7 +228,7 @@ export default function TherapyPlan({
             <div className="flex flex-col gap-2">
               {therapies.map((therapy) => (
                 <div
-                  key={therapy.id}
+                  key={therapy.id || therapy._id}
                   className="flex items-center justify-between p-3 bg-white border rounded-lg"
                 >
                   <span className="text-sm font-medium">{therapy.type}</span>
@@ -241,7 +241,7 @@ export default function TherapyPlan({
                     </button>
                     {!readOnly && (
                       <button
-                        onClick={() => onRemoveTherapy(therapy.id)}
+                        onClick={() => onRemoveTherapy(therapy.id || therapy._id)}
                         className="text-xs text-red-600"
                       >
                         <Trash2 size={14} />
