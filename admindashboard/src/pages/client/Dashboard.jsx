@@ -14,6 +14,7 @@ import ExpertsList from "./components/ExpertsList";
 import Measeurement from "./components/Measeurement";
 import NotificationsList from "./components/NotificationsList";
 import MobileBottomNav from "./components/MobileBottomNav";
+import BookmarkedRecipes from "./components/BookmarkedRecipes";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useDispatch } from "react-redux";
@@ -264,6 +265,8 @@ export default function Dashboard() {
             </div>
           </div>
           <WaterIntake />
+
+          {/* <BookmarkedRecipes /> */}
 
           {/* Bottom Section: My Tasks */}
           <div className="lg:order-5 order-2">

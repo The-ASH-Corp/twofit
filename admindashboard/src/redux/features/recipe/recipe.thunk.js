@@ -46,7 +46,7 @@ export const getRecipesThunk = createAsyncThunk(
         params,
       });
 
-      return response.data;
+      return response;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to fetch recipes"

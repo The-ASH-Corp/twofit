@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  Plus,
-  X,
-  ChefHat,
-} from "lucide-react";
+import { Plus, X, ChefHat } from "lucide-react";
 import { toast } from "react-toastify";
 import {
   createRecipeThunk,
@@ -18,17 +14,17 @@ import {
   selectRecipeLoading,
 } from "@/redux/features/recipe/recipe.selector";
 
-const CATEGORY_OPTIONS = [
-  "Fat loss meals",
-  "Muscle gain meals",
-  "Vegetarian meals",
-  "High-protein snacks",
-  "Low-calorie desserts",
-];
+// const CATEGORY_OPTIONS = [
+//   "Fat loss meals",
+//   "Muscle gain meals",
+//   "Vegetarian meals",
+//   "High-protein snacks",
+//   "Low-calorie desserts",
+// ];
 
 const emptyForm = {
   name: "",
-  category: CATEGORY_OPTIONS[0],
+  category: "",
   calories: "",
   protein: "",
   image: "",
@@ -47,6 +43,14 @@ export default function RecipeForm() {
   const [formData, setFormData] = useState(emptyForm);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageFile, setImageFile] = useState(null);
+
+  const [categories, setCategories] = useState([
+    "Fat loss meals",
+    "Muscle gain meals",
+    "Vegetarian meals",
+    "High-protein snacks",
+    "Low-calorie desserts",
+  ]);
 
   const toDisplayText = (item) => {
     if (typeof item === "string") {
@@ -78,9 +82,7 @@ export default function RecipeForm() {
       return [];
     }
 
-    return value
-      .map((item) => toDisplayText(item).trim())
-      .filter(Boolean);
+    return value.map((item) => toDisplayText(item).trim()).filter(Boolean);
   };
 
   useEffect(() => {
@@ -94,15 +96,14 @@ export default function RecipeForm() {
       return;
     }
 
-    const recipe = recipeDetails?.recipe || recipeDetails?.data || recipeDetails;
+    const recipe =
+      recipeDetails?.recipe || recipeDetails?.data || recipeDetails;
     const ingredients = normalizeList(recipe?.ingredients);
     const steps = normalizeList(recipe?.steps);
 
     setFormData({
       name: recipe?.name || "",
-      category: CATEGORY_OPTIONS.includes(recipe?.category)
-        ? recipe.category
-        : CATEGORY_OPTIONS[0],
+      category:recipe?.category || "",
       calories: recipe?.calories ?? "",
       protein: recipe?.protein ?? "",
       image: recipe?.image || "",
@@ -157,7 +158,9 @@ export default function RecipeForm() {
     const cleanedIngredients = formData.ingredients
       .map((item) => item.trim())
       .filter(Boolean);
-    const cleanedSteps = formData.steps.map((item) => item.trim()).filter(Boolean);
+    const cleanedSteps = formData.steps
+      .map((item) => item.trim())
+      .filter(Boolean);
 
     if (
       !formData.name.trim() ||
@@ -178,7 +181,9 @@ export default function RecipeForm() {
       if (imageFile) {
         const uploadFormData = new FormData();
         uploadFormData.append("file", imageFile);
-        const uploadResponse = await dispatch(uploadRecipeImageThunk(uploadFormData)).unwrap();
+        const uploadResponse = await dispatch(
+          uploadRecipeImageThunk(uploadFormData),
+        ).unwrap();
         imageUrl = uploadResponse?.url || "";
 
         if (!imageUrl) {
@@ -187,17 +192,19 @@ export default function RecipeForm() {
       }
 
       const recipePayload = {
-      name: formData.name.trim(),
-      category: formData.category,
-      calories: Number(formData.calories),
-      protein: Number(formData.protein),
-      image: imageUrl,
-      ingredients: cleanedIngredients,
-      steps: cleanedSteps,
+        name: formData.name.trim(),
+        category: formData.category,
+        calories: Number(formData.calories),
+        protein: Number(formData.protein),
+        image: imageUrl,
+        ingredients: cleanedIngredients,
+        steps: cleanedSteps,
       };
 
       if (isEditMode) {
-        await dispatch(updateRecipeThunk({ recipeId: id, data: recipePayload })).unwrap();
+        await dispatch(
+          updateRecipeThunk({ recipeId: id, data: recipePayload }),
+        ).unwrap();
         toast.success("Recipe updated successfully");
       } else {
         await dispatch(createRecipeThunk(recipePayload)).unwrap();
@@ -208,7 +215,11 @@ export default function RecipeForm() {
       setImageFile(null);
       navigate("/founder/recipe");
     } catch (error) {
-      toast.error(error?.message || error || `Failed to ${isEditMode ? "update" : "create"} recipe`);
+      toast.error(
+        error?.message ||
+          error ||
+          `Failed to ${isEditMode ? "update" : "create"} recipe`,
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -227,8 +238,9 @@ export default function RecipeForm() {
                 Comprehensive Categorized Recipe Hub
               </h1>
               <p className="mt-2 max-w-2xl text-sm text-slate-600">
-                Build meal plans that improve diet adherence and user satisfaction with
-                rich nutrition metadata and fast recipe discovery.
+                Build meal plans that improve diet adherence and user
+                satisfaction with rich nutrition metadata and fast recipe
+                discovery.
               </p>
             </div>
 
@@ -256,10 +268,13 @@ export default function RecipeForm() {
               {isEditMode ? "Edit Recipe" : "Create Recipe"}
             </h2>
             <p className="mt-1 text-sm text-slate-500">
-              Each recipe includes calories, protein, ingredient list, and preparation steps.
+              Each recipe includes calories, protein, ingredient list, and
+              preparation steps.
             </p>
             {isEditMode && loading ? (
-              <p className="mt-2 text-xs text-slate-500">Loading recipe details...</p>
+              <p className="mt-2 text-xs text-slate-500">
+                Loading recipe details...
+              </p>
             ) : null}
 
             <div className="mt-6 space-y-4">
@@ -270,7 +285,9 @@ export default function RecipeForm() {
                 <input
                   type="text"
                   value={formData.name}
-                  onChange={(event) => handleFieldChange("name", event.target.value)}
+                  onChange={(event) =>
+                    handleFieldChange("name", event.target.value)
+                  }
                   placeholder="Enter recipe title"
                   className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
                 />
@@ -281,16 +298,27 @@ export default function RecipeForm() {
                   <label className="mb-1 block text-sm font-semibold text-slate-700">
                     Category
                   </label>
-                  <select
+                  <select className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
                     value={formData.category}
-                    onChange={(event) => handleFieldChange("category", event.target.value)}
-                    className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
+                    onChange={(e) => {
+                      if (e.target.value === "new") {
+                        const newCategory = prompt("Enter new category");
+
+                        if (newCategory) {
+                          setCategories((prev) => [...prev, newCategory]);
+                          handleFieldChange("category", newCategory);
+                        }
+                      } else {
+                        handleFieldChange("category", e.target.value);
+                      }
+                    }}
                   >
-                    {CATEGORY_OPTIONS.map((category) => (
+                    {categories.map((category) => (
                       <option key={category} value={category}>
                         {category}
                       </option>
                     ))}
+                    <option value="new" className="bg-green-800 text-white rounded font-bold ">+ Add New Category</option>
                   </select>
                 </div>
 
@@ -302,7 +330,9 @@ export default function RecipeForm() {
                     type="number"
                     min="1"
                     value={formData.calories}
-                    onChange={(event) => handleFieldChange("calories", event.target.value)}
+                    onChange={(event) =>
+                      handleFieldChange("calories", event.target.value)
+                    }
                     placeholder="kcal"
                     className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
                   />
@@ -316,7 +346,9 @@ export default function RecipeForm() {
                     type="number"
                     min="1"
                     value={formData.protein}
-                    onChange={(event) => handleFieldChange("protein", event.target.value)}
+                    onChange={(event) =>
+                      handleFieldChange("protein", event.target.value)
+                    }
                     placeholder="grams"
                     className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
                   />
@@ -331,7 +363,9 @@ export default function RecipeForm() {
                   <input
                     type="url"
                     value={formData.image}
-                    onChange={(event) => handleFieldChange("image", event.target.value)}
+                    onChange={(event) =>
+                      handleFieldChange("image", event.target.value)
+                    }
                     placeholder="https://example.com/recipe-image.jpg"
                     className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
                   />
@@ -362,7 +396,9 @@ export default function RecipeForm() {
 
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <label className="text-sm font-semibold text-slate-700">Ingredients</label>
+                  <label className="text-sm font-semibold text-slate-700">
+                    Ingredients
+                  </label>
                   <button
                     type="button"
                     onClick={() => addListField("ingredients")}
@@ -378,7 +414,11 @@ export default function RecipeForm() {
                         type="text"
                         value={ingredient}
                         onChange={(event) =>
-                          updateListField("ingredients", index, event.target.value)
+                          updateListField(
+                            "ingredients",
+                            index,
+                            event.target.value,
+                          )
                         }
                         placeholder={`Ingredient ${index + 1}`}
                         className="w-full rounded-xl border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100"
@@ -397,7 +437,9 @@ export default function RecipeForm() {
 
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <label className="text-sm font-semibold text-slate-700">Preparation Steps</label>
+                  <label className="text-sm font-semibold text-slate-700">
+                    Preparation Steps
+                  </label>
                   <button
                     type="button"
                     onClick={() => addListField("steps")}
@@ -435,7 +477,12 @@ export default function RecipeForm() {
                 disabled={isSubmitting}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
               >
-                <ChefHat size={16} /> {isSubmitting ? "Saving..." : isEditMode ? "Update Recipe" : "Save Recipe"}
+                <ChefHat size={16} />{" "}
+                {isSubmitting
+                  ? "Saving..."
+                  : isEditMode
+                    ? "Update Recipe"
+                    : "Save Recipe"}
               </button>
             </div>
           </form>
