@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { CheckCircle2, Dumbbell, Lock, PlayCircle, Upload } from "lucide-react";
@@ -40,6 +40,7 @@ export default function WorkoutTasksPage() {
   const [comment, setComment] = useState("");
   const [effortRating, setEffortRating] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchPageData = async () => {
@@ -236,6 +237,23 @@ export default function WorkoutTasksPage() {
     }
   };
 
+  const handleOpenFilePicker = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const selected = e.target.files?.[0];
+    if (!selected) return;
+
+    setFile(selected);
+    setFileName(selected.name);
+
+    // Remove focus from the hidden file input to avoid viewport jump after picker closes.
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  };
+
   const clientStatus = clientUser?.status || user?.status;
 
   if (isLoading) {
@@ -381,104 +399,175 @@ export default function WorkoutTasksPage() {
 
       {/* Submission section — visible once all videos are watched */}
       {shouldShowSubmissionForm && (
-        <div className="mx-4 lg:mx-2 mb-4">
-          <div className="bg-white rounded-2xl shadow-sm border border-[#0A4F48]/10 p-4 lg:p-6">
-
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-[#E6EEED] flex items-center justify-center shrink-0">
-                <CheckCircle2 size={18} className="text-[#0A4F48]" />
-              </div>
-              <div>
-                <h2 className="text-[#0A4F48] font-bold text-base">Submit Workout Proof</h2>
-                <p className="text-xs text-gray-500">All videos watched — rate your effort, add notes, and upload your proof.</p>
+        <div className="mx-4 lg:mx-2 mb-8">
+          <div className="bg-white rounded-4xl shadow-xl shadow-[#0A4F48]/5 border border-[#0A4F48]/10 overflow-hidden">
+            <div className="bg-[#0A4F48] p-6 text-white">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center shrink-0">
+                  <CheckCircle2 size={24} className="text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">Finish Strong</h2>
+                  <p className="text-white/70 text-sm">Review your session and upload your progress</p>
+                </div>
               </div>
             </div>
+
+            <div className="p-6 lg:p-8">
 
             {/* RPE Scale */}
-            <div className="mb-6">
-              <label className="block text-sm font-bold text-[#0A4F48] mb-2">
+            <div className="mb-8">
+              <label className="block text-sm font-bold text-[#0A4F48] mb-4">
                 Rate of Perceived Exertion (RPE 1–10)
               </label>
-              <div className="space-y-2 max-h-56 overflow-y-auto rounded-xl border border-gray-100 bg-gray-50/30 p-3">
-                {rpeScale.map(({ value, label, description }) => (
-                  <label
-                    key={value}
-                    className="flex items-center justify-between gap-3 text-[12px] font-semibold text-gray-700 bg-white border border-gray-100 rounded-lg px-3 py-2 cursor-pointer hover:border-[#0A4F48]/30 transition-colors"
-                  >
-                    <div className="flex items-center gap-2 shrink-0">
-                      <input
-                        type="radio"
-                        name="workoutEffortRating"
-                        value={value}
-                        checked={effortRating?.ratingNumber === value}
-                        onChange={() =>
-                          setEffortRating({
-                            ratingNumber:      value,
-                            ratingLabel:       label,
-                            ratingDescription: description,
-                          })
-                        }
-                        className="accent-[#0A4F48]"
-                      />
-                      <span className="font-black text-[#0A4F48] text-sm w-4 text-center">{value}</span>
+              
+              <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 mb-4">
+                {rpeScale.map(({ value, label, description }) => {
+                  const isActive = effortRating?.ratingNumber === value;
+                  
+                  // Color coding based on intensity
+                  const getColorClass = (val) => {
+                    if (val <= 3) return "hover:bg-green-500 hover:text-white border-green-200 text-green-700";
+                    if (val <= 6) return "hover:bg-yellow-500 hover:text-white border-yellow-200 text-yellow-700";
+                    if (val <= 8) return "hover:bg-orange-500 hover:text-white border-orange-200 text-orange-700";
+                    return "hover:bg-red-500 hover:text-white border-red-200 text-red-700";
+                  };
+
+                  const getActiveClass = (val) => {
+                    if (val <= 3) return "bg-green-600 text-white border-green-600 ring-2 ring-green-600/20";
+                    if (val <= 6) return "bg-yellow-500 text-white border-yellow-500 ring-2 ring-yellow-500/20";
+                    if (val <= 8) return "bg-orange-600 text-white border-orange-600 ring-2 ring-orange-600/20";
+                    return "bg-red-600 text-white border-red-600 ring-2 ring-red-600/20";
+                  };
+
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setEffortRating({
+                        ratingNumber: value,
+                        ratingLabel: label,
+                        ratingDescription: description,
+                      })}
+                      className={`h-12 flex items-center justify-center rounded-xl border-2 font-black text-lg transition-all transform active:scale-95 ${
+                        isActive ? getActiveClass(value) : `bg-white ${getColorClass(value)}`
+                      }`}
+                    >
+                      {value}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Selection Details */}
+              {effortRating ? (
+                <div className="bg-[#E6EEED] border border-[#0A4F48]/20 rounded-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`w-2 h-2 rounded-full ${
+                      effortRating.ratingNumber <= 3 ? "bg-green-500" :
+                      effortRating.ratingNumber <= 6 ? "bg-yellow-500" :
+                      effortRating.ratingNumber <= 8 ? "bg-orange-500" : "bg-red-500"
+                    }`} />
+                    <h3 className="text-[#0A4F48] font-bold text-sm uppercase tracking-wider">
+                      {effortRating.ratingLabel}
+                    </h3>
+                  </div>
+                  <p className="text-gray-600 text-xs leading-relaxed">
+                    {effortRating.ratingDescription}
+                  </p>
+                </div>
+              ) : (
+                <div className="border border-dashed border-gray-200 rounded-2xl p-4 text-center">
+                  <p className="text-gray-400 text-xs italic">Select a rating to see details</p>
+                </div>
+              )}
+              
+              <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-widest px-1 mt-3">
+                <span>1 — Very Light</span>
+                <span>10 — Max Effort</span>
+              </div>
+            </div>
+
+            {/* Notes & Upload Row */}
+            <div className="grid md:grid-cols-2 gap-6 mb-8">
+              <div>
+                <label className="text-sm font-bold text-[#0A4F48] mb-2 flex items-center gap-2">
+                  Notes <span className="text-[10px] font-normal text-gray-400 uppercase tracking-wider">(Optional)</span>
+                </label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  rows={4}
+                  placeholder="How did you feel today? Any pain or wins?"
+                  className="w-full rounded-2xl border-2 border-gray-100 bg-gray-50/30 px-4 py-3 text-sm text-gray-700 resize-none focus:outline-none focus:border-[#0A4F48]/30 focus:bg-white transition-all outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-[#0A4F48] mb-2">Upload Proof</label>
+                <div 
+                  onClick={handleOpenFilePicker}
+                  className="group relative h-[116px] flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#0A4F48]/40 hover:bg-[#E6EEED]/20 transition-all cursor-pointer overflow-hidden"
+                >
+                  {file ? (
+                    <div className="flex flex-col items-center gap-1 p-4">
+                      <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                        <CheckCircle2 size={18} className="text-green-600" />
+                      </div>
+                      <span className="text-xs font-bold text-[#0A4F48] truncate max-w-full text-center">{fileName}</span>
+                      <button 
+                        type="button" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setFile(null);
+                          setFileName("Upload File");
+                        }}
+                        className="text-[10px] text-red-500 font-bold uppercase hover:underline"
+                      >
+                        Remove
+                      </button>
                     </div>
-                    <span className="text-gray-700 font-semibold text-[12px] w-28 shrink-0">{label}</span>
-                    <span className="text-gray-400 text-[11px] leading-tight">{description}</span>
-                  </label>
-                ))}
-              </div>
-              <div className="flex justify-between text-[10px] text-gray-400 font-semibold px-1 mt-1">
-                <span>1 = Very Light</span>
-                <span>10 = Maximum Effort</span>
-              </div>
-            </div>
-
-            {/* Notes */}
-            <div className="mb-6">
-              <label className="block text-sm font-bold text-[#0A4F48] mb-2">Notes (optional)</label>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                rows={3}
-                placeholder="How did the workout feel? Any observations…"
-                className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 resize-none focus:outline-none focus:ring-2 focus:ring-[#0A4F48]/20"
-              />
-            </div>
-
-            {/* File upload */}
-            <div className="mb-6">
-              <label className="block text-sm font-bold text-[#0A4F48] mb-2">Upload Proof (Photo / Video)</label>
-              <label
-                htmlFor="workout-proof-upload"
-                className="flex items-center gap-3 w-full rounded-xl border-2 border-dashed border-[#0A4F48]/30 px-4 py-3 cursor-pointer hover:bg-[#E6EEED]/30 transition-colors"
-              >
-                <Upload size={18} className="text-[#0A4F48] shrink-0" />
-                <span className="text-sm font-medium text-gray-600 truncate">{fileName}</span>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Upload size={20} className="text-gray-400 group-hover:text-[#0A4F48]" />
+                      </div>
+                      <p className="text-xs font-bold text-gray-500 group-hover:text-[#0A4F48]">Drop photo/video here</p>
+                      <p className="text-[10px] text-gray-400">or click to browse</p>
+                    </div>
+                  )}
+                </div>
                 <input
+                  ref={fileInputRef}
                   id="workout-proof-upload"
                   type="file"
                   accept="image/*,video/*"
-                  className="sr-only"
-                  onChange={(e) => {
-                    const selected = e.target.files?.[0];
-                    if (selected) {
-                      setFile(selected);
-                      setFileName(selected.name);
-                    }
-                  }}
+                  className="hidden"
+                  onChange={handleFileChange}
                 />
-              </label>
+              </div>
             </div>
 
             <button
               onClick={handleSubmit}
               disabled={uploading}
-              className="w-full bg-[#0A4F48] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl py-3 text-sm font-bold transition-colors"
+              className="w-full bg-[#0A4F48] hover:bg-[#083b36] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-2xl py-4 text-base font-black transition-all shadow-lg shadow-[#0A4F48]/20 flex items-center justify-center gap-2 group"
             >
-              {uploading ? "Submitting…" : "Submit Workout"}
+              {uploading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Submitting...</span>
+                </div>
+              ) : (
+                <>
+                  <span>Complete My Workout</span>
+                  <Dumbbell size={18} className="group-hover:rotate-12 transition-transform" />
+                </>
+              )}
             </button>
           </div>
         </div>
+      </div>
       )}
 
       {(overallWorkoutStatus === "pending" || overallWorkoutStatus === "verified" || overallWorkoutStatus === "rejected") && (
