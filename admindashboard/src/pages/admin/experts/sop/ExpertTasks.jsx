@@ -74,7 +74,7 @@ const ExpertTasks = () => {
         tasks.map((task) => (
           <div
             key={task._id}
-            className="mb-8 bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden md:w-[70%]"
+            className="mb-8 bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden lg:w-[70%]"
           >
             <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-green-100">
               <h2 className="font-semibold text-lg text-[#0A4F48]">
@@ -107,12 +107,12 @@ const ExpertTasks = () => {
                 <div className="flex items-start">
                   <div className="ml-3 flex-1 min-w-0">
                     <div className="flex justify-between">
-                      <label className="font-medium text-gray-900 break-words">
+                      <label className="font-medium text-gray-900 wrap-break-words">
                         {task?.title}
                       </label>
                     </div>
 
-                    <p className="text-gray-500 text-sm mt-1 mb-2 leading-relaxed break-words">
+                    <p className="text-gray-500 text-sm mt-1 mb-2 leading-relaxed wrap-break-words">
                       {task?.description}
                     </p>
                   </div>

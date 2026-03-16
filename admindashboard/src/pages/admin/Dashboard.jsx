@@ -93,41 +93,41 @@ export default function Dashboard() {
   };
 
   // --- Expert Performance Data Calculation ---
-  const totalPrograms = dashboardData?.totalPrograms || 0;
-  const totalExp = dashboardData?.totalExperts || 0;
-  const totalCli = dashboardData?.totalClients || 0;
+  // const totalPrograms = dashboardData?.totalPrograms || 0;
+  // const totalExp = dashboardData?.totalExperts || 0;
+  // const totalCli = dashboardData?.totalClients || 0;
 
-  const totalEntities = totalPrograms + totalExp + totalCli; // Total for percentage calculation
+  // const totalEntities = totalPrograms + totalExp + totalCli; // Total for percentage calculation
 
-  const getPercent = (val) => {
-    if (totalEntities === 0) return 0;
-    return Math.round((val / totalEntities) * 100);
-  };
+  // const getPercent = (val) => {
+  //   if (totalEntities === 0) return 0;
+  //   return Math.round((val / totalEntities) * 100);
+  // };
 
-  const progPct = getPercent(totalPrograms);
-  const expPct = getPercent(totalExp);
-  const cliPct = getPercent(totalCli);
+  // const progPct = getPercent(totalPrograms);
+  // const expPct = getPercent(totalExp);
+  // const cliPct = getPercent(totalCli);
 
-  const hasPerformanceData = totalEntities > 0;
-  const performanceData = {
-    labels: hasPerformanceData
-      ? ["Programs", "Experts", "Clients"]
-      : ["No Data"],
-    datasets: [
-      {
-        data: hasPerformanceData ? [totalPrograms, totalExp, totalCli] : [1],
-        backgroundColor: hasPerformanceData
-          ? ["#0A4F48", "#E6EFEE", "#FFD7A8"]
-          : ["#E5E7EB"],
-        borderWidth: 0,
-        rotation: 270,
-        cutout: "80%",
-        hoverOffset: hasPerformanceData ? 15 : 0,
-        spacing: hasPerformanceData ? 1 : 0,
-        borderRadius: 8,
-      },
-    ],
-  };
+  // const hasPerformanceData = totalEntities > 0;
+  // const performanceData = {
+  //   labels: hasPerformanceData
+  //     ? ["Programs", "Experts", "Clients"]
+  //     : ["No Data"],
+  //   datasets: [
+  //     {
+  //       data: hasPerformanceData ? [totalPrograms, totalExp, totalCli] : [1],
+  //       backgroundColor: hasPerformanceData
+  //         ? ["#0A4F48", "#E6EFEE", "#FFD7A8"]
+  //         : ["#E5E7EB"],
+  //       borderWidth: 0,
+  //       rotation: 270,
+  //       cutout: "80%",
+  //       hoverOffset: hasPerformanceData ? 15 : 0,
+  //       spacing: hasPerformanceData ? 1 : 0,
+  //       borderRadius: 8,
+  //     },
+  //   ],
+  // };
 
   const complianceData = {
     labels: getSlicedData(
@@ -654,7 +654,8 @@ export default function Dashboard() {
               ))}
             </div>
           </div>
-          <div className="bg-white p-6 rounded-2xl shadow-sm">
+          {/* this graph is un-nessessory the details are already showing the KPI card */}
+          {/* <div className="bg-white p-6 rounded-2xl shadow-sm">
             <h3 className="text-lg font-bold text-[#0A4F48] mb-6">
               Expert Performance
             </h3>
@@ -685,7 +686,7 @@ export default function Dashboard() {
                 value={`${cliPct}%`}
               />
             </div>
-          </div>
+          </div> */}
           {/* Recent Notifications */}
           <RecentNotificationsCard
             notifications={notifications}
