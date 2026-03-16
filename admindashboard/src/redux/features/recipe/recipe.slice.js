@@ -33,10 +33,10 @@ const recipeSlice = createSlice({
       })
       .addCase(getRecipesThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.recipes = action.payload.recipes;
-        state.total = action.payload.total;
-        state.page = action.payload.page;
-        state.totalPages = action.payload.totalPages;
+        state.recipes = action.payload?.data?.recipes || [];
+        state.total = action.payload?.data?.total || 0;
+        state.page = action.payload?.data?.page || 1;
+        state.totalPages = action.payload?.data?.totalPages || 1;
       })
       .addCase(getRecipesThunk.rejected, (state, action) => {
         state.loading = false;
@@ -45,7 +45,9 @@ const recipeSlice = createSlice({
 
       // CREATE RECIPE
       .addCase(createRecipeThunk.fulfilled, (state, action) => {
-        state.recipes.unshift(action.payload);
+        if (action.payload.data) {
+          state.recipes.unshift(action.payload.data);
+        }
       })
 
       // GET RECIPE BY ID
@@ -54,7 +56,7 @@ const recipeSlice = createSlice({
       })
       .addCase(getRecipeByIdThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.recipeDetails = action.payload;
+        state.recipeDetails = action.payload.data || null;
       })
       .addCase(getRecipeByIdThunk.rejected, (state, action) => {
         state.loading = false;
@@ -63,12 +65,17 @@ const recipeSlice = createSlice({
 
       // UPDATE RECIPE
       .addCase(updateRecipeThunk.fulfilled, (state, action) => {
+        const updatedRecipe = action.payload.data;
+        if (!updatedRecipe) {
+          return;
+        }
+
         const index = state.recipes.findIndex(
-          (recipe) => recipe._id === action.payload._id
+          (recipe) => recipe._id === updatedRecipe._id
         );
 
         if (index !== -1) {
-          state.recipes[index] = action.payload;
+          state.recipes[index] = updatedRecipe;
         }
       })
 
@@ -81,7 +88,10 @@ const recipeSlice = createSlice({
 
       // TOGGLE BOOKMARK
       .addCase(toggleRecipeBookmarkThunk.fulfilled, (state, action) => {
-        const updatedRecipe = action.payload;
+        const updatedRecipe = action.payload.data;
+        if (!updatedRecipe) {
+          return;
+        }
 
         const index = state.recipes.findIndex(
           (recipe) => recipe._id === updatedRecipe._id
@@ -89,6 +99,10 @@ const recipeSlice = createSlice({
 
         if (index !== -1) {
           state.recipes[index] = updatedRecipe;
+        }
+
+        if (state.recipeDetails?._id === updatedRecipe._id) {
+          state.recipeDetails = updatedRecipe;
         }
       });
   },

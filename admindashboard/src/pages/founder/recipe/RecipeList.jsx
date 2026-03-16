@@ -31,8 +31,7 @@ export default function RecipeList() {
 
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchText, setSearchText] = useState("");
-  const [showBookmarkedOnly, setShowBookmarkedOnly] = useState(false);
-
+ 
 
   const CATEGORY_OPTIONS = useMemo(() => {
   const categories = recipes.map((recipe) => recipe.category);
@@ -95,11 +94,10 @@ export default function RecipeList() {
         recipeIngredients.some((item) => item.toLowerCase().includes(query)) ||
         recipeSteps.some((item) => item.toLowerCase().includes(query));
 
-      const matchesBookmark = !showBookmarkedOnly || recipe.isBookmarked;
-
-      return matchesCategory && matchesSearch && matchesBookmark;
+ 
+      return matchesCategory && matchesSearch;
     });
-  }, [recipes, activeCategory, searchText, showBookmarkedOnly]);
+  }, [recipes, activeCategory, searchText]);
 
   const toggleBookmark = (id) => {
     dispatch(toggleRecipeBookmarkThunk(id));
@@ -182,17 +180,7 @@ export default function RecipeList() {
                 Add Recipe
               </Link>
 
-              <button
-                onClick={() => setShowBookmarkedOnly((prev) => !prev)}
-                className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition ${
-                  showBookmarkedOnly
-                    ? "bg-amber-100 text-amber-800"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                }`}
-              >
-                <Filter size={15} />
-                {showBookmarkedOnly ? "Bookmarked Only" : "Filter Bookmarked"}
-              </button>
+              
 
             </div>
           </div>
@@ -290,7 +278,7 @@ export default function RecipeList() {
                       </div>
                     )}
 
-                    <button
+                    {/* <button
                       onClick={() => toggleBookmark(recipe._id)}
                       className={`absolute right-3 top-3 rounded-full p-2 backdrop-blur-sm transition ${
                         recipe.isBookmarked
@@ -302,7 +290,7 @@ export default function RecipeList() {
                         size={15}
                         fill={recipe.isBookmarked ? "currentColor" : "none"}
                       />
-                    </button>
+                    </button> */}
 
                   </div>
 
