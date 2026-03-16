@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { Brain, CheckCircle2, Lock, PlayCircle, Upload } from "lucide-react";
@@ -29,6 +29,8 @@ export default function TherapyTasksPage() {
   const [fileName, setFileName] = useState("Upload File");
   const [comment, setComment] = useState("");
   const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
 
   useEffect(() => {
     const fetchPageData = async () => {
@@ -216,8 +218,25 @@ export default function TherapyTasksPage() {
       setUploading(false);
     }
   };
+ 
+   const handleOpenFilePicker = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e) => {
+    const selected = e.target.files?.[0];
+    if (!selected) return;
+
+    setFile(selected);
+    setFileName(selected.name);
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  };
 
   const openNextVideo = () => {
+
     const nextIndex = selectedIndex + 1;
     if (nextIndex < therapyTasks.length && isUnlocked(nextIndex)) {
       setSelectedIndex(nextIndex);
@@ -305,11 +324,11 @@ export default function TherapyTasksPage() {
             {selectedTask?.mediaUrl ? (
               <video
                 key={selectedIndex}
-                controls
-                onEnded={handleVideoEnd}
-                className="w-full aspect-video"
-                src={selectedTask.mediaUrl}
-              >
+                 controls
+                 onEnded={handleVideoEnd}
+                 className="w-full aspect-video"
+                 src={selectedTask.mediaUrl?.replace(/^http:\/\//i, "https://")}
+               >
                 Your browser does not support the video tag.
               </video>
             ) : (
@@ -389,61 +408,100 @@ export default function TherapyTasksPage() {
         </div>
       </div>
 
-      {shouldShowSubmissionForm && (
-        <div className="mx-4 lg:mx-2 mb-4">
-          <div className="bg-white rounded-2xl shadow-sm border border-[#0A4F48]/10 p-4 lg:p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-[#E6EEED] flex items-center justify-center shrink-0">
-                <CheckCircle2 size={18} className="text-[#0A4F48]" />
-              </div>
-              <div>
-                <h2 className="text-[#0A4F48] font-bold text-base">Submit Therapy Proof</h2>
-                <p className="text-xs text-gray-500">All videos watched — add notes and upload your completion proof.</p>
+ 
+       {shouldShowSubmissionForm && (
+        <div className="mx-4 lg:mx-2 mb-8">
+          <div className="bg-white rounded-4xl shadow-xl shadow-[#0A4F48]/5 border border-[#0A4F48]/10 overflow-hidden">
+            <div className="bg-[#0A4F48] p-6 text-white">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center shrink-0">
+                  <CheckCircle2 size={24} className="text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold">Therapy Complete</h2>
+                  <p className="text-white/70 text-sm">Review your session and upload your completion proof</p>
+                </div>
               </div>
             </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-bold text-[#0A4F48] mb-2">Notes (optional)</label>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                rows={3}
-                placeholder="How did the therapy session feel?"
-                className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 resize-none focus:outline-none focus:ring-2 focus:ring-[#0A4F48]/20"
-              />
-            </div>
+            <div className="p-6 lg:p-8">
+              <div className="grid md:grid-cols-2 gap-6 mb-8">
+                <div>
+                  <label className="text-sm font-bold text-[#0A4F48] mb-2 flex items-center gap-2">
+                    Notes <span className="text-[10px] font-normal text-gray-400 uppercase tracking-wider">(Optional)</span>
+                  </label>
+                  <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    rows={4}
+                    placeholder="How did the therapy session feel? Any breakthrough or observations?"
+                    className="w-full rounded-2xl border-2 border-gray-100 bg-gray-50/30 px-4 py-3 text-sm text-gray-700 resize-none focus:outline-none focus:border-[#0A4F48]/30 focus:bg-white transition-all outline-hidden"
+                  />
+                </div>
 
-            <div className="mb-6">
-              <label className="block text-sm font-bold text-[#0A4F48] mb-2">Upload Proof (Photo / Video)</label>
-              <label
-                htmlFor="therapy-proof-upload"
-                className="flex items-center gap-3 w-full rounded-xl border-2 border-dashed border-[#0A4F48]/30 px-4 py-3 cursor-pointer hover:bg-[#E6EEED]/30 transition-colors"
+                <div>
+                  <label className="block text-sm font-bold text-[#0A4F48] mb-2">Upload Proof</label>
+                  <div 
+                    onClick={handleOpenFilePicker}
+                    className="group relative h-[116px] flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#0A4F48]/40 hover:bg-[#E6EEED]/20 transition-all cursor-pointer overflow-hidden"
+                  >
+                    {file ? (
+                      <div className="flex flex-col items-center gap-1 p-4">
+                        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                          <CheckCircle2 size={18} className="text-green-600" />
+                        </div>
+                        <span className="text-xs font-bold text-[#0A4F48] truncate max-w-full text-center">{fileName}</span>
+                        <button 
+                          type="button" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFile(null);
+                            setFileName("Upload File");
+                          }}
+                          className="text-[10px] text-red-500 font-bold uppercase hover:underline"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Upload size={20} className="text-gray-400 group-hover:text-[#0A4F48]" />
+                        </div>
+                        <p className="text-xs font-bold text-gray-500 group-hover:text-[#0A4F48]">Drop photo/video proof</p>
+                        <p className="text-[10px] text-gray-400">or click to browse</p>
+                      </div>
+                    )}
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    id="therapy-proof-upload"
+                    type="file"
+                    accept="image/*,video/*"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={handleSubmit}
+                disabled={uploading}
+                className="w-full bg-[#0A4F48] hover:bg-[#083b36] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-2xl py-4 text-base font-black transition-all shadow-lg shadow-[#0A4F48]/20 flex items-center justify-center gap-2 group"
               >
-                <Upload size={18} className="text-[#0A4F48] shrink-0" />
-                <span className="text-sm font-medium text-gray-600 truncate">{fileName}</span>
-                <input
-                  id="therapy-proof-upload"
-                  type="file"
-                  accept="image/*,video/*"
-                  className="sr-only"
-                  onChange={(e) => {
-                    const selected = e.target.files?.[0];
-                    if (selected) {
-                      setFile(selected);
-                      setFileName(selected.name);
-                    }
-                  }}
-                />
-              </label>
+                {uploading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Submitting...</span>
+                  </div>
+                ) : (
+                  <>
+                    <span>Submit Therapy Result</span>
+                    <Brain size={18} className="group-hover:rotate-12 transition-transform" />
+                  </>
+                )}
+              </button>
             </div>
-
-            <button
-              onClick={handleSubmit}
-              disabled={uploading}
-              className="w-full bg-[#0A4F48] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl py-3 text-sm font-bold transition-colors"
-            >
-              {uploading ? "Submitting..." : "Submit Therapy"}
-            </button>
           </div>
         </div>
       )}

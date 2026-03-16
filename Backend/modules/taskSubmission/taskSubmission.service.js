@@ -193,10 +193,6 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
         }
     }
 
-    const hasRejectedWorkoutHistory = daySubmission.exercises.some(
-        ex => ex.taskType === "Workout" && ex.wasRejectedOnce === true
-    );
-
     if (workoutComplete && therapyComplete) {
         if (user.currentGlobalDay === Number(globalDayIndex)) {
             // Check if we already have a completion time for this day? 
@@ -211,10 +207,10 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
                     scheduledDayUtc && todayUtc && todayUtc > scheduledDayUtc
                 );
 
-                // If a rejected task is completed after its scheduled day,
+                // If a task is completed after its scheduled day,
                 // do not add an extra cooldown from "today". Advance immediately
-                // based on the original program day timeline.
-                if (completedAfterScheduledDay && hasRejectedWorkoutHistory) {
+                // based on the original program day timeline to allow catch-up.
+                if (completedAfterScheduledDay) {
                     user.lastDayCompletionTime = scheduledDayUtc;
                     await user.save();
                     await attemptDayAdvancement(userId);
