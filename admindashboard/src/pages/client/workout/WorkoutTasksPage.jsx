@@ -316,7 +316,7 @@ export default function WorkoutTasksPage() {
                 controls
                 onEnded={handleVideoEnd}
                 className="w-full aspect-video"
-                src={selectedTask.url}
+                src={selectedTask.url?.replace(/^http:\/\//i, "https://")}
               >
                 Your browser does not support the video tag.
               </video>
