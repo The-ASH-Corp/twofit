@@ -1,5 +1,4 @@
-import { Button } from "@/components/ui/button";
-import { Droplets, Minus, Plus } from "lucide-react";
+import { Droplets, Plus, GlassWater } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
@@ -127,198 +126,107 @@ const WaterIntake = () => {
   const disableControls = isWaterLoading || isWaterSyncing;
 
   return (
-    <>
-      <div className="bg-white p-6 rounded-2xl shadow-sm lg:order-3 order-4">
-        <div className="flex items-center justify-between gap-4 mb-4">
-          <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-[#F4DBC7] flex items-center justify-center">
-              <Droplets size={18} className="text-[#0A4F48]" />
-            </div>
-            <div>
-              <h2 className="text-[#0A4F48] font-bold text-sm">
-                Water Intake Tracker
-              </h2>
-              <p className="text-xs text-slate-500">Today</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-2 rounded-lg border border-slate-200 px-2 py-1">
-              <label
-                htmlFor="water-step"
-                className="text-[11px] font-semibold text-slate-500"
-              >
-                Per tap
-              </label>
-              <select
-                id="water-step"
-                value={waterStepMl}
-                onChange={(event) => setWaterStepMl(Number(event.target.value))}
-                className="bg-transparent text-xs font-bold text-[#0A4F48] outline-none"
-                aria-label="Water intake amount per tap"
-                disabled={disableControls}
-              >
-                {Array.from({ length: 9 }, (_, idx) => 100 + idx * 50).map(
-                  (step) => (
-                    <option key={step} value={step}>
-                      {step} ml
-                    </option>
-                  ),
-                )}
-              </select>
-            </div>
-            <Button
-              variant="outline"
-              size="icon-sm"
-              onClick={() => adjustWaterIntake(waterStepMl)}
-              disabled={disableControls}
-              aria-label="Increase water intake"
-            >
-              <Plus size={16} />
-            </Button>
-          </div>
+    <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-50 flex flex-col md:flex-row gap-8 items-center transition-all hover:shadow-md">
+      {/* Visual Indicator Layer */}
+      <div className="relative w-40 h-40 shrink-0">
+        <svg className="w-full h-full -rotate-90">
+          <circle
+            cx="80"
+            cy="80"
+            r="70"
+            className="stroke-gray-100 fill-none"
+            strokeWidth="12"
+          />
+          <circle
+            cx="80"
+            cy="80"
+            r="70"
+            className="stroke-[#0A4F48] fill-none transition-all duration-1000 ease-out"
+            strokeWidth="12"
+            strokeDasharray={2 * Math.PI * 70}
+            strokeDashoffset={2 * Math.PI * 70 * (1 - waterProgressBarPercent / 100)}
+            strokeLinecap="round"
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <Droplets className="text-[#0A4F48] w-8 h-8 mb-1 animate-bounce" />
+          <span className="text-2xl font-black text-[#0A4F48]">{Math.round(waterProgressPercent)}%</span>
         </div>
-
-        <div className="flex items-end justify-between mb-2">
-          <span className="text-xs font-bold text-[#334155]">
-            {formatLiters(waterIntakeMl)} / {formatLiters(waterGoalMl)}
-          </span>
-          <span className="text-xl font-black text-[#0A4F48]">
-            {Math.round(waterProgressPercent)}%
-          </span>
-        </div>
-
-        <div className="relative">
-          <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-linear-to-r from-[#0A4F48] to-[#116D63] rounded-full transition-all duration-500 ease-out"
-              style={{ width: `${waterProgressBarPercent}%` }}
-            />
-          </div>
-          {waterProgressPercent >= 100 && (
-            <div className="pointer-events-none absolute inset-0 rounded-full border border-[#0A4F48]/40 animate-[goal-pulse_1.2s_ease-out_infinite]" />
-          )}
-          {showWaterCompletionBurst && (
-            <div className="pointer-events-none absolute right-0 top-1/2">
-              {[
-                { x: "-84px", y: "-34px", size: 6, delay: 0 },
-                { x: "-64px", y: "-48px", size: 7, delay: 35 },
-                { x: "-40px", y: "-28px", size: 5, delay: 70 },
-                { x: "-18px", y: "-56px", size: 6, delay: 105 },
-                { x: "-94px", y: "-10px", size: 6, delay: 140 },
-                { x: "-76px", y: "18px", size: 7, delay: 175 },
-                { x: "-50px", y: "28px", size: 5, delay: 210 },
-                { x: "-22px", y: "14px", size: 6, delay: 245 },
-                { x: "-100px", y: "-54px", size: 5, delay: 280 },
-                { x: "-58px", y: "-72px", size: 5, delay: 315 },
-                { x: "-12px", y: "-30px", size: 4, delay: 350 },
-                { x: "-8px", y: "22px", size: 4, delay: 385 },
-              ].map((particle, idx) => (
-                <span
-                  key={idx}
-                  className="absolute rounded-full bg-[#0A4F48]"
-                  style={{
-                    width: `${particle.size}px`,
-                    height: `${particle.size}px`,
-                    animation: `water-burst 650ms ease-out ${particle.delay}ms forwards`,
-                    "--water-burst-x": particle.x,
-                    "--water-burst-y": particle.y,
-                  }}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-
         {waterProgressPercent >= 100 && (
-          <p className="mt-2 text-xs font-semibold text-[#0A4F48] animate-[goal-message_1.2s_ease-in-out_infinite]">
-            Goal achieved. Keep going.
-          </p>
+          <div className="absolute inset-0 rounded-full border-4 border-[#0A4F48]/20 animate-ping" />
         )}
+      </div>
 
-        <div className="mt-4">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-              Glasses
-            </span>
-            <span className="text-xs font-bold text-slate-600">
-              {waterGlassesDone}/{waterGlassesTotal}
-            </span>
-          </div>
-
-          {extraWaterMl > 0 && (
-            <p className="mb-2 text-[11px] font-semibold text-[#0A4F48]">
-              Extra after target: +{formatLiters(extraWaterMl)}
+      {/* Control Layer */}
+      <div className="flex-1 w-full">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-[#0A4F48] font-black text-xs uppercase tracking-[0.2em] mb-1">
+              Hydration Tracker
+            </h2>
+            <p className="text-2xl font-black text-gray-800 tracking-tight">
+              {formatLiters(waterIntakeMl)} <span className="text-gray-300">/ {formatLiters(waterGoalMl)}</span>
             </p>
-          )}
-
-          <div className="grid grid-cols-8 gap-2">
-            {Array.from({ length: waterGlassesTotal }).map((_, idx) => {
-              const isFilled = idx < waterGlassesDone;
-              return (
-                <div
-                  key={idx}
-                  className={
-                    "h-8 rounded-xl border transition-all " +
-                    (isFilled
-                      ? "bg-[#0A4F48] border-transparent"
-                      : "bg-[#F8FAFC] border-[#E2E8F0]")
-                  }
-                  aria-hidden="true"
-                />
-              );
-            })}
           </div>
 
-          <p className="mt-2 text-[11px] text-slate-500">
-            Tap +  to update by {waterStepMl} ml (server synced).
-          </p>
+          <div className="flex items-center gap-2">
+            <div className="flex flex-col items-end">
+               <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Per Tap</span>
+               <select
+                 value={waterStepMl}
+                 onChange={(e) => setWaterStepMl(Number(e.target.value))}
+                 className="bg-gray-50 text-xs font-black text-[#0A4F48] px-3 py-1.5 rounded-xl outline-none border border-gray-100 focus:border-[#0A4F48]/30 transition-all"
+                 disabled={disableControls}
+               >
+                 {[100, 250, 500].map(val => (
+                   <option key={val} value={val}>{val}ml</option>
+                 ))}
+               </select>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-6">
+           {/* Glass grid */}
+           <div className="flex flex-wrap gap-2">
+              {Array.from({ length: waterGlassesTotal }).map((_, idx) => (
+                <div key={idx} className={`w-8 h-10 rounded-lg border-2 flex items-end overflow-hidden transition-all duration-500 ${idx < waterGlassesDone ? 'border-[#0A4F48] bg-[#0A4F48]/5' : 'border-gray-100'}`}>
+                   <div 
+                     className="w-full bg-[#0A4F48] transition-all duration-700 ease-out" 
+                     style={{ height: idx < waterGlassesDone ? '100%' : '0%' }}
+                   />
+                </div>
+              ))}
+              {extraWaterMl > 0 && (
+                <div className="flex items-center gap-1 ml-2">
+                   <div className="w-8 h-10 rounded-lg border-2 border-orange-200 bg-orange-50 flex items-center justify-center">
+                      <Plus className="text-orange-400 w-3 h-3" />
+                   </div>
+                   <span className="text-[10px] font-black text-orange-400">+{formatLiters(extraWaterMl)}</span>
+                </div>
+              )}
+           </div>
+
+           <div className="flex items-center gap-3">
+              {/* <button
+                onClick={() => adjustWaterIntake(-waterStepMl)}
+                disabled={disableControls || waterIntakeMl === 0}
+                className="flex-1 bg-gray-50 hover:bg-gray-100 text-gray-400 h-14 rounded-2xl flex items-center justify-center transition-all disabled:opacity-30 active:scale-95"
+              >
+                <Minus className="w-5 h-5" />
+              </button> */}
+              <button
+                onClick={() => adjustWaterIntake(waterStepMl)}
+                disabled={disableControls}
+                className="flex-2 bg-[#0A4F48] hover:bg-[#0c5c54] text-white h-14 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-[#0A4F48]/20 transition-all active:scale-95"
+              >
+                <GlassWater className="w-5 h-5" />
+                <span className="text-sm font-black uppercase tracking-widest">Add Water</span>
+              </button>
+           </div>
         </div>
       </div>
-      <style>
-        {`
-          @keyframes goal-pulse {
-            0% {
-              opacity: 0;
-              transform: scale(1);
-            }
-            40% {
-              opacity: 1;
-            }
-            100% {
-              opacity: 0;
-              transform: scale(1.08);
-            }
-          }
-
-          @keyframes goal-message {
-            0%,
-            100% {
-              transform: translateY(0px);
-              opacity: 0.8;
-            }
-            50% {
-              transform: translateY(-2px);
-              opacity: 1;
-            }
-          }
-
-          @keyframes water-burst {
-            0% {
-              opacity: 1;
-              transform: translate(-50%, -50%) scale(1);
-            }
-            100% {
-              opacity: 0;
-              transform: translate(
-                calc(-50% + var(--water-burst-x)),
-                calc(-50% + var(--water-burst-y))
-              ) scale(0.2);
-            }
-          }
-        `}
-      </style>
-    </>
+    </div>
   );
 };
 
