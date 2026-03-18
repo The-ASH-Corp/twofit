@@ -34,7 +34,7 @@ export const seedReminders = async () => {
         },
       ]);
     }
-
+    
     return { message: "Default reminders seeded" };
   } catch (error) {
     throw error;
