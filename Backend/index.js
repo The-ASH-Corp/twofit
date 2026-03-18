@@ -14,6 +14,7 @@ import { startNotificationCron } from "./utils/notification.cron.js";
 import { ensureNotificationIndexes } from "./modules/notification/notification.service.js";
 import "./utils/payroll.cron.js";
 import "./utils/SOPLog.cron.js";
+import { seedReminders } from "./modules/autoReminder/reminder.service.js";
 
 
 
@@ -88,12 +89,14 @@ initSocket(io);
 await connectRedis()
 mongoose
   .connect(process.env.MONGOURI)
-  .then(() => {
+  .then(async() => {
     console.log("connected");
+    await seedReminders();
     // Start the cleanup scheduler after DB connection
     ensureNotificationIndexes();
     startImageCleanupTask();
     startNotificationCron();
+    
   })
   .catch(() => console.log("not connected"));
 
