@@ -8,12 +8,12 @@ import KpiCard from "@/components/cards/KpiCard";
 import HeroCard from "./components/HeroCard";
 import ComplianceChart from "@/components/chart/ComplianceChart";
 import ProgressChart from "./components/ProgressChart";
-import TaskList from "./components/TaskList";
 import DietPlanCard from "./components/DietPlanCard";
 import ExpertsList from "./components/ExpertsList";
 import Measeurement from "./components/Measeurement";
 import NotificationsList from "./components/NotificationsList";
 import MobileBottomNav from "./components/MobileBottomNav";
+import BookmarkedRecipes from "./components/BookmarkedRecipes";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useDispatch } from "react-redux";
@@ -59,11 +59,11 @@ export default function Dashboard() {
         typeof user?.programType === "object"
           ? user?.programType?._id
           : user?.programType;
-      const program = await dispatch(getProgramById(programId)).unwrap();
-      const coaches = await dispatch(
-        getAllCoachesByAdmin([user?.trainer, user?.therapist, user?.dietition]),
-      ).unwrap();
-      const compliance = await dispatch(fetchClientComplianceStats()).unwrap();
+      const [program, coaches, compliance] = await Promise.all([
+        dispatch(getProgramById(programId)).unwrap(),
+        dispatch(getAllCoachesByAdmin([user?.trainer, user?.therapist, user?.dietition])).unwrap(),
+        dispatch(fetchClientComplianceStats()).unwrap(),
+      ]);
       setProgram(program.data);
       setCoaches(coaches);
       setComplianceData(compliance);
@@ -111,7 +111,7 @@ export default function Dashboard() {
       } else {
         toast.error(result.payload || "Failed to submit assessment");
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred during submission");
     }
   };
@@ -265,19 +265,7 @@ export default function Dashboard() {
           </div>
           <WaterIntake />
 
-          {/* Bottom Section: My Tasks */}
-          <div className="lg:order-5 order-2">
-            <h2 className="text-[#0A4F48] font-bold text-lg">My Tasks</h2>
-            <TaskList
-              plans={program?.plan}
-              therapyPlan={clientUser?.therapyType}
-              programTitle={program?.title}
-              isProgramStarted={isProgramStarted}
-              mealCount={
-                clientUser?.dietPlanMealCount || user?.dietPlanMealCount
-              }
-            />
-          </div>
+           
 
           {/* Mobile Only: Measurements */}
           <div className="lg:hidden order-4">

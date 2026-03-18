@@ -101,10 +101,12 @@ export const syncMissedDaysForUser = async (userId) => {
 
 // Helper to determine if we should advance the user's day
 export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
-    const user = await User.findById(userId).populate({
-        path: 'programType',
-        populate: { path: 'plan' }
-    });
+    const user = await User.findById(userId)
+        .populate({
+            path: 'programType',
+            populate: { path: 'plan' }
+        })
+        .populate('therapyType');
 
     if (!user?.programType?.plan) return false;
 
@@ -159,7 +161,7 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
     const daySubmission = userSubmission.dailySubmissions.find(d => d.globalDayIndex === Number(globalDayIndex));
     if (!daySubmission) return false;
 
-    // Check Workouts
+    // Check Workouts (must be expert-verified)
     let workoutComplete = true;
     if (expectedWorkoutCount > 0) {
         let completedWorkouts = 0;
@@ -167,7 +169,7 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
             const submission = daySubmission.exercises.find(
                 ex => ex.taskType === "Workout" && Number(ex.exerciseIndex) === i
             );
-            if (submission && (submission.status === "verified" || submission.status === "pending")) {
+            if (submission && submission.status === "verified") {
                 completedWorkouts++;
             }
         }
@@ -176,7 +178,7 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
         }
     }
 
-    // Check Therapy
+    // Check Therapy (must be expert-verified)
     let therapyComplete = true;
     if (expectedTherapyCount > 0) {
         let completedTherapies = 0;
@@ -184,7 +186,7 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
             const submission = daySubmission.exercises.find(
                 ex => ex.taskType === "Therapy" && Number(ex.exerciseIndex) === i
             );
-            if (submission && (submission.status === "verified" || submission.status === "pending")) {
+            if (submission && submission.status === "verified") {
                 completedTherapies++;
             }
         }
@@ -192,10 +194,6 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
             therapyComplete = false;
         }
     }
-
-    const hasRejectedWorkoutHistory = daySubmission.exercises.some(
-        ex => ex.taskType === "Workout" && ex.wasRejectedOnce === true
-    );
 
     if (workoutComplete && therapyComplete) {
         if (user.currentGlobalDay === Number(globalDayIndex)) {
@@ -211,13 +209,22 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
                     scheduledDayUtc && todayUtc && todayUtc > scheduledDayUtc
                 );
 
-                // If a rejected task is completed after its scheduled day,
-                // do not add an extra cooldown from "today". Advance immediately
-                // based on the original program day timeline.
-                if (completedAfterScheduledDay && hasRejectedWorkoutHistory) {
-                    user.lastDayCompletionTime = scheduledDayUtc;
+                // If a task is completed after its scheduled day (catch-up),
+                // advance the day directly without auto-verifying tasks.
+                // Tasks remain "pending" so experts can still review them.
+                if (completedAfterScheduledDay) {
+                    user.currentGlobalDay += 1;
+                    user.lastDayCompletionTime = null;
                     await user.save();
-                    await attemptDayAdvancement(userId);
+
+                    try {
+                        const io = getIO();
+                        io.to(userId.toString()).emit("day_advanced", {
+                            newGlobalDay: user.currentGlobalDay
+                        });
+                    } catch (socketError) {
+                        console.error("Socket notification for catch-up day advancement failed:", socketError.message);
+                    }
                     return true;
                 }
 
@@ -250,40 +257,16 @@ export const attemptDayAdvancement = async (userId) => {
     const user = await User.findById(userId);
     if (!user || !user.lastDayCompletionTime) return user; // No completion recorded or user invalid
 
+    // Defensive check: only unlock/advance if the current day is still fully eligible.
+    // This protects users who may have stale completion timestamps from older logic.
+    const isEligibleToAdvance = await checkAndAdvanceDay(userId, user.currentGlobalDay);
+    if (!isEligibleToAdvance) return user;
+
     // Check if NOW > Unlock Date
     const unlockDate = calculateUnlockDate(user.lastDayCompletionTime);
 
     if (new Date() >= unlockDate) {
         // Unlock time passed! Advance the day.
-        const previousDay = user.currentGlobalDay;
-
-        // Auto-verify all pending tasks from the completed day
-        const userSubmission = await TaskSubmission.findOne({ userId });
-        if (userSubmission) {
-            const completedDaySubmission = userSubmission.dailySubmissions.find(
-                d => d.globalDayIndex === previousDay
-            );
-
-            if (completedDaySubmission) {
-                let hasChanges = false;
-                completedDaySubmission.exercises.forEach(ex => {
-                    if (ex.status === 'pending') {
-                        ex.status = 'verified';
-                        // ex.updatedAt = Date.now();
-                        hasChanges = true;
-                    }
-                    if (ex.wasRejectedOnce) {
-                        ex.wasRejectedOnce = false;
-                        hasChanges = true;
-                    }
-                });
-
-                if (hasChanges) {
-                    await userSubmission.save();
-                }
-            }
-        }
-
         user.currentGlobalDay += 1;
         user.lastDayCompletionTime = null; // Clear completion time reset for next day cycle
         await user.save();

@@ -3,19 +3,15 @@ import {
   Bookmark,
   Search,
   Filter,
-  Plus,
   Flame,
   Dumbbell,
   FolderOpen,
-  Pencil,
-  Trash2,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
-  deleteRecipeThunk,
   getRecipesThunk,
   toggleRecipeBookmarkThunk,
 } from "@/redux/features/recipe/recipe.thunk";
@@ -25,24 +21,52 @@ import { selectRecipes, selectRecipeLoading } from "@/redux/features/recipe/reci
 
 export default function RecipeList() {
   const dispatch = useDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const bookmarkedFilter = searchParams.get("filter") === "bookmarked";
 
   const recipes = useSelector(selectRecipes);
   const loading = useSelector(selectRecipeLoading);
 
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchText, setSearchText] = useState("");
-  const [showBookmarkedOnly, setShowBookmarkedOnly] = useState(false);
+  const [showBookmarkedOnly, setShowBookmarkedOnly] = useState(bookmarkedFilter);
+  const [bookmarkLoadingId, setBookmarkLoadingId] = useState(null);
 
   const CATEGORY_OPTIONS = useMemo(() => {
-  const categories = recipes.map((recipe) => recipe.category);
-  return [...new Set(categories)].filter(Boolean);
-}, [recipes]);
+    const categories = recipes.map((recipe) => recipe.category);
+    return [...new Set(categories)].filter(Boolean);
+  }, [recipes]);
 
- 
+  const bookmarkedCount = useMemo(
+    () => recipes.filter((recipe) => recipe.isBookmarked).length,
+    [recipes],
+  );
 
   useEffect(() => {
-    dispatch(getRecipesThunk());
+    dispatch(getRecipesThunk()).unwrap().catch(() => {
+      toast.error("Failed to load recipes");
+    });
   }, [dispatch]);
+
+  useEffect(() => {
+    setShowBookmarkedOnly(bookmarkedFilter);
+  }, [bookmarkedFilter]);
+
+  useEffect(() => {
+    if (showBookmarkedOnly === bookmarkedFilter) {
+      return;
+    }
+
+    const nextParams = new URLSearchParams(searchParams);
+
+    if (showBookmarkedOnly) {
+      nextParams.set("filter", "bookmarked");
+    } else {
+      nextParams.delete("filter");
+    }
+
+    setSearchParams(nextParams, { replace: true });
+  }, [bookmarkedFilter, searchParams, setSearchParams, showBookmarkedOnly]);
 
   const toDisplayText = (item) => {
     if (typeof item === "string") {
@@ -100,20 +124,15 @@ export default function RecipeList() {
     });
   }, [recipes, activeCategory, searchText, showBookmarkedOnly]);
 
-  const toggleBookmark = (id) => {
-    dispatch(toggleRecipeBookmarkThunk(id));
-  };
-
-  const handleDeleteRecipe = async (id) => {
-    if (!window.confirm("Delete this recipe?")) {
-      return;
-    }
-
+  const toggleBookmark = async (id) => {
     try {
-      await dispatch(deleteRecipeThunk(id)).unwrap();
-      toast.success("Recipe deleted successfully");
+      setBookmarkLoadingId(id);
+      await dispatch(toggleRecipeBookmarkThunk(id)).unwrap();
+      await dispatch(getRecipesThunk()).unwrap();
     } catch (error) {
-      toast.error(error || "Failed to delete recipe");
+      toast.error(error || "Failed to update bookmark");
+    } finally {
+      setBookmarkLoadingId(null);
     }
   };
 
@@ -150,6 +169,12 @@ export default function RecipeList() {
                 <p className="text-xs font-semibold text-emerald-700">Total Recipes</p>
                 <p className="text-lg font-bold text-emerald-900">
                   {recipes.length}
+                </p>
+              </div>
+              <div className="rounded-xl bg-amber-50 px-4 py-2 text-sm">
+                <p className="text-xs font-semibold text-amber-700">My Bookmarks</p>
+                <p className="text-lg font-bold text-amber-900">
+                  {bookmarkedCount}
                 </p>
               </div>
             </div>
@@ -288,12 +313,23 @@ export default function RecipeList() {
                     )}
 
                     <button
+                      type="button"
                       onClick={() => toggleBookmark(recipe._id)}
+                      disabled={bookmarkLoadingId === recipe._id}
                       className={`absolute right-3 top-3 rounded-full p-2 backdrop-blur-sm transition ${
                         recipe.isBookmarked
                           ? "bg-amber-100/90 text-amber-700"
                           : "bg-white/80 text-slate-500"
+                      } ${
+                        bookmarkLoadingId === recipe._id
+                          ? "cursor-not-allowed opacity-60"
+                          : ""
                       }`}
+                      aria-label={
+                        recipe.isBookmarked
+                          ? `Remove ${recipe.name} from bookmarks`
+                          : `Bookmark ${recipe.name}`
+                      }
                     >
                       <Bookmark
                         size={15}
