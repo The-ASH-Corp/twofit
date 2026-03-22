@@ -389,8 +389,7 @@ const notifyExpertsAndAdmins = async (userId, submissionId, eventType, extraData
                     safeCreateNotification({
                         type,
                         message,
-                        recipientRo
-le: "coach",
+                        recipientRole: "coach",
                         recipientId: expertId,
                         priority: type === "risk_alert" ? "critical" : "high",
                         dedupeKey: `${eventType}:coach:${expertId}:${submissionId}:${normalizedTaskType}:${status}`,
