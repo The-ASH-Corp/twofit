@@ -21,6 +21,7 @@ const persistConfig = {
     "finance",
     "broadcast",
     "sop",
+    "reminder",
   ],
 };
 
