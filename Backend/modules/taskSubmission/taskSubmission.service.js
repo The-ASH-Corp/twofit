@@ -1,6 +1,5 @@
 import TaskSubmission from "./taskSubmission.model.js";
 import User from "../auth/auth.model.js";
-import Plan from "../plan/plan.model.js";
 import mongoose from "mongoose";
 import { getIO } from "../../utils/socket.js";
 import { createNotification } from "../notification/notification.service.js";
@@ -101,10 +100,12 @@ export const syncMissedDaysForUser = async (userId) => {
 
 // Helper to determine if we should advance the user's day
 export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
-    const user = await User.findById(userId).populate({
-        path: 'programType',
-        populate: { path: 'plan' }
-    });
+    const user = await User.findById(userId)
+        .populate({
+            path: 'programType',
+            populate: { path: 'plan' }
+        })
+        .populate('therapyType');
 
     if (!user?.programType?.plan) return false;
 
@@ -127,8 +128,6 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
 
     // Determine meal count based on program title
     const programTitle = user.programType.title || "";
-    const isWeightLoss = programTitle.toLowerCase().includes("weight loss");
-    const mealCount = isWeightLoss ? 5 : 6;
 
     // Total exercises = workout exercises from plan
     const expectedWorkoutCount = currentDayConfig.exercises.length;
@@ -159,7 +158,7 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
     const daySubmission = userSubmission.dailySubmissions.find(d => d.globalDayIndex === Number(globalDayIndex));
     if (!daySubmission) return false;
 
-    // Check Workouts
+    // Check Workouts (must be expert-verified)
     let workoutComplete = true;
     if (expectedWorkoutCount > 0) {
         let completedWorkouts = 0;
@@ -167,7 +166,7 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
             const submission = daySubmission.exercises.find(
                 ex => ex.taskType === "Workout" && Number(ex.exerciseIndex) === i
             );
-            if (submission && (submission.status === "verified" || submission.status === "pending")) {
+            if (submission && submission.status === "verified") {
                 completedWorkouts++;
             }
         }
@@ -176,7 +175,7 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
         }
     }
 
-    // Check Therapy
+    // Check Therapy (must be expert-verified)
     let therapyComplete = true;
     if (expectedTherapyCount > 0) {
         let completedTherapies = 0;
@@ -184,7 +183,7 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
             const submission = daySubmission.exercises.find(
                 ex => ex.taskType === "Therapy" && Number(ex.exerciseIndex) === i
             );
-            if (submission && (submission.status === "verified" || submission.status === "pending")) {
+            if (submission && submission.status === "verified") {
                 completedTherapies++;
             }
         }
@@ -195,30 +194,47 @@ export const checkAndAdvanceDay = async (userId, globalDayIndex) => {
 
     if (workoutComplete && therapyComplete) {
         if (user.currentGlobalDay === Number(globalDayIndex)) {
-            // Check if we already have a completion time for this day? 
+            // Check if we already have a completion time for this day
             if (!user.lastDayCompletionTime) {
                 const now = new Date();
                 const todayUtc = toUtcDateOnly(now);
-                const scheduledDayUtc = getProgramDayDateUtc(
-                    user.programStartDate,
-                    Number(globalDayIndex)
-                );
-                const completedAfterScheduledDay = Boolean(
-                    scheduledDayUtc && todayUtc && todayUtc > scheduledDayUtc
-                );
 
-                // If a task is completed after its scheduled day,
-                // do not add an extra cooldown from "today". Advance immediately
-                // based on the original program day timeline to allow catch-up.
-                if (completedAfterScheduledDay) {
-                    user.lastDayCompletionTime = scheduledDayUtc;
+                // Determine if this is a catch-up/re-submission:
+                // Look at when exercises were first created. If ANY were created before today, it's catch-up.
+                let isCatchupCompletion = false;
+                
+                for (const exercise of daySubmission.exercises) {
+                    const exerciseDate = exercise.createdAt ? toUtcDateOnly(exercise.createdAt) : null;
+                    if (exerciseDate && todayUtc && exerciseDate < todayUtc) {
+                        isCatchupCompletion = true;
+                        break;
+                    }
+                }
+
+
+                // If a task is being re-submitted/caught-up (created on earlier day),
+                // advance the day directly without setting a lock.
+                if (isCatchupCompletion) {
+                    user.currentGlobalDay += 1;
+                    user.lastDayCompletionTime = null;
                     await user.save();
-                    await attemptDayAdvancement(userId);
+
+
+                    try {
+                        const io = getIO();
+                        io.to(userId.toString()).emit("day_advanced", {
+                            newGlobalDay: user.currentGlobalDay
+                        });
+                    } catch (socketError) {
+                        console.error("Socket notification for catch-up day advancement failed:", socketError.message);
+                    }
                     return true;
                 }
 
+                // Normal same-day completion: set lock until next midnight
                 user.lastDayCompletionTime = now; // Record completion time
                 await user.save();
+
 
                 // Notify the client that they've completed the day
                 try {
@@ -246,40 +262,16 @@ export const attemptDayAdvancement = async (userId) => {
     const user = await User.findById(userId);
     if (!user || !user.lastDayCompletionTime) return user; // No completion recorded or user invalid
 
+    // Defensive check: only unlock/advance if the current day is still fully eligible.
+    // This protects users who may have stale completion timestamps from older logic.
+    const isEligibleToAdvance = await checkAndAdvanceDay(userId, user.currentGlobalDay);
+    if (!isEligibleToAdvance) return user;
+
     // Check if NOW > Unlock Date
     const unlockDate = calculateUnlockDate(user.lastDayCompletionTime);
 
     if (new Date() >= unlockDate) {
         // Unlock time passed! Advance the day.
-        const previousDay = user.currentGlobalDay;
-
-        // Auto-verify all pending tasks from the completed day
-        const userSubmission = await TaskSubmission.findOne({ userId });
-        if (userSubmission) {
-            const completedDaySubmission = userSubmission.dailySubmissions.find(
-                d => d.globalDayIndex === previousDay
-            );
-
-            if (completedDaySubmission) {
-                let hasChanges = false;
-                completedDaySubmission.exercises.forEach(ex => {
-                    if (ex.status === 'pending') {
-                        ex.status = 'verified';
-                        // ex.updatedAt = Date.now();
-                        hasChanges = true;
-                    }
-                    if (ex.wasRejectedOnce) {
-                        ex.wasRejectedOnce = false;
-                        hasChanges = true;
-                    }
-                });
-
-                if (hasChanges) {
-                    await userSubmission.save();
-                }
-            }
-        }
-
         user.currentGlobalDay += 1;
         user.lastDayCompletionTime = null; // Clear completion time reset for next day cycle
         await user.save();
@@ -539,8 +531,11 @@ export const createTaskSubmission = async (submissionData) => {
     // Update last task submission date for inactivity tracking
     await User.findByIdAndUpdate(userId, { $set: { lastTaskSubmissionDate: new Date() } }).exec();
 
-    // Check if we can complete the day (regardless of status: skipped, verified, or pending)
-    await checkAndAdvanceDay(userId, gIndex);
+    // Only trigger progression checks on gating task flows.
+    // Meal pending/skipped updates should not advance the day.
+    if (taskType === "Workout" || taskType === "Therapy" || status === "verified") {
+        await checkAndAdvanceDay(userId, gIndex);
+    }
 
     // Get the specific submission object for socket/response (flattened format)
     const day = userSubmission.dailySubmissions.find(d => d.globalDayIndex === gIndex);
@@ -987,8 +982,10 @@ export const verifyTaskSubmission = async (submissionId) => {
 
     await userSubmission.save();
 
-    // Check if we need to advance the day
-    await checkAndAdvanceDay(userSubmission.userId, foundGlobalDayIndex);
+    // Only gating task types should trigger progression checks.
+    if (foundTaskType === "Workout" || foundTaskType === "Therapy") {
+        await checkAndAdvanceDay(userSubmission.userId, foundGlobalDayIndex);
+    }
 
     // Notify Experts and Admins via Socket
     await notifyExpertsAndAdmins(userSubmission.userId, userSubmission._id, "task_updated", {
