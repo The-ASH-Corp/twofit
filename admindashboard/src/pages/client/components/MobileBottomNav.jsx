@@ -37,8 +37,8 @@ export default function MobileBottomNav() {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
-      <div className="flex items-center justify-around px-4 py-3">
+    <div className="lg:hidden fixed bottom-6 left-6 right-6 z-50">
+      <div className="bg-white/80 backdrop-blur-xl border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.12)] rounded-[24px] flex items-center justify-around px-2 py-3 overflow-hidden">
         {navItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.path);
@@ -47,20 +47,23 @@ export default function MobileBottomNav() {
             <button
               key={item.name}
               onClick={() => navigate(item.path)}
-              className="flex flex-col items-center gap-1 min-w-[60px]"
+              className="relative flex flex-col items-center gap-1.5 min-w-[56px] transition-all active:scale-90"
             >
-              <Icon
-                className={`w-6 h-6 ${
+              {active && (
+                <div className="absolute -top-3 w-8 h-1 bg-[#0A4F48] rounded-full animate-in fade-in zoom-in duration-300" />
+              )}
+              <div className={`p-2 rounded-xl transition-all duration-300 ${active ? 'bg-[#0A4F48] text-white shadow-lg shadow-[#0A4F48]/20' : 'text-gray-400'}`}>
+                <Icon
+                  className="w-5 h-5"
+                  strokeWidth={active ? 3 : 2}
+                />
+              </div>
+              <span
+                className={`text-[9px] font-black uppercase tracking-widest transition-colors duration-300 ${
                   active ? "text-[#0A4F48]" : "text-gray-400"
                 }`}
-                strokeWidth={2}
-              />
-              <span
-                className={`text-[11px] font-medium ${
-                  active ? "text-[#0A4F48]" : "text-gray-500"
-                }`}
               >
-                {item.name}
+                {item.name.split(' ')[0]}
               </span>
             </button>
           );
