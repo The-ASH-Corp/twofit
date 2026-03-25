@@ -9,20 +9,72 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { getClient } from "@/redux/features/client/client.thunk";
 import { getProgramById } from "@/redux/features/program/program.thunk";
-import { getUserTaskStatus, uploadMultipleWorkoutTasks } from "@/redux/features/tasks/task.thunk";
+import {
+  getUserTaskStatus,
+  uploadMultipleWorkoutTasks,
+} from "@/redux/features/tasks/task.thunk";
 import MobileBottomNav from "../components/MobileBottomNav";
 
 const rpeScale = [
-  { value: 10, label: "Maximum Effort",    description: "Activity is almost impossible to sustain. You are out of breath and unable to talk." },
-  { value: 9,  label: "Extremely Hard",    description: "Very challenging. Very short bouts only. Conversation is impossible." },
-  { value: 8,  label: "Very Hard",         description: "Intensive activity that you can sustain, but it's challenging to maintain conversation." },
-  { value: 7,  label: "Vigorous",          description: "Strenuous activity. Conversation is possible, but it's very labored." },
-  { value: 6,  label: "Moderately Hard",   description: "A step up in effort. Speaking in full sentences is difficult." },
-  { value: 5,  label: "Hard",              description: "Noticeable increase in effort. Breathing heavily but can maintain short conversation." },
-  { value: 4,  label: "Somewhat Hard",     description: "Moderate — a comfortable activity level that still feels like you're doing something." },
-  { value: 3,  label: "Moderate",          description: "Activity is easy to maintain. Can converse with minimal effort." },
-  { value: 2,  label: "Light",             description: "Feels easy and relaxed. Effortless conversation is possible." },
-  { value: 1,  label: "Very Light",        description: "Minimal effort. No noticeable change in breathing or heart rate." },
+  {
+    value: 10,
+    label: "Maximum Effort",
+    description:
+      "Activity is almost impossible to sustain. You are out of breath and unable to talk.",
+  },
+  {
+    value: 9,
+    label: "Extremely Hard",
+    description:
+      "Very challenging. Very short bouts only. Conversation is impossible.",
+  },
+  {
+    value: 8,
+    label: "Very Hard",
+    description:
+      "Intensive activity that you can sustain, but it's challenging to maintain conversation.",
+  },
+  {
+    value: 7,
+    label: "Vigorous",
+    description:
+      "Strenuous activity. Conversation is possible, but it's very labored.",
+  },
+  {
+    value: 6,
+    label: "Moderately Hard",
+    description:
+      "A step up in effort. Speaking in full sentences is difficult.",
+  },
+  {
+    value: 5,
+    label: "Hard",
+    description:
+      "Noticeable increase in effort. Breathing heavily but can maintain short conversation.",
+  },
+  {
+    value: 4,
+    label: "Somewhat Hard",
+    description:
+      "Moderate — a comfortable activity level that still feels like you're doing something.",
+  },
+  {
+    value: 3,
+    label: "Moderate",
+    description:
+      "Activity is easy to maintain. Can converse with minimal effort.",
+  },
+  {
+    value: 2,
+    label: "Light",
+    description: "Feels easy and relaxed. Effortless conversation is possible.",
+  },
+  {
+    value: 1,
+    label: "Very Light",
+    description:
+      "Minimal effort. No noticeable change in breathing or heart rate.",
+  },
 ];
 
 export default function WorkoutTasksPage() {
@@ -53,8 +105,12 @@ export default function WorkoutTasksPage() {
             : user?.programType;
 
         const [, programData] = await Promise.all([
-          user?._id ? dispatch(getClient({ id: user._id })).unwrap() : Promise.resolve(),
-          programId ? dispatch(getProgramById(programId)).unwrap() : Promise.resolve(null),
+          user?._id
+            ? dispatch(getClient({ id: user._id })).unwrap()
+            : Promise.resolve(),
+          programId
+            ? dispatch(getProgramById(programId)).unwrap()
+            : Promise.resolve(null),
           dispatch(getUserTaskStatus()).unwrap(),
         ]);
 
@@ -203,11 +259,14 @@ export default function WorkoutTasksPage() {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("notes", comment);
-      formData.append("effortRating", JSON.stringify({
-        ratingNumber:      effortRating.ratingNumber,
-        ratingLabel:       effortRating.ratingLabel,
-        ratingDescription: effortRating.ratingDescription,
-      }));
+      formData.append(
+        "effortRating",
+        JSON.stringify({
+          ratingNumber: effortRating.ratingNumber,
+          ratingLabel: effortRating.ratingLabel,
+          ratingDescription: effortRating.ratingDescription,
+        }),
+      );
 
       const exerciseIndices = workoutTasks.map((t) => t.exerciseIndex);
       formData.append("exerciseIndices", JSON.stringify(exerciseIndices));
@@ -268,8 +327,12 @@ export default function WorkoutTasksPage() {
     return (
       <>
         <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-[#0A4F48]/10">
-          <h2 className="text-xl font-bold text-[#0A4F48]">Program Not Started</h2>
-          <p className="text-gray-500 mt-2">Workout tasks will appear once your program starts.</p>
+          <h2 className="text-xl font-bold text-[#0A4F48]">
+            Program Not Started
+          </h2>
+          <p className="text-gray-500 mt-2">
+            Workout tasks will appear once your program starts.
+          </p>
         </div>
         <MobileBottomNav />
       </>
@@ -280,7 +343,9 @@ export default function WorkoutTasksPage() {
     return (
       <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-[#0A4F48]/10">
         <h2 className="text-xl font-bold text-[#0A4F48]">Account Inactive</h2>
-        <p className="text-gray-500 mt-2">Please contact admin to reactivate your account.</p>
+        <p className="text-gray-500 mt-2">
+          Please contact admin to reactivate your account.
+        </p>
       </div>
     );
   }
@@ -292,7 +357,9 @@ export default function WorkoutTasksPage() {
           <div className="flex items-center justify-between gap-3 mb-4">
             <div>
               <h1 className="text-[#0A4F48] font-bold text-xl">Workout</h1>
-              <p className="text-sm text-gray-500">Day {currentGlobalDay} exercise videos</p>
+              <p className="text-sm text-gray-500">
+                Day {currentGlobalDay} exercise videos
+              </p>
             </div>
             {overallWorkoutStatus !== "todo" && (
               <span
@@ -323,20 +390,30 @@ export default function WorkoutTasksPage() {
             ) : (
               <div className="aspect-video w-full bg-linear-to-br from-[#0A4F48] to-[#116D63] text-white flex flex-col items-center justify-center gap-2">
                 <PlayCircle size={36} />
-                <p className="text-sm font-semibold">No video available for this task</p>
+                <p className="text-sm font-semibold">
+                  No video available for this task
+                </p>
               </div>
             )}
           </div>
 
           <div className="mt-4 bg-[#F8FAFC] rounded-xl p-3 border border-gray-100">
             <h2 className="text-[#0A4F48] font-bold text-sm">Current Task</h2>
-            <p className="text-gray-700 font-semibold text-sm mt-1">{selectedTask?.name || "No exercise"}</p>
-            <p className="text-gray-500 text-xs mt-1">{selectedTask?.notes || "Follow the form and pace from the assigned video."}</p>
+            <p className="text-gray-700 font-semibold text-sm mt-1">
+              {selectedTask?.name || "No exercise"}
+            </p>
+            <p className="text-gray-500 text-xs mt-1">
+              {selectedTask?.notes ||
+                "Follow the form and pace from the assigned video."}
+            </p>
           </div>
 
           <button
             onClick={openNextVideo}
-            disabled={selectedIndex >= workoutTasks.length - 1 || !watchedVideos.has(selectedIndex)}
+            disabled={
+              selectedIndex >= workoutTasks.length - 1 ||
+              !watchedVideos.has(selectedIndex)
+            }
             className="mt-4 bg-[#0A4F48] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl px-4 py-2 text-sm font-semibold"
           >
             Play Next Video
@@ -344,8 +421,12 @@ export default function WorkoutTasksPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm p-4 lg:p-6 border border-[#0A4F48]/10 h-fit">
-          <h2 className="text-[#0A4F48] font-bold text-base mb-3">Workout Tasks</h2>
-          <p className="text-xs text-gray-500 mb-4">Videos unlock one by one after finishing the previous video.</p>
+          <h2 className="text-[#0A4F48] font-bold text-base mb-3">
+            Workout Tasks
+          </h2>
+          <p className="text-xs text-gray-500 mb-4">
+            Videos unlock one by one after finishing the previous video.
+          </p>
 
           <div className="space-y-2">
             {workoutTasks.length ? (
@@ -365,14 +446,21 @@ export default function WorkoutTasksPage() {
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="font-semibold text-sm text-[#0A4F48] truncate">{task.name || `Exercise ${idx + 1}`}</p>
-                        <p className="text-[11px] text-gray-500 uppercase mt-0.5">{task.status || "todo"}</p>
+                        <p className="font-semibold text-sm text-[#0A4F48] truncate">
+                          {task.name || `Exercise ${idx + 1}`}
+                        </p>
+                        <p className="text-[11px] text-gray-500 uppercase mt-0.5">
+                          {task.status || "todo"}
+                        </p>
                       </div>
 
                       {!unlocked ? (
                         <Lock size={15} className="text-gray-400 shrink-0" />
                       ) : (
-                        <PlayCircle size={16} className="text-[#0A4F48] shrink-0" />
+                        <PlayCircle
+                          size={16}
+                          className="text-[#0A4F48] shrink-0"
+                        />
                       )}
                     </div>
                   </button>
@@ -391,7 +479,8 @@ export default function WorkoutTasksPage() {
               <p className="text-xs font-semibold text-[#0A4F48]">Progress</p>
             </div>
             <p className="text-xs text-gray-600 mt-1">
-              Watched {watchedVideos.size}/{workoutTasks.length} videos in sequence.
+              Watched {watchedVideos.size}/{workoutTasks.length} videos in
+              sequence.
             </p>
           </div>
         </div>
@@ -408,171 +497,211 @@ export default function WorkoutTasksPage() {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold">Finish Strong</h2>
-                  <p className="text-white/70 text-sm">Review your session and upload your progress</p>
+                  <p className="text-white/70 text-sm">
+                    Review your session and upload your progress
+                  </p>
                 </div>
               </div>
             </div>
 
             <div className="p-6 lg:p-8">
-
-            {/* RPE Scale */}
-            <div className="mb-8">
-              <label className="block text-sm font-bold text-[#0A4F48] mb-4">
-                Rate of Perceived Exertion (RPE 1–10)
-              </label>
-              
-              <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 mb-4">
-                {rpeScale.map(({ value, label, description }) => {
-                  const isActive = effortRating?.ratingNumber === value;
-                  
-                  // Color coding based on intensity
-                  const getColorClass = (val) => {
-                    if (val <= 3) return "hover:bg-green-500 hover:text-white border-green-200 text-green-700";
-                    if (val <= 6) return "hover:bg-yellow-500 hover:text-white border-yellow-200 text-yellow-700";
-                    if (val <= 8) return "hover:bg-orange-500 hover:text-white border-orange-200 text-orange-700";
-                    return "hover:bg-red-500 hover:text-white border-red-200 text-red-700";
-                  };
-
-                  const getActiveClass = (val) => {
-                    if (val <= 3) return "bg-green-600 text-white border-green-600 ring-2 ring-green-600/20";
-                    if (val <= 6) return "bg-yellow-500 text-white border-yellow-500 ring-2 ring-yellow-500/20";
-                    if (val <= 8) return "bg-orange-600 text-white border-orange-600 ring-2 ring-orange-600/20";
-                    return "bg-red-600 text-white border-red-600 ring-2 ring-red-600/20";
-                  };
-
-                  return (
-                    <button
-                      key={value}
-                      type="button"
-                      onClick={() => setEffortRating({
-                        ratingNumber: value,
-                        ratingLabel: label,
-                        ratingDescription: description,
-                      })}
-                      className={`h-12 flex items-center justify-center rounded-xl border-2 font-black text-lg transition-all transform active:scale-95 ${
-                        isActive ? getActiveClass(value) : `bg-white ${getColorClass(value)}`
-                      }`}
-                    >
-                      {value}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Selection Details */}
-              {effortRating ? (
-                <div className="bg-[#E6EEED] border border-[#0A4F48]/20 rounded-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className={`w-2 h-2 rounded-full ${
-                      effortRating.ratingNumber <= 3 ? "bg-green-500" :
-                      effortRating.ratingNumber <= 6 ? "bg-yellow-500" :
-                      effortRating.ratingNumber <= 8 ? "bg-orange-500" : "bg-red-500"
-                    }`} />
-                    <h3 className="text-[#0A4F48] font-bold text-sm uppercase tracking-wider">
-                      {effortRating.ratingLabel}
-                    </h3>
-                  </div>
-                  <p className="text-gray-600 text-xs leading-relaxed">
-                    {effortRating.ratingDescription}
-                  </p>
-                </div>
-              ) : (
-                <div className="border border-dashed border-gray-200 rounded-2xl p-4 text-center">
-                  <p className="text-gray-400 text-xs italic">Select a rating to see details</p>
-                </div>
-              )}
-              
-              <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-widest px-1 mt-3">
-                <span>1 — Very Light</span>
-                <span>10 — Max Effort</span>
-              </div>
-            </div>
-
-            {/* Notes & Upload Row */}
-            <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <div>
-                <label className="text-sm font-bold text-[#0A4F48] mb-2 flex items-center gap-2">
-                  Notes <span className="text-[10px] font-normal text-gray-400 uppercase tracking-wider">(Optional)</span>
+              {/* RPE Scale */}
+              <div className="mb-8">
+                <label className="block text-sm font-bold text-[#0A4F48] mb-4">
+                  Rate of Perceived Exertion (RPE 1–10)
                 </label>
-                <textarea
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  rows={4}
-                  placeholder="How did you feel today? Any pain or wins?"
-                  className="w-full rounded-2xl border-2 border-gray-100 bg-gray-50/30 px-4 py-3 text-sm text-gray-700 resize-none focus:outline-none focus:border-[#0A4F48]/30 focus:bg-white transition-all outline-hidden"
-                />
-              </div>
 
-              <div>
-                <label className="block text-sm font-bold text-[#0A4F48] mb-2">Upload Proof</label>
-                <div 
-                  onClick={handleOpenFilePicker}
-                  className="group relative h-[116px] flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#0A4F48]/40 hover:bg-[#E6EEED]/20 transition-all cursor-pointer overflow-hidden"
-                >
-                  {file ? (
-                    <div className="flex flex-col items-center gap-1 p-4">
-                      <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                        <CheckCircle2 size={18} className="text-green-600" />
-                      </div>
-                      <span className="text-xs font-bold text-[#0A4F48] truncate max-w-full text-center">{fileName}</span>
-                      <button 
-                        type="button" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setFile(null);
-                          setFileName("Upload File");
-                        }}
-                        className="text-[10px] text-red-500 font-bold uppercase hover:underline"
+                <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 mb-4">
+                  {rpeScale.map(({ value, label, description }) => {
+                    const isActive = effortRating?.ratingNumber === value;
+
+                    // Color coding based on intensity
+                    const getColorClass = (val) => {
+                      if (val <= 3)
+                        return "hover:bg-green-500 hover:text-white border-green-200 text-green-700";
+                      if (val <= 6)
+                        return "hover:bg-yellow-500 hover:text-white border-yellow-200 text-yellow-700";
+                      if (val <= 8)
+                        return "hover:bg-orange-500 hover:text-white border-orange-200 text-orange-700";
+                      return "hover:bg-red-500 hover:text-white border-red-200 text-red-700";
+                    };
+
+                    const getActiveClass = (val) => {
+                      if (val <= 3)
+                        return "bg-green-600 text-white border-green-600 ring-2 ring-green-600/20";
+                      if (val <= 6)
+                        return "bg-yellow-500 text-white border-yellow-500 ring-2 ring-yellow-500/20";
+                      if (val <= 8)
+                        return "bg-orange-600 text-white border-orange-600 ring-2 ring-orange-600/20";
+                      return "bg-red-600 text-white border-red-600 ring-2 ring-red-600/20";
+                    };
+
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() =>
+                          setEffortRating({
+                            ratingNumber: value,
+                            ratingLabel: label,
+                            ratingDescription: description,
+                          })
+                        }
+                        className={`h-12 flex items-center justify-center rounded-xl border-2 font-black text-lg transition-all transform active:scale-95 ${
+                          isActive
+                            ? getActiveClass(value)
+                            : `bg-white ${getColorClass(value)}`
+                        }`}
                       >
-                        Remove
+                        {value}
                       </button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Upload size={20} className="text-gray-400 group-hover:text-[#0A4F48]" />
-                      </div>
-                      <p className="text-xs font-bold text-gray-500 group-hover:text-[#0A4F48]">Drop photo/video here</p>
-                      <p className="text-[10px] text-gray-400">or click to browse</p>
-                    </div>
-                  )}
+                    );
+                  })}
                 </div>
-                <input
-                  ref={fileInputRef}
-                  id="workout-proof-upload"
-                  type="file"
-                  accept="image/*,video/*"
-                  className="hidden"
-                  onChange={handleFileChange}
-                />
-              </div>
-            </div>
 
-            <button
-              onClick={handleSubmit}
-              disabled={uploading}
-              className="w-full bg-[#0A4F48] hover:bg-[#083b36] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-2xl py-4 text-base font-black transition-all shadow-lg shadow-[#0A4F48]/20 flex items-center justify-center gap-2 group"
-            >
-              {uploading ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Submitting...</span>
+                {/* Selection Details */}
+                {effortRating ? (
+                  <div className="bg-[#E6EEED] border border-[#0A4F48]/20 rounded-2xl p-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span
+                        className={`w-2 h-2 rounded-full ${
+                          effortRating.ratingNumber <= 3
+                            ? "bg-green-500"
+                            : effortRating.ratingNumber <= 6
+                              ? "bg-yellow-500"
+                              : effortRating.ratingNumber <= 8
+                                ? "bg-orange-500"
+                                : "bg-red-500"
+                        }`}
+                      />
+                      <h3 className="text-[#0A4F48] font-bold text-sm uppercase tracking-wider">
+                        {effortRating.ratingLabel}
+                      </h3>
+                    </div>
+                    <p className="text-gray-600 text-xs leading-relaxed">
+                      {effortRating.ratingDescription}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="border border-dashed border-gray-200 rounded-2xl p-4 text-center">
+                    <p className="text-gray-400 text-xs italic">
+                      Select a rating to see details
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex justify-between text-[10px] text-gray-400 font-bold uppercase tracking-widest px-1 mt-3">
+                  <span>1 — Very Light</span>
+                  <span>10 — Max Effort</span>
                 </div>
-              ) : (
-                <>
-                  <span>Complete My Workout</span>
-                  <Dumbbell size={18} className="group-hover:rotate-12 transition-transform" />
-                </>
-              )}
-            </button>
+              </div>
+
+              {/* Notes & Upload Row */}
+              <div className="grid md:grid-cols-2 gap-6 mb-8">
+                <div>
+                  <label className="text-sm font-bold text-[#0A4F48] mb-2 flex items-center gap-2">
+                    Notes{" "}
+                    <span className="text-[10px] font-normal text-gray-400 uppercase tracking-wider">
+                      (Optional)
+                    </span>
+                  </label>
+                  <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    rows={4}
+                    placeholder="How did you feel today? Any pain or wins?"
+                    className="w-full rounded-2xl border-2 border-gray-100 bg-gray-50/30 px-4 py-3 text-sm text-gray-700 resize-none focus:outline-none focus:border-[#0A4F48]/30 focus:bg-white transition-all outline-hidden"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-[#0A4F48] mb-2">
+                    Upload Proof
+                  </label>
+                  <div
+                    onClick={handleOpenFilePicker}
+                    className="group relative h-[116px] flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#0A4F48]/40 hover:bg-[#E6EEED]/20 transition-all cursor-pointer overflow-hidden"
+                  >
+                    {file ? (
+                      <div className="flex flex-col items-center gap-1 p-4">
+                        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                          <CheckCircle2 size={18} className="text-green-600" />
+                        </div>
+                        <span className="text-xs font-bold text-[#0A4F48] truncate max-w-full text-center">
+                          {fileName}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFile(null);
+                            setFileName("Upload File");
+                          }}
+                          className="text-[10px] text-red-500 font-bold uppercase hover:underline"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Upload
+                            size={20}
+                            className="text-gray-400 group-hover:text-[#0A4F48]"
+                          />
+                        </div>
+                        <p className="text-xs font-bold text-gray-500 group-hover:text-[#0A4F48]">
+                          Drop photo/video here
+                        </p>
+                        <p className="text-[10px] text-gray-400">
+                          or click to browse
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    id="workout-proof-upload"
+                    type="file"
+                    accept="image/*,video/*"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                </div>
+              </div>
+
+              <button
+                onClick={handleSubmit}
+                disabled={uploading}
+                className="w-full bg-[#0A4F48] hover:bg-[#083b36] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-2xl py-4 text-base font-black transition-all shadow-lg shadow-[#0A4F48]/20 flex items-center justify-center gap-2 group"
+              >
+                {uploading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Submitting...</span>
+                  </div>
+                ) : (
+                  <>
+                    <span>Complete My Workout</span>
+                    <Dumbbell
+                      size={18}
+                      className="group-hover:rotate-12 transition-transform"
+                    />
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
       )}
 
-      {(overallWorkoutStatus === "pending" || overallWorkoutStatus === "verified" || overallWorkoutStatus === "rejected") && (
+      {(overallWorkoutStatus === "pending" ||
+        overallWorkoutStatus === "verified" ||
+        overallWorkoutStatus === "rejected") && (
         <div className="mx-4 lg:mx-2 mb-4">
-          <div className={`rounded-2xl border shadow-sm p-6 text-center ${statusConfig[overallWorkoutStatus].panelClass}`}>
+          <div
+            className={`rounded-2xl border shadow-sm p-6 text-center ${statusConfig[overallWorkoutStatus].panelClass}`}
+          >
             <CheckCircle2 size={40} className="text-[#0A4F48] mx-auto mb-3" />
             <h3 className="text-[#0A4F48] font-bold text-lg">
               Workout Status: {statusConfig[overallWorkoutStatus].label}
