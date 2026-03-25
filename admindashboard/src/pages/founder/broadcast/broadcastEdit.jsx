@@ -1,5 +1,17 @@
-import React, { useEffect } from "react";
-import { ChevronDown, Upload, FileText, X } from "lucide-react";
+import React, { useEffect, useRef } from "react";
+import {
+  ChevronDown,
+  Upload,
+  FileText,
+  X,
+  Smile,
+  Bold,
+  Italic,
+  Strikethrough,
+  Code,
+  Plus,
+  Info,
+} from "lucide-react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,12 +28,24 @@ const BroadcastEdit = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const broadcast = useSelector(selectBroadcast);
+  const textareaRef = useRef(null);
 
   useEffect(() => {
     if (id) {
       dispatch(getBroadcast(id));
     }
   }, [id, dispatch]);
+
+  // Convert Mongoose Map object to plain object for Formik
+  const getVariableSamples = () => {
+    const raw = broadcast?.variableSamples;
+    if (!raw) return {};
+    // Mongoose returns Map as plain object after JSON serialization
+    if (typeof raw === "object" && !(raw instanceof Map)) return raw;
+    const obj = {};
+    raw.forEach?.((v, k) => { obj[k] = v; });
+    return obj;
+  };
 
   const initialValues = {
     title: broadcast?.title || "",
@@ -31,12 +55,13 @@ const BroadcastEdit = () => {
     attachmentName: broadcast?.attachment
       ? broadcast.attachment.split("/").pop()
       : "",
+    variableSamples: getVariableSamples(),
   };
 
   const validationSchema = Yup.object({
     title: Yup.string().required("Broadcast title is required"),
     type: Yup.string().required("Broadcast type is required"),
-    message: Yup.string().required("Message body is required"),
+    message: Yup.string().max(1024, "Message is too long").required("Message body is required"),
   });
 
   const handleSubmit = async (values) => {
@@ -44,6 +69,7 @@ const BroadcastEdit = () => {
     formData.append("title", values.title);
     formData.append("type", values.type);
     formData.append("message", values.message);
+    formData.append("variableSamples", JSON.stringify(values.variableSamples));
 
     if (values.attachment instanceof File) {
       formData.append("attachment", values.attachment);
@@ -57,6 +83,85 @@ const BroadcastEdit = () => {
     } catch (error) {
       toast.error(error || "Failed to update Broadcast");
     }
+  };
+
+  const handleFormat = (marker, setFieldValue, currentMessage) => {
+    if (!textareaRef.current) return;
+    const { selectionStart, selectionEnd } = textareaRef.current;
+    const selectedText = currentMessage.substring(selectionStart, selectionEnd);
+    let newMessage;
+    if (selectedText.startsWith(marker) && selectedText.endsWith(marker)) {
+      newMessage = currentMessage.substring(0, selectionStart) +
+        selectedText.substring(marker.length, selectedText.length - marker.length) +
+        currentMessage.substring(selectionEnd);
+    } else {
+      newMessage = currentMessage.substring(0, selectionStart) +
+        marker + selectedText + marker +
+        currentMessage.substring(selectionEnd);
+    }
+    setFieldValue("message", newMessage);
+    setTimeout(() => {
+      textareaRef.current.focus();
+      textareaRef.current.setSelectionRange(selectionStart + marker.length, selectionEnd + marker.length);
+    }, 0);
+  };
+
+  const handleAddVariable = (message, setFieldValue) => {
+    const variables = message.match(/{{[0-9]+}}/g) || [];
+    const nextNum = variables.length + 1;
+    const marker = `{{${nextNum}}}`;
+    if (textareaRef.current) {
+      const { selectionStart, selectionEnd } = textareaRef.current;
+      const newMessage = message.substring(0, selectionStart) + marker + message.substring(selectionEnd);
+      setFieldValue("message", newMessage);
+      setTimeout(() => {
+        textareaRef.current.focus();
+        textareaRef.current.setSelectionRange(selectionStart + marker.length, selectionStart + marker.length);
+      }, 0);
+    } else {
+      setFieldValue("message", message + marker);
+    }
+  };
+
+  const VariableSamplesSection = ({ message, variableSamples, setFieldValue }) => {
+    const variables = [...new Set(message.match(/{{[0-9]+}}/g) || [])].sort((a, b) => {
+      return parseInt(a.replace(/[{}]/g, "")) - parseInt(b.replace(/[{}]/g, ""));
+    });
+    if (variables.length === 0) return null;
+    return (
+      <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <h3 className="text-sm font-bold text-slate-800">Variable samples</h3>
+          <p className="text-xs text-slate-500 font-medium">
+            Include samples for all variables to help review your template.
+          </p>
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Body</span>
+        </div>
+        <div className="grid grid-cols-1 gap-3">
+          {variables.map((v) => {
+            const varNum = v.replace(/[{}]/g, "");
+            return (
+              <div key={v} className="flex items-center gap-3">
+                <div className="w-16 px-3 py-2 bg-slate-100 border border-slate-200 rounded-lg text-xs font-bold text-slate-500 text-center">
+                  {v}
+                </div>
+                <input
+                  type="text"
+                  placeholder="Sample value"
+                  value={variableSamples[varNum] || ""}
+                  onChange={(e) =>
+                    setFieldValue(`variableSamples.${varNum}`, e.target.value)
+                  }
+                  className="flex-1 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg focus:ring-1 focus:ring-[#0A4F48] focus:border-[#0A4F48] outline-none transition-all"
+                />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -103,32 +208,91 @@ const BroadcastEdit = () => {
               <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Left Column - Core Content */}
                 <div className="lg:col-span-2 flex flex-col gap-6">
-                  <div className="bg-white p-1 rounded-2xl shadow-sm border border-slate-200">
-                    <Field
-                      name="title"
-                      type="text"
-                      placeholder="Broadcast Title"
-                      className="w-full px-6 py-4 text-lg font-bold text-slate-800 placeholder:text-slate-300 border-none rounded-t-xl focus:ring-0 focus:outline-none bg-transparent"
-                    />
+                  <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="p-1">
+                      <Field
+                        name="title"
+                        type="text"
+                        placeholder="Broadcast Title"
+                        className="w-full px-6 py-4 text-lg font-bold text-slate-800 placeholder:text-slate-300 border-none rounded-t-xl focus:ring-0 focus:outline-none bg-transparent"
+                      />
+                    </div>
                     <div className="h-px bg-slate-100 mx-6"></div>
-                    <Field
-                      as="textarea"
+
+                    <div className="flex flex-col">
+                      <div className="px-6 pt-4 flex items-center justify-between">
+                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Body</span>
+                        <span className={`text-[10px] font-bold ${values.message.length > 1024 ? 'text-red-500' : 'text-slate-400'}`}>
+                          {values.message.length}/1024
+                        </span>
+                      </div>
+
+                      <Field name="message">
+                        {({ field }) => (
+                          <textarea
+                            {...field}
+                            ref={textareaRef}
+                            rows={10}
+                            placeholder="Type your message content here..."
+                            className="w-full px-6 py-4 text-sm font-medium text-slate-600 placeholder:text-slate-300 border-none focus:ring-0 focus:outline-none resize-none bg-transparent leading-relaxed"
+                          />
+                        )}
+                      </Field>
+
+                      {/* Toolbar */}
+                      <div className="px-5 py-2.5 border-t border-slate-50 flex items-center gap-1">
+                        <button type="button" className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-all">
+                          <Smile className="w-4 h-4" />
+                        </button>
+                        <div className="w-px h-4 bg-slate-100 mx-1"></div>
+                        <button type="button" onClick={() => handleFormat("*", setFieldValue, values.message)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-all">
+                          <Bold className="w-4 h-4" />
+                        </button>
+                        <button type="button" onClick={() => handleFormat("_", setFieldValue, values.message)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-all">
+                          <Italic className="w-4 h-4" />
+                        </button>
+                        <button type="button" onClick={() => handleFormat("~", setFieldValue, values.message)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-all">
+                          <Strikethrough className="w-4 h-4" />
+                        </button>
+                        <button type="button" onClick={() => handleFormat("```", setFieldValue, values.message)} className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-all">
+                          <Code className="w-4 h-4" />
+                        </button>
+                        <div className="w-px h-4 bg-slate-100 mx-1"></div>
+                        <button
+                          type="button"
+                          onClick={() => handleAddVariable(values.message, setFieldValue)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Add variable</span>
+                        </button>
+                        <div className="ml-auto">
+                          <button type="button" className="p-2 text-slate-300 hover:text-slate-400 rounded-lg transition-all">
+                            <Info className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <VariableSamplesSection
+                    message={values.message}
+                    variableSamples={values.variableSamples}
+                    setFieldValue={setFieldValue}
+                  />
+
+                  <div className="flex flex-col gap-1">
+                    <ErrorMessage
+                      name="title"
+                      component="p"
+                      className="text-xs font-bold text-red-500 px-2"
+                    />
+                    <ErrorMessage
                       name="message"
-                      rows={12}
-                      placeholder="Type your message content here..."
-                      className="w-full px-6 py-6 text-sm font-medium text-slate-600 placeholder:text-slate-300 border-none rounded-b-xl focus:ring-0 focus:outline-none resize-none bg-transparent leading-relaxed"
+                      component="p"
+                      className="text-xs font-bold text-red-500 px-2"
                     />
                   </div>
-                  <ErrorMessage
-                    name="title"
-                    component="p"
-                    className="text-xs font-bold text-red-500 px-2"
-                  />
-                  <ErrorMessage
-                    name="message"
-                    component="p"
-                    className="text-xs font-bold text-red-500 px-2 -mt-4"
-                  />
                 </div>
 
                 {/* Right Column - Meta & Media */}
