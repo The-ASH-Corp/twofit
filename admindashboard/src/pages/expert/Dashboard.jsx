@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Users,
-  FileText,
-  TrendingUp,
-  Activity,
+  UserRoundPen,
+  UserStar,
+  BicepsFlexed,
   MoreHorizontal,
 } from "lucide-react";
 import { Bar, Doughnut } from "react-chartjs-2";
@@ -32,6 +32,7 @@ import { selectToken } from "@/redux/features/auth/auth.selectores";
 import HabitProgress from "./components/HabitProgress";
 import RecentNotificationsCard from "@/components/notifications/RecentNotificationsCard";
 import useRecentNotifications from "@/hooks/useRecentNotifications";
+import BackgroundAnimation from "@/components/ui/BackgroundAnimation";
 
 ChartJS.register(
   CategoryScale,
@@ -391,83 +392,111 @@ export default function Dashboard() {
     },
   };
 
+  const topMetricCards = [
+    {
+      label: "Total Clients",
+      value: dashboardStats?.totalClients || 0,
+      icon: <Users size={20} className="text-white md:w-6 md:h-6" />,
+      bg: "bg-linear-to-br from-[#0A4F48] to-[#128a7e] text-white",
+      iconBg: "bg-white/20",
+      border: "border-transparent",
+      textColor: "text-white",
+      subTextColor: "text-white/80",
+    },
+    {
+      label: "Pending Reviews",
+      value: pendingTasks?.length || 0,
+      icon: (
+        <UserRoundPen size={20} className="text-[#DAA520] md:w-6 md:h-6" />
+      ),
+      bg: "bg-white hover:bg-[#FAF3E0]/30",
+      border: "border-[#DAA520]/20",
+      iconBg: "bg-[#FAF3E0]",
+      textColor: "text-[#0A4F48]",
+      subTextColor: "text-[#66706D]",
+    },
+    {
+      label: "Client Compliance",
+      value: `${dashboardStats?.totalCompliance || 0}%`,
+      icon: <UserStar size={20} className="text-[#0A4F48] md:w-6 md:h-6" />,
+      bg: "bg-white hover:bg-[#EBF3F2]/50",
+      border: "border-[#0A4F48]/10",
+      iconBg: "bg-[#EBF3F2]",
+      textColor: "text-[#0A4F48]",
+      subTextColor: "text-[#66706D]",
+    },
+    {
+      label: user?.role?.toLowerCase() !== "therapist" ? "Programs" : "Therapy",
+      value: dashboardStats?.totalPrograms || 0,
+      icon: (
+        <BicepsFlexed size={20} className="text-[#DAA520] md:w-6 md:h-6" />
+      ),
+      bg: "bg-white hover:bg-[#FAF3E0]/30",
+      border: "border-[#DAA520]/20",
+      iconBg: "bg-[#FAF3E0]",
+      textColor: "text-[#0A4F48]",
+      subTextColor: "text-[#66706D]",
+    },
+  ];
+
   return (
-    <div className="flex flex-col gap-6 pb-6 h-[calc(100vh-120px)] overflow-auto no-scrollbar">
-      {/* Top Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-3xl p-4 sm:p-5 flex items-center gap-4 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] transition-all duration-300">
-          <div className="w-12 h-12 rounded-xl bg-[#EBF3F2] flex items-center justify-center">
-            <Users size={20} className="text-[#0A4F48]" />
-          </div>
-          <div>
-            <p className="text-[13px] text-gray-500 font-medium">
-              Total Clients
-            </p>
-            <p className="text-[24px] font-bold text-gray-900">
-              {dashboardStats?.totalClients || 0}
-            </p>
-          </div>
+    <>
+      <BackgroundAnimation />
+      <div className="flex flex-col gap-4 md:gap-6 p-3 md:p-5 lg:p-8 bg-transparent h-[calc(100vh-120px)] overflow-auto no-scrollbar max-w-[1600px] mx-auto relative z-10">
+        <div className="flex flex-col gap-1 mb-1">
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#0A4F48] tracking-tight">
+            Overview
+          </h1>
+          <p className="text-xs md:text-sm text-[#66706D]">
+            Track your client performance, pending reviews, and growth metrics.
+          </p>
         </div>
 
-        <div className="bg-white rounded-3xl p-4 sm:p-5 flex items-center gap-4 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] transition-all duration-300">
-          <div className="w-12 h-12 rounded-xl bg-[#FAE8E6] flex items-center justify-center">
-            <FileText size={20} className="text-[#D4A5A0]" />
-          </div>
-          <div>
-            <p className="text-[13px] text-gray-500 font-medium">
-              Pending Reviews
-            </p>
-            <p className="text-[24px] font-bold text-gray-900">
-              {pendingTasks?.length}
-            </p>
-          </div>
+        {/* Top Metrics */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5">
+          {topMetricCards.map((card, i) => (
+            <div
+              key={card.label}
+              className={`${card.bg} ${card.border ? `border ${card.border}` : ""} p-5 md:p-6 rounded-[20px] shadow-[0_2px_10px_-2px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-1 transition-all duration-300 flex items-center justify-between group cursor-default relative overflow-hidden`}
+            >
+              {i === 0 && (
+                <div className="absolute inset-0 opacity-10 pointer-events-none bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
+              )}
+              <div className="flex flex-col gap-1 z-10">
+                <span
+                  className={`text-[10px] md:text-[11px] font-bold uppercase tracking-wider ${card.subTextColor}`}
+                >
+                  {card.label}
+                </span>
+                <span
+                  className={`text-2xl md:text-3xl font-black tracking-tight ${card.textColor}`}
+                >
+                  {card.value}
+                </span>
+              </div>
+              <div
+                className={`${card.iconBg} p-3 md:p-3.5 rounded-xl shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 z-10`}
+              >
+                {card.icon}
+              </div>
+            </div>
+          ))}
         </div>
 
-        <div className="bg-white rounded-3xl p-4 sm:p-5 flex items-center gap-4 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] transition-all duration-300">
-          <div className="w-12 h-12 rounded-xl bg-[#E8F5E9] flex items-center justify-center">
-            <TrendingUp size={20} className="text-[#45C4A2]" />
-          </div>
-          <div>
-            <p className="text-[13px] text-gray-500 font-medium">
-              Client Compliance
-            </p>
-            <p className="text-[24px] font-bold text-gray-900">
-              {dashboardStats?.totalCompliance || 0}%
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-3xl p-4 sm:p-5 flex items-center gap-4 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] transition-all duration-300">
-          <div className="w-12 h-12 rounded-xl bg-[#F0FDF4] flex items-center justify-center">
-            <Activity size={20} className="text-[#45C4A2]" />
-          </div>
-          <div>
-            <p className="text-[13px] text-gray-500 font-medium">
-              {user?.role.toLowerCase() !== "therapist"
-                ? "Programs"
-                : "Therapy"}
-            </p>
-            <p className="text-[24px] font-bold text-gray-900">
-              {dashboardStats?.totalPrograms || 0}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Section - Charts & Pending Reviews */}
         <div className="lg:col-span-2 space-y-6">
           {/* Charts Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Client Compliance Chart */}
-            <div className="bg-white rounded-3xl p-4 sm:p-6 border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] transition-all duration-300">
+            <div className="bg-white rounded-3xl p-4 sm:p-6 border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] hover:border-[#E2E8F0] transition-all duration-300">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-[16px] font-bold text-gray-900">
+                <h2 className="text-[16px] font-bold text-[#1E293B]">
                   Client Compliance
                 </h2>
                 <select
-                  className="text-[13px] text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A4F48]"
+                  className="text-[12px] font-semibold text-[#64748B] border border-[#E2E8F0] rounded-lg px-3 py-1.5 bg-[#F8FAFC] focus:outline-none focus:border-[#0A4F48]"
                   onChange={(e) => setComplianceDuration(e.target.value)}
                 >
                   <option value="12">Last Year</option>
@@ -488,13 +517,13 @@ export default function Dashboard() {
             </div>
 
             {/* Rating Score Chart */}
-            <div className="bg-white rounded-3xl p-4 sm:p-6 border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] transition-all duration-300">
+            <div className="bg-white rounded-3xl p-4 sm:p-6 border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] hover:border-[#E2E8F0] transition-all duration-300">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-[16px] font-bold text-gray-900">
+                <h2 className="text-[16px] font-bold text-[#1E293B]">
                   Rating Score
                 </h2>
                 <select
-                  className="text-[13px] text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#0A4F48]"
+                  className="text-[12px] font-semibold text-[#64748B] border border-[#E2E8F0] rounded-lg px-3 py-1.5 bg-[#F8FAFC] focus:outline-none focus:border-[#0A4F48]"
                   onChange={(e) => setRatingDuration(e.target.value)}
                   value={ratingDuration}
                 >
@@ -519,30 +548,30 @@ export default function Dashboard() {
           {user?.role?.toLowerCase() === "therapist" && <HabitProgress />}
 
           {/* Pending Reviews Table */}
-          <div className="bg-white rounded-3xl p-4 sm:p-6 border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] transition-all duration-300">
-            <h2 className="text-[16px] font-bold text-gray-900 mb-4">
+          <div className="bg-white rounded-3xl p-4 sm:p-6 border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] hover:border-[#E2E8F0] transition-all duration-300">
+            <h2 className="text-[16px] font-bold text-[#1E293B] mb-4">
               Pending Reviews
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-gray-100">
-                    <th className="text-left text-[12px] font-semibold text-gray-500 uppercase tracking-wider pb-3">
+                  <tr className="border-b border-[#F1F5F9]">
+                    <th className="text-left text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider pb-3">
                       Client Name
                     </th>
-                    <th className="text-left text-[12px] font-semibold text-gray-500 uppercase tracking-wider pb-3">
+                    <th className="text-left text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider pb-3">
                       Program
                     </th>
-                    <th className="text-left text-[12px] font-semibold text-gray-500 uppercase tracking-wider pb-3">
+                    <th className="text-left text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider pb-3">
                       Meal Type
                     </th>
-                    <th className="text-left text-[12px] font-semibold text-gray-500 uppercase tracking-wider pb-3">
+                    <th className="text-left text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider pb-3">
                       Date & Time
                     </th>
-                    <th className="text-left text-[12px] font-semibold text-gray-500 uppercase tracking-wider pb-3">
+                    <th className="text-left text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider pb-3">
                       Status
                     </th>
-                    <th className="text-left text-[12px] font-semibold text-gray-500 uppercase tracking-wider pb-3">
+                    <th className="text-left text-[11px] font-bold text-[#94A3B8] uppercase tracking-wider pb-3">
                       Action
                     </th>
                   </tr>
@@ -561,19 +590,19 @@ export default function Dashboard() {
                     groupedPendingTasks?.map((group) => (
                       <tr
                         key={`${group.userId?._id}-${group.globalDayIndex}`}
-                        className="border-b border-gray-50 hover:bg-gray-50/50"
+                        className="border-b border-[#F8FAFC] hover:bg-[#F8FAFC]/60 transition-colors"
                       >
-                        <td className="py-4 text-[13px] text-gray-900 font-medium">
+                        <td className="py-4 text-[13px] text-[#1E293B] font-semibold">
                           {group.userId?.name}
                         </td>
-                        <td className="py-4 text-[13px] text-gray-600">
+                        <td className="py-4 text-[13px] text-[#64748B]">
                           {group.programId?.title || "N/A"}
                         </td>
-                        <td className="py-4 text-[13px] text-gray-600">
+                        <td className="py-4 text-[13px] text-[#64748B]">
                           Day {group.globalDayIndex} ({group.tasks.length}{" "}
                           {group.tasks.length === 1 ? "task" : "tasks"})
                         </td>
-                        <td className="py-4 text-[13px] text-gray-600">
+                        <td className="py-4 text-[13px] text-[#64748B]">
                           {new Date(group.createdAt).toLocaleString()}
                         </td>
                         <td className="py-4">
@@ -588,7 +617,7 @@ export default function Dashboard() {
                         <td className="py-4">
                           <button
                             onClick={() => setSelectedReview(group)}
-                            className="bg-[#0A4F48] text-white text-[13px] font-medium px-5 py-2 rounded-lg hover:bg-[#083d37] transition-colors"
+                            className="bg-[#0A4F48] text-white text-[13px] font-semibold px-5 py-2 rounded-lg hover:bg-[#083d37] transition-colors"
                           >
                             Review
                           </button>
@@ -605,9 +634,9 @@ export default function Dashboard() {
         {/* Right Section - My Performance & Daily Activity */}
         <div className="space-y-6">
           {/* My Performance Card */}
-          <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] border border-[#EEF2F6] flex flex-col h-[500px] overflow-hidden transition-all duration-300">
+          <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.06)] hover:border-[#E2E8F0] border border-[#EEF2F6] flex flex-col h-[500px] overflow-hidden transition-all duration-300">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-base font-bold text-[#0A4F48]">
+              <h3 className="text-base font-bold text-[#1E293B]">
                 My Performance
               </h3>
               <MoreHorizontal
@@ -628,9 +657,9 @@ export default function Dashboard() {
 
             {/* Performance Metrics List */}
             <div className="flex flex-col gap-3 mt-4">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-[#F8F9FA] relative overflow-hidden">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-[#F8FAFC] relative overflow-hidden">
                 <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#0A4F48] rounded-l-lg"></div>
-                <span className="ml-3 text-[13px] font-medium text-gray-700">
+                <span className="ml-3 text-[13px] font-medium text-[#475569]">
                   Task Completion
                 </span>
                 <span className="text-[14px] font-bold text-[#0A4F48]">
@@ -638,9 +667,9 @@ export default function Dashboard() {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-lg bg-[#F8F9FA] relative overflow-hidden">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-[#F8FAFC] relative overflow-hidden">
                 <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#F4DBC7] rounded-l-lg"></div>
-                <span className="ml-3 text-[13px] font-medium text-gray-700">
+                <span className="ml-3 text-[13px] font-medium text-[#475569]">
                   Rating
                 </span>
                 <span className="text-[14px] font-bold text-[#0A4F48]">
@@ -648,9 +677,9 @@ export default function Dashboard() {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between p-3 rounded-lg bg-[#F8F9FA] relative overflow-hidden">
+              <div className="flex items-center justify-between p-3 rounded-lg bg-[#F8FAFC] relative overflow-hidden">
                 <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#EBF3F2] rounded-l-lg"></div>
-                <span className="ml-3 text-[13px] font-medium text-gray-700">
+                <span className="ml-3 text-[13px] font-medium text-[#475569]">
                   Client Load
                 </span>
                 <span className="text-[14px] font-bold text-[#0A4F48]">
@@ -673,6 +702,7 @@ export default function Dashboard() {
         review={selectedReview}
         onClose={() => setSelectedReview(null)}
       />
-    </div>
+      </div>
+    </>
   );
 }
