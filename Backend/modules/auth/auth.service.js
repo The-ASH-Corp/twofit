@@ -16,105 +16,105 @@ import {
 } from "../notification/notification.service.js";
 
 export const adminCreateUser = async (userData) => {
- try {
-   const exists = await User.findOne({ email: userData.email });
-   if (exists) throw new Error("Email already exists");
-   const password = generatePassword();
-   console.log("Generated Password for User:", password);
-   const hashed = await bcrypt.hash(password, 10);
+  try {
+    const exists = await User.findOne({ email: userData.email });
+    if (exists) throw new Error("Email already exists");
+    const password = generatePassword();
+    console.log("Generated Password for User:", password);
+    const hashed = await bcrypt.hash(password, 10);
 
-   const initialWeight = userData.currentWeight;
-   const user = await User.create({
-     name: capitalizeFirst(userData.fullname),
-     email: userData.email,
-     password: hashed,
-     role: "user",
-     status: "Active",
-     dob: userData.dob,
-     gender: userData.gender,
-     phone: userData.phone,
-     address: userData.address,
-     currentWeight: initialWeight,
-     targetWeight: userData.targetWeight,
-     weightHistory: initialWeight
-       ? [
-           {
-             weight: initialWeight,
-             date: new Date(),
-             isInitial: true,
-           },
-         ]
-       : [],
-     medicalConditions: userData.medicalconditions,
-     allergies: userData.allergy,
-     goals: userData.fitnessGoal,
-     foodPreferences: userData.foodPreference,
-     profileImage: userData?.profileImage || "",
-     height: userData.height || "",
-     workoutExperience: userData.workoutExperience || "beginner",
-     programType: userData.programType,
-     therapyType: userData.therapyType || null,
-     duration: userData.duration,
-     programEndDate: userData.endDate,
-     programStartDate: userData.startDate,
-     dietition: userData.dietician || null,
-     trainer: userData.trainer || null,
-     therapist: userData.therapist || null,
-     autoSendGuide: userData.autoSendGuide || false,
-     automatedReminder: userData.automatedReminder || false,
-     autoSendWelcome: userData.autoSendWelcome || false,
-   });
-   const coaches = [
-     userData.dietician,
-     userData.trainer,
-     userData.therapist,
-   ].filter(Boolean);
+    const initialWeight = userData.currentWeight;
+    const user = await User.create({
+      name: capitalizeFirst(userData.fullname),
+      email: userData.email,
+      password: hashed,
+      role: "user",
+      status: "Active",
+      dob: userData.dob,
+      gender: userData.gender,
+      phone: userData.phone,
+      address: userData.address,
+      currentWeight: initialWeight,
+      targetWeight: userData.targetWeight,
+      weightHistory: initialWeight
+        ? [
+            {
+              weight: initialWeight,
+              date: new Date(),
+              isInitial: true,
+            },
+          ]
+        : [],
+      medicalConditions: userData.medicalconditions,
+      allergies: userData.allergy,
+      goals: userData.fitnessGoal,
+      foodPreferences: userData.foodPreference,
+      profileImage: userData?.profileImage || "",
+      height: userData.height || "",
+      workoutExperience: userData.workoutExperience || "beginner",
+      programType: userData.programType,
+      therapyType: userData.therapyType || null,
+      duration: userData.duration,
+      programEndDate: userData.endDate,
+      programStartDate: userData.startDate,
+      dietition: userData.dietician || null,
+      trainer: userData.trainer || null,
+      therapist: userData.therapist || null,
+      autoSendGuide: userData.autoSendGuide || false,
+      automatedReminder: userData.automatedReminder || false,
+      autoSendWelcome: userData.autoSendWelcome || false,
+    });
+    const coaches = [
+      userData.dietician,
+      userData.trainer,
+      userData.therapist,
+    ].filter(Boolean);
 
-   for (const coachId of coaches) {
-     await CoachModel.findByIdAndUpdate(
-       coachId,
-       { $addToSet: { assignedUsers: user._id } },
-       { new: true },
-     );
+    for (const coachId of coaches) {
+      await CoachModel.findByIdAndUpdate(
+        coachId,
+        { $addToSet: { assignedUsers: user._id } },
+        { new: true },
+      );
 
-     // Recalculate extra client incentive
-     await calculateExtraClientIncentive(coachId);
+      // Recalculate extra client incentive
+      await calculateExtraClientIncentive(coachId);
 
-     // Notify Coach
-     await createNotification({
-       type: "system_announcement",
-       title: "New Client Assigned",
-       message: `You have been assigned a new client: ${user.name}`,
-       recipientRole: "coach", // Could be trainer, dietician etc.
-       recipientId: coachId,
-       category: "expert",
-       priority: "high",
-       metadata: { userId: user._id },
-     });
-   }
+      // Notify Coach
+      await createNotification({
+        type: "system_announcement",
+        title: "New Client Assigned",
+        message: `You have been assigned a new client: ${user.name}`,
+        recipientRole: "coach", // Could be trainer, dietician etc.
+        recipientId: coachId,
+        category: "expert",
+        priority: "high",
+        metadata: { userId: user._id },
+      });
+    }
 
-   // Notify User: welcome + plan ready
-   await createNotificationFromEvent("welcome_message", {
+    // Notify User: welcome + plan ready
+    await createNotificationFromEvent("welcome_message", {
       recipientRole: "user",
       recipientId: user._id,
       userName: user.name,
       metadata: { userId: user._id },
       dedupeKey: `welcome-message:${user._id}`,
-   });
+    });
 
-   await createNotificationFromEvent("plan_ready_message", {
+    await createNotificationFromEvent("plan_ready_message", {
       recipientRole: "user",
       recipientId: user._id,
       userName: user.name,
       metadata: { userId: user._id },
       dedupeKey: `plan-ready:${user._id}`,
-   });
+    });
 
-
-   await sendEmail({
-    to: userData.email,
-    subject: "Welcome to TwoFit - Your Login Credentials",
-    html: `
+    try {
+      const result = await sendEmail({
+        to: userData.email,
+        subject: "Welcome to TwoFit - Your Login Credentials",
+        html: `
       <!DOCTYPE html>
       <html>
       <head>
@@ -144,7 +144,7 @@ export const adminCreateUser = async (userData) => {
             <p>Please log in and change your password immediately for security purposes.</p>
             
             <div style="text-align: center; margin-top: 30px;">
-              <a href="http://localhost:5173/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
+              <a href="https://app.twofit.co/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
             </div>
           </div>
           <div class="footer">
@@ -155,12 +155,16 @@ export const adminCreateUser = async (userData) => {
       </body>
       </html>
     `,
-   });
+      });
+      console.log("✅ Email sent:", result);
+    } catch (err) {
+      console.error("❌ Email error:", err);
+    }
 
-   return user;
- } catch (error) {
-   throw error;
- }
+    return user;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const loginUser = async ({ email, password }) => {
@@ -439,12 +443,12 @@ export const resetPassword = async ({ email, otp, newPassword }) => {
 };
 
 export const editUserProfile = async (userId, profileData) => {
-    const user =
-      (await User.findById(userId)) ||
-      (await AdminModel.findById(userId)) ||
-      (await HeadsModel.findById(userId)) ||
-      (await FounderModel.findById(userId)) ||
-      (await CoachModel.findById(userId));
+  const user =
+    (await User.findById(userId)) ||
+    (await AdminModel.findById(userId)) ||
+    (await HeadsModel.findById(userId)) ||
+    (await FounderModel.findById(userId)) ||
+    (await CoachModel.findById(userId));
   if (!user) {
     throw new Error("User not found");
   }
@@ -461,8 +465,11 @@ export const editUserProfile = async (userId, profileData) => {
   return user;
 };
 
-
-export const changeUserPassword = async (userId, currentPassword, newPassword) => {
+export const changeUserPassword = async (
+  userId,
+  currentPassword,
+  newPassword,
+) => {
   const user =
     (await User.findById(userId).select("+password")) ||
     (await AdminModel.findById(userId).select("+password")) ||
@@ -486,4 +493,4 @@ export const changeUserPassword = async (userId, currentPassword, newPassword) =
   await user.save();
 
   return { message: "Password changed successfully" };
-}
+};
