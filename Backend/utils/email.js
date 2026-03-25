@@ -1,30 +1,39 @@
-import sgMail from "@sendgrid/mail";
 
+import nodemailer from "nodemailer";
+
+let transporter;
 let initialized = false;
 
-function initSendGrid() {
+function initMailer() {
   if (initialized) return;
 
-  const apiKey = process.env.SENDGRID_API_KEY;
-  const from = process.env.SENDGRID_FROM_EMAIL;
+  const user = process.env.EMAIL_USER;
+  const pass = process.env.EMAIL_PASS;
 
-  if (!apiKey || !apiKey.startsWith("SG.")) {
-    throw new Error("SENDGRID_API_KEY missing or invalid");
+  if (!user) {
+    throw new Error("EMAIL_USER missing");
   }
 
-  if (!from) {
-    throw new Error("SENDGRID_FROM_EMAIL missing");
+  if (!pass) {
+    throw new Error("EMAIL_PASS missing");
   }
 
-  sgMail.setApiKey(apiKey);
+  transporter = nodemailer.createTransport({
+    service: "gmail",  
+    auth: {
+      user,
+      pass,  
+    },
+  });
+
   initialized = true;
 }
 
 export async function sendEmail({ to, subject, html }) {
-  initSendGrid();
+  initMailer();
 
-  return sgMail.send({
-    from: `TwoFit App <${process.env.SENDGRID_FROM_EMAIL}>`,
+  return transporter.sendMail({
+    from: `TwoFit App <${process.env.EMAIL_USER}>`,
     to,
     subject,
     html,

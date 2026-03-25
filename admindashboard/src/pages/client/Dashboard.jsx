@@ -1,9 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import KpiCard from "@/components/cards/KpiCard";
 import HeroCard from "./components/HeroCard";
 import ComplianceChart from "@/components/chart/ComplianceChart";
@@ -24,12 +19,7 @@ import {
   getClient,
 } from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
-import {
-  CalendarDays,
-  ChartPie,
-  Flame,
-  Weight,
-} from "lucide-react";
+import { CalendarDays, ChartPie, Flame, Weight } from "lucide-react";
 import { SyncLoader } from "react-spinners";
 import WaterIntake from "./components/WaterIntake";
 import WeeklyCheckInModal from "./components/WeeklyCheckInModal.jsx";
@@ -61,7 +51,13 @@ export default function Dashboard() {
           : user?.programType;
       const [program, coaches, compliance] = await Promise.all([
         dispatch(getProgramById(programId)).unwrap(),
-        dispatch(getAllCoachesByAdmin([user?.trainer, user?.therapist, user?.dietition])).unwrap(),
+        dispatch(
+          getAllCoachesByAdmin([
+            user?.trainer,
+            user?.therapist,
+            user?.dietition,
+          ]),
+        ).unwrap(),
         dispatch(fetchClientComplianceStats()).unwrap(),
       ]);
       setProgram(program.data);
@@ -86,14 +82,15 @@ export default function Dashboard() {
     }
   }, [fetchDashboardData, user?._id, user?.programType]);
 
-  const currentGlobalDay = clientUser?.currentGlobalDay || user?.currentGlobalDay || 1;
+  const currentGlobalDay =
+    clientUser?.currentGlobalDay || user?.currentGlobalDay || 1;
   const currentWeek = Math.ceil(currentGlobalDay / 7);
   const isCheckInDay = currentGlobalDay % 7 === 0;
 
   useEffect(() => {
     if (isCheckInDay && clientUser) {
       const hasCheckedIn = clientUser.weeklyCheckIns?.some(
-        (ci) => ci.weekIndex === currentWeek
+        (ci) => ci.weekIndex === currentWeek,
       );
       if (!hasCheckedIn) {
         setShowCheckInModal(true);
@@ -103,7 +100,9 @@ export default function Dashboard() {
 
   const handleWeeklyCheckInSubmit = async (weekIndex, responses) => {
     try {
-      const result = await dispatch(submitWeeklyCheckIn({ weekIndex, responses }));
+      const result = await dispatch(
+        submitWeeklyCheckIn({ weekIndex, responses }),
+      );
       if (submitWeeklyCheckIn.fulfilled.match(result)) {
         toast.success("Assessment submitted successfully!");
         setShowCheckInModal(false);
@@ -117,7 +116,6 @@ export default function Dashboard() {
   };
 
   const isProgramStarted = useMemo(() => {
-   
     const startDate = clientUser?.programStartDate || user?.programStartDate;
 
     if (!startDate) return true; // Fallback if no date found
@@ -264,8 +262,6 @@ export default function Dashboard() {
             </div>
           </div>
           <WaterIntake />
-
-           
 
           {/* Mobile Only: Measurements */}
           <div className="lg:hidden order-4">
