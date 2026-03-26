@@ -1,5 +1,32 @@
 import TaskSubmission from "../modules/taskSubmission/taskSubmission.model.js";
 import User from "../modules/auth/auth.model.js";
+import ProgramExtension from "../modules/plan/programExtension.model.js";
+
+// Helper function to calculate total duration including extensions
+const getTotalProgramDurationWithExtensions = async (userId, originalProgramId) => {
+  try {
+    const user = await User.findById(userId).select('duration');
+    if (!user) return user?.duration || 0;
+
+    // Check for any extensions for this program
+    const extension = await ProgramExtension.findOne({
+      userId,
+      originalProgramId,
+    });
+
+    if (extension && extension.isActivated) {
+      // Return combined duration: original + extended
+      return parseInt(user.duration) + extension.extensionDuration;
+    }
+
+    return parseInt(user.duration) || 0;
+  } catch (error) {
+    console.error('Error getting total duration with extensions:', error.message);
+    return 0;
+  }
+};
+
+export { getTotalProgramDurationWithExtensions };
 
 export const getUserComplianceStats = async (userId, programPlan, therapyPlan = null, programTitle = "", durationInMonths = null) => {
     try {

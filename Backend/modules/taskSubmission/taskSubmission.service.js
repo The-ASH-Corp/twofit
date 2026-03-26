@@ -3,6 +3,7 @@ import User from "../auth/auth.model.js";
 import mongoose from "mongoose";
 import { getIO } from "../../utils/socket.js";
 import { createNotification } from "../notification/notification.service.js";
+import { shiftExtensionDatesForMissedDays, shiftActivatedExtensionForMissedDays } from "../plan/programExtension.service.js";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -87,15 +88,26 @@ export const syncMissedDaysForUser = async (userId) => {
     const endDateUtc = toUtcDateOnly(user.programEndDate);
     if (!endDateUtc) return { missedDaysApplied: 0 };
 
-    const newEndDateUtc = addDaysUtc(endDateUtc, missedDays);
-    user.programEndDate = formatDateYYYYMMDD(newEndDateUtc);
+        const newEndDateUtc = addDaysUtc(endDateUtc, missedDays);
+        user.programEndDate = formatDateYYYYMMDD(newEndDateUtc);
 
-    // Mark missed days processed up to yesterday
-    user.lastMissedSyncDate = addDaysUtc(todayUtc, -1);
+        // Mark missed days processed up to yesterday
+        user.lastMissedSyncDate = addDaysUtc(todayUtc, -1);
 
-    await user.save();
+        await user.save();
 
-    return { missedDaysApplied: missedDays, newProgramEndDate: user.programEndDate };
+        // Shift extension dates if there's a pending or activated extension
+        try {
+            // Handle pending extension
+            await shiftExtensionDatesForMissedDays(userId, missedDays);
+            // Handle already-activated extension
+            await shiftActivatedExtensionForMissedDays(userId, missedDays);
+        } catch (error) {
+            console.error(`Error shifting extension dates for user ${userId}:`, error.message);
+            // Continue execution even if extension shift fails
+        }
+
+        return { missedDaysApplied: missedDays, newProgramEndDate: user.programEndDate };
 };
 
 // Helper to determine if we should advance the user's day

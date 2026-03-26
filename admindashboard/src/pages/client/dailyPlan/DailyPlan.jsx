@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, AlertCircle } from "lucide-react";
 import DailyTaskDrawer from "./DailyTaskDrawer";
 import MobileBottomNav from "../components/MobileBottomNav";
 import { useDispatch } from "react-redux";
@@ -7,6 +7,7 @@ import {
   getUserTaskStatus,
   uploadTask,
 } from "@/redux/features/tasks/task.thunk";
+import { getPendingExtension } from "@/redux/features/plans/plan.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { getProgramById } from "@/redux/features/program/program.thunk";
@@ -33,6 +34,7 @@ export default function DailyPlan() {
   const [therapyPlan, setTherapyPlan] = useState(null);
   const [calendarData, setCalendarData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [pendingExtension, setPendingExtension] = useState(null);
 
   // Fetch program, therapy plan and tasks on mount
   useEffect(() => {
@@ -53,6 +55,12 @@ export default function DailyPlan() {
         }
 
         await dispatch(getUserTaskStatus()).unwrap();
+        
+        // Fetch pending extension
+        const extensionData = await dispatch(getPendingExtension(user?._id)).unwrap();
+        if (extensionData) {
+          setPendingExtension(extensionData);
+        }
       } catch (error) {
         console.error("Error fetching daily plan data:", error);
       } finally {
@@ -420,6 +428,24 @@ export default function DailyPlan() {
 
   return (
     <div className="bg-white lg:rounded-2xl lg:p-8 p-4 lg:shadow-sm">
+      {/* Extension Info Banner */}
+      {pendingExtension && !pendingExtension.isActivated && (
+        <div className="mb-6 lg:mb-8 p-4 lg:p-6 bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-xl">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-purple-600 mt-0.5 shrink-0" />
+            <div className="flex-1">
+              <h3 className="font-bold text-purple-900 mb-1">Program Extension Coming!</h3>
+              <p className="text-sm text-purple-800 mb-2">
+                Your current program ends on <strong>{new Date(pendingExtension.originalProgramEndDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</strong>
+              </p>
+              <p className="text-sm text-purple-800">
+                <strong>{pendingExtension.extensionDuration} days</strong> extension starts on <strong>{new Date(pendingExtension.extendedProgramStartDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col lg:flex-row justify-between lg:items-center gap-4 lg:gap-0 mb-6 lg:mb-8">
         <h2 className="font-bold text-[18px] lg:text-[20px] text-[#0A4F48]">
           {monthNames[currentMonth]} {currentYear}
@@ -500,12 +526,27 @@ export default function DailyPlan() {
             ? filterTasks(tasksForDay.summary)
             : null;
 
+          // Check if this date is the extension start date
+          const isExtensionStartDate = 
+            pendingExtension && 
+            fullDate === pendingExtension.extendedProgramStartDate;
+
+          // Check if this date is within the extension period
+          const isWithinExtension = 
+            pendingExtension && 
+            fullDate >= pendingExtension.extendedProgramStartDate && 
+            fullDate <= pendingExtension.extendedProgramEndDate;
+
           return (
             <div
               key={index}
               onClick={() => handleDateClick(fullDate)}
               className={`min-h-[80px] lg:min-h-[120px] border-r border-b border-gray-200 p-2 lg:p-3 relative cursor-pointer hover:bg-gray-50/50 transition-colors ${
                 !isCurrentMonth ? "bg-gray-50/30" : ""
+              } ${
+                isWithinExtension && pendingExtension && !pendingExtension.isActivated 
+                  ? "bg-purple-50/40 border-purple-200" 
+                  : ""
               }`}
             >
               {isCurrentMonth && (
@@ -517,6 +558,14 @@ export default function DailyPlan() {
                   >
                     {day}
                   </span>
+
+                  {/* EXTENSION START BADGE */}
+                  {isExtensionStartDate && !pendingExtension.isActivated && (
+                    <div className="absolute top-1 lg:top-2 right-1 lg:right-2 left-1 lg:left-2 bg-purple-500 text-white text-[8px] lg:text-[9px] font-bold py-0.5 lg:py-1 rounded px-1 flex items-center justify-center gap-1">
+                      <AlertCircle size={12} />
+                      <span>Extension Starts</span>
+                    </div>
+                  )}
 
                   {/* TODAY Badge */}
                   {fullDate === today && (

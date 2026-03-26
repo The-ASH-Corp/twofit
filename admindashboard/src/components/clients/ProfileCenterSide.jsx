@@ -1,7 +1,11 @@
 /* eslint-disable react-hooks/preserve-manual-memoization */
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUserSubmissions } from "@/redux/features/tasks/task.thunk";
+import {
+  deleteExtension,
+  getUserExtensions,
+} from "@/redux/features/plans/plan.thunk";
 import { 
   Activity, 
   Scale, 
@@ -13,8 +17,11 @@ import {
   Utensils,
   BicepsFlexed,
   HeartPulse,
-  BookMarked
+  BookMarked,
+  Plus
 } from "lucide-react";
+import ExtendProgramModal from "./ExtendProgramModal";
+import { toast } from "react-toastify";
 
 const statusConfig = {
   Completed: { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", icon: CheckCircle2 },
@@ -28,12 +35,50 @@ const statusConfig = {
 const ProfileCenterSide = ({ client }) => {
   const dispatch = useDispatch();
   const { selectedUserTasks } = useSelector((state) => state.tasks);
+  const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
+  const [pendingExtension, setPendingExtension] = useState(null);
+  const [isDeletingExtension, setIsDeletingExtension] = useState(false);
 
   useEffect(() => {
     if (client?._id) {
       dispatch(getAllUserSubmissions(client?._id));
     }
   }, [client?._id, dispatch]);
+
+  const fetchPendingExtension = async () => {
+    if (!client?._id) {
+      setPendingExtension(null);
+      return;
+    }
+
+    try {
+      const extensions = await dispatch(getUserExtensions(client._id)).unwrap();
+      const list = Array.isArray(extensions) ? extensions : [];
+      const pending = list.find((ext) => !ext?.isActivated) || null;
+      setPendingExtension(pending);
+    } catch {
+      setPendingExtension(null);
+    }
+  };
+
+  useEffect(() => {
+    fetchPendingExtension();
+  }, [client?._id]);
+
+  const handleDeleteExtension = async () => {
+    if (!pendingExtension?._id || isDeletingExtension) return;
+
+    setIsDeletingExtension(true);
+    try {
+      await dispatch(deleteExtension(pendingExtension._id)).unwrap();
+      toast.success("Extension deleted successfully");
+      setPendingExtension(null);
+    } catch (error) {
+      toast.error(error || "Failed to delete extension");
+    } finally {
+      setIsDeletingExtension(false);
+    }
+  };
 
   const todaysTasks = useMemo(() => {
     if (!selectedUserTasks || !client) return [];
@@ -163,6 +208,26 @@ const ProfileCenterSide = ({ client }) => {
             </div>
             <h2 className="font-bold text-[#1E293B] text-lg">Current Plan</h2>
           </div>
+          {pendingExtension ? (
+            <button
+              onClick={handleDeleteExtension}
+              disabled={isDeletingExtension}
+              className="flex items-center gap-2 px-3 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors text-sm font-semibold group disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              {isDeletingExtension ? "Deleting..." : "Delete Extension"}
+            </button>
+          ) : (
+            <button
+              onClick={() => setIsExtendModalOpen(true)}
+              className="flex items-center gap-2 px-3 py-2 bg-[#0A4F48] text-white rounded-lg hover:bg-[#084240] transition-colors text-sm font-semibold group"
+            >
+              <Plus
+                size={16}
+                className="group-hover:scale-110 transition-transform"
+              />
+              Extend Plan
+            </button>
+          )}
         </div>
 
         <div className="flex flex-col gap-6">
@@ -272,6 +337,16 @@ const ProfileCenterSide = ({ client }) => {
           )}
         </div>
       </div>
+
+      {/* Extend Program Modal */}
+      <ExtendProgramModal
+        isOpen={isExtendModalOpen}
+        onClose={() => setIsExtendModalOpen(false)}
+        client={client}
+        onSuccess={() => {
+          fetchPendingExtension();
+        }}
+      />
     </div>
   );
 };
