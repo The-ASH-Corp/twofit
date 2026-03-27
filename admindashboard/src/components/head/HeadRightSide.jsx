@@ -7,7 +7,7 @@ const HeadRightSide = ({ dashboardData }) => {
   const performanceInfo = useMemo(() => {
     // Default values
     const defaultPerf = { programs: 30, experts: 45, clients: 25 };
-    const adminPerf = dashboardData?.adminPerformance || defaultPerf;
+    const adminPerf = dashboardData?.adminPerformance;
 
     const total = adminPerf.programs + adminPerf.experts + adminPerf.clients;
 
@@ -20,7 +20,7 @@ const HeadRightSide = ({ dashboardData }) => {
 
     // Use expertPerformance.taskCompletion as the center average compliance score
     // If no data, use a placeholder for visual demonstration
-    const avgCompliance = dashboardData?.expertPerformance?.taskCompletion || 78;
+    const avgCompliance = dashboardData?.expertPerformance?.taskCompletion || 0;
 
     return {
       average: avgCompliance,

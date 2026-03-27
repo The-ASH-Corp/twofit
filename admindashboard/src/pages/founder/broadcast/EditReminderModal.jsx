@@ -1,49 +1,86 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { updateReminder } from "@/redux/features/autoReminder/reminder.thunk";
+import {
+  getReminders,
+  updateReminder,
+} from "@/redux/features/autoReminder/reminder.thunk";
 
 const EditReminderModal = ({ isOpen, onClose, reminder }) => {
   const dispatch = useDispatch();
 
-  const [message, setMessage] = useState(reminder?.message || "");
-  const [settings, setSettings] = useState(reminder?.settings || []);
+  const [message, setMessage] = useState("");
+  const [settings, setSettings] = useState([]);
+
+  useEffect(() => {
+    if (isOpen && reminder) {
+      setMessage(reminder.message || "");
+      setSettings(reminder.settings || []);
+    }
+  }, [isOpen, reminder]);
 
   if (!isOpen) return null;
 
+  const formatTo24Hour = (time) => {
+    if (!time) return "";
+
+    if (/^\d{2}:\d{2}$/.test(time)) return time;
+
+    const [rawTime, modifier] = time.split(" ");
+    if (!rawTime || !modifier) return "";
+
+    let [hours, minutes] = rawTime.split(":");
+    hours = parseInt(hours, 10);
+
+    if (modifier === "PM" && hours !== 12) hours += 12;
+    if (modifier === "AM" && hours === 12) hours = 0;
+
+    return `${hours.toString().padStart(2, "0")}:${minutes}`;
+  };
+
+  const convertTo12Hour = (time24h) => {
+    if (!time24h) return "";
+
+    let [hours, minutes] = time24h.split(":");
+    hours = parseInt(hours);
+
+    const modifier = hours >= 12 ? "PM" : "AM";
+    const hour12 = hours % 12 || 12;
+
+    return `${hour12}:${minutes} ${modifier}`;
+  };
+
   const handleTimeChange = (index, value) => {
     const updated = [...settings];
-    updated[index].time = value;
+
+    updated[index] = {
+      ...updated[index],
+      time: convertTo12Hour(value), 
+    };
+
     setSettings(updated);
   };
 
-  const handleSave = () => {
-    dispatch(
+
+  const handleSave = async () => {
+    await dispatch(
       updateReminder({
         type: reminder.type,
         data: { message, settings },
       }),
     );
+
+    dispatch(getReminders()); 
     onClose();
-  };
-
-  const convertTo24Hour = (time12h) => {
-    const [time, modifier] = time12h.split(" ");
-    let [hours, minutes] = time.split(":");
-
-    if (hours === "12") hours = "00";
-    if (modifier === "PM") hours = parseInt(hours, 10) + 12;
-
-    return `${hours.toString().padStart(2, "0")}:${minutes}`;
   };
 
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl p-6 w-[400px] space-y-4">
+      <div className="bg-white p-6 rounded-xl w-[400px] space-y-4">
         <h2 className="font-bold text-lg">Edit Reminder</h2>
 
         {/* Message */}
         <textarea
-          className="w-full border rounded-lg p-2 text-sm"
+          className="w-full border rounded p-2 text-sm"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
@@ -54,13 +91,14 @@ const EditReminderModal = ({ isOpen, onClose, reminder }) => {
             <span>{item.label}</span>
             <input
               type="time"
-              value={convertTo24Hour(item.time)}
+              value={formatTo24Hour(item.time)} 
               onChange={(e) => handleTimeChange(idx, e.target.value)}
               className="border rounded px-2 py-1"
             />
           </div>
         ))}
 
+        {/* Actions */}
         <div className="flex justify-end gap-2">
           <button onClick={onClose}>Cancel</button>
           <button
