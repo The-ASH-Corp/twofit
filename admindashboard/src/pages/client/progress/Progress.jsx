@@ -24,7 +24,6 @@ import {
 } from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { SyncLoader } from "react-spinners";
-import { assets } from "@/assets/asset";
 
 export default function Progress() {
   const [program, setProgram] = useState(null);
@@ -38,6 +37,12 @@ export default function Progress() {
   const dispatch = useDispatch();
   const clientData = selectedClient || user;
 
+  const clampPercent = (value) => {
+    const num = Number(value);
+    if (!Number.isFinite(num)) return 0;
+    return Math.min(Math.max(Math.round(num), 0), 100);
+  };
+
   const fetchDashboardData = useCallback(async () => {
     try {
       setIsLoading(true);
@@ -47,7 +52,7 @@ export default function Progress() {
           : user?.programType;
       const program = await dispatch(getProgramById(programId)).unwrap();
       await dispatch(getClient({ id: user?._id })).unwrap();
-      const compliance = await dispatch(fetchClientComplianceStats()).unwrap();
+      const compliance = await dispatch(fetchClientComplianceStats(user?._id)).unwrap();
       setComplianceData(compliance);
       setProgram(program.data);
     } catch (error) {
@@ -55,7 +60,7 @@ export default function Progress() {
     } finally {
       setIsLoading(false);
     }
-  }, [dispatch, user?.programType]);
+  }, [dispatch, user?._id, user?.programType]);
 
   useEffect(() => {
     if (user?._id && user?.programType) {
@@ -63,25 +68,39 @@ export default function Progress() {
     }
   }, [fetchDashboardData, user?._id, user?.programType]);
 
-  const lastWeightUpdateDate = clientData?.weightHistory?.at(-1)?.date || "";
+  const sortedWeightHistory = [...(clientData?.weightHistory || [])].sort(
+    (a, b) => new Date(a?.date) - new Date(b?.date)
+  );
+  const sortedMeasurementHistory = [...(clientData?.measurementHistory || [])].sort(
+    (a, b) => new Date(a?.date) - new Date(b?.date)
+  );
+
   const lastMeasurementUpdateDate =
-    clientData?.measurementHistory?.at(-1)?.date || "";
+    sortedMeasurementHistory[sortedMeasurementHistory.length - 1]?.date || "";
 
   // Data processing for KPIs
-  const startWeight = clientData?.weightHistory?.[0]?.weight || 0;
+  const startWeight = sortedWeightHistory[0]?.weight || 0;
   const currentWeight = clientData?.currentWeight || 0;
   const weightChange = currentWeight - startWeight;
 
-  const startMeasurements = clientData?.measurementHistory?.[0] || {
+  const startMeasurements = sortedMeasurementHistory[0] || {
     chest: 0,
     waist: 0,
     hip: 0,
   };
-  const currentMeasurements = clientData?.measurementHistory?.at(-1) || {
+  const currentMeasurements =
+    sortedMeasurementHistory[sortedMeasurementHistory.length - 1] || {
     chest: 0,
     waist: 0,
     hip: 0,
   };
+
+  const currentDay = Number(clientData?.currentGlobalDay) || 1;
+  const totalDuration =
+    parseInt(program?.plan?.duration, 10) || Number(program?.plan?.duration) || 0;
+  const programProgressPercent = clampPercent(
+    totalDuration > 0 ? (currentDay / totalDuration) * 100 : 0
+  );
 
   const kpiData = [
     {
@@ -94,16 +113,11 @@ export default function Progress() {
       ),
       icon: <Calendar size={18} className="text-[#0A4F48] hidden lg:block" />,
       subtitle: (
-        <div className="w-full bg-gray-100 h-1.5 rounded-full mt-4 overflow-hidden">
+        <div className="w-full bg-[#D8EFE7] h-1.5 rounded-full mt-4 overflow-hidden">
           <div
             className="bg-[#0A4F48] h-full"
             style={{
-              width: `${Math.min(
-                ((clientData?.currentGlobalDay || 1) /
-                  (program?.plan?.duration || 1)) *
-                  100,
-                100
-              )}%`,
+              width: `${programProgressPercent}%`,
             }}
           />
         </div>
@@ -163,17 +177,17 @@ export default function Progress() {
   const complianceBreakdown = [
     {
       title: "DIET",
-      percentage: Math.round(((complianceData?.stats?.expectedMeals - (complianceData?.stats?.missedCount + complianceData?.stats?.skippedCount)) / Math.max(complianceData?.stats?.expectedMeals, 1)) * 100) || 12,
+      percentage: clampPercent(complianceData?.diet),
       color: "#0A4F48",
     },
     {
       title: "WORKOUT",
-      percentage: 8, 
+      percentage: clampPercent(complianceData?.workout),
       color: "#0A4F48",
     },
     {
       title: "THERAPY",
-      percentage: 0,
+      percentage: clampPercent(complianceData?.therapy),
       color: "#0A4F48",
     },
   ];
@@ -280,53 +294,11 @@ export default function Progress() {
             <h3 className="font-black text-[15px] lg:text-[18px] text-gray-800 tracking-tight">
               Weight Progress
             </h3>
-            <div className="flex lg:bg-[#F8FAFA] lg:rounded-full lg:p-1 lg:border lg:border-gray-100">
-              <button className="px-3 lg:px-4 py-1.5 rounded-full bg-[#E6FFFA] lg:bg-[#A7F3D0] text-[#0A4F48] text-[9px] lg:text-[10px] font-black tracking-widest uppercase">
-                <span className="hidden lg:inline">1W</span>
-                <span className="inline lg:hidden">WEEKLY VIEW</span>
-              </button>
-              <button className="hidden lg:inline px-4 py-1.5 rounded-full text-gray-400 text-[10px] font-black tracking-widest uppercase hover:text-gray-600">1M</button>
-              <button className="hidden lg:inline px-4 py-1.5 rounded-full text-gray-400 text-[10px] font-black tracking-widest uppercase hover:text-gray-600">3M</button>
-            </div>
-          </div>
-          
-          {/* Desktop Recharts Variant */}
-          <div className="hidden lg:block w-full flex-1">
-            <ProgressChart />
           </div>
 
-          {/* Mobile Custom CSS Bar Variant */}
-          <div className="block lg:hidden w-full pt-8 pb-2">
-            <div className="flex justify-between items-end h-[160px] px-2 relative">
-               {[1, 2, 3, 4, 5].map((idx) => {
-                 const isLatest = idx === 5;
-                 // Gradient shades matching UI
-                 const bgColors = [
-                   'bg-[#E2ECE9]', 'bg-[#CBE0D8]', 'bg-[#98BBAF]', 'bg-[#679B8C]', 'bg-[#0A4F48]'
-                 ];
-                 const heights = ['60%', '70%', '65%', '75%', '100%'];
-                 
-                 return (
-                   <div key={idx} className="flex flex-col items-center justify-end h-full w-[16%]">
-                     {isLatest && (
-                        <div className="absolute top-0 right-1 w-12 h-6 bg-[#002D27] text-white text-[10px] font-black tracking-widest rounded-full flex items-center justify-center translate-y-[-50%] z-20 shadow-md">
-                          99.0
-                        </div>
-                     )}
-                     <div 
-                        className={`w-full rounded-t-full rounded-b-sm ${bgColors[idx-1]} transition-all duration-700 ease-out`}
-                        style={{ height: heights[idx-1] }}
-                     />
-                   </div>
-                 );
-               })}
-            </div>
-            {/* Mobile X-Axis Labels */}
-            <div className="flex justify-between px-2 mt-4 text-[9px] font-black text-gray-500 uppercase tracking-widest">
-              <span>JAN 1</span>
-              <span>JAN 15</span>
-              <span>JAN 30</span>
-            </div>
+          {/* Unified chart on both desktop and mobile using live backend data */}
+          <div className="w-full flex-1">
+            <ProgressChart />
           </div>
         </div>
 
@@ -355,7 +327,7 @@ export default function Progress() {
               { label: "WAIST", current: currentMeasurements.waist || 0, initial: startMeasurements.waist || 0 },
               { label: "HIPS", current: currentMeasurements.hip || 0, initial: startMeasurements.hip || 0 },
             ].map((m, i) => {
-              const maxVal = Math.max(m.current, m.initial, 120);
+              const maxVal = Math.max(m.current, m.initial, 1);
               const currentPct = (m.current / maxVal) * 100;
               const initialPct = (m.initial / maxVal) * 100;
 
@@ -365,22 +337,22 @@ export default function Progress() {
                   <div className="flex justify-between items-center w-full gap-4 relative">
                      <span className="text-[10px] font-black tracking-widest uppercase text-gray-800 w-12 shrink-0">{m.label}</span>
                      
-                     {/* The continuous segmented pill for Mobile (left grey, right green) */}
+                     {/* Overlay bars: initial in light color, current in dark color */}
                      <div className="flex-1 h-3 lg:h-10 rounded-full w-full bg-[#E5ECE9] lg:bg-transparent overflow-hidden relative">
-                        {/* Initial Bar Desktop */}
+                        {/* Initial Bar */}
                         <div
-                          className="hidden lg:block absolute left-0 top-0 h-full bg-[#E6FFFA] rounded-[12px] z-0 transition-all duration-1000"
+                          className="absolute left-0 top-0 h-full bg-[#E6FFFA] rounded-[12px] z-0 transition-all duration-1000"
                           style={{ width: `${initialPct}%` }}
                         />
-                        {/* Current Bar Desktop / Segment Mobile  */}
+                        {/* Current Bar */}
                         <div
-                          className="absolute right-0 lg:left-0 top-0 h-full bg-[#0A4F48] lg:rounded-[12px] z-10 transition-all duration-1000 shadow-sm"
-                          style={{ width: `${50}%` }} 
+                          className="absolute left-0 top-0 h-full bg-[#0A4F48] rounded-[12px] z-10 transition-all duration-1000 shadow-sm"
+                          style={{ width: `${currentPct}%` }}
                         />
                      </div>
 
                      <span className="text-[10px] lg:text-[11px] font-black text-gray-800 lg:w-32 text-right shrink-0">
-                       {m.current} cm <span className="text-gray-400 font-bold hidden lg:inline">VS {m.initial} CM</span>
+                       {m.current} cm <span className="text-gray-400 font-bold">VS {m.initial} CM</span>
                      </span>
                   </div>
                 </div>
@@ -428,26 +400,6 @@ export default function Progress() {
                <div className="w-1/2 h-px bg-linear-to-r from-transparent to-[#A7F3D0]/20 mb-8" />
                <TrendingDown size={120} className="text-[#A7F3D0]/10 absolute -top-10 -left-10" />
             </div>
-          </div>
-
-          <div className="bg-[#E6FFFA] rounded-[32px] p-8 flex flex-col justify-between shadow-[0_4px_30px_rgba(0,0,0,0.02)] min-h-[220px]">
-             <button
-                onClick={() => {
-                  setIsOpen(true);
-                  setPanelType("measurement"); 
-                }}
-                className="w-12 h-12 bg-[#0A4F48] rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-md"
-             >
-                <Plus size={24} className="text-white" />
-             </button>
-             <div>
-               <h3 className="font-black text-[18px] text-[#0A4F48] tracking-tight mb-2">
-                 Log New Activity
-               </h3>
-               <p className="text-[12px] font-medium text-[#0A4F48]/70 leading-relaxed max-w-[200px]">
-                 Keep your data up to date for precise insights.
-               </p>
-             </div>
           </div>
         </div>
       </div>

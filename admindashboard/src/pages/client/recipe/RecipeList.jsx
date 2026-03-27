@@ -387,7 +387,7 @@ export default function RecipeList() {
         {/* =========================================
             ACTION BANNER
             ========================================= */}
-        <section className="relative rounded-[48px] bg-[#0A4F48] p-10 lg:p-16 overflow-hidden mt-12 group">
+        {/* <section className="relative rounded-[48px] bg-[#0A4F48] p-10 lg:p-16 overflow-hidden mt-12 group">
            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-linear-to-bl from-white/10 to-transparent rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-110 transition-transform duration-1000" />
            
            <div className="relative z-10 max-w-2xl">
@@ -402,7 +402,7 @@ export default function RecipeList() {
                  Generate My Plan
               </button>
            </div>
-        </section>
+        </section> */}
 
       </div>
 
