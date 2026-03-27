@@ -7,29 +7,7 @@ const roleStyles = {
 };
 
 export const feedbackColumns = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <div className="flex items-center justify-center">
-        <div className="w-5 h-5 rounded-full border-2 border-[#E2E8F0] flex items-center justify-center cursor-pointer">
-          <div className={`w-2.5 h-2.5 rounded-full ${table.getIsAllRowsSelected() ? "bg-[#45C4A2]" : "bg-transparent"}`} />
-        </div>
-      </div>
-    ),
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <div 
-          className="w-5 h-5 rounded-full border-2 border-[#45C4A2]/30 flex items-center justify-center cursor-pointer"
-          onClick={(e) => {
-            e.stopPropagation();
-            row.toggleSelected();
-          }}
-        >
-          <div className={`w-2.5 h-2.5 rounded-full ${row.getIsSelected() ? "bg-[#45C4A2]" : "bg-transparent"}`} />
-        </div>
-      </div>
-    ),
-  },
+
   { 
     accessorKey: "name", 
     header: "Expert Name",
@@ -95,13 +73,5 @@ export const feedbackColumns = [
       <span className="text-[13px] text-gray-600 font-medium">{row.original.date}</span>
     )
   },
-  { 
-    id: "actions", 
-    header: "Action", 
-    cell: () => (
-      <div className="text-gray-400 hover:text-gray-600 cursor-pointer text-xl font-bold">
-        ⋮
-      </div>
-    ) 
-  },
+  
 ];

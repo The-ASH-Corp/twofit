@@ -6,6 +6,7 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useDispatch } from "react-redux";
 import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
 import { AiFillStar } from "react-icons/ai";
+import { ENV } from "@/utils/env";
 
 export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,6 +32,24 @@ export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
     fetchExperts();
   }, []);
 
+  const getFileUrl = (path) => {
+    if (!path) return "";
+    if (path.startsWith("http") || path.startsWith("blob:")) return path;
+    const baseUrl = (ENV.API_BASE_URL || "").replace(/\/api\/v1\/?$/, "").replace(/\/api\/?$/, "");
+    const cleanPath = path.startsWith("/") ? path : `/${path}`;
+    return `${baseUrl}${cleanPath}`;
+  };
+
+  const getExpertImage = (expert) => {
+    if (expert?.image) return getFileUrl(expert.image);
+    if (expert?.profile) return expert.profile;
+    const role = (expert?.role || "").toLowerCase();
+    if (role.includes("trainer")) return assets.trainerCartoon;
+    if (role.includes("diet") || role.includes("nutrition")) return assets.dietitianCartoon;
+    if (role.includes("therapist") || role.includes("therapy")) return assets.therapistCartoon;
+    return assets.profile;
+  };
+
   const renderStars = (rating = 5) => {
     return (
       <div className="flex gap-1">
@@ -49,10 +68,8 @@ export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mb-8">
         {experts.map((expert, index) => {
           const isRated = ratedExpertIds.includes(expert?._id);
-          // Mock data for rating and reviews if not present
-          const rating = expert?.rating || (4.5 + Math.random() * 0.5).toFixed(1);
-          const reviewsCount = expert?.reviewsCount || Math.floor(Math.random() * 200) + 50;
-
+          // Use actual backend data for rating and reviews
+          const rating = expert?.avgRating ? parseFloat(expert.avgRating).toFixed(1) : 0;
           return (
             <div
               key={index}
@@ -65,26 +82,29 @@ export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
 
               {/* Avatar */}
               <div className="mb-4">
-                <img
-                  src={expert?.profile || assets.profile}
-                  alt={expert.name}
-                  className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-sm"
-                />
+                <div className="w-20 h-20 rounded-full border-4 border-white shadow-sm overflow-hidden">
+                  <img
+                    src={getExpertImage(expert)}
+                    alt={expert?.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
 
               {/* Info */}
               <div className="space-y-1 mb-4">
-                <h3 className="text-xl font-bold text-[#0F172A]">{expert?.name || "Live Expert"}</h3>
-                <p className="text-[11px] font-bold text-[#45C4A2] tracking-[0.2em] uppercase">
-                  {expert?.qualification || "MBBS"} | {expert?.experience || "5 YEARS EXP"}
+                <h3 className="text-lg font-bold text-[#0F172A]">{expert?.name || "Expert"}</h3>
+                <p className="text-[10px] font-bold text-[#45C4A2] tracking-[0.2em] uppercase">
+                  {expert?.qualification || "Certification"} | {expert?.experience ? `${expert.experience} ${expert.experience === 1 ? "Year" : "Years"} Exp` : "Experience"}
                 </p>
               </div>
 
               {/* Rating */}
-              <div className="flex items-center gap-3 mb-8">
-                {renderStars(rating)}
-                <span className="text-sm font-bold text-gray-700">{rating}</span>
-                <span className="text-sm text-gray-400 font-medium">({reviewsCount} reviews)</span>
+              <div className="flex flex-col items-center gap-2 mb-8">
+                <div className="flex items-center gap-2">
+                  {renderStars(rating)}
+                  <span className="text-sm font-bold text-gray-700">{rating}</span>
+                </div>
               </div>
 
               {/* Action Button */}
@@ -102,7 +122,7 @@ export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
                     : "border-[#0A4F48] text-[#0A4F48] hover:bg-[#0A4F48] hover:text-white"
                 }`}
               >
-                {isRated ? "Already Rated" : "View Full Profile"}
+                {isRated ? "Already Rated" : "Rate Now"}
               </button>
             </div>
           );
