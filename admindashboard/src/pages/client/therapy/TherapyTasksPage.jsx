@@ -340,22 +340,12 @@ export default function TherapyTasksPage() {
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
           <div>
-            <h4 className="text-[#10B981] font-black text-[11px] tracking-[0.2em] uppercase mb-1">
-              Mental Performance
-            </h4>
             <h1 className="text-[#0A4F48] font-black text-3xl lg:text-4xl tracking-tight">
               Day {currentGlobalDay} Therapy Videos
             </h1>
-            <p className="text-gray-500 font-bold text-sm lg:text-base mt-2">
-              Focus: Neural Recovery & Vagus Nerve Stimulation
-            </p>
           </div>
           
           <div className="flex items-center gap-3">
-            <div className="bg-[#E6FFFA] text-[#0A4F48] px-4 py-2 rounded-full flex items-center gap-2 shadow-sm">
-              <Timer size={16} className="text-[#0A4F48]" />
-              <span className="text-[11px] font-black tracking-widest uppercase">45 mins total</span>
-            </div>
             <div className="bg-[#0A4F48] text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg">
               <Sparkles size={16} className="text-[#71FEE2]" />
               <span className="text-[11px] font-black tracking-widest uppercase">
@@ -424,60 +414,6 @@ export default function TherapyTasksPage() {
                   <span className="text-[11px] font-black tracking-widest uppercase">Play Next Video</span>
                   <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </button>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4 pt-8 border-t border-gray-100 relative z-10">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-[#F0FDF4] flex items-center justify-center">
-                    <Brain size={20} className="text-[#10B981]" />
-                  </div>
-                  <div>
-                    <h5 className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Technique</h5>
-                    <p className="text-[#0A4F48] font-black text-xs lg:text-sm">{selectedTask?.technique}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-[#E6FFFA] flex items-center justify-center">
-                    <Clock size={20} className="text-[#03624C]" />
-                  </div>
-                  <div>
-                    <h5 className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Duration</h5>
-                    <p className="text-[#0A4F48] font-black text-xs lg:text-sm">{selectedTask?.duration}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-2xl bg-[#F0F9FF] flex items-center justify-center">
-                    <Sparkles size={20} className="text-[#0EA5E9]" />
-                  </div>
-                  <div>
-                    <h5 className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Impact</h5>
-                    <p className="text-[#0A4F48] font-black text-xs lg:text-sm">{selectedTask?.impact}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Recommended Reading Section */}
-            <div>
-              <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6 pl-2">
-                Recommended Reading
-              </h3>
-              <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide">
-                {[
-                  { title: "Vagus Nerve Science", time: "4 min read", icon: "https://images.unsplash.com/photo-1559757175-5700dde675bc?auto=format&fit=crop&q=80&w=100" },
-                  { title: "Flow State Triggers", time: "7 min read", icon: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&q=80&w=100" },
-                  { title: "Neural Plasticity", time: "12 min read", icon: "https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&q=80&w=100" },
-                ].map((item, idx) => (
-                  <div key={idx} className="bg-white rounded-[32px] p-4 flex items-center gap-4 min-w-[280px] shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-pointer group">
-                    <div className="w-14 h-14 rounded-2xl overflow-hidden bg-gray-100 shrink-0">
-                      <img src={item.icon} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
-                    </div>
-                    <div>
-                      <h4 className="text-[#0A4F48] font-black text-sm">{item.title}</h4>
-                      <p className="text-gray-400 font-bold text-[10px] mt-1 uppercase tracking-widest">{item.time}</p>
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
           </div>
