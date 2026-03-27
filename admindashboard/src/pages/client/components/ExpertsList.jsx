@@ -1,52 +1,65 @@
 import React from "react";
+import { MessageCircle } from "lucide-react";
 import { assets } from "@/assets/asset";
-import { BsChatLeftDots } from "react-icons/bs";
-import { useNavigate } from "react-router-dom";
 
 export default function ExpertsList({ expert }) {
-const navigate = useNavigate();
-  const experts = [
-    { role: "Trainer", name: expert?.filter((expert) => expert?.role === "Trainer").map((expert) => expert?.name) || "N/A", icon: assets.profileVector },
-    { role: "Dietitian", name: expert?.filter((expert) => expert?.role === "Dietician").map((expert) => expert?.name) || "N/A", icon: assets.profileVector },
-    { role: "Therapist", name: expert?.filter((expert) => expert?.role === "Therapist").map((expert) => expert?.name) || "N/A", icon: assets.profileVector },
+  // Use dummy data matching reference image
+  const experts = expert?.length ? expert : [
+    {
+      name: "Elena Rodriguez",
+      role: "Live Trainer",
+      image: assets.profile,
+    },
+    {
+      name: "Dr. Sarah Chen",
+      role: "Live Dieteteian",
+      image: assets.profile,
+    },
+    {
+      name: "Mark Williams",
+      role: "Live Therapist",
+      image: assets.profile,
+    }
   ];
 
   return (
-    <div className="bg-white p-5 rounded-2xl shadow-sm mt-4">
-      <div className="flex justify-between items-center mb-5">
-        <h3 className="text-[#0A4F48] font-bold text-sm">Experts</h3>
-        <img
-          src={assets.threeDotVector}
-          alt="more"
-          className="w-4 h-4 cursor-pointer"
-        />
-      </div>
-      <div className="space-y-5">
-        {experts.map((expert, index) => (
-          <div key={index} className="flex items-center justify-between">
-            <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 bg-gray-50 flex items-center justify-center rounded-full border border-gray-100 shadow-sm">
+    <div className="bg-white p-8 rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col gap-6 group transition-all duration-300 hover:shadow-lg">
+      <h3 className="text-gray-400 font-black text-[15px] uppercase tracking-widest">
+        Your Experts
+      </h3>
+
+      <div className="flex flex-col gap-6">
+        {experts.map((exp, index) => (
+          <div 
+            key={index} 
+            className="flex items-center justify-between group/row cursor-pointer"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-transparent group-hover/row:border-[#0A4F48]/10 transition-all shadow-sm">
                 <img
-                  src={expert.icon}
-                  alt={expert.role}
-                  className="w-5 h-5 opacity-70"
+                  src={exp.user?.profileimage || exp.image || assets.profile}
+                  alt={exp.name}
+                  className="w-full h-full object-cover"
                 />
               </div>
-              <div>
-                <p className="text-[10px] text-gray-400 font-bold leading-none mb-1.5 uppercase tracking-wider">
-                  {expert.role}
+              <div className="flex flex-col">
+                <p className="text-[15px] font-black text-gray-800 leading-none mb-1">
+                  {exp.user?.name || exp.name}
                 </p>
-                <p className="text-[14px] font-bold text-gray-800 leading-none">
-                  {expert.name}
+                <p className="text-[10px] font-black text-[#0A4F48] uppercase tracking-widest leading-none opacity-80">
+                  {exp.role}
                 </p>
               </div>
             </div>
-            <div className="w-7 h-7 flex items-center justify-center bg-[#EBF3F2] rounded-lg border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors shadow-sm">
-              <BsChatLeftDots className="w-3.5 h-3.5 font-bold " onClick={()=>navigate("/client/chats")}/>
-            </div>
+            
+            <button className="w-10 h-10 bg-[#F1F5F9] rounded-2xl flex items-center justify-center text-gray-400 group-hover/row:bg-[#0A4F48] group-hover/row:text-white transition-all">
+              <MessageCircle size={18} fill="currentColor" className="opacity-20 group-hover/row:opacity-100" />
+            </button>
           </div>
         ))}
       </div>
     </div>
   );
 }
+
+

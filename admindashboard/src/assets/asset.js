@@ -45,6 +45,8 @@ import dailyTasks from "./list-todo.svg"
 import wl from "./wl.jpg";
 import Workout from "./Workout.png";
 import MealPlaceholder from "./MealPlaceholder.png";
+import heroMascot from "./hero_mascot.png";
+import lunchWrap from "./lunch_wrap.png";
 import breakfast from "./breakfast.svg";
 
 export const assets = {
@@ -93,6 +95,8 @@ export const assets = {
   broadCast,
   wl,
   Workout,
+  heroMascot,
+  lunchWrap,
   MealPlaceholder,
   breakfast,
   dailyTasks,
