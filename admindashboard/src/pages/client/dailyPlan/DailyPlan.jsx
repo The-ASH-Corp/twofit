@@ -11,7 +11,10 @@ import { getPendingExtension } from "@/redux/features/plans/plan.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { getProgramById } from "@/redux/features/program/program.thunk";
-import { getClient } from "@/redux/features/client/client.thunk";
+import {
+  fetchClientComplianceStats,
+  getClient,
+} from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { assets } from "@/assets/asset";
 import { toast } from "react-toastify";
@@ -35,6 +38,8 @@ export default function DailyPlan() {
   const [calendarData, setCalendarData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [pendingExtension, setPendingExtension] = useState(null);
+  const [compliance, setCompliance] = useState(0);
+  const [streak, setStreak] = useState(0);
 
   // Fetch program, therapy plan and tasks on mount
   useEffect(() => {
@@ -60,6 +65,13 @@ export default function DailyPlan() {
         const extensionData = await dispatch(getPendingExtension(user?._id)).unwrap();
         if (extensionData) {
           setPendingExtension(extensionData);
+        }
+
+        // Fetch compliance and streaks
+        const complianceRes = await dispatch(fetchClientComplianceStats(user?._id)).unwrap();
+        if (complianceRes) {
+          setCompliance(complianceRes.overall || 0);
+          setStreak(complianceRes.streaks?.activeStreak || 0);
         }
       } catch (error) {
         console.error("Error fetching daily plan data:", error);
@@ -481,14 +493,10 @@ export default function DailyPlan() {
                 <option>Pending</option>
                 <option>Rejected</option>
                 <option>Skipped</option>
-                <option>Missed</option>
               </select>
             </div>
 
-            <button className="hidden lg:flex items-center gap-2 bg-[#0A4F48] text-white px-5 py-2.5 rounded-full text-[13px] font-black tracking-widest uppercase hover:bg-[#004d44] transition-all shadow-[0_8px_30px_rgba(10,79,72,0.2)]">
-              <Plus size={16} /> Schedule
-            </button>
-
+         
             {/* Mobile Month Nav */}
             <div className="flex lg:hidden gap-1 bg-white rounded-full p-1 border border-gray-100 shadow-sm">
               <button
@@ -557,7 +565,7 @@ export default function DailyPlan() {
                   
                   {isToday && (
                     <div className="bg-[#0A4F48] text-white text-[8px] lg:text-[9px] uppercase font-black tracking-widest py-0.5 lg:py-1 px-1.5 lg:px-2 rounded-full leading-none">
-                      Today
+                      {fullDate}
                     </div>
                   )}
                 </div>
@@ -610,15 +618,15 @@ export default function DailyPlan() {
           <div className="bg-[#0A4F48] rounded-[32px] p-8 flex-1 text-white relative overflow-hidden shadow-[0_20px_50px_rgba(10,79,72,0.3)]">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-[#A7F3D0] mb-3">Monthly Outlook</h4>
             <h3 className="text-[28px] font-black leading-[1.1] mb-8 max-w-lg tracking-tight">
-              March is looking<br />strong for endurance.
+              {monthNames[currentMonth]} is looking<br />strong for endurance.
             </h3>
             <div className="flex gap-12 relative z-10">
               <div>
-                <p className="text-[32px] font-black leading-none mb-1">84%</p>
+                <p className="text-[32px] font-black leading-none mb-1">{Math.round(compliance)}%</p>
                 <p className="text-[10px] font-bold text-[#A7F3D0] uppercase tracking-widest">Completion Rate</p>
               </div>
               <div>
-                <p className="text-[32px] font-black leading-none mb-1">12</p>
+                <p className="text-[32px] font-black leading-none mb-1">{streak}</p>
                 <p className="text-[10px] font-bold text-[#A7F3D0] uppercase tracking-widest">Active Streaks</p>
               </div>
             </div>
@@ -632,7 +640,7 @@ export default function DailyPlan() {
             <div>
               <h4 className="text-[10px] font-black uppercase tracking-widest text-orange-200 mb-4">Expert Tip</h4>
               <p className="text-[16px] font-medium italic leading-relaxed opacity-90 pr-4">
-                "Consistency in March prepares the muscle fibers for high-intensity April training."
+                "Consistency in {monthNames[currentMonth]} prepares the muscle fibers for high-intensity training."
               </p>
             </div>
             <div className="flex items-center gap-3 mt-6">
@@ -644,11 +652,6 @@ export default function DailyPlan() {
           </div>
         </div>
       </div>
-
-      {/* Floating Action Button */}
-      <button className="hidden lg:flex fixed bottom-12 right-12 w-14 h-14 bg-[#0A4F48] text-white rounded-full items-center justify-center shadow-[0_8px_30px_rgba(10,79,72,0.4)] hover:bg-[#004d44] hover:scale-105 transition-all z-50">
-        <Plus size={24} />
-      </button>
 
       <DailyTaskDrawer
         selectedDate={selectedDate}
