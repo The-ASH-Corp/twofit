@@ -75,8 +75,22 @@ export default function Progress() {
     (a, b) => new Date(a?.date) - new Date(b?.date)
   );
 
+  const lastWeightUpdateDate =
+    sortedWeightHistory[sortedWeightHistory.length - 1]?.date || "";
   const lastMeasurementUpdateDate =
     sortedMeasurementHistory[sortedMeasurementHistory.length - 1]?.date || "";
+
+  const shouldShowWeightUpdateButton = () => {
+    if (!lastWeightUpdateDate) return true;
+    const daysSinceLastUpdate = (new Date() - new Date(lastWeightUpdateDate)) / (1000 * 60 * 60 * 24);
+    return daysSinceLastUpdate >= 7;
+  };
+
+  const shouldShowMeasurementUpdateButton = () => {
+    if (!lastMeasurementUpdateDate) return true;
+    const daysSinceLastUpdate = (new Date() - new Date(lastMeasurementUpdateDate)) / (1000 * 60 * 60 * 24);
+    return daysSinceLastUpdate >= 7;
+  };
 
   // Data processing for KPIs
   const startWeight = sortedWeightHistory[0]?.weight || 0;
@@ -294,6 +308,17 @@ export default function Progress() {
             <h3 className="font-black text-[15px] lg:text-[18px] text-gray-800 tracking-tight">
               Weight Progress
             </h3>
+            {shouldShowWeightUpdateButton() && (
+              <button
+                onClick={() => {
+                  setIsOpen(true);
+                  setPanelType("weight");
+                }}
+                className="text-[10px] uppercase font-black tracking-widest text-[#0A4F48] bg-[#E6FFFA] px-3 py-1.5 rounded-full hover:bg-[#A7F3D0] transition-colors"
+              >
+                Update
+              </button>
+            )}
           </div>
 
           {/* Unified chart on both desktop and mobile using live backend data */}
@@ -308,7 +333,7 @@ export default function Progress() {
             <h3 className="font-black text-[15px] lg:text-[18px] text-gray-800 tracking-tight">
               Measurements
             </h3>
-            {(!lastMeasurementUpdateDate || (new Date() - new Date(lastMeasurementUpdateDate)) / (1000 * 60 * 60 * 24) >= 7) && (
+            {shouldShowMeasurementUpdateButton() && (
               <button
                 onClick={() => {
                   setIsOpen(true);
