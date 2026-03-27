@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { fetchClientMeasurementHistory } from "@/redux/features/client/client.thunk";
+import { useNavigate } from "react-router-dom";
 
 export default function Measeurement() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
@@ -16,8 +18,9 @@ export default function Measeurement() {
   }, [dispatch]);
 
   const stats = [
-    { label: "Chest", before: "112 CM", current: "105 cm", progress: 85 },
-    { label: "Waist", before: "68 CM", current: "55 cm", progress: 75 },
+    { label: "Chest", before: "112 CM", current: "105 CM", progress: 85 },
+    { label: "Waist", before: "68 CM", current: "55 CM", progress: 75 },
+    { label: "Hips", before: "95 CM", current: "92 CM", progress: 65 },
   ];
 
   return (
@@ -55,7 +58,7 @@ export default function Measeurement() {
         ))}
       </div>
 
-      <button className="w-full mt-2 border-2 border-[#0A4F48] text-[#0A4F48] py-3.5 rounded-full text-[13px] font-black uppercase tracking-widest hover:bg-[#0A4F48] hover:text-white transition-all active:scale-95 shadow-sm">
+      <button className="w-full mt-2 border-2 border-[#0A4F48] text-[#0A4F48] py-3.5 rounded-full text-[13px] font-black uppercase tracking-widest hover:bg-[#0A4F48] hover:text-white transition-all active:scale-95 shadow-sm"onClick={()=>navigate("/client/progress")} >
         Update All Metrics
       </button>
     </div>
