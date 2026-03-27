@@ -2,20 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Bookmark,
   Search,
-  Filter,
-  Flame,
-  Dumbbell,
-  FolderOpen,
-  Bell,
-  Settings,
   ChevronRight,
   Plus,
-  Heart,
   Clock,
-  CircleCheck,
-  Zap,
-  Leaf,
-  Scale
 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -41,8 +30,12 @@ export default function RecipeList() {
 
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchText, setSearchText] = useState("");
-  const [showBookmarkedOnly, setShowBookmarkedOnly] = useState(bookmarkedFilter);
   const [bookmarkLoadingId, setBookmarkLoadingId] = useState(null);
+  const [featuredId, setFeaturedId] = useState(null);
+
+  const showBookmarkedOnly = useMemo(() => {
+    return searchParams.get("filter") === "bookmarked";
+  }, [searchParams]);
 
   const CATEGORY_OPTIONS = useMemo(() => {
     const categories = recipes.map((recipe) => recipe.category);
@@ -60,25 +53,20 @@ export default function RecipeList() {
     });
   }, [dispatch]);
 
+  // Reset featured view when filters change to show most relevant results
   useEffect(() => {
-    setShowBookmarkedOnly(bookmarkedFilter);
-  }, [bookmarkedFilter]);
+    setFeaturedId(null);
+  }, [activeCategory, searchText, showBookmarkedOnly]);
 
-  useEffect(() => {
-    if (showBookmarkedOnly === bookmarkedFilter) {
-      return;
-    }
-
+  const handleToggleBookmarkFilter = () => {
     const nextParams = new URLSearchParams(searchParams);
-
     if (showBookmarkedOnly) {
-      nextParams.set("filter", "bookmarked");
-    } else {
       nextParams.delete("filter");
+    } else {
+      nextParams.set("filter", "bookmarked");
     }
-
     setSearchParams(nextParams, { replace: true });
-  }, [bookmarkedFilter, searchParams, setSearchParams, showBookmarkedOnly]);
+  };
 
   const toDisplayText = (item) => {
     if (typeof item === "string") {
@@ -116,7 +104,7 @@ export default function RecipeList() {
   };
 
   const filteredRecipes = useMemo(() => {
-    return recipes.filter((recipe) => {
+    const baseFiltered = recipes.filter((recipe) => {
       const matchesCategory =
         activeCategory === "All" || recipe.category === activeCategory;
 
@@ -134,7 +122,15 @@ export default function RecipeList() {
 
       return matchesCategory && matchesSearch && matchesBookmark;
     });
-  }, [recipes, activeCategory, searchText, showBookmarkedOnly]);
+
+    if (!featuredId) return baseFiltered;
+
+    const featured = baseFiltered.find(r => r._id === featuredId);
+    if (!featured) return baseFiltered;
+
+    const others = baseFiltered.filter(r => r._id !== featuredId);
+    return [featured, ...others];
+  }, [recipes, activeCategory, searchText, showBookmarkedOnly, featuredId]);
 
   const toggleBookmark = async (id) => {
     try {
@@ -185,7 +181,7 @@ export default function RecipeList() {
             </div>
 
             <button
-              onClick={() => setShowBookmarkedOnly((prev) => !prev)}
+              onClick={handleToggleBookmarkFilter}
               className={cn(
                 "flex items-center gap-2 px-6 py-3.5 rounded-[20px] text-sm font-black tracking-tight transition-all shadow-sm active:scale-95",
                 showBookmarkedOnly 
@@ -197,14 +193,7 @@ export default function RecipeList() {
               <span className="uppercase tracking-widest text-[11px]">Filter Bookmarked</span>
             </button>
 
-            <div className="hidden sm:flex items-center gap-3 ml-2">
-              <button className="w-12 h-12 rounded-full flex items-center justify-center text-[#0A4F48] hover:bg-white hover:shadow-md transition-all">
-                <Bell size={22} />
-              </button>
-              <button className="w-12 h-12 rounded-full flex items-center justify-center text-[#0A4F48] hover:bg-white hover:shadow-md transition-all">
-                <Settings size={22} />
-              </button>
-            </div>
+            
           </div>
         </header>
 
@@ -231,141 +220,169 @@ export default function RecipeList() {
         {/* =========================================
             FEATURED GRID
             ========================================= */}
-        <section className="grid lg:grid-cols-12 gap-8 lg:gap-12">
-          
-          {/* Main Featured Card (Left) */}
-          <div className="lg:col-span-8 group">
-            <div className="bg-white rounded-[40px] overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.03)] border border-gray-50 h-full flex flex-col md:flex-row">
-              
-              <div className="relative w-full md:w-[45%] h-[400px] md:h-auto overflow-hidden">
-                <div className="absolute top-6 left-6 z-10">
-                   <span className="bg-[#0A4F48] text-[#71FEE2] text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-lg">
-                      Chef's Choice
-                   </span>
-                </div>
-                <img
-                  src={featuredRecipe?.image || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=1200"}
-                  alt={featuredRecipe?.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-              </div>
-
-              <div className="flex-1 p-8 lg:p-12 flex flex-col justify-between">
-                <div>
-                   <div className="flex justify-between items-start mb-6">
-                      <h2 className="text-[#0A4F48] font-black text-3xl lg:text-4xl leading-tight tracking-tighter max-w-[80%]">
-                        {featuredRecipe?.name}
-                      </h2>
-                      <button 
-                        onClick={() => featuredRecipe && toggleBookmark(featuredRecipe._id)}
-                        className="w-12 h-12 rounded-full flex items-center justify-center text-[#0A4F48] hover:bg-gray-50 border border-gray-100 transition-all"
-                      >
-                        <Heart size={20} fill={featuredRecipe?.isBookmarked ? "currentColor" : "none"} />
-                      </button>
-                   </div>
-
-                   <div className="flex items-center gap-4 mb-8">
-                      <div className="w-16 h-16 rounded-full border-2 border-[#71FEE2] flex flex-col items-center justify-center text-center">
-                         <span className="text-[8px] font-black text-[#0A4F48]/40 uppercase">Calories</span>
-                         <span className="text-[12px] font-black text-[#0A4F48]">{featuredRecipe?.calories || 420}</span>
-                      </div>
-                      <div className="w-16 h-16 rounded-full border-2 border-[#71FEE2] flex flex-col items-center justify-center text-center">
-                         <span className="text-[8px] font-black text-[#0A4F48]/40 uppercase">Protein</span>
-                         <span className="text-[12px] font-black text-[#0A4F48]">{featuredRecipe?.protein || 52}g</span>
-                      </div>
-                      <div className="w-16 h-16 rounded-full border-2 border-[#71FEE2] flex flex-col items-center justify-center text-center">
-                         <span className="text-[8px] font-black text-[#0A4F48]/40 uppercase">Carbs</span>
-                         <span className="text-[12px] font-black text-[#0A4F48]">12g</span>
-                      </div>
-                   </div>
-
-                   <div className="mb-8">
-                      <h4 className="text-[#0A4F48]/40 font-black text-[9px] uppercase tracking-[0.2em] mb-3">Key Ingredients</h4>
-                      <p className="text-gray-500 font-bold text-sm leading-relaxed truncate-2-lines">
-                         {normalizeList(featuredRecipe?.ingredients).join(", ") || "No ingredients specified."}
-                      </p>
-                   </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-6 border-t border-gray-50">
-                   <div className="flex items-center gap-2">
-                      <Clock size={16} className="text-gray-400" />
-                      <span className="text-gray-400 font-bold text-xs uppercase tracking-widest">45 Min Preparation</span>
-                   </div>
-                   <button className="bg-[#0A4F48] text-white px-8 py-3.5 rounded-full text-[12px] font-black tracking-widest uppercase hover:scale-[1.02] transition-all shadow-xl shadow-[#0A4F48]/20 active:scale-95">
-                      Full Recipe
-                   </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Secondary Recipe Card (Right) */}
-          <div className="lg:col-span-4">
-            <div className="bg-white rounded-[40px] overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.03)] border border-gray-50 flex flex-col h-full group/side">
-               <div className="relative h-[220px] overflow-hidden">
-                  <div className="absolute top-4 right-4 z-10">
-                     <button 
-                       onClick={() => secondaryRecipe && toggleBookmark(secondaryRecipe._id)}
-                       className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-[#0A4F48] shadow-lg active:scale-90 transition-all font-bold"
-                     >
-                        <Bookmark size={18} fill={secondaryRecipe?.isBookmarked ? "currentColor" : "none"} strokeWidth={3}/>
-                     </button>
+        {featuredRecipe && (
+          <section className="grid lg:grid-cols-12 gap-8 lg:gap-12">
+            
+            {/* Main Featured Card (Left) */}
+            <div className={cn(
+              "group transition-all duration-500",
+              secondaryRecipe ? "lg:col-span-8" : "lg:col-span-12"
+            )}>
+              <div className="bg-white rounded-[40px] overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.03)] border border-gray-50 h-full flex flex-col md:flex-row">
+                
+                <div className={cn(
+                  "relative h-[400px] md:h-auto overflow-hidden",
+                  secondaryRecipe ? "w-full md:w-[45%]" : "w-full md:w-[35%]"
+                )}>
+                  <div className="absolute top-6 left-6 z-10">
+                     {/* <span className="bg-[#0A4F48] text-[#71FEE2] text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-lg">
+                        Selected
+                     </span> */}
                   </div>
                   <img
-                    src={secondaryRecipe?.image || "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=1200"}
-                    alt={secondaryRecipe?.name}
-                    className="w-full h-full object-cover group-hover/side:scale-105 transition-transform duration-700"
+                    src={featuredRecipe?.image || "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=1200"}
+                    alt={featuredRecipe?.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-               </div>
-               
-               <div className="p-8 flex-1 flex flex-col justify-between">
+                </div>
+
+                <div className="flex-1 p-8 lg:p-12 flex flex-col justify-between">
                   <div>
-                    <h5 className="text-[#0A4F48] font-black text-[10px] uppercase tracking-[0.2em] mb-2">{secondaryRecipe?.category || "HIGH PROTEIN"}</h5>
-                    <h3 className="text-[#0A4F48] font-black text-2xl tracking-tighter mb-4">{secondaryRecipe?.name}</h3>
-                    
-                    <div className="flex gap-2 mb-6">
-                       <span className="bg-gray-50 px-4 py-1.5 rounded-full text-[10px] font-black text-gray-500 uppercase tracking-widest">{secondaryRecipe?.calories || 250} kcal</span>
-                       <span className="bg-gray-50 px-4 py-1.5 rounded-full text-[10px] font-black text-gray-500 uppercase tracking-widest">{secondaryRecipe?.protein || 60}g protein</span>
-                    </div>
+                     <div className="flex justify-between items-start mb-6 font-bold">
+                        <h2 className="text-[#0A4F48] font-black text-3xl lg:text-4xl leading-tight tracking-tighter max-w-[80%]">
+                          {featuredRecipe?.name}
+                        </h2>
+                        <button 
+                          onClick={() => featuredRecipe && toggleBookmark(featuredRecipe._id)}
+                          className="w-12 h-12 rounded-full flex items-center justify-center text-[#0A4F48] hover:bg-gray-50 border border-gray-100 transition-all"
+                        >
+                          <Bookmark size={20} fill={featuredRecipe?.isBookmarked ? "currentColor" : "none"} strokeWidth={3} />
+                        </button>
+                     </div>
 
-                    <div className="space-y-4 mb-4">
-                       {normalizeList(secondaryRecipe?.steps).slice(0, 2).map((step, idx) => (
-                         <div key={idx} className="flex gap-4">
-                            <span className="w-5 h-5 rounded-full bg-[#71FEE2] text-[#0A4F48] text-[10px] font-black flex items-center justify-center shrink-0">{idx + 1}</span>
-                            <p className="text-gray-500 font-bold text-xs leading-relaxed line-clamp-2">{step}</p>
-                         </div>
-                       ))}
-                    </div>
+                     <div className="flex items-center gap-4 mb-8">
+                        <div className="w-16 h-16 rounded-full border-2 border-[#71FEE2] flex flex-col items-center justify-center text-center">
+                           <span className="text-[8px] font-black text-[#0A4F48]/40 uppercase">Calories</span>
+                           <span className="text-[12px] font-black text-[#0A4F48]">{featuredRecipe?.calories || 420}</span>
+                        </div>
+                        <div className="w-16 h-16 rounded-full border-2 border-[#71FEE2] flex flex-col items-center justify-center text-center">
+                           <span className="text-[8px] font-black text-[#0A4F48]/40 uppercase">Protein</span>
+                           <span className="text-[12px] font-black text-[#0A4F48]">{featuredRecipe?.protein || 52}g</span>
+                        </div>
+                        <div className="w-16 h-16 rounded-full border-2 border-[#71FEE2] flex flex-col items-center justify-center text-center">
+                           <span className="text-[8px] font-black text-[#0A4F48]/40 uppercase">Carbs</span>
+                           <span className="text-[12px] font-black text-[#0A4F48]">12g</span>
+                        </div>
+                     </div>
+
+                     <div className="mb-8">
+                        <h4 className="text-[#0A4F48]/40 font-black text-[9px] uppercase tracking-[0.2em] mb-3">Key Ingredients</h4>
+                        <p className="text-gray-500 font-bold text-sm leading-relaxed truncate-2-lines">
+                           {normalizeList(featuredRecipe?.ingredients).join(", ") || "No ingredients specified."}
+                        </p>
+                     </div>
                   </div>
-
-                  <button className="w-full bg-white border border-gray-100 rounded-full py-4 text-[11px] font-black tracking-[0.2em] uppercase text-gray-400 hover:text-[#0A4F48] hover:border-[#0A4F48]/20 transition-all active:scale-95 shadow-sm">
-                     View Details
-                  </button>
-               </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </section>
+
+            {/* Secondary Recipe Card (Right) */}
+            {secondaryRecipe && (
+              <div 
+                onClick={() => setFeaturedId(secondaryRecipe._id)}
+                className="lg:col-span-4 cursor-pointer"
+              >
+                <div className="bg-white rounded-[40px] overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.03)] border border-gray-50 flex flex-col h-full group/side hover:shadow-xl transition-all duration-500">
+                   <div className="relative h-[220px] overflow-hidden">
+                      <div className="absolute top-4 right-4 z-10">
+                         <button 
+                           onClick={() => secondaryRecipe && toggleBookmark(secondaryRecipe._id)}
+                           className="w-10 h-10 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-[#0A4F48] shadow-lg active:scale-90 transition-all font-bold"
+                         >
+                            <Bookmark size={18} fill={secondaryRecipe?.isBookmarked ? "currentColor" : "none"} strokeWidth={3}/>
+                         </button>
+                      </div>
+                      <img
+                        src={secondaryRecipe?.image || "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80&w=1200"}
+                        alt={secondaryRecipe?.name}
+                        className="w-full h-full object-cover group-hover/side:scale-105 transition-transform duration-700"
+                      />
+                   </div>
+                   
+                   <div className="p-8 flex-1 flex flex-col justify-between">
+                      <div>
+                        <h5 className="text-[#0A4F48] font-black text-[10px] uppercase tracking-[0.2em] mb-2">{secondaryRecipe?.category || "HIGH PROTEIN"}</h5>
+                        <h3 className="text-[#0A4F48] font-black text-2xl tracking-tighter mb-4">{secondaryRecipe?.name}</h3>
+                        
+                        <div className="flex gap-2 mb-6">
+                           <span className="bg-gray-50 px-4 py-1.5 rounded-full text-[10px] font-black text-gray-500 uppercase tracking-widest">{secondaryRecipe?.calories || 250} kcal</span>
+                           <span className="bg-gray-50 px-4 py-1.5 rounded-full text-[10px] font-black text-gray-500 uppercase tracking-widest">{secondaryRecipe?.protein || 60}g protein</span>
+                        </div>
+
+                        <div className="space-y-4 mb-4">
+                           {normalizeList(secondaryRecipe?.steps).slice(0, 2).map((step, idx) => (
+                             <div key={idx} className="flex gap-4">
+                                <span className="w-5 h-5 rounded-full bg-[#71FEE2] text-[#0A4F48] text-[10px] font-black flex items-center justify-center shrink-0">{idx + 1}</span>
+                                <p className="text-gray-500 font-bold text-xs leading-relaxed line-clamp-2">{step}</p>
+                             </div>
+                           ))}
+                        </div>
+                      </div>
+                   </div>
+                </div>
+              </div>
+            )}
+          </section>
+        )}
 
         {/* =========================================
             BOTTOM MINI CARDS
             ========================================= */}
-        <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-           {otherRecipes.slice(0, 3).map((recipe, idx) => (
-             <div key={recipe._id} className="bg-white rounded-[32px] p-5 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex items-center justify-between group cursor-pointer hover:bg-gray-50 transition-all">
-                <div className="flex items-center gap-4">
-                   <img src={recipe.image || assets.MealPlaceholder} alt={recipe.name} className="w-14 h-14 rounded-[20px] object-cover shadow-md group-hover:scale-105 transition-transform" />
-                   <div>
-                      <h4 className="text-[#0A4F48] font-black text-[14px] tracking-tight">{recipe.name}</h4>
-                      <p className="text-gray-400 font-bold text-[10px] uppercase tracking-widest mt-0.5">15 min Prep • {recipe.calories} kcal</p>
-                   </div>
-                </div>
-                <div className="w-10 h-10 rounded-full flex items-center justify-center text-gray-300 group-hover:text-[#0A4F48] transition-colors">
-                   <ChevronRight size={20} />
-                </div>
+        {otherRecipes.length > 0 && (
+          <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+             {otherRecipes.slice(0, 3).map((recipe, idx) => (
+               <div 
+                  key={recipe._id} 
+                  onClick={() => setFeaturedId(recipe._id)}
+                  className="bg-white rounded-[32px] p-5 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex items-center justify-between group cursor-pointer hover:bg-gray-100/50 hover:shadow-md transition-all active:scale-[0.98]"
+               >
+                  <div className="flex items-center gap-4">
+                     <img src={recipe.image || assets.MealPlaceholder} alt={recipe.name} className="w-14 h-14 rounded-[20px] object-cover shadow-md group-hover:scale-105 transition-transform" />
+                     <div>
+                        <h4 className="text-[#0A4F48] font-black text-[14px] tracking-tight">{recipe.name}</h4>
+                        <p className="text-gray-400 font-bold text-[10px] uppercase tracking-widest mt-0.5">15 min Prep • {recipe.calories} kcal</p>
+                     </div>
+                  </div>
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-gray-300 group-hover:text-[#0A4F48] transition-colors">
+                     <ChevronRight size={20} />
+                  </div>
+               </div>
+             ))}
+          </section>
+        )}
+
+        {/* Global Empty State - Only when truly NO recipes match filters */}
+        {filteredRecipes.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+             <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center text-gray-300 mb-6">
+                <Bookmark size={32} />
              </div>
-           ))}
-        </section>
+             <h3 className="text-[#0A4F48] font-black text-2xl tracking-tight mb-2">No Recipes Found</h3>
+             <p className="text-gray-400 font-bold text-sm max-w-xs">{showBookmarkedOnly ? "You haven't bookmarked any recipes yet." : "No recipes match your current search and filters."}</p>
+             { (showBookmarkedOnly || activeCategory !== "All" || searchText) && (
+                <button 
+                  onClick={() => {
+                    setActiveCategory("All");
+                    setSearchText("");
+                    setSearchParams({}, { replace: true });
+                  }}
+                  className="mt-8 text-[#0A4F48] font-black text-xs uppercase tracking-widest border-b-2 border-[#71FEE2] pb-1 hover:text-black transition-colors"
+                >
+                   Clear all filters
+                </button>
+             )}
+          </div>
+        )}
 
         {/* =========================================
             ACTION BANNER
@@ -388,11 +405,6 @@ export default function RecipeList() {
         </section>
 
       </div>
-
-      {/* FLOATING ACTION BUTTON */}
-      <button className="fixed bottom-10 right-10 w-16 h-16 bg-[#0A4F48] text-white rounded-full flex items-center justify-center shadow-2xl shadow-[#0A4F48]/40 hover:scale-110 active:scale-90 transition-all z-50">
-         <Plus size={28} strokeWidth={3} />
-      </button>
 
       <MobileBottomNav />
     </div>
