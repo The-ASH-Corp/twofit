@@ -1,10 +1,26 @@
 import Recipe from "./recipe.model.js";
+import RecipeBookmark from "./recipeBookmark.model.js";
+
+const attachBookmarkState = (recipes, bookmarkedIds) => {
+  const bookmarkedSet = new Set(bookmarkedIds.map((id) => id.toString()));
+
+  return recipes.map((recipe) => {
+    const recipeObject =
+      typeof recipe.toObject === "function" ? recipe.toObject() : { ...recipe };
+
+    return {
+      ...recipeObject,
+      isBookmarked: bookmarkedSet.has(recipeObject._id.toString()),
+    };
+  });
+};
 
 export const createRecipe = async (data) => {
   return await Recipe.create(data);
 };
 
 export const getRecipes = async ({
+  userId,
   page = 1,
   limit = 20,
   search = "",
@@ -27,8 +43,24 @@ export const getRecipes = async ({
     query.category = category.trim();
   }
 
+  let bookmarkedIds = [];
+  if (userId) {
+    const userBookmarks = await RecipeBookmark.find({ userId }).select("recipeId");
+    bookmarkedIds = userBookmarks.map((bookmark) => bookmark.recipeId);
+  }
+
   if (bookmarked === "true" || bookmarked === true) {
-    query.isBookmarked = true;
+    if (!bookmarkedIds.length) {
+      return {
+        recipes: [],
+        total: 0,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: 1,
+      };
+    }
+
+    query._id = { $in: bookmarkedIds };
   }
 
   const [recipes, total] = await Promise.all([
@@ -37,7 +69,7 @@ export const getRecipes = async ({
   ]);
 
   return {
-    recipes,
+    recipes: attachBookmarkState(recipes, bookmarkedIds),
     total,
     page: pageNum,
     limit: limitNum,
@@ -45,8 +77,25 @@ export const getRecipes = async ({
   };
 };
 
-export const getRecipeById = async (id) => {
-  return await Recipe.findById(id);
+export const getRecipeById = async (id, userId) => {
+  const recipe = await Recipe.findById(id);
+  if (!recipe) {
+    return null;
+  }
+
+  if (!userId) {
+    return {
+      ...recipe.toObject(),
+      isBookmarked: false,
+    };
+  }
+
+  const bookmark = await RecipeBookmark.findOne({ userId, recipeId: id }).select("_id");
+
+  return {
+    ...recipe.toObject(),
+    isBookmarked: Boolean(bookmark),
+  };
 };
 
 export const updateRecipeById = async (id, data) => {
@@ -54,7 +103,13 @@ export const updateRecipeById = async (id, data) => {
 };
 
 export const deleteRecipeById = async (id) => {
-  return await Recipe.findByIdAndDelete(id);
+  const deletedRecipe = await Recipe.findByIdAndDelete(id);
+
+  if (deletedRecipe) {
+    await RecipeBookmark.deleteMany({ recipeId: id });
+  }
+
+  return deletedRecipe;
 };
 
 export const toggleRecipeFlag = async (id, field) => {
@@ -63,4 +118,30 @@ export const toggleRecipeFlag = async (id, field) => {
   recipe[field] = !recipe[field];
   await recipe.save();
   return recipe;
+};
+
+export const toggleRecipeBookmark = async ({ recipeId, userId }) => {
+  const recipe = await Recipe.findById(recipeId);
+  if (!recipe) {
+    return null;
+  }
+
+  const existingBookmark = await RecipeBookmark.findOne({
+    userId,
+    recipeId,
+  });
+
+  if (existingBookmark) {
+    await existingBookmark.deleteOne();
+  } else {
+    await RecipeBookmark.create({
+      userId,
+      recipeId,
+    });
+  }
+
+  return {
+    ...recipe.toObject(),
+    isBookmarked: !existingBookmark,
+  };
 };

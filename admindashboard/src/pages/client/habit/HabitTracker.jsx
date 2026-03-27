@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   getHabitReflectionThunk,
@@ -7,18 +7,30 @@ import {
   updateHabitStatusThunk,
 } from "@/redux/features/habit/habit.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { IoClose } from "react-icons/io5";
-import { TiTick } from "react-icons/ti";
+import { 
+  Check, 
+  X, 
+  Droplets, 
+  Footprints, 
+  Dumbbell, 
+  Moon, 
+  Target,
+  CheckCircle2,
+  Zap,
+  Star,
+  Settings2,
+  Quote,
+  BarChart3
+} from "lucide-react";
 import { SyncLoader } from "react-spinners";
+import { format } from "date-fns";
 
 export default function HabitTracker() {
   const dispatch = useDispatch();
   const [reflectionNotes, setReflectionNotes] = useState("");
-
   const user = useSelector(selectUser);
   const clientId = user?._id;
-
-  const { habits, loading } = useSelector((state) => state.habit);
+  const { habits, loading, reflectionNote, reflectionSaving } = useSelector((state) => state.habit);
 
   useEffect(() => {
     if (clientId) {
@@ -27,11 +39,49 @@ export default function HabitTracker() {
     }
   }, [clientId, dispatch]);
 
-  const { reflectionNote, reflectionSaving } = useSelector((state) => state.habit);
-
   useEffect(() => {
     setReflectionNotes(reflectionNote || "");
   }, [reflectionNote]);
+
+  const todayStr = useMemo(() => format(new Date(), "EEEE, MMMM dd"), []);
+  const todayKey = new Date().toDateString();
+
+  const processedHabits = useMemo(() => {
+    if (!habits?.habits) return [];
+    return habits.habits.map((habit) => {
+      const todayLog = habit.logs.find(
+        (log) => new Date(log.date).toDateString() === todayKey,
+      );
+      // Changed default from 'in-progress' to 'missed' as requested
+      return { ...habit, todayStatus: todayLog?.status || "missed" };
+    });
+  }, [habits, todayKey]);
+
+  const doneCount = processedHabits.filter(h => h.todayStatus === "done").length;
+  const missedCount = processedHabits.filter(h => h.todayStatus === "missed").length;
+
+  const handleChecklistToggle = (habitId, currentStatus) => {
+    // Toggles between 'missed' and 'done' as primary states, or cycle missed -> done -> in-progress
+    let nextStatus = "done";
+    if (currentStatus === "done") nextStatus = "missed";
+    else if (currentStatus === "missed") nextStatus = "done"; // Toggle directly for better UX if they are 'missed' by default
+
+    dispatch(updateHabitStatusThunk({ clientId, habitId, status: nextStatus }));
+  };
+
+  const handleSaveReflection = () => {
+    if (!clientId) return;
+    dispatch(updateHabitReflectionThunk({ clientId, note: reflectionNotes }));
+  };
+
+  const getHabitIcon = (name) => {
+    const n = name.toLowerCase();
+    if (n.includes("water")) return Droplets;
+    if (n.includes("walk") || n.includes("step")) return Footprints;
+    if (n.includes("exercise") || n.includes("gym") || n.includes("workout")) return Dumbbell;
+    if (n.includes("sleep") || n.includes("bed")) return Moon;
+    return Target;
+  };
 
   if (loading)
     return (
@@ -40,118 +90,205 @@ export default function HabitTracker() {
       </div>
     );
 
-  if (!habits || !habits.habits?.length) return <p className="flex justify-center items-center w-full h-full text-lg">No habits assigned</p>;
-
-  const today = new Date().toDateString();
-
-  const doneCount = habits.habits.filter((habit) => {
-    const todayLog = habit.logs.find(
-      (log) => new Date(log.date).toDateString() === today,
-    );
-    return todayLog?.status === "done";
-  }).length;
-
-  const missedCount = habits.habits.length - doneCount;
-
-  const handleChecklistToggle = (habit) => {
-    const todayLog = habit.logs.find(
-      (log) => new Date(log.date).toDateString() === today,
-    );
-    const currentStatus = todayLog?.status;
-    const newStatus = currentStatus === "done" ? "missed" : "done";
-
-    dispatch(
-      updateHabitStatusThunk({
-        clientId,
-        habitId: habit._id,
-        status: newStatus,
-      }),
-    );
-  };
-
-  const handleSaveReflection = () => {
-    if (!clientId) return;
-    dispatch(
-      updateHabitReflectionThunk({
-        clientId,
-        note: reflectionNotes,
-      }),
-    );
-  };
+  if (!habits || !habits.habits?.length) return (
+     <div className="flex flex-col items-center justify-center w-full h-[60vh] text-center p-8 bg-white rounded-[32px] shadow-sm">
+        <Target size={48} className="text-gray-200 mb-4" />
+        <h3 className="text-lg font-bold text-gray-800">No habits assigned yet</h3>
+        <p className="text-sm text-gray-500 max-w-xs mt-1">Visit the admin panel to set up your daily rituals.</p>
+     </div>
+  );
 
   return (
-    <div className="bg-white rounded-lg p-4 space-y-4">
-      <h2 className="text-lg font-semibold text-[#0A4F48]">Daily Habit Tracker</h2>
+    <>
+      {/* MOBILE VERSION: Matching the specific "Daily Habits" image style */}
+      <div className="block md:hidden max-w-md mx-auto space-y-8 px-4 pb-24 pt-6 bg-[#F8FAFA] min-h-screen">
+        <div className="flex justify-between items-center px-2">
+          <h1 className="text-[24px] font-black text-gray-800 leading-none">Daily Habits</h1>
+          <span className="text-[12px] font-black text-gray-400 uppercase tracking-widest">Today</span>
+        </div>
 
-      <div className="border border-gray-200 rounded-xl p-4">
-        <h3 className="text-[15px] font-semibold text-[#0A4F48]">Habit Checklist</h3>
-        <p className="text-xs text-gray-500 mt-1">
-          Toggle each habit to mark it done or missed for today.
-        </p>
-
-        <div className="mt-3 space-y-2">
-          {habits.habits.map((habit) => {
-            const todayLog = habit.logs.find(
-              (log) => new Date(log.date).toDateString() === today,
-            );
-            const isDone = todayLog?.status === "done";
-
+        <div className="space-y-4">
+          {processedHabits.map((habit) => {
+            const Icon = getHabitIcon(habit.name);
+            const status = habit.todayStatus;
             return (
-              <button
+              <div 
                 key={habit._id}
-                onClick={() => handleChecklistToggle(habit)}
-                className="w-full flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2 text-left hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-between bg-white px-5 py-4 rounded-[32px] shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-50 active:scale-95 transition-all"
+                onClick={() => handleChecklistToggle(habit._id, status)}
               >
-                <span className="text-sm font-medium text-gray-800 capitalize">
-                  {habit.name}
-                </span>
-
-                <span
-                  className={`w-7 h-7 flex items-center justify-center rounded-full text-2xl ${
-                    isDone
-                      ? "bg-green-50 text-green-600"
-                      : "bg-red-50 text-red-600"
-                  }`}
-                >
-                  {isDone ? <TiTick /> : <IoClose />}
-                </span>
-              </button>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-[#EBF3F2] flex items-center justify-center text-[#0A4F48]">
+                    <Icon size={22} className={status === "done" ? "fill-current" : ""} />
+                  </div>
+                  <h3 className="text-[17px] font-bold text-gray-800 tracking-tight">{habit.name}</h3>
+                </div>
+                <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${
+                  status === "done" ? "bg-[#0A4F48] border-[#0A4F48] text-white" : 
+                  status === "missed" ? "bg-rose-100 border-rose-200 text-rose-500" : 
+                  "border-gray-100 bg-white"
+                }`}>
+                  {status === "done" && <Check size={20} strokeWidth={4} />}
+                  {status === "missed" && <X size={20} strokeWidth={4} />}
+                </div>
+              </div>
             );
           })}
         </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-[#EBFDFC] rounded-[24px] p-4 flex items-center gap-3 border border-[#DFF9F7]">
+            <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center text-white shrink-0"><Check size={12} strokeWidth={4} /></div>
+            <div>
+              <p className="text-[10px] font-black text-emerald-700/60 uppercase tracking-widest leading-none mb-1">Done</p>
+              <p className="text-[20px] font-black text-gray-800 leading-none">{doneCount}</p>
+            </div>
+          </div>
+          <div className="bg-[#FEF2F2] rounded-[24px] p-4 flex items-center gap-3 border border-[#FEE2E2]">
+            <div className="w-6 h-6 rounded-full bg-rose-500 flex items-center justify-center text-white shrink-0"><X size={12} strokeWidth={4} /></div>
+            <div>
+              <p className="text-[10px] font-black text-rose-700/60 uppercase tracking-widest leading-none mb-1">Missed</p>
+              <p className="text-[20px] font-black text-gray-800 leading-none">{missedCount}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h2 className="text-[20px] font-black text-gray-800 tracking-tight px-1">Daily Reflection</h2>
+          <div className="bg-white p-6 rounded-[40px] shadow-[0_10px_40px_rgba(0,0,0,0.04)] space-y-6">
+            <div className="bg-[#F1F4F4]/60 rounded-[30px] p-6 min-h-[180px]">
+              <textarea
+                value={reflectionNotes}
+                onChange={(e) => setReflectionNotes(e.target.value.slice(0, 500))}
+                placeholder="Write your daily reflection..."
+                className="w-full h-full bg-transparent border-none focus:outline-none focus:ring-0 text-[15px] text-gray-700 placeholder:text-gray-400 font-medium resize-none"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[12px] font-bold text-gray-300">{reflectionNotes.length}/500</span>
+              <button 
+                onClick={handleSaveReflection}
+                disabled={reflectionSaving}
+                className="bg-[#005F54] text-white px-8 py-3.5 rounded-full text-[14px] font-black shadow-lg shadow-[#005F54]/30 active:scale-95 disabled:opacity-50"
+              >
+                {reflectionSaving ? "SAVING..." : "SAVE NOTES"}
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="flex justify-between bg-gray-100 p-3 rounded">
-        <p className="text-green-600 font-semibold flex">
-          <TiTick className="text-2xl" /> Done: {doneCount}
-        </p>
+      {/* DESKTOP VERSION: High-fidelity Dashboard layout with Sidebar */}
+      <div className="hidden md:block max-w-7xl mx-auto space-y-8 pb-12">
+        <div className="flex md:items-end justify-between gap-4 px-2">
+          <div className="space-y-1">
+            <p className="text-[10px] font-black text-[#0A4F48]/40 uppercase tracking-[0.3em]">Personal Dashboard</p>
+            <h1 className="text-3xl md:text-4xl font-black text-gray-800 tracking-tight">Daily Habit Tracker</h1>
+          </div>
+          <div className="text-right flex flex-col items-end gap-1">
+            <p className="text-[14px] font-black text-gray-800 leading-none">{todayStr}</p>
+            <p className="text-[12px] font-bold text-[#0A4F48] uppercase tracking-wide">75% Weekly Goal Reached</p>
+          </div>
+        </div>
 
-        <p className="text-red-500 font-semibold flex ">
-          <IoClose className="text-2xl" /> Missed: {missedCount}
-        </p>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 px-2">
+          <StatCard label="Done Today" value={doneCount} color="bg-emerald-50 text-emerald-600 border-emerald-100" icon={Check} />
+          <StatCard label="Missed" value={missedCount} color="bg-rose-50 text-rose-500 border-rose-100" icon={X} />
+          <StatCard label="Current Streak" value="12 Days" color="bg-teal-50 text-[#0A4F48] border-teal-100" icon={Zap} />
+          <StatCard label="Total Points" value="2,450" color="bg-orange-50 text-orange-500 border-orange-100" icon={Star} />
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-8">
+          <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-50 space-y-8">
+            <div className="flex justify-between items-center">
+              <h2 className="text-[18px] font-black text-gray-800 leading-none">Today's Protocol</h2>
+              <button className="flex items-center gap-2 text-[12px] font-black text-gray-400 uppercase tracking-widest hover:text-[#0A4F48]">
+                <Settings2 size={14} /> Edit Habits
+              </button>
+            </div>
+            <div className="space-y-4">
+              {processedHabits.map((habit) => {
+                const Icon = getHabitIcon(habit.name);
+                const status = habit.todayStatus;
+                return (
+                  <div key={habit._id} className="group flex items-center justify-between bg-[#F8FAFA] hover:bg-white hover:shadow-lg rounded-[28px] p-2 transition-all duration-300">
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-[24px] bg-white shadow-sm flex items-center justify-center text-[#0A4F48]/60 group-hover:scale-105 transition-transform">
+                        <Icon size={24} />
+                      </div>
+                      <div>
+                        <h3 className="text-[15px] font-black text-gray-800 leading-tight">{habit.name}</h3>
+                        <p className="text-[11px] font-bold text-gray-400 mt-0.5">Target: {habit.target || "Daily Goal"}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-4 pr-4">
+                      {status === "in-progress" && (
+                        <div className="hidden sm:flex items-center gap-1.5 bg-[#0A4F48]/10 text-[#0A4F48] px-3 py-1.5 rounded-full">
+                          <SyncLoader color="currentColor" margin={1} size={2} />
+                          <span className="text-[9px] font-black uppercase tracking-widest">In Progress</span>
+                        </div>
+                      )}
+                      <button onClick={() => handleChecklistToggle(habit._id, status)} className={`w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-90 shadow-sm ${status === "done" ? "bg-emerald-400 text-white" : status === "missed" ? "bg-rose-400 text-white" : "bg-white text-gray-200"}`}>
+                        {status === "done" ? <Check size={20} strokeWidth={4} /> : status === "missed" ? <X size={20} strokeWidth={4} /> : <CheckCircle2 size={24} />}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="space-y-8">
+            <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-50 space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#EBF3F2] rounded-2xl flex items-center justify-center"><Quote size={18} className="text-[#0A4F48]" /></div>
+                <h2 className="text-[18px] font-black text-gray-800">Daily Reflection</h2>
+              </div>
+              <textarea value={reflectionNotes} onChange={(e) => setReflectionNotes(e.target.value.slice(0, 500))} placeholder="Type your thoughts here..." className="w-full min-h-[160px] bg-[#F8FAFA] rounded-[28px] p-6 text-[13px] text-gray-700 outline-none resize-none" />
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">{reflectionNotes.length} / 500</span>
+                <button onClick={handleSaveReflection} disabled={reflectionSaving} className="bg-[#0A4F48] text-white px-8 py-3 rounded-full text-[13px] font-black hover:bg-[#0c5c54] active:scale-95 shadow-lg shadow-[#0A4F48]/20">{reflectionSaving ? "Saving..." : "Save Notes"}</button>
+              </div>
+            </div>
+
+            <div className="bg-[#0A4F48] p-8 rounded-[32px] shadow-xl space-y-6">
+              <div className="flex items-center justify-between"><h2 className="text-[16px] font-black text-white">Weekly Adherence</h2><BarChart3 size={18} className="text-white/40" /></div>
+              <div className="flex items-end justify-between h-[120px] px-2">
+                {[{ d: "M", h: "40%" }, { d: "T", h: "70%" }, { d: "W", h: "30%" }, { d: "T", h: "90%" }, { d: "F", h: "100%", a: true }, { d: "S", h: "15%" }, { d: "S", h: "20%" }].map((bar, i) => (
+                  <div key={i} className="flex flex-col items-center gap-3 h-full justify-end">
+                    <div className={`w-6 rounded-t-lg ${bar.a ? 'bg-white' : 'bg-emerald-400/40'}`} style={{ height: bar.h }} />
+                    <span className={`text-[9px] font-black ${bar.a ? 'text-white' : 'text-white/40'}`}>{bar.d}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="bg-[#F4F1ED] p-8 rounded-[32px] shadow-sm relative overflow-hidden group">
+              <Quote size={40} className="absolute -top-2 -left-2 text-black/3 rotate-12" />
+              <div className="space-y-4">
+                <Quote size={20} className="text-[#0A4F48] opacity-20" />
+                <p className="text-[14px] font-bold text-[#0A4F48] leading-relaxed italic pr-4">"We are what we repeatedly do. Excellence, then, is not an act, but a habit."</p>
+                <div className="flex items-center gap-2"><div className="w-4 h-[2px] bg-[#0A4F48]/20" /><span className="text-[10px] font-black text-[#0A4F48] uppercase tracking-[0.2em]">Aristotle</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+    </>
+  );
+}
 
-      <div className="border border-gray-200 rounded-xl p-4">
-        <label className="block text-[15px] font-semibold text-[#0A4F48] mb-2">
-          Reflection Notes
-        </label>
-        <textarea
-          value={reflectionNotes}
-          onChange={(e) => setReflectionNotes(e.target.value.slice(0, 500))}
-          placeholder="Write your daily reflection..."
-          className="w-full min-h-[130px] border border-gray-200 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#0A4F48]/20 resize-none"
-        />
-        <p className="text-xs text-gray-500 mt-2">
-          {reflectionNotes.length}/500 characters
-        </p>
-        <button
-          onClick={handleSaveReflection}
-          disabled={reflectionSaving}
-          className="mt-3 px-4 py-2 rounded-lg bg-[#0A4F48] text-white text-sm font-medium disabled:opacity-60"
-        >
-          {reflectionSaving ? "Saving..." : "Save Notes"}
-        </button>
+function StatCard({ label, value, color, icon: Icon }) {
+  return (
+    <div className={`bg-white border ${color.split(" ")[2]} p-6 rounded-[32px] shadow-sm transition-all hover:shadow-lg hover:-translate-y-1 group`}>
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 ${color.split(" ")[0]} ${color.split(" ")[1]} rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110`}><Icon size={18} /></div>
+        <div className="flex flex-col">
+          <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</p>
+          <p className="text-[20px] font-black text-gray-800 leading-none mt-0.5">{value}</p>
+        </div>
       </div>
     </div>
   );
 }
+

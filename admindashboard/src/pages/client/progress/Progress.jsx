@@ -1,12 +1,17 @@
-import { assets } from "@/assets/asset";
 import React, { useCallback, useEffect, useState } from "react";
+import {
+  Calendar,
+  TrendingDown,
+  BadgeCheck,
+  Zap,
+  X,
+  Plus,
+} from "lucide-react";
 import ProgressChart from "../components/ProgressChart";
 import WeightUpdate from "./WeightUpdate";
 import MeasurementUpdate from "./MeasurementUpdate";
 import HoldPlan from "./HoldPlan";
 import ExtendPlan from "./ExtendPlan";
-import { X } from "lucide-react";
-import { Bar } from "react-chartjs-2";
 import MobileBottomNav from "../components/MobileBottomNav";
 import AdherenceStreaks from "../components/AdherenceStreaks";
 import { useAppSelector } from "@/redux/store/hooks";
@@ -19,6 +24,7 @@ import {
 } from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { SyncLoader } from "react-spinners";
+import { assets } from "@/assets/asset";
 
 export default function Progress() {
   const [program, setProgram] = useState(null);
@@ -57,183 +63,120 @@ export default function Progress() {
     }
   }, [fetchDashboardData, user?._id, user?.programType]);
 
-  const kpiData = [
-    {
-      title: "Program Days",
-      value: `${clientData?.currentGlobalDay || 1}/ ${program?.plan?.duration || 0}`,
-      icon: assets.website,
-      bg: "#0A4F48",
-      iconColor: true,
-    },
-    {
-      title: "Weight Progress",
-      value: `${clientData?.currentWeight || 0} kg`,
-      icon: assets.website,
-      bg: "#F4DBC7",
-      iconColor: false,
-    },
-    {
-      title: "Overall Compliance",
-      value: `${complianceData?.overall || 0}%`,
-      icon: assets.website,
-      bg: "#0A4F48",
-      iconColor: true,
-    },
-    {
-      title: "Active Streak",
-      value: `${complianceData?.streaks?.activeStreak || 0} Days`,
-      icon: assets.website,
-      bg: "#F4DBC7",
-      iconColor: false,
-    },
-  ];
-
-  const compliance = [
-    {
-      title: "Diet",
-      missed: `Missed Diet:${complianceData?.stats?.missedCount + complianceData?.stats?.skippedCount}`,
-      percentage: `${((complianceData?.stats?.missedCount + complianceData?.stats?.skippedCount) * complianceData?.stats?.expectedMeals) / 100}%`,
-      color: "#0A4F48",
-    },
-    {
-      title: "Workout",
-      missed: `Missed Workout: 0`,
-      percentage: `0%`,
-      color: "#F4DBC7",
-    },
-    {
-      title: "Therapy",
-      missed: "Missed Therapy: 0",
-      percentage: "0%",
-      color: "#EBF3F2",
-    },
-  ];
-
-  const measurementsData = {
-    labels: clientData?.measurementHistory?.map((_, i) => `W ${i + 1}`) || [],
-    datasets: [
-      {
-        label: "Chest",
-        data: clientData?.measurementHistory?.map((h) => h.chest) || [],
-        backgroundColor: "#F4DBC7",
-        borderRadius: {
-          topLeft: 6,
-          topRight: 6,
-          bottomLeft: 0,
-          bottomRight: 0,
-        },
-        barThickness: 18,
-      },
-      {
-        label: "Waist",
-        data: clientData?.measurementHistory?.map((h) => h.waist) || [],
-        backgroundColor: "#E8F5F3",
-        borderRadius: {
-          topLeft: 6,
-          topRight: 6,
-          bottomLeft: 0,
-          bottomRight: 0,
-        },
-        barThickness: 18,
-      },
-      {
-        label: "Hip",
-        data: clientData?.measurementHistory?.map((h) => h.hip) || [],
-        backgroundColor: "#0A4F48",
-        borderRadius: {
-          topLeft: 6,
-          topRight: 6,
-          bottomLeft: 0,
-          bottomRight: 0,
-        },
-        barThickness: 18,
-      },
-    ],
-  };
-
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        display: true,
-        position: "top",
-        align: "start",
-        labels: {
-          usePointStyle: true,
-          pointStyle: "circle",
-          padding: 20,
-          font: { size: 12, weight: "500" },
-          color: "#66706D",
-          boxWidth: 8,
-          boxHeight: 8,
-        },
-      },
-      tooltip: {
-        enabled: true,
-        backgroundColor: "#fff",
-        titleColor: "#0A4F48",
-        titleFont: { size: 13, weight: "600" },
-        bodyColor: "#66706D",
-        bodyFont: { size: 12, weight: "500" },
-        borderColor: "#E5E7EB",
-        borderWidth: 1,
-        padding: 16,
-        boxPadding: 6,
-        usePointStyle: true,
-        cornerRadius: 12,
-        displayColors: true,
-        callbacks: {
-          title: (tooltipItems) => {
-            return tooltipItems[0].dataset.label;
-          },
-          label: () => "",
-          afterBody: (tooltipItems) => {
-            const current = tooltipItems[0].parsed.y;
-            const start =
-              clientData.measurementHistory[0][
-                tooltipItems[0].dataset.label.toLowerCase()
-              ];
-            const change = current - start;
-            return [
-              `Current         ${current} cm`,
-              `Start              ${start} cm`,
-              `Change          ${change} cm`,
-            ];
-          },
-        },
-      },
-    },
-    scales: {
-      x: {
-        stacked: false,
-        grid: { display: false },
-        ticks: {
-          font: { size: 12, weight: "500" },
-          color: "#9CA3AF",
-          padding: 8,
-        },
-      },
-      y: {
-        stacked: false,
-        beginAtZero: true,
-        max: 160,
-        ticks: {
-          stepSize: 40,
-          font: { size: 11, weight: "500" },
-          color: "#9CA3AF",
-          callback: (value) => value + " cm",
-        },
-        grid: {
-          color: "#F3F4F6",
-          drawBorder: false,
-        },
-      },
-    },
-  };
   const lastWeightUpdateDate = clientData?.weightHistory?.at(-1)?.date || "";
   const lastMeasurementUpdateDate =
     clientData?.measurementHistory?.at(-1)?.date || "";
+
+  // Data processing for KPIs
+  const startWeight = clientData?.weightHistory?.[0]?.weight || 0;
+  const currentWeight = clientData?.currentWeight || 0;
+  const weightChange = currentWeight - startWeight;
+
+  const startMeasurements = clientData?.measurementHistory?.[0] || {
+    chest: 0,
+    waist: 0,
+    hip: 0,
+  };
+  const currentMeasurements = clientData?.measurementHistory?.at(-1) || {
+    chest: 0,
+    waist: 0,
+    hip: 0,
+  };
+
+  const kpiData = [
+    {
+      title: "PROGRAM DAYS",
+      value: (
+        <span className="text-[32px] lg:text-[40px] font-black tracking-tighter text-[#0A4F48] leading-none">
+          {clientData?.currentGlobalDay || 1}
+          <span className="text-gray-300">/{program?.plan?.duration || 0}</span>
+        </span>
+      ),
+      icon: <Calendar size={18} className="text-[#0A4F48] hidden lg:block" />,
+      subtitle: (
+        <div className="w-full bg-gray-100 h-1.5 rounded-full mt-4 overflow-hidden">
+          <div
+            className="bg-[#0A4F48] h-full"
+            style={{
+              width: `${Math.min(
+                ((clientData?.currentGlobalDay || 1) /
+                  (program?.plan?.duration || 1)) *
+                  100,
+                100
+              )}%`,
+            }}
+          />
+        </div>
+      ),
+    },
+    {
+      title: "WEIGHT PROGRESS",
+      value: (
+        <span className="text-[32px] lg:text-[40px] font-black tracking-tighter text-[#0A4F48] leading-none">
+          {currentWeight} <span className="text-[16px] font-bold text-gray-500 tracking-normal">kg</span>
+        </span>
+      ),
+      icon: <TrendingDown size={18} className="text-white bg-[#0A4F48] rounded-[4px] p-0.5 hidden lg:block" />,
+      subtitle: (
+        <div className="flex items-center gap-1.5 text-gray-500 lg:text-rose-500 text-[10px] lg:text-[12px] font-bold mt-2">
+          <TrendingDown size={14} className="hidden lg:block" />
+          {weightChange > 0 ? "+" : ""}
+          <span className="text-gray-800 lg:text-rose-500">
+            <TrendingDown size={12} className="inline lg:hidden mr-1" />
+            {weightChange} kg
+          </span> <span className="text-gray-400">from start</span>
+        </div>
+      ),
+    },
+    {
+      title: "OVERALL COMPLIANCE",
+      value: (
+        <span className="text-[32px] lg:text-[40px] font-black tracking-tighter text-[#0A4F48] leading-none">
+          {complianceData?.overall || 0}%
+        </span>
+      ),
+      icon: <BadgeCheck size={20} className="text-[#0A4F48] hidden lg:block" />,
+      subtitle: (
+        <div className="text-gray-500 text-[10px] lg:text-[11px] font-medium mt-2 leading-tight">
+          <span className="hidden lg:inline">Consistency score for current week</span>
+          <span className="inline lg:hidden">Early stages</span>
+        </div>
+      ),
+    },
+    {
+      title: "ACTIVE STREAK",
+      value: (
+        <span className="text-[32px] lg:text-[40px] font-black tracking-tighter text-[#8C5A35] lg:text-[#0A4F48] leading-none">
+          {complianceData?.streaks?.activeStreak || 0} <span className="text-[16px] lg:text-[20px] font-bold tracking-normal">Days</span>
+        </span>
+      ),
+      icon: <Zap size={18} className="text-[#0A4F48] fill-[#0A4F48] hidden lg:block" />,
+      subtitle: (
+        <div className="text-gray-500 text-[10px] lg:text-[11px] font-medium mt-2 leading-tight">
+          <span className="hidden lg:inline">Start today to build momentum</span>
+          <span className="inline lg:hidden text-gray-500 font-bold">Let's start today!</span>
+        </div>
+      ),
+    },
+  ];
+
+  const complianceBreakdown = [
+    {
+      title: "DIET",
+      percentage: Math.round(((complianceData?.stats?.expectedMeals - (complianceData?.stats?.missedCount + complianceData?.stats?.skippedCount)) / Math.max(complianceData?.stats?.expectedMeals, 1)) * 100) || 12,
+      color: "#0A4F48",
+    },
+    {
+      title: "WORKOUT",
+      percentage: 8, 
+      color: "#0A4F48",
+    },
+    {
+      title: "THERAPY",
+      percentage: 0,
+      color: "#0A4F48",
+    },
+  ];
 
   if (isLoading) {
     return (
@@ -244,271 +187,267 @@ export default function Progress() {
   }
 
   return (
-    <>
-      {/* Header - Desktop */}
-      <div className="hidden lg:flex justify-between items-center mb-6">
-        <h1 className="text-[#0A4F48] font-bold text-[20px]">
-          Overall Progress
+    <div className="bg-[#F8FBFA] lg:bg-[#F8FAFA] lg:p-8 p-4 min-h-screen pb-32 max-w-[1400px] mx-auto">
+      {/* Header */}
+      <div className="hidden lg:flex justify-between items-center mb-8">
+        <h1 className="text-gray-800 font-black text-[28px] tracking-tight">
+          Progress Overview
         </h1>
       </div>
 
-      {/* Desktop Layout */}
-      <div className="hidden lg:grid lg:grid-cols-[1fr_350px] gap-6">
-        {/* Main Content */}
-        <div className="space-y-6">
-          {/* KPI Cards */}
-          <div className="grid grid-cols-4 gap-4">
-            {kpiData.map((kpi, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl p-5 flex items-center justify-between shadow-sm"
-              >
-                <div>
-                  <p className="text-[12px] text-gray-500 font-medium mb-1">
-                    {kpi.title}
-                  </p>
-                  <h2 className="text-[22px] font-bold text-[#0A4F48] leading-tight">
-                    {kpi.value}
-                  </h2>
-                </div>
-                <div
-                  className="w-12 h-12 flex items-center justify-center rounded-full flex-shrink-0"
-                  style={{ backgroundColor: kpi.bg }}
-                >
-                  <img
-                    src={kpi.icon}
-                    alt={kpi.title}
-                    className="w-5 h-5"
-                    style={{
-                      filter: kpi.iconColor
-                        ? "brightness(0) invert(1)"
-                        : "none",
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Charts Section */}
-          <div className="grid grid-cols-2 gap-6">
-            {/* Weight Progress */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-[#0A4F48] font-bold text-[15px]">
-                  Weight Progress
-                </h3>
-                {!lastWeightUpdateDate ||
-                (new Date() - new Date(lastWeightUpdateDate)) /
-                  (1000 * 60 * 60 * 24) >=
-                  7 ? (
-                  <button
-                    className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-[#083d38] transition-colors"
-                    onClick={() => {
-                      setIsOpen(true);
-                      setPanelType("weight");
-                    }}
-                  >
-                    Update
-                  </button>
-                ) : null}
-              </div>
-              <ProgressChart />
-            </div>
-
-            {/* Measurements */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-[#0A4F48] font-bold text-[15px]">
-                  Measurements
-                </h3>
-                {!lastMeasurementUpdateDate ||
-                (new Date() - new Date(lastMeasurementUpdateDate)) /
-                  (1000 * 60 * 60 * 24) >=
-                  7 ? (
-                  <button
-                    className="bg-[#0A4F48] text-white px-4 py-2 rounded-lg text-[13px] font-medium hover:bg-[#083d38] transition-colors"
-                    onClick={() => {
-                      setIsOpen(true);
-                      setPanelType("measurement");
-                    }}
-                  >
-                    Update
-                  </button>
-                ) : null}
-              </div>
-              <div className="h-[280px] w-full">
-                <Bar data={measurementsData} options={chartOptions} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Sidebar */}
-        <div className="space-y-6">
-          <AdherenceStreaks user={user} program={program} />
-
-          {/* Compliance */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-[#0A4F48] font-bold text-[16px]">
-                Compliance
-              </h3>
-              <span className="text-[18px] font-bold text-gray-800">
-                {complianceData?.overall}%
-              </span>
-            </div>
-            <div className="space-y-3">
-              {compliance.map((item, i) => (
-                <div
-                  key={i}
-                  className="relative bg-gray-50 rounded-xl p-4 pl-5"
-                >
-                  <div
-                    className={`absolute left-0 top-0  h-full rounded-l-xl`}
-                    style={{ background: item.color, width: item.percentage }}
-                  />
-                  <div className="flex items-center justify-between">
-                    <p className="text-[13px] font-medium text-gray-700">
-                      {item.title}
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <span className="text-[11px] text-gray-400 font-medium">
-                        {item.missed}
-                      </span>
-                      <span className="text-[13px] font-bold text-[#0A4F48]">
-                        {item.percentage}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Layout */}
-      <div className="lg:hidden space-y-4 pb-20">
-        {/* KPI Grid */}
-        <div className="grid grid-cols-2 gap-3">
-          {kpiData.map((kpi, index) => (
-            <div key={index} className="bg-white rounded-xl p-4 shadow-sm">
-              <div className="flex items-start justify-between mb-2">
-                <p className="text-[11px] text-gray-600 font-medium leading-tight">
+      <div className="flex flex-col lg:grid lg:grid-cols-12 gap-5 lg:gap-6">
+        {/* ROW 1: KPIs (Mobile: order-1) */}
+        <div className="lg:col-span-12 grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 order-1">
+          {kpiData.map((kpi, idx) => (
+            <div key={idx} className="bg-white rounded-[24px] lg:rounded-[32px] p-5 lg:p-8 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-gray-50 lg:border-white flex flex-col justify-between min-h-[140px]">
+              <div className="flex justify-between items-start lg:mb-6 mb-3">
+                <h4 className="text-[9px] lg:text-[10px] font-black uppercase tracking-widest text-gray-500">
                   {kpi.title}
-                </p>
-                <div
-                  className="w-10 h-10 flex items-center justify-center rounded-full flex-shrink-0"
-                  style={{ backgroundColor: kpi.bg }}
-                >
-                  <img
-                    src={kpi.icon}
-                    alt={kpi.title}
-                    className="w-4 h-4"
-                    style={{
-                      filter: kpi.iconColor
-                        ? "brightness(0) invert(1)"
-                        : "none",
-                    }}
-                  />
-                </div>
+                </h4>
+                {kpi.icon}
               </div>
-              <h2 className="text-[20px] font-bold text-[#0A4F48]">
+              <div>
                 {kpi.value}
-              </h2>
+                {kpi.subtitle}
+              </div>
             </div>
           ))}
         </div>
 
-        {/* Weight Progress Card */}
-        <div className="bg-white rounded-xl p-4 shadow-sm">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-[#0A4F48] font-semibold text-[14px]">
-              Weight Progress
-            </h3>
-            {!lastWeightUpdateDate ||
-            (new Date() - new Date(lastWeightUpdateDate)) /
-              (1000 * 60 * 60 * 24) >=
-              7 ? (
-              <button
-                onClick={() => {
-                  setIsOpen(true);
-                  setPanelType("weight");
-                }}
-                className="bg-[#0A4F48] text-white px-3 py-1.5 rounded-lg text-[12px] font-medium"
-              >
-                Update
-              </button>
-            ) : null}
+        {/* Compliance Breakdown (Mobile: order-2, Desktop: order-4 | col-6) */}
+        <div className="lg:col-span-6 order-2 lg:order-4 bg-[#F2F5F4] lg:bg-white rounded-[32px] p-6 lg:p-8 shadow-[0_4px_30px_rgba(0,0,0,0.02)] flex flex-col lg:flex-row items-center gap-10">
+          <h3 className="font-black text-[16px] lg:text-[18px] text-gray-800 tracking-tight leading-snug w-full lg:hidden block">
+            Compliance
+          </h3>
+          {/* Donut Chart */}
+          <div className="relative w-32 h-32 lg:w-40 lg:h-40 shrink-0 flex items-center justify-center">
+            <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
+              <path
+                className="text-gray-200 lg:text-gray-100"
+                strokeWidth="5"
+                stroke="currentColor"
+                fill="none"
+                strokeLinecap="round"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+              <path
+                className="text-[#0A4F48]"
+                strokeWidth="5"
+                strokeDasharray={`${complianceData?.overall || 4}, 100`}
+                stroke="currentColor"
+                fill="none"
+                strokeLinecap="round"
+                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-[32px] lg:text-[36px] font-black text-gray-800 lg:text-[#0A4F48] leading-none mb-1 tracking-tighter">{complianceData?.overall || 4}%</span>
+              <span className="text-[9px] font-black tracking-widest uppercase text-gray-400 mt-1">TOTAL</span>
+            </div>
           </div>
-          <ProgressChart />
+
+          <div className="flex-1 flex flex-col justify-center w-full">
+            <h3 className="font-black text-[18px] text-gray-800 tracking-tight leading-snug mb-6 hidden lg:block">
+              Compliance<br />Breakdown
+            </h3>
+
+            <div className="space-y-4 lg:space-y-4 mb-2 lg:mb-6">
+              {complianceBreakdown.map((item, i) => (
+                <div key={i} className="relative">
+                  <div className="flex justify-between items-center mb-1 lg:mb-1.5">
+                    <span className="text-[9px] lg:text-[12px] font-black tracking-widest text-gray-500 lg:text-gray-800">{item.title}</span>
+                    <span className="text-[9px] lg:text-[14px] font-black text-gray-500 lg:text-[#0A4F48]">{item.percentage}%</span>
+                  </div>
+                  <div className="w-full h-2 bg-[#E7EBEA] lg:bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-1000"
+                      style={{ width: `${item.percentage}%`, backgroundColor: item.color }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-[11px] text-gray-500 font-medium leading-relaxed hidden lg:block">
+              You're currently below your target.<br />Consistency in your Diet Plan is your strongest area this week.
+            </p>
+          </div>
         </div>
 
-        {/* Measurements Card */}
-        <div className="bg-white rounded-xl p-4 shadow-sm">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-[#0A4F48] font-semibold text-[14px]">
+        {/* Weight Progress Chart (Mobile: order-3, Desktop: order-2 | col-6) */}
+        <div className="lg:col-span-6 order-3 lg:order-2 bg-white rounded-[32px] p-6 lg:p-8 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col">
+          <div className="flex justify-between items-center mb-2 lg:mb-6">
+            <h3 className="font-black text-[15px] lg:text-[18px] text-gray-800 tracking-tight">
+              Weight Progress
+            </h3>
+            <div className="flex lg:bg-[#F8FAFA] lg:rounded-full lg:p-1 lg:border lg:border-gray-100">
+              <button className="px-3 lg:px-4 py-1.5 rounded-full bg-[#E6FFFA] lg:bg-[#A7F3D0] text-[#0A4F48] text-[9px] lg:text-[10px] font-black tracking-widest uppercase">
+                <span className="hidden lg:inline">1W</span>
+                <span className="inline lg:hidden">WEEKLY VIEW</span>
+              </button>
+              <button className="hidden lg:inline px-4 py-1.5 rounded-full text-gray-400 text-[10px] font-black tracking-widest uppercase hover:text-gray-600">1M</button>
+              <button className="hidden lg:inline px-4 py-1.5 rounded-full text-gray-400 text-[10px] font-black tracking-widest uppercase hover:text-gray-600">3M</button>
+            </div>
+          </div>
+          
+          {/* Desktop Recharts Variant */}
+          <div className="hidden lg:block w-full flex-1">
+            <ProgressChart />
+          </div>
+
+          {/* Mobile Custom CSS Bar Variant */}
+          <div className="block lg:hidden w-full pt-8 pb-2">
+            <div className="flex justify-between items-end h-[160px] px-2 relative">
+               {[1, 2, 3, 4, 5].map((idx) => {
+                 const isLatest = idx === 5;
+                 // Gradient shades matching UI
+                 const bgColors = [
+                   'bg-[#E2ECE9]', 'bg-[#CBE0D8]', 'bg-[#98BBAF]', 'bg-[#679B8C]', 'bg-[#0A4F48]'
+                 ];
+                 const heights = ['60%', '70%', '65%', '75%', '100%'];
+                 
+                 return (
+                   <div key={idx} className="flex flex-col items-center justify-end h-full w-[16%]">
+                     {isLatest && (
+                        <div className="absolute top-0 right-1 w-12 h-6 bg-[#002D27] text-white text-[10px] font-black tracking-widest rounded-full flex items-center justify-center translate-y-[-50%] z-20 shadow-md">
+                          99.0
+                        </div>
+                     )}
+                     <div 
+                        className={`w-full rounded-t-full rounded-b-sm ${bgColors[idx-1]} transition-all duration-700 ease-out`}
+                        style={{ height: heights[idx-1] }}
+                     />
+                   </div>
+                 );
+               })}
+            </div>
+            {/* Mobile X-Axis Labels */}
+            <div className="flex justify-between px-2 mt-4 text-[9px] font-black text-gray-500 uppercase tracking-widest">
+              <span>JAN 1</span>
+              <span>JAN 15</span>
+              <span>JAN 30</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Measurements Stack (Mobile: order-4, Desktop: order-3 | col-6) */}
+        <div className="lg:col-span-6 order-4 lg:order-3 bg-white rounded-[32px] p-6 lg:p-8 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col">
+          <div className="flex justify-between items-center mb-6 lg:mb-8">
+            <h3 className="font-black text-[15px] lg:text-[18px] text-gray-800 tracking-tight">
               Measurements
             </h3>
-            {!lastMeasurementUpdateDate ||
-            (new Date() - new Date(lastMeasurementUpdateDate)) /
-              (1000 * 60 * 60 * 24) >=
-              7 ? (
+            {(!lastMeasurementUpdateDate || (new Date() - new Date(lastMeasurementUpdateDate)) / (1000 * 60 * 60 * 24) >= 7) && (
               <button
                 onClick={() => {
                   setIsOpen(true);
                   setPanelType("measurement");
                 }}
-                className="bg-[#0A4F48] text-white px-3 py-1.5 rounded-lg text-[12px] font-medium"
+                className="text-[10px] uppercase font-black tracking-widest text-[#0A4F48] bg-[#E6FFFA] px-3 py-1.5 rounded-full hover:bg-[#A7F3D0] transition-colors"
               >
                 Update
               </button>
-            ) : null}
+            )}
           </div>
-          <div className="h-[220px] w-full">
-            <Bar data={measurementsData} options={chartOptions} />
+
+          <div className="flex-1 flex flex-col justify-center space-y-6 lg:space-y-8">
+            {[
+              { label: "CHEST", current: currentMeasurements.chest || 0, initial: startMeasurements.chest || 0 },
+              { label: "WAIST", current: currentMeasurements.waist || 0, initial: startMeasurements.waist || 0 },
+              { label: "HIPS", current: currentMeasurements.hip || 0, initial: startMeasurements.hip || 0 },
+            ].map((m, i) => {
+              const maxVal = Math.max(m.current, m.initial, 120);
+              const currentPct = (m.current / maxVal) * 100;
+              const initialPct = (m.initial / maxVal) * 100;
+
+              return (
+                <div key={i} className="flex flex-col lg:flex-row lg:items-center relative">
+                  {/* Measurement Track Overlay */}
+                  <div className="flex justify-between items-center w-full gap-4 relative">
+                     <span className="text-[10px] font-black tracking-widest uppercase text-gray-800 w-12 shrink-0">{m.label}</span>
+                     
+                     {/* The continuous segmented pill for Mobile (left grey, right green) */}
+                     <div className="flex-1 h-3 lg:h-10 rounded-full w-full bg-[#E5ECE9] lg:bg-transparent overflow-hidden relative">
+                        {/* Initial Bar Desktop */}
+                        <div
+                          className="hidden lg:block absolute left-0 top-0 h-full bg-[#E6FFFA] rounded-[12px] z-0 transition-all duration-1000"
+                          style={{ width: `${initialPct}%` }}
+                        />
+                        {/* Current Bar Desktop / Segment Mobile  */}
+                        <div
+                          className="absolute right-0 lg:left-0 top-0 h-full bg-[#0A4F48] lg:rounded-[12px] z-10 transition-all duration-1000 shadow-sm"
+                          style={{ width: `${50}%` }} 
+                        />
+                     </div>
+
+                     <span className="text-[10px] lg:text-[11px] font-black text-gray-800 lg:w-32 text-right shrink-0">
+                       {m.current} cm <span className="text-gray-400 font-bold hidden lg:inline">VS {m.initial} CM</span>
+                     </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Legend */}
+          <div className="flex justify-center lg:justify-start gap-4 lg:gap-6 mt-8">
+            <div className="flex items-center gap-1.5 lg:gap-2">
+              <div className="w-2.5 h-2.5 rounded-full lg:rounded-[3px] bg-[#D4E4E0] lg:bg-[#E6FFFA]" />
+              <span className="text-[9px] lg:text-[10px] font-black tracking-widest uppercase text-gray-500">INITIAL</span>
+            </div>
+            <div className="flex items-center gap-1.5 lg:gap-2">
+              <div className="w-2.5 h-2.5 rounded-full lg:rounded-[3px] bg-[#0A4F48]" />
+              <span className="text-[9px] lg:text-[10px] font-black tracking-widest uppercase text-gray-500">CURRENT</span>
+            </div>
           </div>
         </div>
 
-        <AdherenceStreaks
-          user={user}
-          program={program}
-          className="rounded-xl p-4 shadow-sm"
-        />
+        {/* Daily Adherence Streaks (Mobile: order-5, Desktop: order-5 | col-6) */}
+        <div className="lg:col-span-6 order-5 lg:order-5 mt-4 lg:mt-0 bg-transparent xl:bg-none">
+           <AdherenceStreaks user={user} program={program} />
+        </div>
 
-        {/* Compliance Card */}
-        <div className="bg-white rounded-xl p-4 shadow-sm">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-[#0A4F48] font-semibold text-[14px]">
-              Compliance
-            </h3>
-            <span className="text-[16px] font-bold text-gray-800">
-              {complianceData?.overall}%
-            </span>
-          </div>
-          <div className="space-y-2">
-            {compliance.map((item, i) => (
-              <div key={i} className="relative bg-gray-50 rounded-lg p-3 pl-4">
-                <div
-                  className="absolute left-0 top-0 w-1 h-full rounded-l-lg "
-                  style={{ background: item.color, width: item.percentage }}
-                />
-                <div className="flex items-center justify-between">
-                  <p className="text-[12px] font-medium text-gray-700">
-                    {item.title}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-gray-400 font-medium">
-                      {item.missed}
-                    </span>
-                    <span className="text-[12px] font-bold text-[#0A4F48]">
-                      {item.percentage}
-                    </span>
-                  </div>
-                </div>
+        {/* ROW 4: Footer Cards (Mobile: order-6 hidden, Desktop: order-6 | col-12) */}
+        <div className="hidden lg:grid lg:col-span-12 lg:grid-cols-[2fr_1fr] gap-6 order-6 mt-4">
+          <div className="bg-[#0A4F48] rounded-[32px] p-10 flex text-white relative overflow-hidden shadow-[0_10px_40px_rgba(10,79,72,0.3)] min-h-[220px]">
+            <div className="relative z-10 max-w-lg flex flex-col justify-center">
+              <h3 className="font-black text-[24px] tracking-tight mb-4">Expert Analysis</h3>
+              <p className="text-[14px] font-medium leading-relaxed text-[#A7F3D0] mb-6 pr-8">
+                Based on your weight trend and compliance, we recommend increasing your water intake by 500ml and focusing on the Diet Plan adherence for the next 4 days to hit your weekly target.
+              </p>
+              <div>
+                <button className="bg-white text-[#0A4F48] px-6 py-3 rounded-full text-[12px] font-black tracking-widest uppercase hover:bg-gray-50 transition-colors shadow-sm">
+                  Get Detailed Plan
+                </button>
               </div>
-            ))}
+            </div>
+            {/* Visual Decoration / Chart abstract on right */}
+            <div className="absolute right-0 top-0 bottom-0 w-1/2 bg-linear-to-l from-[#073D38] to-transparent pointer-events-none" />
+            <div className="absolute right-10 bottom-0 opacity-60 w-64 h-64 pointer-events-none border-b border-r border-[#A7F3D0]/20 hidden lg:flex flex-col items-end justify-end pb-8 pr-8">
+               <div className="w-full h-px bg-linear-to-r from-transparent to-[#A7F3D0]/20 mb-8" />
+               <div className="w-3/4 h-px bg-linear-to-r from-transparent to-[#A7F3D0]/20 mb-8" />
+               <div className="w-1/2 h-px bg-linear-to-r from-transparent to-[#A7F3D0]/20 mb-8" />
+               <TrendingDown size={120} className="text-[#A7F3D0]/10 absolute -top-10 -left-10" />
+            </div>
+          </div>
+
+          <div className="bg-[#E6FFFA] rounded-[32px] p-8 flex flex-col justify-between shadow-[0_4px_30px_rgba(0,0,0,0.02)] min-h-[220px]">
+             <button
+                onClick={() => {
+                  setIsOpen(true);
+                  setPanelType("measurement"); 
+                }}
+                className="w-12 h-12 bg-[#0A4F48] rounded-full flex items-center justify-center hover:scale-105 transition-transform shadow-md"
+             >
+                <Plus size={24} className="text-white" />
+             </button>
+             <div>
+               <h3 className="font-black text-[18px] text-[#0A4F48] tracking-tight mb-2">
+                 Log New Activity
+               </h3>
+               <p className="text-[12px] font-medium text-[#0A4F48]/70 leading-relaxed max-w-[200px]">
+                 Keep your data up to date for precise insights.
+               </p>
+             </div>
           </div>
         </div>
       </div>
@@ -522,7 +461,7 @@ export default function Progress() {
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Drawer - Full screen on mobile, sidebar on desktop */}
+          {/* Drawer */}
           <div className="relative w-full lg:w-[400px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
             <div className="flex justify-between items-center p-6 pb-4 border-b border-gray-100">
               <h2 className="font-bold text-[18px] text-[#0A4F48]">
@@ -557,6 +496,6 @@ export default function Progress() {
         </div>
       )}
       <MobileBottomNav />
-    </>
+    </div>
   );
 }

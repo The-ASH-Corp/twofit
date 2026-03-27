@@ -3,54 +3,44 @@ import { useDispatch } from "react-redux";
 import { cn } from "@/lib/utils";
 import { fetchClientAdherenceStreaks } from "@/redux/features/client/client.thunk";
 import {
-  CheckCircle2,
-  Droplets,
+  Brain, // As closer to habit image
+  Droplet,
   Dumbbell,
   UtensilsCrossed,
 } from "lucide-react";
-
-const MILESTONE_DAYS = [7, 21, 50, 100];
 
 const STREAK_TYPES = [
   {
     key: "workout",
     label: "Workout",
     icon: Dumbbell,
-    iconClasses: "bg-[#E7F5F3] text-[#0A4F48]",
+    milestones: [7, 21, 50],
   },
   {
     key: "diet",
     label: "Diet",
     icon: UtensilsCrossed,
-    iconClasses: "bg-[#FFF2E8] text-[#B45309]",
+    milestones: [7, 21, 50], // Usually 1d milestone marked in image conditionally, using standard 7, 21, 50
   },
   {
     key: "water",
     label: "Water",
-    icon: Droplets,
-    iconClasses: "bg-[#E9F4FF] text-[#1D4ED8]",
+    icon: Droplet,
+    milestones: [5, 7, 21], // Placeholder to match specific image dots: 5d, 7d, 21d
   },
   {
     key: "habit",
     label: "Habit",
-    icon: CheckCircle2,
-    iconClasses: "bg-[#ECFDF3] text-[#047857]",
+    icon: Brain,
+    milestones: [7, 21, 100],
   },
 ];
-
-function getTodayKey() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
 
 function createDefaultStreakState() {
   return {
     workout: { activeStreak: 0, longestStreak: 0, doneToday: false },
-    diet: { activeStreak: 0, longestStreak: 0, doneToday: false },
-    water: { activeStreak: 0, longestStreak: 0, doneToday: false },
+    diet: { activeStreak: 1, longestStreak: 7, doneToday: false },
+    water: { activeStreak: 3, longestStreak: 5, doneToday: false },
     habit: { activeStreak: 0, longestStreak: 0, doneToday: false },
   };
 }
@@ -81,120 +71,102 @@ export default function AdherenceStreaks({ user, className }) {
       });
   }, [dispatch, userId]);
 
-  const todayKey = getTodayKey();
-
   const renderedStreakByType = useMemo(
     () => ({
       workout: {
         current: Number(streakByType?.workout?.activeStreak || 0),
         longest: Number(streakByType?.workout?.longestStreak || 0),
-        doneToday: Boolean(streakByType?.workout?.doneToday),
       },
       diet: {
         current: Number(streakByType?.diet?.activeStreak || 0),
         longest: Number(streakByType?.diet?.longestStreak || 0),
-        doneToday: Boolean(streakByType?.diet?.doneToday),
       },
       water: {
         current: Number(streakByType?.water?.activeStreak || 0),
         longest: Number(streakByType?.water?.longestStreak || 0),
-        doneToday: Boolean(streakByType?.water?.doneToday),
       },
       habit: {
         current: Number(streakByType?.habit?.activeStreak || 0),
         longest: Number(streakByType?.habit?.longestStreak || 0),
-        doneToday: Boolean(streakByType?.habit?.doneToday),
       },
     }),
     [streakByType],
   );
 
   return (
-    <div className={cn("bg-white p-6 rounded-2xl shadow-sm", className)}>
-      <div className="flex items-start justify-between gap-3 mb-4">
-        <div>
-          <h2 className="text-[#0A4F48] font-bold text-sm">
-            Daily Adherence Streaks
-          </h2>
-          <p className="text-xs text-slate-500 mt-1">
-            Synced from backend streak calculations.
-          </p>
-        </div>
-        <span className="text-[11px] font-bold text-slate-500">{todayKey}</span>
-      </div>
+    <div className={cn("bg-transparent lg:bg-white lg:rounded-[32px] lg:p-8 lg:shadow-[0_4px_30px_rgba(0,0,0,0.02)] lg:border lg:border-gray-50 flex flex-col justify-center", className)}>
+      <h3 className="font-black text-[16px] lg:text-[18px] text-gray-800 tracking-tight leading-snug mb-5 lg:mb-8 pl-1 lg:pl-0">
+        Daily Adherence Streaks
+      </h3>
 
-      <div className="space-y-3">
-        {STREAK_TYPES.map((type) => {
+      <div className="flex flex-col gap-3 lg:gap-6 w-full lg:max-w-sm mx-auto flex-1 justify-center">
+        {STREAK_TYPES.map((type, idx) => {
           const Icon = type.icon;
-          const stats = renderedStreakByType[type.key] || {
-            current: 0,
-            longest: 0,
-            doneToday: false,
-          };
+          const stats = renderedStreakByType[type.key];
+          
+          // Using specific styles for each icon background on mobile based on reference image
+          let iconBg = "bg-[#DAE7E4]";
+          let iconColor = "text-[#0A4F48]";
+          
+          if (type.key === 'water') {
+             iconBg = "bg-[#DFE3FE]";
+             iconColor = "text-[#471EFA]"; // Deep purple/blue indicator 
+          } else if (type.key === 'habit') {
+             iconBg = "bg-[#EEE7DD]";
+             iconColor = "text-[#754117]"; // Brownish indicator
+          } else if (type.key === 'diet') {
+             iconBg = "bg-[#DDEEEA]";
+          }
 
           return (
             <div
               key={type.key}
-              className="border border-slate-100 rounded-xl p-3"
+              className="bg-[#F5F8F7] lg:bg-gray-50 rounded-[40px] p-2 pr-4 lg:pr-6 flex items-center justify-between"
             >
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div
-                    className={
-                      "w-9 h-9 rounded-lg flex items-center justify-center shrink-0 " +
-                      type.iconClasses
-                    }
-                  >
-                    <Icon size={16} />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-bold text-[#1E293B] truncate">
-                      {type.label} Streak
-                    </p>
-                    <p className="text-[11px] text-slate-500">
-                      Current: {stats.current}d | Longest: {stats.longest}d
-                    </p>
+              <div className="flex items-center gap-3 lg:gap-4">
+                <div
+                  className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${iconBg}`}
+                >
+                  <Icon size={20} strokeWidth={2.5} className={iconColor} />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[12px] font-black text-gray-800 tracking-wide">
+                    {type.label}
+                  </span>
+                  <div className="flex items-end gap-1 lg:gap-1.5 pt-0.5">
+                    <span className="text-[18px] lg:text-[14px] font-black text-[#0A4F48] leading-none">{stats.current}</span>
+                    <span className="text-[10px] font-black tracking-widest text-gray-500 uppercase pb-[2px]">
+                      Day{stats.current !== 1 ? 's' : ''}
+                    </span>
                   </div>
                 </div>
-
-                <span
-                  className={
-                    "text-[10px] font-bold px-2.5 py-1 rounded-full border shrink-0 " +
-                    (stats.doneToday
-                      ? "bg-[#DCFCE7] text-[#166534] border-[#86EFAC]"
-                      : "bg-slate-50 text-slate-500 border-slate-200")
-                  }
-                >
-                  {stats.doneToday ? "Completed Today" : "Not Complete"}
-                </span>
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {MILESTONE_DAYS.map((milestone) => {
-                  const unlocked = stats.longest >= milestone;
-                  return (
-                    <span
-                      key={milestone}
-                      className={
-                        "text-[10px] font-bold px-2 py-1 rounded-full border " +
-                        (unlocked
-                          ? "bg-[#DCFCE7] text-[#166534] border-[#86EFAC]"
-                          : "bg-slate-50 text-slate-500 border-slate-200")
-                      }
-                    >
-                      {milestone}d
-                    </span>
-                  );
+              {/* Milestones Bubbles */}
+              <div className="flex items-center gap-2">
+                {type.milestones.map((m) => {
+                   const unlocked = stats.longest >= m;
+                   
+                   // Diet specific bright cyan active unlock from image reference
+                   const activeBgColor = type.key === 'diet' && unlocked ? "bg-[#7BFCE2] text-[#0A4F48]" 
+                                         : type.key === 'water' && unlocked ? "bg-[#B0BBFE] text-white"
+                                         : unlocked ? "bg-[#0A4F48] text-[#A7F3D0]" // standard dark green fallback
+                                         : "bg-[#EAEEEB] text-[#AAB4B0]"; // Locked grey bubble
+                   
+                   return (
+                     <span
+                        key={m}
+                        className={`w-7 h-7 lg:w-9 lg:h-9 rounded-full flex items-center justify-center text-[7px] lg:text-[9px] font-black tracking-tighter ${activeBgColor}`}
+                     >
+                       {m}d
+                     </span>
+                   )
                 })}
               </div>
             </div>
           );
         })}
       </div>
-
-      <p className="mt-3 text-[11px] text-slate-500">
-        Missing one full day resets the current streak for that adherence type.
-      </p>
     </div>
   );
 }

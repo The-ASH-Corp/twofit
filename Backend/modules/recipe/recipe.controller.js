@@ -23,6 +23,7 @@ export const getRecipesController = async (req, res) => {
   try {
     const { page, limit, search, category, bookmarked } = req.query;
     const data = await recipeService.getRecipes({
+      userId: req.user?._id || req.user?.id,
       page,
       limit,
       search,
@@ -38,7 +39,7 @@ export const getRecipesController = async (req, res) => {
 export const getRecipeByIdController = async (req, res) => {
   try {
     const { id } = req.params;
-    const recipe = await recipeService.getRecipeById(id);
+    const recipe = await recipeService.getRecipeById(id, req.user?._id || req.user?.id);
     if (!recipe) {
       return res.status(404).json({ success: false, message: "Recipe not found" });
     }
@@ -79,7 +80,8 @@ export const deleteRecipeController = async (req, res) => {
 export const toggleBookmarkController = async (req, res) => {
   try {
     const { id } = req.params;
-    const recipe = await recipeService.toggleRecipeFlag(id, "isBookmarked");
+    const userId = req.user?._id || req.user?.id;
+    const recipe = await recipeService.toggleRecipeBookmark({ recipeId: id, userId });
     if (!recipe) {
       return res.status(404).json({ success: false, message: "Recipe not found" });
     }

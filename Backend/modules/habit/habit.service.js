@@ -222,52 +222,59 @@ export const getDailyClientHabitSummary = async () => {
 
   return summary;
 };
-
-
 export const getWeeklyClientHabitSummaryService = async () => {
   const habits = await HabitModel.find().populate("clientId", "name");
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const day = today.getDay();
-  const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-
-  const startOfWeek = new Date(today);
-  startOfWeek.setDate(diff);
-  startOfWeek.setHours(0, 0, 0, 0);
-
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 6);
-  endOfWeek.setHours(23, 59, 59, 999);
-
-  console.log("Start of Week:", startOfWeek);
-  console.log("End of Week:", endOfWeek);
-
   const summary = habits.map((doc) => {
     let done = 0;
     let missed = 0;
 
-    doc.habits.forEach((habit) => {
-      habit.logs.forEach((log) => {
-        const logDate = new Date(log.date);
-        logDate.setHours(0, 0, 0, 0);
+    // ✅ define inside map
+    const startDate = new Date(doc.createdAt);
+    startDate.setHours(0, 0, 0, 0);
 
-        if (logDate >= startOfWeek && logDate <= endOfWeek) {
+    const diffDays = Math.floor(
+      (today - startDate) / (1000 * 60 * 60 * 24)
+    );
+
+    // ✅ rolling week
+    const cycleStart = new Date(startDate);
+    cycleStart.setDate(
+      startDate.getDate() + Math.floor(diffDays / 7) * 7
+    );
+
+    doc.habits.forEach((habit) => {
+      for (let i = 0; i < 7; i++) {
+        const currentDate = new Date(cycleStart);
+        currentDate.setDate(cycleStart.getDate() + i);
+        currentDate.setHours(0, 0, 0, 0);
+
+        const log = habit.logs.find((l) => {
+          const logDate = new Date(l.date);
+          logDate.setHours(0, 0, 0, 0);
+          return logDate.getTime() === currentDate.getTime();
+        });
+
+        if (log) {
           if (log.status === "done") done++;
-          else if (log.status === "missed") missed++;
+          else missed++;
+        } else {
+          // ✅ strict tracking
+          missed++;
         }
-      });
+      }
     });
 
     const total = doc.habits.length * 7;
-    missed = total - done;
-
-    const percentage = total > 0 ? Math.round((done / total) * 100) : 0;
+    const percentage =
+      total > 0 ? Math.round((done / total) * 100) : 0;
 
     return {
-      clientId: doc.clientId._id,
-      clientName: doc.clientId.name,
+      clientId: doc.clientId?._id,
+      clientName: doc.clientId?.name,
       done,
       missed,
       total,

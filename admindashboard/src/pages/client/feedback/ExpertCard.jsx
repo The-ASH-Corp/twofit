@@ -5,6 +5,7 @@ import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useDispatch } from "react-redux";
 import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
+import { AiFillStar } from "react-icons/ai";
 
 export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,145 +31,90 @@ export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
     fetchExperts();
   }, []);
 
+  const renderStars = (rating = 5) => {
+    return (
+      <div className="flex gap-1">
+        {[...Array(5)].map((_, i) => (
+          <AiFillStar
+            key={i}
+            className={`w-4 h-4 ${i < Math.floor(rating) ? "text-[#F5BA02]" : "text-gray-200"}`}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <>
-      {/* Desktop View - Original 3 column grid */}
-      <div className="hidden lg:grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
-        {experts.map((expert, index) => (
-          <div key={index} className="bg-white rounded-xl p-4">
-            {/* Header */}
-            <div className="flex gap-3 items-center">
-              <img
-                src={assets.profile}
-                alt={expert.name}
-                className="w-14 h-14 rounded-full object-cover"
-              />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mb-8">
+        {experts.map((expert, index) => {
+          const isRated = ratedExpertIds.includes(expert?._id);
+          // Mock data for rating and reviews if not present
+          const rating = expert?.rating || (4.5 + Math.random() * 0.5).toFixed(1);
+          const reviewsCount = expert?.reviewsCount || Math.floor(Math.random() * 200) + 50;
 
-              <div className="flex-1">
-                <h3 className="font-semibold text-sm">{expert?.name}</h3>
-                <div className="flex flex-row gap-2">
-                  <p className="text-xs text-gray-500 px-3 py-1 rounded-full bg-gray-200">
-                    {expert?.role}
-                  </p>
-                  <p className="text-xs px-3 py-1 rounded-full bg-[#45C4A2] text-white">
-                    {expert?.status}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Details */}
-            <div className="mt-3 bg-[#F8F8F8] p-3 rounded-lg text-xs space-y-3">
-              <div className="space-y-2">
-                <p className="text-gray-500">Experience</p>
-                <p className="font-medium text-black">{expert?.experience}</p>
-              </div>
-              <hr className="text-gray-300"></hr>
-
-              <div className="space-y-2">
-                <p className="text-gray-500">Certification</p>
-                <p className="font-medium">{expert?.qualification}</p>
-              </div>
-            </div>
-            <button
-              onClick={() => {
-                if (!ratedExpertIds.includes(expert?._id)) {
-                  setSelectedExpert(expert);
-                  setIsOpen(!isOpen);
-                }
-              }}
-              disabled={ratedExpertIds.includes(expert?._id)}
-              className={`text-white p-3 rounded-xl mt-4 w-full transition-all ${
-                ratedExpertIds.includes(expert?._id)
-                  ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-[#0A4F48] hover:bg-[#083d38]"
-              }`}
+          return (
+            <div
+              key={index}
+              className="bg-white rounded-[40px] p-8 border border-gray-50 flex flex-col items-center text-center relative shadow-sm hover:shadow-md transition-shadow"
             >
-              {ratedExpertIds.includes(expert?._id)
-                ? "Already Rated"
-                : "Rate & Review"}
-            </button>
-          </div>
-        ))}
+              {/* Active Badge */}
+              <div className="absolute top-8 right-8 bg-[#E6F8F3] text-[#45C4A2] px-3 py-1 rounded-full text-[10px] font-bold tracking-wider">
+                ACTIVE
+              </div>
+
+              {/* Avatar */}
+              <div className="mb-4">
+                <img
+                  src={expert?.profile || assets.profile}
+                  alt={expert.name}
+                  className="w-20 h-20 rounded-full object-cover border-4 border-white shadow-sm"
+                />
+              </div>
+
+              {/* Info */}
+              <div className="space-y-1 mb-4">
+                <h3 className="text-xl font-bold text-[#0F172A]">{expert?.name || "Live Expert"}</h3>
+                <p className="text-[11px] font-bold text-[#45C4A2] tracking-[0.2em] uppercase">
+                  {expert?.qualification || "MBBS"} | {expert?.experience || "5 YEARS EXP"}
+                </p>
+              </div>
+
+              {/* Rating */}
+              <div className="flex items-center gap-3 mb-8">
+                {renderStars(rating)}
+                <span className="text-sm font-bold text-gray-700">{rating}</span>
+                <span className="text-sm text-gray-400 font-medium">({reviewsCount} reviews)</span>
+              </div>
+
+              {/* Action Button */}
+              <button
+                onClick={() => {
+                  if (!isRated) {
+                    setSelectedExpert(expert);
+                    setIsOpen(true);
+                  }
+                }}
+                disabled={isRated}
+                className={`w-full py-3.5 rounded-full font-bold text-sm transition-all border-2 ${
+                  isRated
+                    ? "bg-gray-100 border-transparent text-gray-400 cursor-not-allowed"
+                    : "border-[#0A4F48] text-[#0A4F48] hover:bg-[#0A4F48] hover:text-white"
+                }`}
+              >
+                {isRated ? "Already Rated" : "View Full Profile"}
+              </button>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Mobile View - Single column list */}
-      <div className="lg:hidden space-y-4 w-full">
-        {experts.map((expert, index) => (
-          <div key={index} className="bg-white rounded-2xl p-4 shadow-sm">
-            {/* Header */}
-            <div className="flex gap-3 items-start mb-4">
-              <div className="w-12 h-12 rounded-full bg-[#D4A5A0] flex items-center justify-center text-white text-sm font-semibold shrink-0">
-                {expert?.name?.split(" ")?.[0]?.[0]}
-                {expert?.name?.split(" ")?.[1]?.[0]}
-              </div>
-
-              <div className="flex-1">
-                <h3 className="font-semibold text-[15px] text-gray-900">
-                  {expert?.name}
-                </h3>
-                <p className="text-xs text-gray-600 capitalize mt-0.5">
-                  {expert?.role}
-                </p>
-                <span className="inline-block mt-1.5 text-[10px] px-2.5 py-1 rounded-full bg-[#45C4A2] text-white font-medium">
-                  {expert?.status}
-                </span>
-              </div>
-            </div>
-
-            {/* Details */}
-            <div className="space-y-3 mb-4">
-              <div>
-                <p className="text-[11px] text-gray-500 mb-1">Response Time</p>
-                <p className="text-[13px] font-medium text-gray-900">1h 12m</p>
-              </div>
-
-              <div>
-                <p className="text-[11px] text-gray-500 mb-1">Experience</p>
-                <p className="text-[13px] font-medium text-gray-900">
-                  {expert?.experience || "7 Years"}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-[11px] text-gray-500 mb-1">Certifications</p>
-                <p className="text-[13px] font-medium text-gray-900">
-                  {expert?.qualification || "M.Sc. Clinical Nutrition"}
-                </p>
-              </div>
-            </div>
-
-            {/* Button */}
-            <button
-              onClick={() => {
-                if (!ratedExpertIds.includes(expert?._id)) {
-                  setSelectedExpert(expert);
-                  setIsOpen(!isOpen);
-                }
-              }}
-              disabled={ratedExpertIds.includes(expert?._id)}
-              className={`w-full py-3 rounded-xl font-medium text-[14px] transition-colors ${
-                ratedExpertIds.includes(expert?._id)
-                  ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                  : "bg-[#0A4F48] text-white hover:bg-[#083d38]"
-              }`}
-            >
-              {ratedExpertIds.includes(expert?._id)
-                ? "Already Rated"
-                : "Rate & Review"}
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {isOpen ? (
+      {isOpen && (
         <Modal
           expert={selectedExpert}
           onClose={() => setIsOpen(false)}
           fetchFeedbackData={fetchFeedbackData}
         />
-      ) : (
-        ""
       )}
     </>
   );

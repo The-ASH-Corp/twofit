@@ -1,12 +1,59 @@
 import { assets } from "@/assets/asset";
-import React from "react";
+import { getUserExtensions } from "@/redux/features/plans/plan.thunk";
+import React, { useEffect, useMemo, useState } from "react";
+import { useDispatch } from "react-redux";
 
 const ProfileLeftSide = ({ client, complianceStats }) => {
+   const dispatch = useDispatch();
+   const [latestExtension, setLatestExtension] = useState(null);
 
   const [year, ,] = client?.dob?.split("-") || [];
   const today = new Date();
 
   let age = year ? today.getFullYear() - year : null;
+
+   useEffect(() => {
+      let isMounted = true;
+
+      const loadUserExtensions = async () => {
+         if (!client?._id) {
+            if (isMounted) setLatestExtension(null);
+            return;
+         }
+
+         try {
+            const extensions = await dispatch(getUserExtensions(client._id)).unwrap();
+            if (!isMounted) return;
+
+            const list = Array.isArray(extensions) ? extensions : [];
+            if (!list.length) {
+               setLatestExtension(null);
+               return;
+            }
+
+            const latest = [...list].sort(
+               (a, b) =>
+                  new Date(b.createdAt || b.updatedAt || 0).getTime() -
+                  new Date(a.createdAt || a.updatedAt || 0).getTime(),
+            )[0];
+
+            setLatestExtension(latest || null);
+         } catch {
+            if (isMounted) setLatestExtension(null);
+         }
+      };
+
+      loadUserExtensions();
+
+      return () => {
+         isMounted = false;
+      };
+   }, [client?._id, dispatch]);
+
+   const extensionStateLabel = useMemo(() => {
+      if (!latestExtension) return "";
+      return latestExtension.isActivated ? "Activated" : "Pending Activation";
+   }, [latestExtension]);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-GB", {
@@ -152,6 +199,25 @@ const ProfileLeftSide = ({ client, complianceStats }) => {
                     <span className="text-xs font-bold text-[#334155]">{formatDate(client?.programEndDate)}</span>
                 </div>
             </div>
+
+                  {latestExtension && (
+                     <div className="mt-3 rounded-xl border border-violet-200 bg-violet-50 p-3">
+                        <div className="flex items-center justify-between gap-2">
+                           <span className="text-[11px] font-black uppercase tracking-wider text-violet-800">
+                              Plan Extended
+                           </span>
+                           <span className="rounded-md border border-violet-300 bg-white px-2 py-0.5 text-[10px] font-bold text-violet-700">
+                              {latestExtension?.extensionDuration || 0} Days
+                           </span>
+                        </div>
+                        <p className="mt-1 text-xs font-semibold text-violet-700">
+                           {extensionStateLabel}
+                           {latestExtension?.extendedProgramEndDate
+                              ? ` till ${formatDate(latestExtension.extendedProgramEndDate)}`
+                              : ""}
+                        </p>
+                     </div>
+                  )}
          </div>
       </div>
 

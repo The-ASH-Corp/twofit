@@ -1,21 +1,7 @@
 import React from "react";
-import { assets } from "@/assets/asset";
+import { FileText, MoreHorizontal } from "lucide-react";
 
-export default function DietPlanCard({
-  isProgramStarted = true,
-  startDate,
-  dietPlanPdf,
-}) {
-  const formatDate = (dateString) => {
-    if (!dateString) return "";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
-
+export default function DietPlanCard({ dietPlanPdf }) {
   const handleViewPdf = () => {
     if (dietPlanPdf) {
       const fullUrl = `${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}${dietPlanPdf}`;
@@ -24,49 +10,40 @@ export default function DietPlanCard({
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm mt-4">
-      <h3 className="text-[#0A4F48] font-bold text-sm mb-5 leading-none">
-        Diet Plan
-      </h3>
-      {!isProgramStarted ? (
-        <div className="flex flex-col items-center justify-center p-4 text-center">
-          <p className="text-[#0A4F48] font-semibold text-sm">
-            Program starts on
-          </p>
-          <p className="text-2xl font-bold text-[#0A4F48] mt-2">
-            {formatDate(startDate)}
-          </p>
-          <p className="text-xs text-gray-500 mt-2">
-            Your daily plan will appear here once the program begins.
-          </p>
-        </div>
-      ) : dietPlanPdf ? (
-        <div className="flex items-center justify-between bg-[#FDF8F3] p-4 rounded-[20px] border border-[#FBEAD9]/50">
-          <div className="flex items-center gap-4">
-            <div className="w-11 h-11 bg-[#FBEAD9] flex items-center justify-center rounded-xl shadow-sm">
-              <img src={assets.pdfVector} alt="pdf" className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-[14px] font-bold text-gray-800 leading-none mb-1.5 max-w-[150px] truncate">
-                {dietPlanPdf.split("/").pop()}
-              </p>
-              <p className="text-[11px] text-gray-400 font-bold uppercase tracking-tight">
-                PDF
-              </p>
-            </div>
+    <div className="bg-white p-8 rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col gap-6 group transition-all duration-300 hover:shadow-lg">
+      <div className="flex justify-between items-center">
+        <h3 className="text-gray-800 font-black text-[15px] uppercase tracking-widest">
+          Diet Plan
+        </h3>
+        <button className="text-gray-400 hover:text-gray-600 transition-colors">
+          <MoreHorizontal size={20} />
+        </button>
+      </div>
+
+      <div 
+        className="bg-[#F8FAFA] p-4 rounded-[24px] flex items-center justify-between border border-gray-100 transition-all hover:border-[#0A4F48]/10 group/item cursor-pointer"
+        onClick={handleViewPdf}
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-rose-50 rounded-[18px] flex items-center justify-center text-rose-500 shadow-sm group-hover/item:scale-105 transition-transform">
+            <FileText size={20} />
           </div>
-          <button
-            onClick={handleViewPdf}
-            className="bg-white text-[12px] font-bold px-4 py-2 rounded-xl border border-gray-100 shadow-sm text-gray-600 hover:bg-gray-50 transition-colors"
-          >
-            View
-          </button>
+          <div className="flex flex-col">
+            <h4 className="text-[13px] font-black text-gray-800 tracking-tight leading-none mb-1 max-w-[120px] truncate">
+              {dietPlanPdf?.split('/').pop() || "1771065315273..."}
+            </h4>
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">
+              Diet Guide PDF
+            </span>
+          </div>
         </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center p-4 text-center border-dashed border-2 border-gray-100 rounded-2xl">
-          <p className="text-gray-400 text-sm">No diet plan assigned yet</p>
-        </div>
-      )}
+        
+        <button className="text-[#0A4F48] font-black text-[13px] hover:underline px-2">
+          View
+        </button>
+      </div>
     </div>
   );
 }
+
+

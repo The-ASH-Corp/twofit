@@ -56,8 +56,22 @@ export const deletePlan = createAsyncThunk(
         }
     }
 );
-
-
+export const getPendingExtension = createAsyncThunk(
+    "plans/getPendingExtension",
+    async (userId, { rejectWithValue }) => {
+        try {
+            const data = await axiosInstance.get(`/plans/extensions/user/${userId}`);
+            // Return the pending (non-activated) extension if it exists
+            const extensions = data.data || [];
+            const pendingExtension = extensions.find(ext => !ext.isActivated);
+            return pendingExtension || null;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to fetch extensions"
+            );
+        }
+    }
+);
 export const uploadPlanMedia = createAsyncThunk(
     "plans/uploadMedia",
     async ({ formData, onUploadProgress }, { rejectWithValue }) => {
@@ -73,6 +87,54 @@ export const uploadPlanMedia = createAsyncThunk(
         } catch (error) {
             return rejectWithValue(
                 error.response?.data?.message || "Failed to upload media"
+            );
+        }
+    }
+);
+
+export const extendProgram = createAsyncThunk(
+    "plans/extendProgram",
+    async ({ userId, originalProgramId, extendedProgramId, extensionDuration, notes }, { rejectWithValue }) => {
+        try {
+            const data = await axiosInstance.post("/plans/extend-program", {
+                userId,
+                originalProgramId,
+                extendedProgramId,
+                extensionDuration,
+                notes,
+            });
+            return data.data;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to extend program"
+            );
+        }
+    }
+);
+
+export const getUserExtensions = createAsyncThunk(
+    "plans/getUserExtensions",
+    async (userId, { rejectWithValue }) => {
+        try {
+            const data = await axiosInstance.get(`/plans/extensions/user/${userId}`);
+            return data.data;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to fetch extensions"
+            );
+        }
+    }
+);
+
+export const deleteExtension = createAsyncThunk(
+    "plans/deleteExtension",
+    async (extensionId, { rejectWithValue }) => {
+        try {
+            const data = await axiosInstance.delete(`/plans/extensions/${extensionId}`);
+            return data.data;
+        } catch (error) {
+            return rejectWithValue(
+                error.response?.data?.message || "Failed to delete extension"
             );
         }
     }
