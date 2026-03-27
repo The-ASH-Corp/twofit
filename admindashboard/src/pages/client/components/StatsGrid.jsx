@@ -6,42 +6,42 @@ import {
   Flame 
 } from "lucide-react";
 
-const stats = [
-  {
-    label: "Program Days",
-    value: "12/30",
-    unit: "Days",
-    icon: Calendar,
-    color: "bg-[#E6FFFA]",
-    textColor: "text-[#38B2AC]",
-  },
-  {
-    label: "Compliance",
-    value: "31%",
-    unit: "",
-    icon: LayoutGrid,
-    color: "bg-[#EBF3F2]",
-    textColor: "text-[#0A4F48]",
-  },
-  {
-    label: "Current Weight",
-    value: "75",
-    unit: "kg",
-    icon: Weight,
-    color: "bg-[#FDF8F3]",
-    textColor: "text-[#DD6B20]",
-  },
-  {
-    label: "Active Streak",
-    value: "0",
-    unit: "Days",
-    icon: Flame,
-    color: "bg-[#FFF5F5]",
-    textColor: "text-[#E53E3E]",
-  }
-];
+export default function StatsGrid({ statsData }) {
+  const stats = [
+    {
+      label: "Program Days",
+      value: statsData?.programDays.split(" ")[0] || "0/30",
+      unit: "Days",
+      icon: Calendar,
+      color: "bg-[#E6FFFA]",
+      textColor: "text-[#38B2AC]",
+    },
+    {
+      label: "Compliance",
+      value: statsData?.compliance || "0%",
+      unit: "",
+      icon: LayoutGrid,
+      color: "bg-[#EBF3F2]",
+      textColor: "text-[#0A4F48]",
+    },
+    {
+      label: "Current Weight",
+      value: statsData?.currentWeight || "--",
+      unit: "kg",
+      icon: Weight,
+      color: "bg-[#FDF8F3]",
+      textColor: "text-[#DD6B20]",
+    },
+    {
+      label: "Active Streak",
+      value: statsData?.activeStreak || "0",
+      unit: "Days",
+      icon: Flame,
+      color: "bg-[#FFF5F5]",
+      textColor: "text-[#E53E3E]",
+    }
+  ];
 
-export default function StatsGrid() {
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
       {stats.map((stat, index) => {

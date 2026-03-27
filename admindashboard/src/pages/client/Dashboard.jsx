@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import HeroCard from "./components/HeroCard";
 import StatsGrid from "./components/StatsGrid";
 import DietPlanCard from "./components/DietPlanCard";
@@ -13,6 +13,7 @@ import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
 import {
   fetchClientComplianceStats,
   getClient,
+  fetchClientAdherenceStreaks,
 } from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { SyncLoader } from "react-spinners";
@@ -20,10 +21,13 @@ import NotificationsList from "./components/NotificationsList";
 import WaterIntake from "./components/WaterIntake";
 import WeeklyCheckInModal from "./components/WeeklyCheckInModal.jsx";
 import { submitWeeklyCheckIn } from "@/redux/features/client/client.thunk";
+import { toast } from "react-toastify";
 
 export default function Dashboard() {
   const [program, setProgram] = useState(null);
   const [coaches, setCoaches] = useState([]);
+  const [compliance, setCompliance] = useState(0);
+  const [streak, setStreak] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const user = useAppSelector(selectUser);
   const clientUser = useAppSelector(selectSelectedClient);
@@ -43,13 +47,13 @@ export default function Dashboard() {
         typeof user?.programType === "object"
           ? user?.programType?._id
           : user?.programType;
-          
+
       if (!programId) {
-         setIsLoading(false);
-         return;
+        setIsLoading(false);
+        return;
       }
 
-      const [programRes, coachesRes] = await Promise.all([
+      const [programRes, coachesRes, complianceRes] = await Promise.all([
         dispatch(getProgramById(programId)).unwrap(),
         dispatch(
           getAllCoachesByAdmin([
@@ -58,10 +62,13 @@ export default function Dashboard() {
             user?.dietition,
           ]),
         ).unwrap(),
-        dispatch(fetchClientComplianceStats()).unwrap(),
+        dispatch(fetchClientComplianceStats(user?._id)).unwrap(),
       ]);
+
       setProgram(programRes.data);
       setCoaches(coachesRes);
+      setCompliance(complianceRes?.overall || 0);
+      setStreak(complianceRes?.streaks?.activeStreak || 0);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     } finally {
@@ -69,6 +76,7 @@ export default function Dashboard() {
     }
   }, [
     dispatch,
+    user?._id,
     user?.dietition,
     user?.programType,
     user?.therapist,
@@ -131,7 +139,8 @@ export default function Dashboard() {
           Account Inactive
         </h1>
         <p className="text-gray-600 text-lg font-medium max-w-md">
-          Please contact your administrator to reactivate your account and continue your wellness journey.
+          Please contact your administrator to reactivate your account and
+          continue your wellness journey.
         </p>
       </div>
     );
@@ -150,24 +159,30 @@ export default function Dashboard() {
     );
   }
 
+  const statsData = {
+    programDays: `${currentGlobalDay}/${program?.plan?.duration || 30}`,
+    compliance: `${Math.round(compliance)}%`,
+    currentWeight: clientUser?.currentWeight || user?.currentWeight || "--",
+    activeStreak: streak,
+  };
+
   return (
     <div className="max-w-7xl mx-auto lg:p-8 p-4 pb-32 bg-[#F8FAFA] min-h-screen">
       <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-10 items-start">
-        
         {/* Main Column */}
         <div className="flex flex-col gap-10">
-          <HeroCard program={program} />
-          <StatsGrid />
+          <HeroCard program={program} currentGlobalDay={currentGlobalDay} />
+          <StatsGrid statsData={statsData} />
           <WaterIntake />
-          
+
           {/* Mobile Only: Sidebars stack below main content */}
           <div className="lg:hidden flex flex-col gap-10">
-             <DietPlanCard
-               dietPlanPdf={clientUser?.dietPlanPdf || user?.dietPlanPdf}
-             />
-             <ExpertsList expert={coaches} />
-             <Measeurement />
-             <NotificationsList />
+            <DietPlanCard
+              dietPlanPdf={clientUser?.dietPlanPdf || user?.dietPlanPdf}
+            />
+            <ExpertsList expert={coaches} />
+            <Measeurement />
+            <NotificationsList />
           </div>
         </div>
 
@@ -182,8 +197,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-
-
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
 
@@ -196,4 +209,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
