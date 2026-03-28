@@ -1,11 +1,12 @@
 import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
+import { 
   getHabitReflectionThunk,
   getClientHabitsThunk,
   updateHabitReflectionThunk,
   updateHabitStatusThunk,
 } from "@/redux/features/habit/habit.thunk";
+import { fetchClientAdherenceStreaks } from "@/redux/features/client/client.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { 
   Check, 
@@ -17,10 +18,7 @@ import {
   Target,
   CheckCircle2,
   Zap,
-  Star,
-  Settings2,
   Quote,
-  BarChart3
 } from "lucide-react";
 import { SyncLoader } from "react-spinners";
 import { format } from "date-fns";
@@ -31,11 +29,17 @@ export default function HabitTracker() {
   const user = useSelector(selectUser);
   const clientId = user?._id;
   const { habits, loading, reflectionNote, reflectionSaving } = useSelector((state) => state.habit);
+  const [streak, setStreak] = useState(0);
 
   useEffect(() => {
     if (clientId) {
       dispatch(getClientHabitsThunk(clientId));
       dispatch(getHabitReflectionThunk(clientId));
+      dispatch(fetchClientAdherenceStreaks(clientId)).unwrap().then(res => {
+        if (res?.habit) {
+          setStreak(res.habit.activeStreak || 0);
+        }
+      });
     }
   }, [clientId, dispatch]);
 
@@ -182,29 +186,23 @@ export default function HabitTracker() {
       <div className="hidden md:block max-w-7xl mx-auto space-y-8 pb-12">
         <div className="flex md:items-end justify-between gap-4 px-2">
           <div className="space-y-1">
-            <p className="text-[10px] font-black text-[#0A4F48]/40 uppercase tracking-[0.3em]">Personal Dashboard</p>
             <h1 className="text-3xl md:text-4xl font-black text-gray-800 tracking-tight">Daily Habit Tracker</h1>
           </div>
           <div className="text-right flex flex-col items-end gap-1">
             <p className="text-[14px] font-black text-gray-800 leading-none">{todayStr}</p>
-            <p className="text-[12px] font-bold text-[#0A4F48] uppercase tracking-wide">75% Weekly Goal Reached</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 px-2">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 px-2">
           <StatCard label="Done Today" value={doneCount} color="bg-emerald-50 text-emerald-600 border-emerald-100" icon={Check} />
           <StatCard label="Missed" value={missedCount} color="bg-rose-50 text-rose-500 border-rose-100" icon={X} />
-          <StatCard label="Current Streak" value="12 Days" color="bg-teal-50 text-[#0A4F48] border-teal-100" icon={Zap} />
-          <StatCard label="Total Points" value="2,450" color="bg-orange-50 text-orange-500 border-orange-100" icon={Star} />
+          <StatCard label="Current Streak" value={`${streak} Days`} color="bg-teal-50 text-[#0A4F48] border-teal-100" icon={Zap} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-8">
           <div className="bg-white p-8 rounded-[32px] shadow-sm border border-gray-50 space-y-8">
             <div className="flex justify-between items-center">
               <h2 className="text-[18px] font-black text-gray-800 leading-none">Today's Protocol</h2>
-              <button className="flex items-center gap-2 text-[12px] font-black text-gray-400 uppercase tracking-widest hover:text-[#0A4F48]">
-                <Settings2 size={14} /> Edit Habits
-              </button>
             </div>
             <div className="space-y-4">
               {processedHabits.map((habit) => {
@@ -251,17 +249,6 @@ export default function HabitTracker() {
               </div>
             </div>
 
-            <div className="bg-[#0A4F48] p-8 rounded-[32px] shadow-xl space-y-6">
-              <div className="flex items-center justify-between"><h2 className="text-[16px] font-black text-white">Weekly Adherence</h2><BarChart3 size={18} className="text-white/40" /></div>
-              <div className="flex items-end justify-between h-[120px] px-2">
-                {[{ d: "M", h: "40%" }, { d: "T", h: "70%" }, { d: "W", h: "30%" }, { d: "T", h: "90%" }, { d: "F", h: "100%", a: true }, { d: "S", h: "15%" }, { d: "S", h: "20%" }].map((bar, i) => (
-                  <div key={i} className="flex flex-col items-center gap-3 h-full justify-end">
-                    <div className={`w-6 rounded-t-lg ${bar.a ? 'bg-white' : 'bg-emerald-400/40'}`} style={{ height: bar.h }} />
-                    <span className={`text-[9px] font-black ${bar.a ? 'text-white' : 'text-white/40'}`}>{bar.d}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
 
             <div className="bg-[#F4F1ED] p-8 rounded-[32px] shadow-sm relative overflow-hidden group">
               <Quote size={40} className="absolute -top-2 -left-2 text-black/3 rotate-12" />

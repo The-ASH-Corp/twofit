@@ -1,10 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
 import { 
   CheckCircle2, 
-  Upload, 
-  UtensilsCrossed, 
   Clock, 
   TrendingUp, 
   Droplets, 
@@ -12,11 +9,9 @@ import {
   Moon, 
   Camera, 
   Check, 
-  ChevronRight,
   Utensils,
-  Smartphone,
   Info,
-  Calendar
+  X
 } from "lucide-react";
 import { SyncLoader } from "react-spinners";
 import { toast } from "react-toastify";
@@ -24,7 +19,11 @@ import { assets } from "@/assets/asset";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
-import { getClient } from "@/redux/features/client/client.thunk";
+import {
+  getClient,
+  fetchClientComplianceStats,
+  fetchClientAdherenceStreaks,
+} from "@/redux/features/client/client.thunk";
 import { getProgramById } from "@/redux/features/program/program.thunk";
 import {
   getUserTaskStatus,
@@ -33,12 +32,39 @@ import {
 import MobileBottomNav from "../components/MobileBottomNav";
 import { cn } from "@/lib/utils";
 
-const MEAL_LABELS = [
-  { label: "BREAKFAST", time: "08:00 AM", icon: Apple },
-  { label: "LUNCH", time: "01:00 PM", icon: Utensils },
-  { label: "SNACK", time: "04:30 PM", icon: Apple },
-  { label: "DINNER", time: "07:30 PM", icon: Moon },
-];
+const getMealConfig = (index, totalCount, Apple, Utensils, Moon) => {
+  if (totalCount === 4) {
+    const configs = [
+      { label: "BREAKFAST", time: "08:00 AM", icon: Apple },
+      { label: "LUNCH", time: "01:30 PM", icon: Utensils },
+      { label: "SNACK", time: "05:00 PM", icon: Apple },
+      { label: "DINNER", time: "08:30 PM", icon: Moon },
+    ];
+    return configs[index] || { label: `MEAL ${index + 1}`, time: "--:--", icon: Utensils };
+  }
+  if (totalCount === 5) {
+    const configs = [
+      { label: "BREAKFAST", time: "08:00 AM", icon: Apple },
+      { label: "MID-MORNING", time: "11:00 AM", icon: Apple },
+      { label: "LUNCH", time: "01:30 PM", icon: Utensils },
+      { label: "EVENING", time: "05:00 PM", icon: Apple },
+      { label: "DINNER", time: "08:30 PM", icon: Moon },
+    ];
+    return configs[index] || { label: `MEAL ${index + 1}`, time: "--:--", icon: Utensils };
+  }
+  if (totalCount === 6) {
+    const configs = [
+      { label: "BREAKFAST", time: "07:30 AM", icon: Apple },
+      { label: "MID-MORNING", time: "10:30 AM", icon: Apple },
+      { label: "LUNCH", time: "01:00 PM", icon: Utensils },
+      { label: "AFTERNOON", time: "04:00 PM", icon: Apple },
+      { label: "EVENING", time: "07:00 PM", icon: Apple },
+      { label: "DINNER", time: "09:30 PM", icon: Moon },
+    ];
+    return configs[index] || { label: `MEAL ${index + 1}`, time: "--:--", icon: Utensils };
+  }
+  return { label: `MEAL ${index + 1}`, time: "--:--", icon: Utensils };
+};
 
 export default function DietTasksPage() {
   const dispatch = useDispatch();
@@ -55,8 +81,15 @@ export default function DietTasksPage() {
   const [uploading, setUploading] = useState(false);
   const [skippingMeal, setSkippingMeal] = useState(false);
   const [showSkipConfirm, setShowSkipConfirm] = useState(false);
+  const [complianceData, setComplianceData] = useState(null);
+  const [streak, setStreak] = useState(0);
   const autoSkippedPreviousDayRef = useRef(null);
+  const hasAutoSelected = useRef(false);
   const fileInputRef = useRef(null);
+
+  const currentGlobalDay =
+    clientUser?.currentGlobalDay || user?.currentGlobalDay || 1;
+  const dietPlanPdf = clientUser?.dietPlanPdf || user?.dietPlanPdf;
 
   useEffect(() => {
     const fetchPageData = async () => {
@@ -68,12 +101,16 @@ export default function DietTasksPage() {
             ? user?.programType?._id
             : user?.programType;
 
-        const [, programData] = await Promise.all([
+        const [,, complianceRes, streaksRes, programData] = await Promise.all([
           user?._id ? dispatch(getClient({ id: user._id })).unwrap() : Promise.resolve(),
-          programId ? dispatch(getProgramById(programId)).unwrap() : Promise.resolve(null),
           dispatch(getUserTaskStatus()).unwrap(),
+          user?._id ? dispatch(fetchClientComplianceStats(user._id)).unwrap() : Promise.resolve(null),
+          user?._id ? dispatch(fetchClientAdherenceStreaks(user._id)).unwrap() : Promise.resolve(null),
+          programId ? dispatch(getProgramById(programId)).unwrap() : Promise.resolve(null),
         ]);
 
+        if (complianceRes) setComplianceData(complianceRes || null);
+        if (streaksRes?.diet) setStreak(streaksRes.diet.activeStreak || 0);
         if (programData) setProgram(programData.data);
       } catch (error) {
         console.error("Failed to load diet page:", error);
@@ -84,23 +121,6 @@ export default function DietTasksPage() {
 
     fetchPageData();
   }, [dispatch, user?._id, user?.programType]);
-
-  const currentGlobalDay =
-    clientUser?.currentGlobalDay || user?.currentGlobalDay || 1;
-  const dietPlanPdf = clientUser?.dietPlanPdf || user?.dietPlanPdf;
-
-  const isProgramStarted = useMemo(() => {
-    const startDate = clientUser?.programStartDate || user?.programStartDate;
-    if (!startDate) return true;
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const start = new Date(startDate);
-    start.setHours(0, 0, 0, 0);
-
-    return today >= start;
-  }, [clientUser?.programStartDate, user?.programStartDate]);
 
   const dietTasks = useMemo(() => {
     const isWeightLoss = program?.title?.toLowerCase().includes("weight loss");
@@ -117,8 +137,10 @@ export default function DietTasksPage() {
           task.taskType === "Meal",
       );
 
+      const config = getMealConfig(index, mealCount, Apple, Utensils, Moon);
+
       return {
-        name: MEAL_LABELS[index]?.label || `Meal ${index + 1}`,
+        name: config.label,
         notes: "Upload a clear image of your meal for expert review.",
         index,
         exerciseIndex: mealIndex,
@@ -138,6 +160,39 @@ export default function DietTasksPage() {
     user?.dietPlanMealCount,
   ]);
 
+  // Auto-select the first actionable (todo or rejected) meal after data loads
+  useEffect(() => {
+    if (!isLoading && dietTasks.length > 0 && !hasAutoSelected.current) {
+      const firstActionableIndex = dietTasks.findIndex(
+        (t) => t.status === "todo" || t.status === "rejected"
+      );
+
+      if (firstActionableIndex !== -1) {
+        setSelectedIndex(firstActionableIndex);
+      } else {
+        // If all are processed, stay at the last meal
+        setSelectedIndex(dietTasks.length - 1);
+      }
+      hasAutoSelected.current = true;
+    }
+  }, [isLoading, dietTasks]);
+
+  
+  const isProgramStarted = useMemo(() => {
+    const startDate = clientUser?.programStartDate || user?.programStartDate;
+    if (!startDate) return true;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+
+    return today >= start;
+  }, [clientUser?.programStartDate, user?.programStartDate]);
+
+  
+
   const selectedTask = dietTasks[selectedIndex] || null;
 
   const selectedMealStatus = selectedTask?.status || "todo";
@@ -149,6 +204,25 @@ export default function DietTasksPage() {
       ).length,
     [tasks],
   );
+
+  const todayProgress = useMemo(() => {
+    if (!dietTasks.length) return 0;
+    const completedToday = dietTasks.filter(t => t.status === "verified").length;
+    return Math.round((completedToday / dietTasks.length) * 100);
+  }, [dietTasks]);
+
+  const furthestIndex = useMemo(() => {
+    // Find last verified or skipped meal
+    const lastCompletedIdx = dietTasks.slice().reverse().findIndex(t => t.status === "verified" || t.status === "skipped");
+    const lastIdx = lastCompletedIdx === -1 ? 0 : (dietTasks.length - 1 - lastCompletedIdx);
+    // Determine the progress line endpoint: it should reach at least the selectedIndex or the last actioned meal
+    return Math.max(lastIdx, selectedIndex);
+  }, [dietTasks, selectedIndex]);
+
+  const progressBarWidth = useMemo(() => {
+    if (dietTasks.length <= 1) return 0;
+    return (furthestIndex / (dietTasks.length - 1)) * 100;
+  }, [furthestIndex, dietTasks.length]);
 
   const statusConfig = {
     pending: {
@@ -384,7 +458,7 @@ export default function DietTasksPage() {
       <div className="max-w-[1400px] mx-auto p-4 lg:p-10 flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12">
         
         {/* =========================================
-            LEFT COLUMN (Banner + Progression)
+            LEFT COLUMN (Banner + Progression + Summary)
             ========================================= */}
         <div className="lg:col-span-8 flex flex-col gap-8">
           
@@ -404,18 +478,14 @@ export default function DietTasksPage() {
                 Ongoing Session
               </div>
               <h1 className="text-white font-black text-3xl lg:text-5xl leading-tight tracking-tighter drop-shadow-md">
-                {selectedTask?.name === "LUNCH" ? "Mindful Lunch Protocol" : `${selectedTask?.name} Protocol`}
+                {selectedTask?.name === "LUNCH" ? "Lunch" : `${selectedTask?.name}`}
               </h1>
               <p className="text-white/80 font-bold text-sm lg:text-base mt-2 lg:mt-4 leading-relaxed max-w-xl">
                 Precision-balanced nutrients for optimal cognitive performance and sustained energy levels throughout the afternoon.
               </p>
             </div>
             
-            <div className="absolute top-8 left-8 lg:top-10 lg:left-10 z-20">
-               <button onClick={() => window.history.back()} className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white/80 hover:bg-white hover:text-[#0A4F48] transition-all">
-                  <span className="text-xl font-bold">‹</span>
-               </button>
-            </div>
+            
           </div>
 
           {/* Daily Progression Stepper */}
@@ -425,19 +495,24 @@ export default function DietTasksPage() {
                 Daily Progression
               </h2>
               <div className="flex items-center gap-2">
-                <span className="text-[#0A4F48] font-black text-xl lg:text-xl">65% Completed</span>
+                <span className="text-[#0A4F48] font-black text-xl lg:text-xl">{todayProgress}% Completed</span>
               </div>
             </div>
 
             <div className="relative flex justify-between items-start pt-4 px-4 lg:px-8">
               {/* Connector Lines */}
               <div className="absolute top-[34px] left-16 right-16 h-1 bg-gray-100 z-0" />
-              <div className="absolute top-[34px] left-16 w-1/3 h-1 bg-[#0A4F48] z-0" />
+              <div 
+                className="absolute top-[34px] left-16 h-1 bg-[#0A4F48] z-0 transition-all duration-700 ease-in-out" 
+                style={{ width: `calc(${progressBarWidth}% - ${progressBarWidth > 0 ? "32px" : "0px"})` }}
+              />
 
-              {MEAL_LABELS.map((item, idx) => {
+              {dietTasks.map((item, idx) => {
                  const isActive = idx === selectedIndex;
-                 const isCompleted = tasks?.some(t => t.exerciseIndex === (100 + idx) && t.status === "verified");
-                 const Icon = item.icon;
+                 const isVerified = item.status === "verified";
+                 const isSkipped = item.status === "skipped";
+                 const config = getMealConfig(idx, dietTasks.length, Apple, Utensils, Moon);
+                 const Icon = config.icon;
 
                  return (
                    <div key={idx} className="flex flex-col items-center gap-4 relative z-10 w-24">
@@ -446,12 +521,15 @@ export default function DietTasksPage() {
                         className={cn(
                           "w-12 h-12 lg:w-16 lg:h-16 rounded-full flex items-center justify-center transition-all duration-300 transform",
                           isActive ? "bg-[#0A4F48] scale-115 shadow-xl shadow-[#0A4F48]/30 border-4 border-white" : 
-                          isCompleted ? "bg-[#0A4F48] text-white" : 
+                          isVerified ? "bg-[#0A4F48] text-white" :
+                          isSkipped ? "bg-orange-500 text-white" :
                           "bg-gray-100 text-gray-400 hover:bg-gray-200"
                         )}
                       >
-                        {isCompleted ? (
+                        {isVerified ? (
                           <Check size={24} strokeWidth={4} />
+                        ) : isSkipped ? (
+                          <X size={24} strokeWidth={4} />
                         ) : (
                           <Icon size={isActive ? 28 : 24} className={isActive ? "text-[#71FEE2]" : ""} />
                         )}
@@ -462,13 +540,13 @@ export default function DietTasksPage() {
                           "text-[9px] lg:text-[10px] font-black tracking-widest uppercase transition-colors",
                           isActive ? "text-[#0A4F48]" : "text-gray-400"
                         )}>
-                          {item.label}
+                          {item.name}
                         </h4>
                         <p className={cn(
                           "text-[9px] font-bold mt-1 uppercase",
                           isActive ? "text-[#0A4F48]" : "text-gray-300"
                         )}>
-                          {isActive ? "In Progress" : item.time}
+                          {isActive ? "In Progress" : config.time}
                         </p>
                       </div>
                    </div>
@@ -476,10 +554,66 @@ export default function DietTasksPage() {
               })}
             </div>
           </div>
+
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Diet Summary Card */}
+            <div className="bg-[#0A4F48] rounded-[48px] p-8 lg:p-10 shadow-2xl shadow-[#0A4F48]/20 flex flex-col gap-10 flex-1">
+              <div className="flex justify-between items-start">
+                 <h3 className="text-[#71FEE2] font-black text-[9px] uppercase tracking-[0.3em] pl-1">
+                    Diet Summary
+                 </h3>
+                 <div className="flex items-center gap-2 bg-[#71FEE2]/10 px-3 py-1 rounded-full">
+                    <span className="text-[#71FEE2] font-black text-[10px] tracking-widest uppercase">{streak}D Streak</span>
+                 </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white/10 backdrop-blur-md rounded-[32px] p-6 lg:p-7 relative overflow-hidden group border border-white/5">
+                  <h4 className="text-white/40 font-black text-[9px] uppercase tracking-widest mb-2">Meals Assigned</h4>
+                  <p className="text-white font-black text-3xl tracking-tighter">
+                    {String(complianceData?.stats?.expectedMeals || (dietTasks.length * currentGlobalDay)).padStart(2, '0')}
+                  </p>
+                  <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#71FEE2]" />
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-[32px] p-6 lg:p-7 relative overflow-hidden group border border-white/5">
+                  <h4 className="text-white/40 font-black text-[9px] uppercase tracking-widest mb-2">Non-Compliant</h4>
+                  <p className="text-white font-black text-3xl tracking-tighter">
+                     {String((complianceData?.stats?.skippedCount || 0) + (complianceData?.stats?.missedCount || 0)).padStart(2, '0')}
+                  </p>
+                  <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-red-400" />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 pl-1">
+                <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-[#71FEE2]">
+                  <TrendingUp size={20} />
+                </div>
+                <p className="text-white/90 font-black text-sm tracking-tight leading-tight">
+                  {complianceData?.stats?.expectedMeals 
+                    ? Math.round(((complianceData.stats.expectedMeals - (complianceData.stats.missedCount + complianceData.stats.skippedCount)) / complianceData.stats.expectedMeals) * 100) 
+                    : 0}% Diet Compliance
+                </p>
+              </div>
+            </div>
+
+            {/* Hydration Tip */}
+            <div className="bg-[#FFE5D2] rounded-[48px] p-8 lg:p-10 flex flex-col justify-center gap-6 group hover:translate-y-[-4px] transition-transform shadow-sm flex-1">
+              <div className="w-14 h-14 rounded-2xl bg-[#CC895B]/10 flex items-center justify-center text-[#845E47] shrink-0">
+                <Droplets size={28} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h4 className="text-[#845E47]/40 font-black text-[9px] uppercase tracking-[0.2em] mb-2">Hydration Tip</h4>
+                <p className="text-[#845E47] font-black text-[15px] lg:text-[18px] leading-snug tracking-tight">
+                  Drink 250ml of water before this meal.
+                </p>
+                <p className="text-[#845E47]/60 text-xs font-bold mt-2">Proper hydration increases metabolic efficiency by 15% during digestion.</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* =========================================
-            RIGHT COLUMN (Submission + Summary)
+            RIGHT COLUMN (Submission)
             ========================================= */}
         <div className="lg:col-span-4 flex flex-col gap-8">
           
@@ -493,14 +627,6 @@ export default function DietTasksPage() {
              </h2>
              
              <div className="flex flex-col gap-3 mt-8">
-                <div className="bg-gray-50 rounded-[28px] p-4 lg:p-5 flex items-center gap-4 border border-gray-100 transition-colors hover:bg-white hover:shadow-md cursor-default group">
-                   <div className="w-10 h-10 rounded-2xl bg-[#EAF5F4] flex items-center justify-center text-[#0A4F48] shrink-0">
-                      <CheckCircle2 size={20} strokeWidth={2.5} />
-                   </div>
-                   <p className="text-gray-600 font-bold text-xs lg:text-sm leading-snug">
-                      Validation required for AI nutrient tracking
-                   </p>
-                </div>
                 <div className="bg-gray-50 rounded-[28px] p-4 lg:p-5 flex items-center gap-4 border border-gray-100 transition-colors hover:bg-white hover:shadow-md cursor-default group">
                    <div className="w-10 h-10 rounded-2xl bg-[#EAF5F4] flex items-center justify-center text-[#0A4F48] shrink-0">
                       <Clock size={20} strokeWidth={2.5} />
@@ -550,7 +676,7 @@ export default function DietTasksPage() {
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Add optional notes (e.g. substitutions, mood...)"
-                  className="w-full rounded-[32px] border-none bg-gray-50 px-6 py-5 text-sm font-bold text-gray-700 placeholder-gray-400/60 focus:ring-0 resize-none h-32 transition-all shadow-inner"
+                  className="w-full rounded-[20px] border-none bg-gray-50 px-6 py-5 text-sm font-bold text-gray-700 placeholder-gray-400/60 focus:ring-0 resize-none h-32 transition-all shadow-inner"
                 />
 
                 <div className="flex flex-col gap-4 mt-2">
@@ -583,58 +709,8 @@ export default function DietTasksPage() {
                </div>
             )}
           </div>
-
-          {/* Diet Summary Card */}
-          <div className="bg-[#0A4F48] rounded-[48px] p-8 lg:p-10 shadow-2xl shadow-[#0A4F48]/20 flex flex-col gap-10">
-            <h3 className="text-[#71FEE2] font-black text-[9px] uppercase tracking-[0.3em] pl-1">
-               Diet Summary
-            </h3>
-            
-            <div className="grid grid-cols-2 gap-4">
-               <div className="bg-white/10 backdrop-blur-md rounded-[32px] p-6 lg:p-7 relative overflow-hidden group border border-white/5">
-                  <h4 className="text-white/40 font-black text-[9px] uppercase tracking-widest mb-2">Meals Assigned</h4>
-                  <p className="text-white font-black text-3xl tracking-tighter">24</p>
-                  <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#71FEE2]" />
-               </div>
-               <div className="bg-white/10 backdrop-blur-md rounded-[32px] p-6 lg:p-7 relative overflow-hidden group border border-white/5">
-                  <h4 className="text-white/40 font-black text-[9px] uppercase tracking-widest mb-2">Meals Skipped</h4>
-                  <p className="text-white font-black text-3xl tracking-tighter">02</p>
-                  <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-red-400" />
-               </div>
-            </div>
-
-            <div className="flex items-center gap-4 pl-1">
-               <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-[#71FEE2]">
-                  <TrendingUp size={20} />
-               </div>
-               <p className="text-white/90 font-black text-sm tracking-tight leading-tight">
-                  92% Compliance rate this<br className="hidden lg:block"/>week
-               </p>
-            </div>
-          </div>
-
-          {/* Hydration Tip */}
-          <div className="bg-[#FFE5D2] rounded-[32px] p-8 lg:p-10 flex items-center gap-6 group hover:translate-y-[-4px] transition-transform shadow-sm">
-             <div className="w-14 h-14 rounded-2xl bg-[#CC895B]/10 flex items-center justify-center text-[#845E47] shrink-0">
-                <Droplets size={28} strokeWidth={2.5} />
-             </div>
-             <div>
-                <h4 className="text-[#845E47]/40 font-black text-[9px] uppercase tracking-[0.2em] mb-2">Hydration Tip</h4>
-                <p className="text-[#845E47] font-black text-[13px] lg:text-[14px] leading-snug tracking-tight">
-                   Drink 250ml of water before this meal.
-                </p>
-             </div>
-          </div>
         </div>
       </div>
-      
-      {/* Page Footer */}
-      <div className="w-full text-center pb-20 mt-12">
-         <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">
-            Precision Wellness Protocol © 2024 Vitalist Pro System
-         </p>
-      </div>
-
       <MobileBottomNav />
 
       {/* Skip Confirmation Modal */}
