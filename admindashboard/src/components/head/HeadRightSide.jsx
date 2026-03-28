@@ -9,14 +9,14 @@ const HeadRightSide = ({ dashboardData }) => {
     const defaultPerf = { programs: 30, experts: 45, clients: 25 };
     const adminPerf = dashboardData?.adminPerformance;
 
-    const total = adminPerf.programs + adminPerf.experts + adminPerf.clients;
+    const total = adminPerf?.programs + adminPerf?.experts + adminPerf?.clients;
 
     const toPercent = (val) =>
       total > 0 ? Math.round((val / total) * 100) : 0;
 
-    const programsPct = toPercent(adminPerf.programs);
-    const expertsPct = toPercent(adminPerf.experts);
-    const clientsPct = toPercent(adminPerf.clients);
+    const programsPct = toPercent(adminPerf?.programs);
+    const expertsPct = toPercent(adminPerf?.experts);
+    const clientsPct = toPercent(adminPerf?.clients);
 
     // Use expertPerformance.taskCompletion as the center average compliance score
     // If no data, use a placeholder for visual demonstration
