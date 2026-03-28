@@ -69,7 +69,7 @@ export default function Modal({ expert, onClose, fetchFeedbackData }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end lg:justify-end lg:flex-row">
+    <div className="fixed inset-0 z-60 flex flex-col justify-end lg:justify-end lg:flex-row">
       {/* Blurred backdrop */}
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-sm"
