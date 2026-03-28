@@ -161,7 +161,7 @@ export default function BaseForm({
           enableReinitialize={enableReinitialize}
         >
           {() => (
-            <Form className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+            <Form className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start pb-28 sm:pb-0">
               {/* Left Column - Main Details */}
               <div className="xl:col-span-2 flex flex-col gap-6">
                 {fields
@@ -169,7 +169,7 @@ export default function BaseForm({
                   .map((section, index) => (
                     <div
                       key={index}
-                      className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden"
+                      className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-visible"
                     >
                       <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-3">
                         <div className="w-1 h-4 bg-[#0A4F48] rounded-full"></div>
@@ -213,7 +213,7 @@ export default function BaseForm({
                     .map((section, index) => (
                       <div
                         key={index}
-                        className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden"
+                        className="bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-visible"
                       >
                         <div className="px-5 py-3 border-b border-slate-100 bg-slate-50/30 flex items-center gap-2">
                           <div className="w-1.5 h-1.5 bg-orange-400 rounded-full"></div>
@@ -245,7 +245,7 @@ export default function BaseForm({
                 <button
                   id="base-form-submit"
                   type="submit"
-                  className="flex-[2] py-3 px-4 rounded-xl bg-[#0A4F48] text-white font-bold text-sm shadow-lg shadow-[#0A4F48]/20"
+                  className="flex-2 py-3 px-4 rounded-xl bg-[#0A4F48] text-white font-bold text-sm shadow-lg shadow-[#0A4F48]/20"
                 >
                   Save
                 </button>
