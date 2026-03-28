@@ -13,7 +13,6 @@ import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
 import {
   fetchClientComplianceStats,
   getClient,
-  fetchClientAdherenceStreaks,
 } from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { SyncLoader } from "react-spinners";
@@ -187,7 +186,7 @@ export default function Dashboard() {
         </div>
 
         {/* Sidebar Column (Desktop Only) */}
-        <div className="hidden lg:flex flex-col gap-10">
+        <div className="hidden lg:flex flex-col gap-10 sticky top-8 max-h-[calc(100vh-4rem)] overflow-y-auto no-scrollbar">
           <DietPlanCard
             dietPlanPdf={clientUser?.dietPlanPdf || user?.dietPlanPdf}
           />
