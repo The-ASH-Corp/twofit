@@ -79,7 +79,6 @@ export const deleteHead = async (req, res) => {
 export const getDashboardData = async (req, res) => {
   try {
     const { duration } = req.query;
-    console.log(req.params.id);
     const head = await headService.getDashboardData(req.params.id, duration);
     res.status(200).json({
       success: true,

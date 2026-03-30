@@ -18,7 +18,6 @@ export const updateSOP = async (id, updatedData) => {
 
 export const deactivate = async (id) => {
    const data = await SOP.updateOne({ _id: id }, { status: "Inactive" }, { new: true });
-   console.log(data)
    return data
 };
 

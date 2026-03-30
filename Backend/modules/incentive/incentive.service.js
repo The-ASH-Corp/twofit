@@ -39,8 +39,6 @@ export const calculateExtraClientIncentive = async (coachId) => {
     "assignedUsers maxClient ratingIncentiveAmount"
   );
 
-  console.log(coach)
-
   if (!coach) return;
 
   const payroll = await incentiveModel.findOne({

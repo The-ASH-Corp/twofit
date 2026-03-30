@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import BaseTable from '../../../components/table/BaseTable'
 import { AdminColumns } from './AdminColumns'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getAdminsByHeadId } from '@/redux/features/admins/admin.thunk';
 import { useAppSelector } from '@/redux/store/hooks';
 import { selectUser } from '@/redux/features/auth/auth.selectores';
 import { SyncLoader } from 'react-spinners';
+import { getAdminError, getAdminStatus } from '@/redux/features/admins/admins.selecters';
 
 export default function AdminsList() {
 
@@ -15,6 +16,8 @@ export default function AdminsList() {
   const [totalCount,setTotalCount]=useState(0)
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+    const status = useSelector(getAdminStatus);
+    const error = useSelector(getAdminError);
 
   const dispatch = useDispatch();
   const fetchAdminData=async()=>{
@@ -52,7 +55,8 @@ export default function AdminsList() {
     fetchAdminData();
   }, [page, limit]);
 
-  if (admins.length<=0) return (
+  if (status === "loading")
+    return (
       <div className="flex justify-center items-center h-[calc(100vh-120px)]">
         <SyncLoader color="#0A4F48" loading margin={2} size={20} />
       </div>

@@ -2,9 +2,10 @@ import BaseTable from "@/components/table/BaseTable";
 import React, { useEffect, useState } from "react";
 import { therapyColumns } from "./Therapycolumns";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchTherapyPlans } from "@/redux/features/therapy/therapy.thunk";
 import { SyncLoader } from "react-spinners";
+import { selectTherapyError, selectTherapyLoading } from "@/redux/features/therapy/therapy.selectors";
 
 const TherapyTable = () => {
   const navigate = useNavigate();
@@ -13,6 +14,9 @@ const TherapyTable = () => {
 
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(false);
+
+    const status = useSelector(selectTherapyLoading);
+    const error = useSelector(selectTherapyError);
 
   useEffect(() => {
     const loadPlans = async () => {
@@ -29,11 +33,12 @@ const TherapyTable = () => {
 
     loadPlans();
   }, [dispatch]);
-if (plans.length<=0) return (
-      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
-        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
-      </div>
-    );
+if (status === "loading")
+  return (
+    <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+      <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+    </div>
+  );
   return (
     <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable

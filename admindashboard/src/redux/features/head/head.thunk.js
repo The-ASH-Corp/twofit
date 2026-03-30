@@ -145,7 +145,6 @@ export const getHeadPerformance = createAsyncThunk(
       const response = await axiosInstance.get(
         `heads/performance/${headId}`,
       );
-      console.log(response.data)
       return response.data;
     } catch (error) {
       return rejectWithValue(
