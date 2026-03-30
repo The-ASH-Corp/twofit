@@ -17,11 +17,19 @@ export default function ExpertTable() {
   const [coaches,setCoaches]=useState([])
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
+    const [loading, setLoading] = useState(false);
   
   const dispatch = useDispatch();
   const fetchCoachData=async()=>{
-    const coache =await dispatch(getAllCoachesByHead({page,limit,headId:user?._id})).unwrap()
-    setCoaches(coache.data)
+    setLoading(true);
+    try {
+      const coache =await dispatch(getAllCoachesByHead({page,limit,headId:user?._id})).unwrap()
+      setCoaches(coache.data)
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   }
 
   const handlePageChange = (newPage) => {
@@ -51,13 +59,12 @@ export default function ExpertTable() {
 
   useEffect(() => {
     fetchCoachData();
-  }, []);
-   if (status === "loading")
-     return (
-       <div className="flex justify-center items-center h-[calc(100vh-120px)]">
-         <SyncLoader color="#0A4F48" loading margin={2} size={20} />
-       </div>
-     );
+  }, [page, limit]);
+   if (loading) return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+      </div>
+    );
   return (
     <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable

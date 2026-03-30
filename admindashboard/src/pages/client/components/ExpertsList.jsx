@@ -38,19 +38,19 @@ export default function ExpertsList({ expert }) {
   };
 
   return (
-    <div className="bg-white p-8 rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col gap-6 group transition-all duration-300 hover:shadow-lg">
+    <div className="bg-white p-5 sm:p-6 md:p-8 rounded-3xl md:rounded-4xl shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col gap-5 sm:gap-6 group transition-all duration-300 hover:shadow-lg">
       <h3 className="text-gray-400 font-black text-[15px] uppercase tracking-widest">
         Your Experts
       </h3>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4 sm:gap-5 md:gap-6">
         {experts.map((exp, index) => (
           <div 
             key={index} 
             className="flex items-center justify-between group/row"
           >
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-transparent group-hover/row:border-[#0A4F48]/10 transition-all shadow-sm">
+              <div className="w-12 h-12 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-full overflow-hidden border-2 border-transparent group-hover/row:border-[#0A4F48]/10 transition-all shadow-sm">
                 <img
                   src={getExpertImage(exp)}
                   alt={exp.name}
@@ -58,7 +58,7 @@ export default function ExpertsList({ expert }) {
                 />
               </div>
               <div className="flex flex-col">
-                <p className="text-[15px] font-black text-gray-800 leading-none mb-1">
+                <p className="text-[14px] sm:text-[15px] font-black text-gray-800 leading-none mb-1">
                   {exp.user?.name || exp.name}
                 </p>
                 <p className="text-[10px] font-black text-[#0A4F48] uppercase tracking-widest leading-none opacity-80">

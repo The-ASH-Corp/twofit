@@ -1,13 +1,76 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { Droplets } from "lucide-react";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useAppSelector } from "@/redux/store/hooks";
 import { fetchWaterIntake, upsertWaterIntake } from "@/redux/features/tasks/task.thunk";
 
+// Seeded pseudo-random for stable SSR/hydration-safe positions
+const PARTICLE_CONFIG = [
+  { x: -60, delay: 0,    dur: 1.6 },
+  { x: -40, delay: 0.1,  dur: 1.9 },
+  { x: -20, delay: 0.2,  dur: 1.7 },
+  { x:   0, delay: 0.05, dur: 2.0 },
+  { x:  20, delay: 0.15, dur: 1.8 },
+  { x:  40, delay: 0.25, dur: 1.65 },
+  { x:  60, delay: 0.08, dur: 1.75 },
+  { x: -50, delay: 0.3,  dur: 1.55 },
+  { x:  50, delay: 0.18, dur: 1.85 },
+  { x: -30, delay: 0.35, dur: 2.0 },
+  { x:  30, delay: 0.12, dur: 1.7 },
+  { x:  10, delay: 0.28, dur: 1.9 },
+];
+
+function HydrationCelebration({ onDone }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 3500);
+    return () => clearTimeout(t);
+  }, [onDone]);
+
+  return (
+    <div className="fixed inset-0 z-9999 flex items-center justify-center pointer-events-none">
+      {/* Dimmed backdrop */}
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px] animate-hydration-fade-out" />
+
+      {/* Floating drops */}
+      {PARTICLE_CONFIG.map((p, i) => (
+        <div
+          key={i}
+          className="absolute animate-hydration-float-up"
+          style={{
+            bottom: "48%",
+            left: `calc(50% + ${p.x}px)`,
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.dur}s`,
+          }}
+        >
+          <Droplets
+            size={i % 3 === 0 ? 28 : i % 3 === 1 ? 20 : 14}
+            className="text-[#0A4F48] fill-[#0A4F48] opacity-90"
+          />
+        </div>
+      ))}
+
+      {/* Celebration card */}
+      <div className="relative animate-hydration-burst animate-hydration-fade-out bg-white rounded-[28px] px-10 py-8 shadow-2xl flex flex-col items-center gap-3 pointer-events-auto">
+        <div className="w-16 h-16 rounded-full bg-[#E6FFFA] flex items-center justify-center mb-1">
+          <Droplets size={32} className="text-[#0A4F48] fill-[#0A4F48]" />
+        </div>
+        <p className="text-[22px] font-black text-gray-800 tracking-tight text-center leading-snug">
+          Hydration Goal<br />Achieved! 💧
+        </p>
+        <p className="text-[13px] font-semibold text-gray-400 uppercase tracking-widest text-center">
+          2.5L today — well done!
+        </p>
+      </div>
+    </div>
+  );
+}
+
 const WaterIntake = () => {
   const [waterStepMl, setWaterStepMl] = useState(250);
   const [isWaterSyncing, setIsWaterSyncing] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
@@ -30,16 +93,28 @@ const WaterIntake = () => {
   const syncWaterIntake = async (nextIntake) => {
     if (!user?._id || isWaterSyncing) return;
     setIsWaterSyncing(true);
-    await dispatch(
-      upsertWaterIntake({
-        waterIntakeMl: Math.max(0, nextIntake),
-        globalDayIndex: currentGlobalDay,
-      })
-    ).unwrap().finally(() => setIsWaterSyncing(false));
+    try {
+      const result = await dispatch(
+        upsertWaterIntake({
+          waterIntakeMl: Math.max(0, nextIntake),
+          globalDayIndex: currentGlobalDay,
+        })
+      ).unwrap();
+      if (result?.goalJustAchieved) {
+        setShowCelebration(true);
+      }
+    } catch (_) {
+      // silently ignore
+    } finally {
+      setIsWaterSyncing(false);
+    }
   };
 
   const handleAddWater = () => syncWaterIntake(waterIntakeMl + waterStepMl);
   const handleRemoveWater = () => syncWaterIntake(waterIntakeMl - waterStepMl);
+  const dismissCelebration = useCallback(() => setShowCelebration(false), []);
+
+  const isGoalComplete = waterProgressPercent >= 100;
 
   // SVG ring params — shared between mobile & desktop
   const mobileR = 72;
@@ -52,6 +127,7 @@ const WaterIntake = () => {
 
   return (
     <div className="bg-white rounded-[40px] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-gray-50 overflow-hidden">
+      {showCelebration && <HydrationCelebration onDone={dismissCelebration} />}
 
       {/* ── MOBILE LAYOUT ── */}
       <div className="flex flex-col items-center p-8 gap-8 md:hidden relative">
@@ -63,7 +139,7 @@ const WaterIntake = () => {
 
         {/* Circular Ring */}
         <div className="relative w-48 h-48 flex items-center justify-center">
-          <svg className="w-full h-full -rotate-90">
+          <svg className={`w-full h-full -rotate-90 ${isGoalComplete ? "animate-hydration-ring-glow" : ""}`}>
             <circle
               cx="96"
               cy="96"
@@ -75,7 +151,7 @@ const WaterIntake = () => {
               cx="96"
               cy="96"
               r={mobileR}
-              stroke="#0A4F48"
+              stroke={isGoalComplete ? "#059669" : "#0A4F48"}
               fill="none"
               strokeWidth="12"
               strokeDasharray={mobileCir}
@@ -89,8 +165,8 @@ const WaterIntake = () => {
               {(waterIntakeMl / 1000).toFixed(1)}
               <span className="text-[20px] font-bold"> L</span>
             </p>
-            <p className="text-[11px] font-bold text-gray-400 mt-1 uppercase tracking-widest">
-              of {(waterGoalMl / 1000).toFixed(1)}L
+            <p className={`text-[11px] font-bold mt-1 uppercase tracking-widest ${isGoalComplete ? "text-emerald-600" : "text-gray-400"}`}>
+              {isGoalComplete ? "Goal reached!" : `of ${(waterGoalMl / 1000).toFixed(1)}L`}
             </p>
           </div>
         </div>
@@ -130,13 +206,13 @@ const WaterIntake = () => {
       <div className="hidden md:flex items-center gap-12 p-10 relative overflow-hidden">
         {/* Large Circular Ring */}
         <div className="relative w-56 h-56 flex items-center justify-center shrink-0">
-          <svg className="w-full h-full -rotate-90">
+          <svg className={`w-full h-full -rotate-90 ${isGoalComplete ? "animate-hydration-ring-glow" : ""}`}>
             <circle cx="112" cy="112" r={desktopR} className="stroke-[#EBF3F2] fill-none" strokeWidth="14" />
             <circle
               cx="112"
               cy="112"
               r={desktopR}
-              stroke="#0A4F48"
+              stroke={isGoalComplete ? "#059669" : "#0A4F48"}
               fill="none"
               strokeWidth="14"
               strokeDasharray={desktopCir}
@@ -146,10 +222,12 @@ const WaterIntake = () => {
             />
           </svg>
           <div className="absolute flex flex-col items-center">
-            <p className="text-[44px] font-black text-gray-800 leading-none tracking-tighter">
+            <p className={`text-[44px] font-black leading-none tracking-tighter ${isGoalComplete ? "text-emerald-600" : "text-gray-800"}`}>
               {waterProgressPercent}%
             </p>
-            <p className="text-[12px] font-black text-gray-400 mt-1 uppercase tracking-[0.2em]">Hydration</p>
+            <p className={`text-[12px] font-black mt-1 uppercase tracking-[0.2em] ${isGoalComplete ? "text-emerald-500" : "text-gray-400"}`}>
+              {isGoalComplete ? "Complete!" : "Hydration"}
+            </p>
           </div>
         </div>
 

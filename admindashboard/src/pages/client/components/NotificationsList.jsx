@@ -10,7 +10,7 @@ export default function NotificationsList() {
   const { notifications, loading } = useRecentNotifications(4);
 
   return (
-    <div className="bg-white p-8 rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col gap-6 group transition-all duration-300 hover:shadow-lg">
+    <div className="bg-white p-5 sm:p-6 md:p-8 rounded-3xl md:rounded-4xl shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col gap-5 sm:gap-6 group transition-all duration-300 hover:shadow-lg">
       <div className="flex justify-between items-center">
         <h3 className="text-gray-400 font-black text-[15px] uppercase tracking-widest leading-none">
           Recent Activities
@@ -20,7 +20,7 @@ export default function NotificationsList() {
         </button>
       </div>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4 sm:gap-5 md:gap-6">
         {loading ? (
           <div className="flex items-center gap-4 animate-pulse">
             <div className="w-10 h-10 bg-gray-100 rounded-full" />
@@ -30,7 +30,7 @@ export default function NotificationsList() {
             </div>
           </div>
         ) : notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-6 text-center bg-gray-50 rounded-[24px] border border-dashed border-gray-200">
+          <div className="flex flex-col items-center justify-center p-6 text-center bg-gray-50 rounded-3xl border border-dashed border-gray-200">
              <Bell size={24} className="text-gray-200 mb-2" />
              <p className="text-[12px] font-bold text-gray-400 uppercase tracking-widest">No activities</p>
           </div>
@@ -42,7 +42,7 @@ export default function NotificationsList() {
             return (
               <div key={notification._id} className="flex gap-4 items-start group/item cursor-pointer">
                 <div
-                  className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center shadow-sm transition-transform group-hover/item:scale-110 ${bgClass}`}
+                  className={`w-10 h-10 rounded-full shrink-0 flex items-center justify-center shadow-sm transition-transform group-hover/item:scale-110 ${bgClass}`}
                 >
                   <Bell 
                     size={16} 

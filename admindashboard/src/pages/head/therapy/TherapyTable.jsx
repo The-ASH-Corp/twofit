@@ -22,7 +22,9 @@ const TherapyTable = () => {
     const loadPlans = async () => {
       setLoading(true);
       try {
-        const data = await dispatch(fetchTherapyPlans({page: 1, limit: 100})).unwrap();
+        const data = await dispatch(
+          fetchTherapyPlans({ page: 1, limit: 100 }),
+        ).unwrap();
         setPlans(data.data.therapy);
       } catch (error) {
         console.error(error);
@@ -33,12 +35,12 @@ const TherapyTable = () => {
 
     loadPlans();
   }, [dispatch]);
-if (status === "loading")
-  return (
-    <div className="flex justify-center items-center h-[calc(100vh-120px)]">
-      <SyncLoader color="#0A4F48" loading margin={2} size={20} />
-    </div>
-  );
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+      </div>
+    );
   return (
     <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable

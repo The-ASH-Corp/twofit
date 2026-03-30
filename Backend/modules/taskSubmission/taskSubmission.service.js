@@ -712,6 +712,7 @@ export const createMultipleWorkoutSubmissions = async (submissionData) => {
 };
 
 export const upsertWaterIntakeForDay = async ({ userId, waterIntakeMl, globalDayIndex }) => {
+    const WATER_GOAL_ML = 2500;
     const intake = Number(waterIntakeMl);
     if (!Number.isFinite(intake) || intake < 0) {
         throw new Error("waterIntakeMl must be a non-negative number");
@@ -733,8 +734,10 @@ export const upsertWaterIntakeForDay = async ({ userId, waterIntakeMl, globalDay
     const now = new Date();
 
     let userSubmission = await TaskSubmission.findOne({ userId });
+    let goalJustAchieved = false;
 
     if (!userSubmission) {
+        const achievedNow = roundedIntake >= WATER_GOAL_ML;
         userSubmission = new TaskSubmission({
             userId,
             programId: mongoose.Types.ObjectId.isValid(user.programType)
@@ -746,27 +749,41 @@ export const upsertWaterIntakeForDay = async ({ userId, waterIntakeMl, globalDay
                 dayIndex,
                 waterIntakeMl: roundedIntake,
                 waterIntakeUpdatedAt: now,
+                hydrationGoalAchievedAt: achievedNow ? now : null,
                 exercises: [],
             }],
         });
+        goalJustAchieved = achievedNow;
     } else {
         let day = userSubmission.dailySubmissions.find(
             (entry) => entry.globalDayIndex === dayToUpdate
         );
 
         if (!day) {
+            const achievedNow = roundedIntake >= WATER_GOAL_ML;
             userSubmission.dailySubmissions.push({
                 globalDayIndex: dayToUpdate,
                 weekIndex,
                 dayIndex,
                 waterIntakeMl: roundedIntake,
                 waterIntakeUpdatedAt: now,
+                hydrationGoalAchievedAt: achievedNow ? now : null,
                 exercises: [],
             });
             day = userSubmission.dailySubmissions[userSubmission.dailySubmissions.length - 1];
+            goalJustAchieved = achievedNow;
         } else {
+            const wasAlreadyAchieved = !!day.hydrationGoalAchievedAt;
+            const isNowAchieved = roundedIntake >= WATER_GOAL_ML;
             day.waterIntakeMl = roundedIntake;
             day.waterIntakeUpdatedAt = now;
+            if (isNowAchieved && !wasAlreadyAchieved) {
+                day.hydrationGoalAchievedAt = now;
+                goalJustAchieved = true;
+            } else if (!isNowAchieved) {
+                // Reset if user removes water below goal
+                day.hydrationGoalAchievedAt = null;
+            }
         }
 
         if (!userSubmission.programId && mongoose.Types.ObjectId.isValid(user.programType)) {
@@ -783,6 +800,7 @@ export const upsertWaterIntakeForDay = async ({ userId, waterIntakeMl, globalDay
         dayIndex,
         waterIntakeMl: roundedIntake,
         waterIntakeUpdatedAt: now,
+        goalJustAchieved,
     };
 };
 
