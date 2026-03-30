@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import BaseTable from "../../../components/table/BaseTable";
 import { ClientColumns } from "./ClientColumns";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import {
   selectClientError,
+  selectClientStatus,
 } from "@/redux/features/client/client.selectors";
 import { useNavigate } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
@@ -13,6 +14,7 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 export default function ClientsTable() {
   const user =useAppSelector(selectUser)
+    const status = useSelector(selectClientStatus);
   const navigate = useNavigate();
   const error = useAppSelector(selectClientError);
   const [clients, setClients] = useState([]);
@@ -56,11 +58,12 @@ export default function ClientsTable() {
     fetchClientData();
   }, [page, limit, dispatch]);
 
-  if (clients.length<=0) return (
-        <div className="flex justify-center items-center h-[calc(100vh-120px)]">
-          <SyncLoader color="#0A4F48" loading margin={2} size={20} />
-        </div>
-      );
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+      </div>
+    );
   if (error) return <p>{error}</p>;
 
   return (

@@ -9,7 +9,6 @@ export const createHead = async (req, res) => {
       total: totalCount,
     });
   } catch (error) {
-
     res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -93,40 +92,74 @@ export const getDashboardData = async (req, res) => {
 export const getAllCoachesByHead = async (req, res) => {
   try {
     const { headId, page, limit } = req.params;
-    const { coaches, totalCount } = await headService.getAllCoachesByHead(headId, page, limit);
+    const { coaches, totalCount } = await headService.getAllCoachesByHead(
+      headId,
+      page,
+      limit,
+    );
     res.status(200).json({
       success: true,
       data: coaches,
       total: totalCount,
     });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message })
+    res.status(400).json({ success: false, message: error.message });
   }
-}
+};
 
 export const getAllUsersByHead = async (req, res) => {
   try {
     const { headId, page, limit } = req.params;
-    const { users, totalCount } = await headService.getAllUsersByHead(headId, page, limit);
+    const { users, totalCount } = await headService.getAllUsersByHead(
+      headId,
+      page,
+      limit,
+    );
     res.status(200).json({
       success: true,
       data: users,
       total: totalCount,
     });
   } catch (error) {
-    res.status(400).json({ success: false, message: error.message })
+    res.status(400).json({ success: false, message: error.message });
   }
-}
+};
 
 export const founderHeadList = async (req, res) => {
   try {
     const { page, limit } = req.params;
-    const list = await headService.founderHeadList(page, limit)
+    const list = await headService.founderHeadList(page, limit);
     res.status(200).json({
       success: "true1",
       data: list,
-    })
+    });
   } catch (error) {
     res.status(400).json({ success: false, message: error.message });
   }
-}
+};
+
+export const getHeadPerformance = async (req, res) => {
+  try {
+    const { Id } = req.params;
+
+    if (!Id) {
+      return res.status(400).json({
+        success: false,
+        message: "Head ID is required",
+      });
+    }
+
+    const data = await headService.getHeadPerformance(Id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Dashboard data fetched successfully",
+      data,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

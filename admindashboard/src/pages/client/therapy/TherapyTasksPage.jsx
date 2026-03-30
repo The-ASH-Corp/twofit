@@ -1,7 +1,27 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
-import { Brain, CheckCircle2, Lock, PlayCircle, Upload } from "lucide-react";
+import { 
+  Brain, 
+  CheckCircle2, 
+  Lock, 
+  PlayCircle, 
+  Upload, 
+  Wind, 
+  Accessibility, 
+  PenLine, 
+  Settings, 
+  Maximize, 
+  Play, 
+  Check, 
+  Circle, 
+  Camera, 
+  Lightbulb, 
+  Timer,
+  Info,
+  Clock,
+  Sparkles,
+  ChevronRight,
+  MoreVertical,
+  Volume2
+} from "lucide-react";
 import { SyncLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import { useAppSelector } from "@/redux/store/hooks";
@@ -14,6 +34,9 @@ import {
   uploadMultipleWorkoutTasks,
 } from "@/redux/features/tasks/task.thunk";
 import MobileBottomNav from "../components/MobileBottomNav";
+import { cn } from "@/lib/utils";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 
 export default function TherapyTasksPage() {
   const dispatch = useDispatch();
@@ -99,6 +122,15 @@ export default function TherapyTasksPage() {
             task.taskType === "Therapy",
         );
 
+        // Helper for icons based on therapy name/type
+        const getIcon = (name) => {
+          const n = name?.toLowerCase() || "";
+          if (n.includes("breath")) return Wind;
+          if (n.includes("stretch")) return Accessibility;
+          if (n.includes("journal")) return PenLine;
+          return Brain;
+        };
+
         return {
           name: therapy.type || `Therapy ${index + 1}`,
           notes: therapy.notes,
@@ -111,6 +143,11 @@ export default function TherapyTasksPage() {
           weekIndex: todayTherapy.weekIndex,
           dayIndex: todayTherapy.dayIndex,
           globalDayIndex: currentGlobalDay,
+          icon: getIcon(therapy.type),
+          duration: therapy.duration || "15 mins", // Mocked or from DB
+          focus: therapy.focus || "Section focus note", // Mocked or from DB
+          technique: therapy.technique || "Cognitive Reframing",
+          impact: therapy.impact || "High Precision"
         };
       }) || []
     );
@@ -297,230 +334,272 @@ export default function TherapyTasksPage() {
   }
 
   return (
-    <>
-      <div className="w-full grid lg:grid-cols-[1.5fr_1fr] grid-cols-1 gap-6 p-4 lg:p-2 pb-24 lg:pb-2">
-        <div className="bg-white rounded-2xl shadow-sm p-4 lg:p-6 border border-[#0A4F48]/10">
-          <div className="flex items-center justify-between gap-3 mb-4">
-            <div>
-              <h1 className="text-[#0A4F48] font-bold text-xl">Therapy</h1>
-              <p className="text-sm text-gray-500">Day {currentGlobalDay} therapy videos</p>
-            </div>
-            {overallTherapyStatus !== "todo" && (
-              <span
-                className={`text-xs font-bold px-3 py-1 rounded-full border ${statusConfig[overallTherapyStatus].pillClass}`}
-              >
-                {statusConfig[overallTherapyStatus].label}
+    <div className="bg-[#F8FBFA] min-h-screen pb-32">
+      <div className="max-w-[1400px] mx-auto p-4 lg:p-10">
+        
+        {/* Header Section */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
+          <div>
+            <h1 className="text-[#0A4F48] font-black text-3xl lg:text-4xl tracking-tight">
+              Day {currentGlobalDay} Therapy Videos
+            </h1>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <div className="bg-[#0A4F48] text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg">
+              <Sparkles size={16} className="text-[#71FEE2]" />
+              <span className="text-[11px] font-black tracking-widest uppercase">
+                {watchedVideos.size}/{therapyTasks.length} Tasks
               </span>
-            )}
-            <Link
-              to="/client"
-              className="text-xs font-bold text-[#0A4F48] hover:text-[#083b36]"
-            >
-              Back to Dashboard
-            </Link>
-          </div>
-
-          <div className="rounded-2xl overflow-hidden border border-gray-100 bg-black">
-            {selectedTask?.mediaUrl ? (
-              <video
-                key={selectedIndex}
-                 controls
-                 onEnded={handleVideoEnd}
-                 className="w-full aspect-video"
-                 src={selectedTask.mediaUrl?.replace(/^http:\/\//i, "https://")}
-               >
-                Your browser does not support the video tag.
-              </video>
-            ) : (
-              <div className="aspect-video w-full bg-linear-to-br from-[#0A4F48] to-[#116D63] text-white flex flex-col items-center justify-center gap-2">
-                <PlayCircle size={36} />
-                <p className="text-sm font-semibold">No video available for this task</p>
-              </div>
-            )}
-          </div>
-
-          <div className="mt-4 bg-[#F8FAFC] rounded-xl p-3 border border-gray-100">
-            <h2 className="text-[#0A4F48] font-bold text-sm">Current Task</h2>
-            <p className="text-gray-700 font-semibold text-sm mt-1">{selectedTask?.name || "No therapy task"}</p>
-            <p className="text-gray-500 text-xs mt-1">{selectedTask?.notes || "Follow the therapist instructions from the assigned material."}</p>
-          </div>
-
-          <button
-            onClick={openNextVideo}
-            disabled={selectedIndex >= therapyTasks.length - 1 || !watchedVideos.has(selectedIndex)}
-            className="mt-4 bg-[#0A4F48] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl px-4 py-2 text-sm font-semibold"
-          >
-            Play Next Video
-          </button>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-sm p-4 lg:p-6 border border-[#0A4F48]/10 h-fit">
-          <h2 className="text-[#0A4F48] font-bold text-base mb-3">Therapy Tasks</h2>
-          <p className="text-xs text-gray-500 mb-4">Videos unlock one by one after finishing the previous video.</p>
-
-          <div className="space-y-2">
-            {therapyTasks.length ? (
-              therapyTasks.map((task, idx) => {
-                const unlocked = isUnlocked(idx);
-                const active = idx === selectedIndex;
-
-                return (
-                  <button
-                    key={`${task.name}-${idx}`}
-                    onClick={() => handleTaskClick(idx)}
-                    className={`w-full text-left rounded-xl border px-3 py-2.5 transition-colors ${
-                      active
-                        ? "border-[#0A4F48] bg-[#E6EEED]"
-                        : "border-gray-200 bg-white hover:bg-gray-50"
-                    } ${!unlocked ? "opacity-70" : ""}`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="font-semibold text-sm text-[#0A4F48] truncate">{task.name || `Therapy ${idx + 1}`}</p>
-                        <p className="text-[11px] text-gray-500 uppercase mt-0.5">{task.status || "todo"}</p>
-                      </div>
-
-                      {!unlocked ? (
-                        <Lock size={15} className="text-gray-400 shrink-0" />
-                      ) : (
-                        <PlayCircle size={16} className="text-[#0A4F48] shrink-0" />
-                      )}
-                    </div>
-                  </button>
-                );
-              })
-            ) : (
-              <div className="rounded-xl border border-dashed border-gray-200 p-4 text-center text-sm text-gray-500">
-                No therapy tasks available for today.
-              </div>
-            )}
-          </div>
-
-          <div className="mt-4 rounded-xl bg-[#F4DBC7]/50 p-3 border border-[#F4DBC7]">
-            <div className="flex items-center gap-2">
-              <Brain size={15} className="text-[#0A4F48]" />
-              <p className="text-xs font-semibold text-[#0A4F48]">Progress</p>
             </div>
-            <p className="text-xs text-gray-600 mt-1">
-              Watched {watchedVideos.size}/{therapyTasks.length} videos in sequence.
-            </p>
           </div>
         </div>
-      </div>
 
- 
-       {shouldShowSubmissionForm && (
-        <div className="mx-4 lg:mx-2 mb-8">
-          <div className="bg-white rounded-4xl shadow-xl shadow-[#0A4F48]/5 border border-[#0A4F48]/10 overflow-hidden">
-            <div className="bg-[#0A4F48] p-6 text-white">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center shrink-0">
-                  <CheckCircle2 size={24} className="text-white" />
+        <div className="grid lg:grid-cols-12 gap-10">
+          
+          {/* LEFT COLUMN: Video + Current Task Detail */}
+          <div className="lg:col-span-8 flex flex-col gap-8">
+            
+            {/* Custom Video Player UI */}
+            <div className="relative w-full aspect-video rounded-[40px] overflow-hidden bg-black shadow-2xl group">
+              {selectedTask?.mediaUrl ? (
+                <video
+                  key={selectedIndex}
+                  onEnded={handleVideoEnd}
+                  className="w-full h-full object-cover"
+                  src={selectedTask.mediaUrl?.replace(/^http:\/\//i, "https://")}
+                >
+                  Your browser does not support the video tag.
+                </video>
+              ) : (
+                <div className="w-full h-full bg-linear-to-br from-[#0A4F48] to-[#116D63] text-white flex flex-col items-center justify-center gap-4">
+                  <PlayCircle size={60} className="opacity-40 animate-pulse" />
+                  <p className="text-lg font-black tracking-tight opacity-70">No video assigned for this task</p>
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold">Therapy Complete</h2>
-                  <p className="text-white/70 text-sm">Review your session and upload your completion proof</p>
+              )}
+
+              {/* Custom Controls Overlay (Simulation) */}
+              <div className="absolute bottom-6 left-6 right-6 z-10 flex items-center gap-4 group-hover:opacity-100 transition-opacity">
+                <button className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+                  <Play size={16} fill="white" />
+                </button>
+                <div className="flex-1 h-1.5 bg-white/30 rounded-full overflow-hidden backdrop-blur-sm">
+                  <div className="h-full bg-[#10B981] rounded-full w-[40%]" />
+                </div>
+                <div className="flex items-center gap-4 text-white font-bold text-[11px] font-mono">
+                  <span>04:20 / 12:00</span>
+                  <Volume2 size={16} />
+                  <Maximize size={16} />
                 </div>
               </div>
             </div>
 
-            <div className="p-6 lg:p-8">
-              <div className="grid md:grid-cols-2 gap-6 mb-8">
-                <div>
-                  <label className="text-sm font-bold text-[#0A4F48] mb-2 flex items-center gap-2">
-                    Notes <span className="text-[10px] font-normal text-gray-400 uppercase tracking-wider">(Optional)</span>
-                  </label>
-                  <textarea
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    rows={4}
-                    placeholder="How did the therapy session feel? Any breakthrough or observations?"
-                    className="w-full rounded-2xl border-2 border-gray-100 bg-gray-50/30 px-4 py-3 text-sm text-gray-700 resize-none focus:outline-none focus:border-[#0A4F48]/30 focus:bg-white transition-all outline-hidden"
-                  />
+            {/* Current Task Detail Card */}
+            <div className="bg-white rounded-[40px] p-8 lg:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 relative overflow-hidden">
+              <div className="flex flex-col lg:flex-row justify-between items-start gap-6 mb-8 relative z-10">
+                <div className="flex-1">
+                  <h2 className="text-[#0A4F48] font-black text-2xl lg:text-3xl tracking-tighter mb-4">
+                    Current Task: {selectedTask?.name}
+                  </h2>
+                  <p className="text-gray-500 font-bold leading-relaxed text-sm lg:text-base max-w-2xl">
+                    {selectedTask?.notes || "In this session, we reflect on the physical sensations experienced during the breathing exercises. Document any shifts in heart rate or clarity. Focus on the \"flow state\" triggers identified in yesterday's module."}
+                  </p>
                 </div>
+                
+                <button 
+                  onClick={openNextVideo}
+                  disabled={selectedIndex >= therapyTasks.length - 1 || !watchedVideos.has(selectedIndex)}
+                  className="bg-[#0A4F48] text-white hover:bg-[#083b36] disabled:bg-gray-200 disabled:text-gray-400 rounded-full px-8 py-4 flex items-center gap-3 transition-all hover:scale-105 shadow-xl hover:shadow-[#0A4F48]/30 group"
+                >
+                  <span className="text-[11px] font-black tracking-widest uppercase">Play Next Video</span>
+                  <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+            </div>
+          </div>
 
-                <div>
-                  <label className="block text-sm font-bold text-[#0A4F48] mb-2">Upload Proof</label>
-                  <div 
-                    onClick={handleOpenFilePicker}
-                    className="group relative h-[116px] flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 hover:border-[#0A4F48]/40 hover:bg-[#E6EEED]/20 transition-all cursor-pointer overflow-hidden"
-                  >
-                    {file ? (
-                      <div className="flex flex-col items-center gap-1 p-4">
-                        <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                          <CheckCircle2 size={18} className="text-green-600" />
+          {/* RIGHT COLUMN: Protocol + Submission */}
+          <div className="lg:col-span-4 flex flex-col gap-8">
+            
+            {/* Today's Protocol List */}
+            <div className="bg-[#E6EEED] rounded-[48px] p-8 lg:p-10">
+              <h3 className="text-[10px] font-black text-[#0A4F48]/40 uppercase tracking-[0.3em] mb-8">
+                Today's Protocol
+              </h3>
+              <div className="flex flex-col gap-5">
+                {therapyTasks.map((task, idx) => {
+                  const isCompleted = watchedVideos.has(idx) || idx < selectedIndex;
+                  const isActive = idx === selectedIndex;
+                  const unlocked = isUnlocked(idx);
+                  const IconComp = task.icon;
+
+                  if (isActive) {
+                    return (
+                      <div key={idx} className="bg-[#0A4F48] rounded-[32px] p-6 shadow-2xl shadow-[#0A4F48]/30 relative overflow-hidden group">
+                        <div className="flex items-center gap-5 relative z-10">
+                          <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
+                            <IconComp size={22} />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-white font-black text-sm lg:text-[15px] leading-tight flex items-center gap-2">
+                              {task.name}
+                            </h4>
+                            <p className="text-white/60 font-bold text-[10px] mt-1 lg:mt-2">
+                              {task.duration} • {task.focus}
+                            </p>
+                          </div>
+                          <div className="w-7 h-7 rounded-full border-[3px] border-white/20 flex items-center justify-center">
+                            <div className="w-2.5 h-2.5 rounded-full bg-white" />
+                          </div>
                         </div>
-                        <span className="text-xs font-bold text-[#0A4F48] truncate max-w-full text-center">{fileName}</span>
+                      </div>
+                    );
+                  }
+
+                  if (isCompleted) {
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => handleTaskClick(idx)}
+                        className="bg-white rounded-[32px] p-6 flex items-center gap-5 shadow-sm border border-transparent hover:border-[#0A4F48]/10 transition-all group"
+                      >
+                        <div className="w-12 h-12 rounded-2xl bg-[#EAF1F0] flex items-center justify-center text-[#10B981]">
+                          <IconComp size={22} />
+                        </div>
+                        <div className="flex-1 text-left">
+                          <h4 className="text-gray-800 font-black text-sm lg:text-[15px] leading-tight group-hover:text-[#0A4F48] transition-colors">
+                            {task.name}
+                          </h4>
+                          <p className="text-gray-400 font-bold text-[10px] mt-1 lg:mt-2">
+                            {task.duration} • Completed
+                          </p>
+                        </div>
+                        <div className="w-7 h-7 rounded-full bg-[#0A4F48] flex items-center justify-center text-white">
+                          <Check size={14} strokeWidth={4} />
+                        </div>
+                      </button>
+                    );
+                  }
+
+                  return (
+                    <div 
+                      key={idx} 
+                      className={cn(
+                        "rounded-[32px] border-2 border-dashed border-[#0A4F48]/10 p-6 flex items-center gap-5",
+                        !unlocked && "opacity-40"
+                      )}
+                    >
+                      <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300">
+                        {unlocked ? <IconComp size={22} /> : <Lock size={18} />}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-gray-300 font-black text-sm lg:text-base leading-tight">
+                          {task.name}
+                        </h4>
+                        <p className="text-gray-300 font-bold text-[10px] mt-2 italic">
+                          Locked • Complete previous
+                        </p>
+                      </div>
+                      <div className="w-7 h-7 rounded-full border-2 border-gray-100" />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Submission Section */}
+            {shouldShowSubmissionForm && (
+              <div className="bg-[#DDE5E4] rounded-[48px] p-8 lg:p-10 flex flex-col gap-8">
+                <div className="text-center lg:text-left">
+                  <h3 className="text-[#0A4F48] font-black text-2xl tracking-tighter mb-2">
+                    Therapy Complete?
+                  </h3>
+                  <p className="text-gray-500 font-bold text-xs leading-relaxed">
+                    Finalize your session by logging your notes and data insights.
+                  </p>
+                </div>
+
+                <div 
+                  onClick={handleOpenFilePicker}
+                  className="bg-white rounded-[32px] p-8 border-2 border-dashed border-[#0A4F48]/20 flex flex-col items-center justify-center text-center gap-4 hover:bg-white/80 cursor-pointer transition-all group lg:min-h-[140px]"
+                >
+                  {file ? (
+                    <>
+                      <div className="w-14 h-14 rounded-full bg-[#E6FFFA] flex items-center justify-center text-[#10B981]">
+                        <CheckCircle2 size={32} />
+                      </div>
+                      <div className="min-w-0 px-2 w-full">
+                        <p className="text-[#0A4F48] font-black text-xs truncate max-w-full text-center">{fileName}</p>
                         <button 
-                          type="button" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setFile(null);
-                            setFileName("Upload File");
-                          }}
-                          className="text-[10px] text-red-500 font-bold uppercase hover:underline"
+                          onClick={(e) => { e.stopPropagation(); setFile(null); setFileName("Upload File"); }}
+                          className="text-red-500 font-black text-[9px] uppercase tracking-widest mt-2 hover:underline"
                         >
                           Remove
                         </button>
                       </div>
-                    ) : (
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <Upload size={20} className="text-gray-400 group-hover:text-[#0A4F48]" />
-                        </div>
-                        <p className="text-xs font-bold text-gray-500 group-hover:text-[#0A4F48]">Drop photo/video proof</p>
-                        <p className="text-[10px] text-gray-400">or click to browse</p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform shadow-inner">
+                        <Upload size={24} />
                       </div>
-                    )}
-                  </div>
-                  <input
-                    ref={fileInputRef}
-                    id="therapy-proof-upload"
-                    type="file"
-                    accept="image/*,video/*"
-                    className="hidden"
-                    onChange={handleFileChange}
+                      <div>
+                        <h5 className="text-[#0A4F48] font-black text-sm">Tap to upload proof</h5>
+                        <p className="text-gray-400 font-bold text-[9px] mt-1">Journal photos or session notes (PDF/JPG)</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+                <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
+
+                <div>
+                  <h5 className="text-[10px] font-black text-[#0A4F48]/40 uppercase tracking-[0.2em] mb-4 pl-1">
+                    Optional Notes
+                  </h5>
+                  <textarea
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="How did you feel during today's session?"
+                    className="w-full h-28 bg-white/40 rounded-[28px] border-none px-6 py-5 text-sm font-bold text-[#0A4F48] placeholder-[#0A4F48]/30 focus:ring-0 resize-none transition-all shadow-inner"
                   />
                 </div>
+
+                <button
+                  onClick={handleSubmit}
+                  disabled={uploading}
+                  className="w-full bg-[#0A4F48] text-white disabled:bg-gray-400 rounded-full py-5 flex items-center justify-center gap-3 shadow-2xl shadow-[#0A4F48]/40 hover:scale-[1.02] transition-transform group"
+                >
+                  {uploading ? (
+                    <div className="w-5 h-5 border-4 border-white/20 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <span className="text-[12px] font-black tracking-widest uppercase">Submit Therapy Result</span>
+                    </>
+                  )}
+                </button>
               </div>
+            )}
 
-              <button
-                onClick={handleSubmit}
-                disabled={uploading}
-                className="w-full bg-[#0A4F48] hover:bg-[#083b36] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-2xl py-4 text-base font-black transition-all shadow-lg shadow-[#0A4F48]/20 flex items-center justify-center gap-2 group"
-              >
-                {uploading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Submitting...</span>
-                  </div>
-                ) : (
-                  <>
-                    <span>Submit Therapy Result</span>
-                    <Brain size={18} className="group-hover:rotate-12 transition-transform" />
-                  </>
-                )}
-              </button>
-            </div>
+            {/* Status Feedback */}
+            {(overallTherapyStatus === "pending" || overallTherapyStatus === "verified" || overallTherapyStatus === "rejected") && (
+              <div className={cn(
+                "rounded-[48px] p-8 text-center border-2",
+                overallTherapyStatus === "verified" ? "bg-green-50 border-green-200" : "bg-yellow-50 border-yellow-200"
+              )}>
+                <CheckCircle2 size={48} className="mx-auto mb-4 text-[#0A4F48]" />
+                <h3 className="text-[#0A4F48] font-black text-xl tracking-tighter uppercase mb-2">
+                  Session {overallTherapyStatus}
+                </h3>
+                <p className="text-gray-500 font-bold text-sm">
+                  {statusConfig[overallTherapyStatus].message}
+                </p>
+              </div>
+            )}
+            
           </div>
         </div>
-      )}
-
-      {(overallTherapyStatus === "pending" || overallTherapyStatus === "verified" || overallTherapyStatus === "rejected") && (
-        <div className="mx-4 lg:mx-2 mb-4">
-          <div className={`rounded-2xl border shadow-sm p-6 text-center ${statusConfig[overallTherapyStatus].panelClass}`}>
-            <CheckCircle2 size={40} className="text-[#0A4F48] mx-auto mb-3" />
-            <h3 className="text-[#0A4F48] font-bold text-lg">
-              Therapy Status: {statusConfig[overallTherapyStatus].label}
-            </h3>
-            <p className="text-gray-600 text-sm mt-1">
-              {statusConfig[overallTherapyStatus].message}
-            </p>
-          </div>
-        </div>
-      )}
-
+      </div>
       <MobileBottomNav />
-    </>
+    </div>
   );
 }

@@ -41,8 +41,17 @@ const ChatWindow = ({
   const audioChunksRef = useRef([]);
   const recordingStartedAtRef = useRef(0);
   const recordingTimerRef = useRef(null);
+  const messagesEndRef = useRef(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const stopTimer = () => {
     if (recordingTimerRef.current) {
@@ -253,6 +262,7 @@ const ChatWindow = ({
           {/* Messages Area */}
           <div className="flex-1 min-h-0 overflow-y-auto p-4 md:p-6 space-y-4 bg-[#F0F4F8]">
             {messages.map((msg, index) => {
+              const isLastMessage = index === messages.length - 1;
               const isMe = msg.sender === user?._id;
               const messageType = getMessageType(msg);
               const hasMedia = messageType !== "text";
@@ -262,6 +272,7 @@ const ChatWindow = ({
                 <div
                   key={`${msg.time || index}-${index}`}
                   className={`flex ${isMe ? "justify-end" : "justify-start"}`}
+                  ref={isLastMessage ? messagesEndRef : null}
                 >
                   <div className="max-w-[82%] md:max-w-[70%]">
                     <div

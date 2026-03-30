@@ -1,29 +1,70 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
-import { CheckCircle2, PlayCircle, Upload, UtensilsCrossed } from "lucide-react";
+import { 
+  CheckCircle2, 
+  Clock, 
+  TrendingUp, 
+  Droplets, 
+  Apple, 
+  Moon, 
+  Camera, 
+  Check, 
+  Utensils,
+  Info,
+  X
+} from "lucide-react";
 import { SyncLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import { assets } from "@/assets/asset";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
-import { getClient } from "@/redux/features/client/client.thunk";
+import {
+  getClient,
+  fetchClientComplianceStats,
+  fetchClientAdherenceStreaks,
+} from "@/redux/features/client/client.thunk";
 import { getProgramById } from "@/redux/features/program/program.thunk";
 import {
   getUserTaskStatus,
   uploadTask,
 } from "@/redux/features/tasks/task.thunk";
 import MobileBottomNav from "../components/MobileBottomNav";
+import { cn } from "@/lib/utils";
 
-const MEAL_LABELS = [
-  "Morning",
-  "Lunch",
-  "Evening",
-  "Dinner",
-  "Post Dinner",
-  "Extra Meal",
-];
+const getMealConfig = (index, totalCount, Apple, Utensils, Moon) => {
+  if (totalCount === 4) {
+    const configs = [
+      { label: "BREAKFAST", time: "08:00 AM", icon: Apple },
+      { label: "LUNCH", time: "01:30 PM", icon: Utensils },
+      { label: "SNACK", time: "05:00 PM", icon: Apple },
+      { label: "DINNER", time: "08:30 PM", icon: Moon },
+    ];
+    return configs[index] || { label: `MEAL ${index + 1}`, time: "--:--", icon: Utensils };
+  }
+  if (totalCount === 5) {
+    const configs = [
+      { label: "BREAKFAST", time: "08:00 AM", icon: Apple },
+      { label: "MID-MORNING", time: "11:00 AM", icon: Apple },
+      { label: "LUNCH", time: "01:30 PM", icon: Utensils },
+      { label: "EVENING", time: "05:00 PM", icon: Apple },
+      { label: "DINNER", time: "08:30 PM", icon: Moon },
+    ];
+    return configs[index] || { label: `MEAL ${index + 1}`, time: "--:--", icon: Utensils };
+  }
+  if (totalCount === 6) {
+    const configs = [
+      { label: "BREAKFAST", time: "07:30 AM", icon: Apple },
+      { label: "MID-MORNING", time: "10:30 AM", icon: Apple },
+      { label: "LUNCH", time: "01:00 PM", icon: Utensils },
+      { label: "AFTERNOON", time: "04:00 PM", icon: Apple },
+      { label: "EVENING", time: "07:00 PM", icon: Apple },
+      { label: "DINNER", time: "09:30 PM", icon: Moon },
+    ];
+    return configs[index] || { label: `MEAL ${index + 1}`, time: "--:--", icon: Utensils };
+  }
+  return { label: `MEAL ${index + 1}`, time: "--:--", icon: Utensils };
+};
 
 export default function DietTasksPage() {
   const dispatch = useDispatch();
@@ -40,8 +81,15 @@ export default function DietTasksPage() {
   const [uploading, setUploading] = useState(false);
   const [skippingMeal, setSkippingMeal] = useState(false);
   const [showSkipConfirm, setShowSkipConfirm] = useState(false);
+  const [complianceData, setComplianceData] = useState(null);
+  const [streak, setStreak] = useState(0);
   const autoSkippedPreviousDayRef = useRef(null);
+  const hasAutoSelected = useRef(false);
   const fileInputRef = useRef(null);
+
+  const currentGlobalDay =
+    clientUser?.currentGlobalDay || user?.currentGlobalDay || 1;
+  const dietPlanPdf = clientUser?.dietPlanPdf || user?.dietPlanPdf;
 
   useEffect(() => {
     const fetchPageData = async () => {
@@ -53,12 +101,16 @@ export default function DietTasksPage() {
             ? user?.programType?._id
             : user?.programType;
 
-        const [, programData] = await Promise.all([
+        const [,, complianceRes, streaksRes, programData] = await Promise.all([
           user?._id ? dispatch(getClient({ id: user._id })).unwrap() : Promise.resolve(),
-          programId ? dispatch(getProgramById(programId)).unwrap() : Promise.resolve(null),
           dispatch(getUserTaskStatus()).unwrap(),
+          user?._id ? dispatch(fetchClientComplianceStats(user._id)).unwrap() : Promise.resolve(null),
+          user?._id ? dispatch(fetchClientAdherenceStreaks(user._id)).unwrap() : Promise.resolve(null),
+          programId ? dispatch(getProgramById(programId)).unwrap() : Promise.resolve(null),
         ]);
 
+        if (complianceRes) setComplianceData(complianceRes || null);
+        if (streaksRes?.diet) setStreak(streaksRes.diet.activeStreak || 0);
         if (programData) setProgram(programData.data);
       } catch (error) {
         console.error("Failed to load diet page:", error);
@@ -69,23 +121,6 @@ export default function DietTasksPage() {
 
     fetchPageData();
   }, [dispatch, user?._id, user?.programType]);
-
-  const currentGlobalDay =
-    clientUser?.currentGlobalDay || user?.currentGlobalDay || 1;
-  const dietPlanPdf = clientUser?.dietPlanPdf || user?.dietPlanPdf;
-
-  const isProgramStarted = useMemo(() => {
-    const startDate = clientUser?.programStartDate || user?.programStartDate;
-    if (!startDate) return true;
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const start = new Date(startDate);
-    start.setHours(0, 0, 0, 0);
-
-    return today >= start;
-  }, [clientUser?.programStartDate, user?.programStartDate]);
 
   const dietTasks = useMemo(() => {
     const isWeightLoss = program?.title?.toLowerCase().includes("weight loss");
@@ -102,8 +137,10 @@ export default function DietTasksPage() {
           task.taskType === "Meal",
       );
 
+      const config = getMealConfig(index, mealCount, Apple, Utensils, Moon);
+
       return {
-        name: MEAL_LABELS[index] || `Meal ${index + 1}`,
+        name: config.label,
         notes: "Upload a clear image of your meal for expert review.",
         index,
         exerciseIndex: mealIndex,
@@ -123,6 +160,39 @@ export default function DietTasksPage() {
     user?.dietPlanMealCount,
   ]);
 
+  // Auto-select the first actionable (todo or rejected) meal after data loads
+  useEffect(() => {
+    if (!isLoading && dietTasks.length > 0 && !hasAutoSelected.current) {
+      const firstActionableIndex = dietTasks.findIndex(
+        (t) => t.status === "todo" || t.status === "rejected"
+      );
+
+      if (firstActionableIndex !== -1) {
+        setSelectedIndex(firstActionableIndex);
+      } else {
+        // If all are processed, stay at the last meal
+        setSelectedIndex(dietTasks.length - 1);
+      }
+      hasAutoSelected.current = true;
+    }
+  }, [isLoading, dietTasks]);
+
+  
+  const isProgramStarted = useMemo(() => {
+    const startDate = clientUser?.programStartDate || user?.programStartDate;
+    if (!startDate) return true;
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+
+    return today >= start;
+  }, [clientUser?.programStartDate, user?.programStartDate]);
+
+  
+
   const selectedTask = dietTasks[selectedIndex] || null;
 
   const selectedMealStatus = selectedTask?.status || "todo";
@@ -134,6 +204,25 @@ export default function DietTasksPage() {
       ).length,
     [tasks],
   );
+
+  const todayProgress = useMemo(() => {
+    if (!dietTasks.length) return 0;
+    const completedToday = dietTasks.filter(t => t.status === "verified").length;
+    return Math.round((completedToday / dietTasks.length) * 100);
+  }, [dietTasks]);
+
+  const furthestIndex = useMemo(() => {
+    // Find last verified or skipped meal
+    const lastCompletedIdx = dietTasks.slice().reverse().findIndex(t => t.status === "verified" || t.status === "skipped");
+    const lastIdx = lastCompletedIdx === -1 ? 0 : (dietTasks.length - 1 - lastCompletedIdx);
+    // Determine the progress line endpoint: it should reach at least the selectedIndex or the last actioned meal
+    return Math.max(lastIdx, selectedIndex);
+  }, [dietTasks, selectedIndex]);
+
+  const progressBarWidth = useMemo(() => {
+    if (dietTasks.length <= 1) return 0;
+    return (furthestIndex / (dietTasks.length - 1)) * 100;
+  }, [furthestIndex, dietTasks.length]);
 
   const statusConfig = {
     pending: {
@@ -365,222 +454,295 @@ export default function DietTasksPage() {
   }
 
   return (
-    <>
-      <div className="w-full grid lg:grid-cols-[1.5fr_1fr] grid-cols-1 gap-6 p-4 lg:p-2 pb-24 lg:pb-2">
-        <div className="bg-white rounded-2xl shadow-sm p-4 lg:p-6 border border-[#0A4F48]/10">
-          <div className="flex items-center justify-between gap-3 mb-4">
-            <div>
-              <h1 className="text-[#0A4F48] font-bold text-xl">Diet</h1>
-              <p className="text-sm text-gray-500">Day {currentGlobalDay} meal tasks</p>
-            </div>
-            {selectedMealStatus !== "todo" && statusConfig[selectedMealStatus] && (
-              <span
-                className={`text-xs font-bold px-3 py-1 rounded-full border ${statusConfig[selectedMealStatus].pillClass}`}
-              >
-                {statusConfig[selectedMealStatus].label}
-              </span>
-            )}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleViewAssignedMealPdf}
-                className="text-xs font-bold px-3 py-1.5 rounded-lg border border-[#0A4F48]/20 text-[#0A4F48] hover:bg-[#E6EEED]"
-              >
-                View Meal PDF
-              </button>
-              <Link
-                to="/client"
-                className="text-xs font-bold text-[#0A4F48] hover:text-[#083b36]"
-              >
-                Back to Dashboard
-              </Link>
-            </div>
-          </div>
-
-          <div className="rounded-2xl overflow-hidden border border-gray-100 bg-gray-50">
+    <div className="bg-[#F8FBFA] min-h-screen pb-32 font-sans selection:bg-[#0A4F48]/10">
+      <div className="max-w-[1400px] mx-auto p-4 lg:p-10 flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12">
+        
+        {/* =========================================
+            LEFT COLUMN (Banner + Progression + Summary)
+            ========================================= */}
+        <div className="lg:col-span-8 flex flex-col gap-8">
+          
+          {/* Main Hero Banner: Ongoing Session */}
+          <div className="relative w-full aspect-video lg:aspect-[1.8/1] rounded-[40px] overflow-hidden shadow-2xl group">
+             {/* Gradient Overlay for Text Visibility */}
+            <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent z-10" />
+            
             <img
-              src={selectedIndex === 0 ? assets.breakfast : assets.MealPlaceholder}
-              alt="Meal"
-              className="w-full aspect-video object-cover"
+              src={selectedTask?.index === 1 ? "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=1200" : assets.MealPlaceholder}
+              alt="Current Meal"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             />
+
+            <div className="absolute bottom-8 left-8 lg:bottom-12 lg:left-12 z-20 max-w-2xl">
+              <div className="bg-[#10B981] text-white text-[9px] lg:text-[10px] uppercase font-black tracking-[0.2em] px-4 py-1.5 rounded-full mb-4 w-fit shadow-lg shadow-[#10B981]/20">
+                Ongoing Session
+              </div>
+              <h1 className="text-white font-black text-3xl lg:text-5xl leading-tight tracking-tighter drop-shadow-md">
+                {selectedTask?.name === "LUNCH" ? "Lunch" : `${selectedTask?.name}`}
+              </h1>
+              <p className="text-white/80 font-bold text-sm lg:text-base mt-2 lg:mt-4 leading-relaxed max-w-xl">
+                Precision-balanced nutrients for optimal cognitive performance and sustained energy levels throughout the afternoon.
+              </p>
+            </div>
+            
+            
           </div>
 
-          <div className="mt-4 bg-[#F8FAFC] rounded-xl p-3 border border-gray-100">
-            <h2 className="text-[#0A4F48] font-bold text-sm">Current Meal Task</h2>
-            <p className="text-gray-700 font-semibold text-sm mt-1">{selectedTask?.name || "No meal task"}</p>
-            <p className="text-gray-500 text-xs mt-1">{selectedTask?.notes || "Upload your meal image for review."}</p>
+          {/* Daily Progression Stepper */}
+          <div className="bg-white rounded-[40px] p-8 lg:p-10 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-[#0A4F48]/5 group">
+            <div className="flex justify-between items-end mb-10">
+              <h2 className="text-[#0A4F48] font-black text-2xl lg:text-2xl tracking-tighter">
+                Daily Progression
+              </h2>
+              <div className="flex items-center gap-2">
+                <span className="text-[#0A4F48] font-black text-xl lg:text-xl">{todayProgress}% Completed</span>
+              </div>
+            </div>
+
+            <div className="relative flex justify-between items-start pt-4 px-4 lg:px-8">
+              {/* Connector Lines */}
+              <div className="absolute top-[34px] left-16 right-16 h-1 bg-gray-100 z-0" />
+              <div 
+                className="absolute top-[34px] left-16 h-1 bg-[#0A4F48] z-0 transition-all duration-700 ease-in-out" 
+                style={{ width: `calc(${progressBarWidth}% - ${progressBarWidth > 0 ? "32px" : "0px"})` }}
+              />
+
+              {dietTasks.map((item, idx) => {
+                 const isActive = idx === selectedIndex;
+                 const isVerified = item.status === "verified";
+                 const isSkipped = item.status === "skipped";
+                 const config = getMealConfig(idx, dietTasks.length, Apple, Utensils, Moon);
+                 const Icon = config.icon;
+
+                 return (
+                   <div key={idx} className="flex flex-col items-center gap-4 relative z-10 w-24">
+                      <button
+                        onClick={() => setSelectedIndex(idx)}
+                        className={cn(
+                          "w-12 h-12 lg:w-16 lg:h-16 rounded-full flex items-center justify-center transition-all duration-300 transform",
+                          isActive ? "bg-[#0A4F48] scale-115 shadow-xl shadow-[#0A4F48]/30 border-4 border-white" : 
+                          isVerified ? "bg-[#0A4F48] text-white" :
+                          isSkipped ? "bg-orange-500 text-white" :
+                          "bg-gray-100 text-gray-400 hover:bg-gray-200"
+                        )}
+                      >
+                        {isVerified ? (
+                          <Check size={24} strokeWidth={4} />
+                        ) : isSkipped ? (
+                          <X size={24} strokeWidth={4} />
+                        ) : (
+                          <Icon size={isActive ? 28 : 24} className={isActive ? "text-[#71FEE2]" : ""} />
+                        )}
+                      </button>
+                      
+                      <div className="text-center">
+                        <h4 className={cn(
+                          "text-[9px] lg:text-[10px] font-black tracking-widest uppercase transition-colors",
+                          isActive ? "text-[#0A4F48]" : "text-gray-400"
+                        )}>
+                          {item.name}
+                        </h4>
+                        <p className={cn(
+                          "text-[9px] font-bold mt-1 uppercase",
+                          isActive ? "text-[#0A4F48]" : "text-gray-300"
+                        )}>
+                          {isActive ? "In Progress" : config.time}
+                        </p>
+                      </div>
+                   </div>
+                 );
+              })}
+            </div>
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Diet Summary Card */}
+            <div className="bg-[#0A4F48] rounded-[48px] p-8 lg:p-10 shadow-2xl shadow-[#0A4F48]/20 flex flex-col gap-10 flex-1">
+              <div className="flex justify-between items-start">
+                 <h3 className="text-[#71FEE2] font-black text-[9px] uppercase tracking-[0.3em] pl-1">
+                    Diet Summary
+                 </h3>
+                 <div className="flex items-center gap-2 bg-[#71FEE2]/10 px-3 py-1 rounded-full">
+                    <span className="text-[#71FEE2] font-black text-[10px] tracking-widest uppercase">{streak}D Streak</span>
+                 </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-white/10 backdrop-blur-md rounded-[32px] p-6 lg:p-7 relative overflow-hidden group border border-white/5">
+                  <h4 className="text-white/40 font-black text-[9px] uppercase tracking-widest mb-2">Meals Assigned</h4>
+                  <p className="text-white font-black text-3xl tracking-tighter">
+                    {String(complianceData?.stats?.expectedMeals || (dietTasks.length * currentGlobalDay)).padStart(2, '0')}
+                  </p>
+                  <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#71FEE2]" />
+                </div>
+                <div className="bg-white/10 backdrop-blur-md rounded-[32px] p-6 lg:p-7 relative overflow-hidden group border border-white/5">
+                  <h4 className="text-white/40 font-black text-[9px] uppercase tracking-widest mb-2">Non-Compliant</h4>
+                  <p className="text-white font-black text-3xl tracking-tighter">
+                     {String((complianceData?.stats?.skippedCount || 0) + (complianceData?.stats?.missedCount || 0)).padStart(2, '0')}
+                  </p>
+                  <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-red-400" />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 pl-1">
+                <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-[#71FEE2]">
+                  <TrendingUp size={20} />
+                </div>
+                <p className="text-white/90 font-black text-sm tracking-tight leading-tight">
+                  {complianceData?.stats?.expectedMeals 
+                    ? Math.round(((complianceData.stats.expectedMeals - (complianceData.stats.missedCount + complianceData.stats.skippedCount)) / complianceData.stats.expectedMeals) * 100) 
+                    : 0}% Diet Compliance
+                </p>
+              </div>
+            </div>
+
+            {/* Hydration Tip */}
+            <div className="bg-[#FFE5D2] rounded-[48px] p-8 lg:p-10 flex flex-col justify-center gap-6 group hover:translate-y-[-4px] transition-transform shadow-sm flex-1">
+              <div className="w-14 h-14 rounded-2xl bg-[#CC895B]/10 flex items-center justify-center text-[#845E47] shrink-0">
+                <Droplets size={28} strokeWidth={2.5} />
+              </div>
+              <div>
+                <h4 className="text-[#845E47]/40 font-black text-[9px] uppercase tracking-[0.2em] mb-2">Hydration Tip</h4>
+                <p className="text-[#845E47] font-black text-[15px] lg:text-[18px] leading-snug tracking-tight">
+                  Drink 250ml of water before this meal.
+                </p>
+                <p className="text-[#845E47]/60 text-xs font-bold mt-2">Proper hydration increases metabolic efficiency by 15% during digestion.</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm p-4 lg:p-6 border border-[#0A4F48]/10 h-fit">
-          <h2 className="text-[#0A4F48] font-bold text-base mb-3">Diet Tasks</h2>
-          <p className="text-xs text-gray-500 mb-4">Select a meal task and upload image proof. Video is not used for diet tasks.</p>
-
-          <div className="space-y-2">
-            {dietTasks.length ? (
-              dietTasks.map((task, idx) => {
-                const active = idx === selectedIndex;
-                const taskStatus = task.status || "todo";
-                const taskStatusStyles =
-                  taskStatus === "verified"
-                    ? "bg-green-100 text-green-700"
-                    : taskStatus === "pending"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : taskStatus === "skipped"
-                        ? "bg-orange-100 text-orange-800"
-                      : taskStatus === "rejected"
-                        ? "bg-red-100 text-red-700"
-                        : "bg-gray-100 text-gray-600";
-
-                return (
-                  <button
-                    key={`${task.name}-${idx}`}
-                    onClick={() => setSelectedIndex(idx)}
-                    className={`w-full text-left rounded-xl border px-3 py-2.5 transition-colors ${
-                      active
-                        ? "border-[#0A4F48] bg-[#E6EEED]"
-                        : "border-gray-200 bg-white hover:bg-gray-50"
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="min-w-0">
-                        <p className="font-semibold text-sm text-[#0A4F48] truncate">{task.name}</p>
-                        <span className={`inline-block text-[10px] font-bold uppercase mt-1 px-2 py-0.5 rounded-full ${taskStatusStyles}`}>
-                          {taskStatus}
-                        </span>
-                      </div>
-                      <PlayCircle size={16} className="text-[#0A4F48] shrink-0" />
-                    </div>
-                  </button>
-                );
-              })
-            ) : (
-              <div className="rounded-xl border border-dashed border-gray-200 p-4 text-center text-sm text-gray-500">
-                No diet tasks available for today.
-              </div>
-            )}
+        {/* =========================================
+            RIGHT COLUMN (Submission)
+            ========================================= */}
+        <div className="lg:col-span-4 flex flex-col gap-8">
+          
+          {/* Header Task Info */}
+          <div className="bg-transparent pl-2 pr-2">
+             <h4 className="text-[#10B981] font-black text-[10px] tracking-[0.3em] uppercase mb-1">
+                Current Task
+             </h4>
+             <h2 className="text-[#0A4F48] font-black text-2xl lg:text-3xl leading-tight tracking-tighter">
+                {selectedTask?.name === "BREAKFAST" ? "Morning Meal" : selectedTask?.name} - Upload a clear image
+             </h2>
+             
+             <div className="flex flex-col gap-3 mt-8">
+                <div className="bg-gray-50 rounded-[28px] p-4 lg:p-5 flex items-center gap-4 border border-gray-100 transition-colors hover:bg-white hover:shadow-md cursor-default group">
+                   <div className="w-10 h-10 rounded-2xl bg-[#EAF5F4] flex items-center justify-center text-[#0A4F48] shrink-0">
+                      <Clock size={20} strokeWidth={2.5} />
+                   </div>
+                   <p className="text-gray-600 font-bold text-xs lg:text-sm leading-snug">
+                      Submit within 15 minutes of eating
+                   </p>
+                </div>
+             </div>
           </div>
 
-          <div className="mt-4 rounded-xl bg-[#F4DBC7]/50 p-3 border border-[#F4DBC7]">
-            <div className="flex items-center gap-2">
-              <UtensilsCrossed size={15} className="text-[#0A4F48]" />
-              <p className="text-xs font-semibold text-[#0A4F48]">Diet Summary</p>
-            </div>
-            <p className="text-xs text-gray-600 mt-1">
-              {dietTasks.length} meals assigned for today.
-            </p>
-            <p className="text-xs text-gray-600 mt-0.5">
-              Skipped meals: <span className="font-semibold">{totalSkippedMeals}</span>
-            </p>
+          {/* Submission Form */}
+          <div className="bg-white rounded-[40px] p-8 lg:p-10 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-[#0A4F48]/5">
+            <h3 className="text-[#0A4F48] font-black text-sm uppercase tracking-widest pl-1 mb-6">
+              Submit Diet Proof
+            </h3>
+
+            {shouldShowSubmissionForm && (
+              <div className="flex flex-col gap-6">
+                <div 
+                  onClick={handleOpenFilePicker}
+                  className="relative aspect-square w-full rounded-[40px] border-2 border-dashed border-gray-100 bg-[#F9FBFA] flex flex-col items-center justify-center gap-4 transition-all hover:border-[#0A4F48]/30 hover:bg-[#EAF1F0] cursor-pointer group overflow-hidden"
+                >
+                  {file ? (
+                    <div className="absolute inset-0 w-full h-full p-6">
+                      <div className="relative w-full h-full rounded-[30px] overflow-hidden group/img">
+                         <img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-full object-cover" />
+                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
+                            <span className="text-white font-black text-xs tracking-widest uppercase">Change Photo</span>
+                         </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="w-16 h-16 rounded-full bg-white shadow-xl flex items-center justify-center text-[#0A4F48] group-hover:scale-110 transition-transform">
+                        <Camera size={28} />
+                      </div>
+                      <p className="text-gray-500 font-bold text-xs lg:text-sm text-center px-8">
+                        Drop image here or <span className="text-[#0A4F48] underline underline-offset-4 decoration-2">browse</span>
+                      </p>
+                    </>
+                  )}
+                  <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
+                </div>
+
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Add optional notes (e.g. substitutions, mood...)"
+                  className="w-full rounded-[20px] border-none bg-gray-50 px-6 py-5 text-sm font-bold text-gray-700 placeholder-gray-400/60 focus:ring-0 resize-none h-32 transition-all shadow-inner"
+                />
+
+                <div className="flex flex-col gap-4 mt-2">
+                   <button
+                     onClick={handleSubmit}
+                     disabled={uploading}
+                     className="w-full bg-[#0A4F48] text-white disabled:bg-gray-200 disabled:text-gray-400 rounded-full py-5 text-[14px] font-black tracking-widest uppercase shadow-2xl shadow-[#0A4F48]/30 transition-all hover:scale-[1.02]"
+                   >
+                     {uploading ? "Submitting..." : "Submit Diet"}
+                   </button>
+                   <button 
+                     onClick={() => setShowSkipConfirm(true)}
+                     className="text-gray-400 font-black text-[12px] uppercase tracking-widest hover:text-[#0A4F48] transition-colors mt-2"
+                   >
+                     Skip Meal
+                   </button>
+                </div>
+              </div>
+            )}
+            
+            {/* Feedback Status */}
+            {(selectedMealStatus !== "todo" && !shouldShowSubmissionForm) && statusConfig[selectedMealStatus] && (
+               <div className={cn(
+                  "p-8 rounded-[32px] border-2 text-center flex flex-col items-center gap-4",
+                  statusConfig[selectedMealStatus].panelClass
+               )}>
+                  <CheckCircle2 size={40} className="text-[#0A4F48]" />
+                  <h3 className="text-[#0A4F48] font-black text-lg tracking-tighter uppercase">Meal {selectedMealStatus}</h3>
+                  <p className="text-gray-600 font-bold text-xs">{statusConfig[selectedMealStatus].message}</p>
+               </div>
+            )}
           </div>
         </div>
       </div>
-
-      {shouldShowSubmissionForm && (
-        <div className="mx-4 lg:mx-2 mb-4">
-          <div className="bg-white rounded-2xl shadow-sm border border-[#0A4F48]/10 p-4 lg:p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-[#E6EEED] flex items-center justify-center shrink-0">
-                <CheckCircle2 size={18} className="text-[#0A4F48]" />
-              </div>
-              <div>
-                <h2 className="text-[#0A4F48] font-bold text-base">Submit Diet Proof</h2>
-                <p className="text-xs text-gray-500">Upload meal photo and optional notes.</p>
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-sm font-bold text-[#0A4F48] mb-2">Notes (optional)</label>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                rows={3}
-                placeholder="Any details about your meal choices..."
-                className="w-full rounded-xl border border-gray-200 px-3 py-2 text-sm text-gray-700 resize-none focus:outline-none focus:ring-2 focus:ring-[#0A4F48]/20"
-              />
-            </div>
-
-            <div className="mb-6">
-              <label className="block text-sm font-bold text-[#0A4F48] mb-2">Upload Meal Photo (Image Only)</label>
-              <button
-                type="button"
-                onClick={handleOpenFilePicker}
-                className="flex items-center gap-3 w-full rounded-xl border-2 border-dashed border-[#0A4F48]/30 px-4 py-3 cursor-pointer hover:bg-[#E6EEED]/30 transition-colors"
-              >
-                <Upload size={18} className="text-[#0A4F48] shrink-0" />
-                <span className="text-sm font-medium text-gray-600 truncate min-w-0">{fileName}</span>
-              </button>
-              <input
-                ref={fileInputRef}
-                id="diet-proof-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileChange}
-              />
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={handleSubmit}
-                disabled={uploading || skippingMeal}
-                className="w-full bg-[#0A4F48] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-xl py-3 text-sm font-bold transition-colors"
-              >
-                {uploading ? "Submitting..." : "Submit Diet"}
-              </button>
-              <button
-                onClick={() => setShowSkipConfirm(true)}
-                disabled={uploading || skippingMeal}
-                className="w-full sm:w-auto px-4 py-3 rounded-xl border border-red-200 text-red-600 text-sm font-bold hover:bg-red-50 disabled:opacity-60"
-              >
-                {skippingMeal ? "Skipping..." : "Skip Meal"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {(selectedMealStatus === "pending" || selectedMealStatus === "verified" || selectedMealStatus === "rejected" || selectedMealStatus === "skipped") && (
-        <div className="mx-4 lg:mx-2 mb-4">
-          <div className={`rounded-2xl border shadow-sm p-6 text-center ${statusConfig[selectedMealStatus].panelClass}`}>
-            <CheckCircle2 size={40} className="text-[#0A4F48] mx-auto mb-3" />
-            <h3 className="text-[#0A4F48] font-bold text-lg">
-              {selectedTask?.name || "Meal"} Status: {statusConfig[selectedMealStatus].label}
-            </h3>
-            <p className="text-gray-600 text-sm mt-1">
-              {statusConfig[selectedMealStatus].message}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {showSkipConfirm && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-5 border border-gray-200 shadow-xl">
-            <h3 className="text-base font-bold text-[#0A4F48]">Skip This Meal?</h3>
-            <p className="text-sm text-gray-600 mt-2">
-              Are you sure you want to skip <span className="font-semibold">{selectedTask?.name || "this meal"}</span>? This action marks the meal as skipped.
-            </p>
-            <div className="mt-4 flex items-center justify-end gap-2">
-              <button
-                onClick={() => setShowSkipConfirm(false)}
-                disabled={skippingMeal}
-                className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSkipMeal}
-                disabled={skippingMeal}
-                className="px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 disabled:opacity-60"
-              >
-                {skippingMeal ? "Skipping..." : "Yes, Skip"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <MobileBottomNav />
-    </>
+
+      {/* Skip Confirmation Modal */}
+      {showSkipConfirm && (
+        <div className="fixed inset-0 z-100 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-md rounded-[48px] bg-white p-10 border border-gray-100 shadow-[0_32px_64px_rgba(0,0,0,0.15)] transform transition-all animate-in fade-in zoom-in duration-300">
+             <div className="w-16 h-16 rounded-3xl bg-red-50 flex items-center justify-center text-red-600 mb-8 mx-auto">
+                <Info size={32} />
+             </div>
+             <h3 className="text-2xl font-black text-[#0A4F48] tracking-tighter text-center">Skip This Meal?</h3>
+             <p className="text-sm text-gray-500 font-bold mt-4 text-center leading-relaxed">
+               Are you sure you want to skip <span className="text-[#0A4F48]">{selectedTask?.name}</span>? This session tracking will be cancelled.
+             </p>
+             <div className="mt-10 flex flex-col gap-3">
+                <button
+                  onClick={handleSkipMeal}
+                  disabled={skippingMeal}
+                  className="w-full py-4 rounded-full bg-red-600 text-white font-black text-sm uppercase tracking-widest hover:bg-red-700 transition-colors shadow-xl shadow-red-200 active:scale-95"
+                >
+                  {skippingMeal ? "Processing..." : "Yes, Skip Session"}
+                </button>
+                <button
+                  onClick={() => setShowSkipConfirm(false)}
+                  disabled={skippingMeal}
+                  className="w-full py-4 rounded-full bg-gray-50 text-gray-400 font-black text-sm uppercase tracking-widest hover:bg-gray-100 transition-colors active:scale-95"
+                >
+                  Cancel
+                </button>
+             </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

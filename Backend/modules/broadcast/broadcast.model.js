@@ -7,6 +7,11 @@ const broadcastSchema = new mongoose.Schema(
         type: {type: String, required: true, enum: ["Promotional", "Welcome", "Motivation", "Tips", "Progress"]},
         message: {type: String, required: true},
         attachment: {type: String, default: null},
+        variableSamples: {
+            type: Map,
+            of: String,
+            default: {}
+        },
     },
     {timestamps: true}
 )

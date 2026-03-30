@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { assets } from "@/assets/asset";
 import { useDispatch } from "react-redux";
 import { fetchClientMeasurementHistory } from "@/redux/features/client/client.thunk";
+import { useNavigate } from "react-router-dom";
 
 export default function Measeurement() {
-const dispatch = useDispatch();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
@@ -16,75 +17,52 @@ const dispatch = useDispatch();
       .catch(console.error);
   }, [dispatch]);
 
-  if (!history.length) {
-    return (
-      <div className="bg-white p-5 rounded-2xl shadow-sm mt-4 text-gray-400 text-sm">
-        No measurement data available
-      </div>
-    );
-  }
-
-  const start = history[0];
-  const current = history[history.length - 1];
-
-  const measurements = [
-    {
-      label: "Chest",
-      before: `${start.chest} cm`,
-      current: `${current.chest} cm`,
-      color: "bg-[#0A4F48]",
-    },
-    {
-      label: "Waist",
-      before: `${start.waist} cm`,
-      current: `${current.waist} cm`,
-      color: "bg-[#F4DBC7]",
-    },
-    {
-      label: "Hips",
-      before: `${start.hip} cm`,
-      current: `${current.hip} cm`,
-      color: "bg-[#EBF3F2]",
-    },
+  const stats = [
+    { label: "Chest", before: "112 CM", current: "105 CM", progress: 85 },
+    { label: "Waist", before: "68 CM", current: "55 CM", progress: 75 },
+    { label: "Hips", before: "95 CM", current: "92 CM", progress: 65 },
   ];
 
   return (
-    <div className="bg-white p-5 rounded-2xl shadow-sm mt-4">
-      <div className="flex justify-between items-center mb-5">
-        <h3 className="text-[#0A4F48] font-bold text-sm">Measurements</h3>
-        <img
-          src={assets.threeDotVector}
-          alt="more"
-          className="w-4 h-4 cursor-pointer"
-        />
-      </div>
-      <div className="space-y-6">
-        {measurements.map((m, index) => (
-          <div key={index} className="flex items-center gap-4">
-            <div className={`w-1.5 h-10 rounded-full ${m.color}`}></div>
-            <div className="flex-1 flex items-center justify-between">
-              <span className="text-[14px] font-bold text-gray-800">
-                {m.label}
-              </span>
-              <div className="flex gap-4 items-center">
-                <span className="text-[11px] text-gray-400 font-medium whitespace-nowrap">
-                  Before{" "}
-                  <span className="font-bold text-gray-800">{m.before}</span>
-                </span>
-                <span
-                  className={`text-[12px] font-bold px-3 py-1 rounded-lg ${
-                    m.active
-                      ? "bg-[#0A4F48] text-white shadow-sm"
-                      : "text-[#0A4F48] border border-emerald-100 bg-emerald-50/30"
-                  }`}
-                >
-                  {m.current}
-                </span>
+    <div className="bg-white p-8 rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col gap-8 group transition-all duration-300 hover:shadow-lg">
+      <h3 className="text-gray-400 font-black text-[15px] uppercase tracking-widest">
+        Measurements
+      </h3>
+
+      <div className="space-y-10">
+        {stats.map((stat, index) => (
+          <div key={index} className="space-y-4">
+            <div className="flex justify-between items-start">
+              <div className="space-y-1">
+                <p className="text-[17px] font-black text-gray-800 leading-none">
+                  {stat.label}
+                </p>
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">
+                  BEFORE: {stat.before}
+                </p>
               </div>
+              <div className="bg-[#E6FFFA] px-4 py-1.5 rounded-full shadow-sm">
+                <p className="text-[12px] font-black text-[#0A4F48] leading-none">
+                  {stat.current}
+                </p>
+              </div>
+            </div>
+            
+            <div className="w-full h-2.5 bg-[#F1F5F9] rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-[#0A4F48] rounded-full transition-all duration-1000 ease-out"
+                style={{ width: `${stat.progress}%` }}
+              />
             </div>
           </div>
         ))}
       </div>
+
+      <button className="w-full mt-2 border-2 border-[#0A4F48] text-[#0A4F48] py-3.5 rounded-full text-[13px] font-black uppercase tracking-widest hover:bg-[#0A4F48] hover:text-white transition-all active:scale-95 shadow-sm"onClick={()=>navigate("/client/progress")} >
+        Update All Metrics
+      </button>
     </div>
   );
 }
+
+

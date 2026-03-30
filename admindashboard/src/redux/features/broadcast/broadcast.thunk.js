@@ -69,13 +69,45 @@ export const deleteBroadcast = createAsyncThunk(
 
 export const updateBroadcast = createAsyncThunk(
   "broadcast/update",
-  async ({id, updatedData}, { rejectWithValue }) => {
+  async ({ id, updatedData }, { rejectWithValue }) => {
     try {
       const data = await axiosInstance.put(`/broadcast/update/${id}`, updatedData);
       return data;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to update Broadcast",
+      );
+    }
+  },
+);
+
+export const sentWhatsAppMessage = createAsyncThunk(
+  "broadcast/sentWhatsAppMessage",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.post(
+        "/broadcast/sent-whatsapp-message",
+        payload,
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to send WhatsApp message",
+      );
+    }
+  },
+);
+
+export const getBroadcastAudience = createAsyncThunk(
+  "broadcast/getBroadcastAudience",
+  async ({ page = 1, limit = 20, search = "" }, { rejectWithValue }) => {
+    try {
+      const query = `?page=${page}&limit=${limit}&search=${encodeURIComponent(search)}`;
+      const data = await axiosInstance.get(`/broadcast/audience${query}`);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch audience",
       );
     }
   },

@@ -12,6 +12,7 @@ import initSocket from "./utils/socket.js";
 import { startImageCleanupTask } from "./utils/cronJobs.js";
 import { startNotificationCron } from "./utils/notification.cron.js";
 import { ensureNotificationIndexes } from "./modules/notification/notification.service.js";
+import { activateExtensionsCron } from "./utils/extensionActivation.cron.js";
 import "./utils/payroll.cron.js";
 import "./utils/SOPLog.cron.js";
 import { seedReminders } from "./modules/autoReminder/reminder.service.js";
@@ -96,6 +97,7 @@ mongoose
     ensureNotificationIndexes();
     startImageCleanupTask();
     startNotificationCron();
+    activateExtensionsCron();
     
   })
   .catch(() => console.log("not connected"));

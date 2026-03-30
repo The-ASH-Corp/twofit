@@ -45,7 +45,12 @@ import dailyTasks from "./list-todo.svg"
 import wl from "./wl.jpg";
 import Workout from "./Workout.png";
 import MealPlaceholder from "./MealPlaceholder.png";
+import heroMascot from "./hero_mascot.png";
+import lunchWrap from "./lunch_wrap.png";
 import breakfast from "./breakfast.svg";
+import trainerCartoon from "./trainer_cartoon.png";
+import dietitianCartoon from "./dietitian_cartoon.png";
+import therapistCartoon from "./therapist_cartoon.png";
 
 export const assets = {
   menu,
@@ -93,13 +98,17 @@ export const assets = {
   broadCast,
   wl,
   Workout,
+  heroMascot,
+  lunchWrap,
   MealPlaceholder,
   breakfast,
   dailyTasks,
+  trainerCartoon,
+  dietitianCartoon,
+  therapistCartoon,
 };
 
 //Users,
 //UserStar,
 //UserRoundPen,
 //BicepsFlexed,
-

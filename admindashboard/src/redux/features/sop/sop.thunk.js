@@ -53,7 +53,6 @@ export const updateSOP = createAsyncThunk(
       );
       return response;
     } catch (error) {
-      console.log(error.response);
       return rejectWithValue(
         error.response?.data?.status || "Failed to update task",
       );

@@ -81,7 +81,7 @@ export const getDashboardData = createAsyncThunk(
   async ({ headId, duration }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(
-        `heads/dashboard-data/${headId}?duration=${duration || '3'}`,
+        `heads/dashboard-data/${headId}?duration=${duration || "3"}`,
       );
       return response.data;
     } catch (error) {
@@ -133,8 +133,22 @@ export const getFounderAllHeads = createAsyncThunk(
       );
       return response;
     } catch (error) {
+      return rejectWithValue(error.response?.message || "Failed to get heads");
+    }
+  },
+);
+
+export const getHeadPerformance = createAsyncThunk(
+  "head/performance",
+  async ({ headId }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `heads/performance/${headId}`,
+      );
+      return response.data;
+    } catch (error) {
       return rejectWithValue(
-        error.response?.message || "Failed to get heads",
+        error.response?.data?.message || "Failed to get dashboard data",
       );
     }
   },

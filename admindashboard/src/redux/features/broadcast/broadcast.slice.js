@@ -5,7 +5,7 @@ import { getAllBroadcast, getBroadcast } from "./broadcast.thunk";
 const initialState = {
   allBroadcast: [],
   broadcast: null,
-  totalBroadcast:0,
+  totalBroadcast: 0,
   selectedBroadcast: null,
   error: null,
   status: "idle",
@@ -48,7 +48,7 @@ const BroadcastSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       });
-      
+
   },
 });
 

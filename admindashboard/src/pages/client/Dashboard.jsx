@@ -1,14 +1,10 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
-import KpiCard from "@/components/cards/KpiCard";
+import React, { useEffect, useState, useCallback } from "react";
 import HeroCard from "./components/HeroCard";
-import ComplianceChart from "@/components/chart/ComplianceChart";
-import ProgressChart from "./components/ProgressChart";
+import StatsGrid from "./components/StatsGrid";
 import DietPlanCard from "./components/DietPlanCard";
 import ExpertsList from "./components/ExpertsList";
 import Measeurement from "./components/Measeurement";
-import NotificationsList from "./components/NotificationsList";
 import MobileBottomNav from "./components/MobileBottomNav";
-import BookmarkedRecipes from "./components/BookmarkedRecipes";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { useDispatch } from "react-redux";
@@ -17,10 +13,11 @@ import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
 import {
   fetchClientComplianceStats,
   getClient,
+  fetchClientAdherenceStreaks,
 } from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
-import { CalendarDays, ChartPie, Flame, Weight } from "lucide-react";
 import { SyncLoader } from "react-spinners";
+import NotificationsList from "./components/NotificationsList";
 import WaterIntake from "./components/WaterIntake";
 import WeeklyCheckInModal from "./components/WeeklyCheckInModal.jsx";
 import { submitWeeklyCheckIn } from "@/redux/features/client/client.thunk";
@@ -29,7 +26,8 @@ import { toast } from "react-toastify";
 export default function Dashboard() {
   const [program, setProgram] = useState(null);
   const [coaches, setCoaches] = useState([]);
-  const [complianceData, setComplianceData] = useState(null);
+  const [compliance, setCompliance] = useState(0);
+  const [streak, setStreak] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const user = useAppSelector(selectUser);
   const clientUser = useAppSelector(selectSelectedClient);
@@ -49,7 +47,13 @@ export default function Dashboard() {
         typeof user?.programType === "object"
           ? user?.programType?._id
           : user?.programType;
-      const [program, coaches, compliance] = await Promise.all([
+
+      if (!programId) {
+        setIsLoading(false);
+        return;
+      }
+
+      const [programRes, coachesRes, complianceRes] = await Promise.all([
         dispatch(getProgramById(programId)).unwrap(),
         dispatch(
           getAllCoachesByAdmin([
@@ -58,11 +62,13 @@ export default function Dashboard() {
             user?.dietition,
           ]),
         ).unwrap(),
-        dispatch(fetchClientComplianceStats()).unwrap(),
+        dispatch(fetchClientComplianceStats(user?._id)).unwrap(),
       ]);
-      setProgram(program.data);
-      setCoaches(coaches);
-      setComplianceData(compliance);
+
+      setProgram(programRes.data);
+      setCoaches(coachesRes);
+      setCompliance(complianceRes?.overall || 0);
+      setStreak(complianceRes?.streaks?.activeStreak || 0);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
     } finally {
@@ -70,6 +76,7 @@ export default function Dashboard() {
     }
   }, [
     dispatch,
+    user?._id,
     user?.dietition,
     user?.programType,
     user?.therapist,
@@ -115,19 +122,6 @@ export default function Dashboard() {
     }
   };
 
-  const isProgramStarted = useMemo(() => {
-    const startDate = clientUser?.programStartDate || user?.programStartDate;
-
-    if (!startDate) return true; // Fallback if no date found
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const start = new Date(startDate);
-    start.setHours(0, 0, 0, 0);
-
-    return today >= start;
-  }, [user?.programStartDate, clientUser?.programStartDate]);
-
   const clientStatus = clientUser?.status || user?.status;
 
   if (isLoading) {
@@ -140,13 +134,13 @@ export default function Dashboard() {
 
   if (clientStatus === "Inactive") {
     return (
-      <div className="flex flex-col items-center justify-center h-[80vh] text-center p-8 bg-white rounded-lg shadow-sm">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
+      <div className="flex flex-col items-center justify-center h-[80vh] text-center p-8 bg-white rounded-[32px] shadow-sm">
+        <h1 className="text-3xl font-black text-gray-800 mb-4">
           Account Inactive
         </h1>
-        <p className="text-gray-600 text-lg">
-          You are currently inactive. Please contact the admin to reactivate
-          your account and resume your program.
+        <p className="text-gray-600 text-lg font-medium max-w-md">
+          Please contact your administrator to reactivate your account and
+          continue your wellness journey.
         </p>
       </div>
     );
@@ -154,126 +148,47 @@ export default function Dashboard() {
 
   if (clientStatus === "Completed") {
     return (
-      <div className="flex flex-col items-center justify-center h-[80vh] text-center p-8 bg-white rounded-lg shadow-sm">
-        <h1 className="text-3xl font-bold text-[#0A4F48] mb-4">
-          Program Completed!
+      <div className="flex flex-col items-center justify-center h-[80vh] text-center p-8 bg-[#0A4F48] rounded-[32px] shadow-xl">
+        <h1 className="text-3xl font-black text-white mb-4 tracking-tight">
+          Congratulations!
         </h1>
-        <p className="text-gray-600 text-lg">
-          Congratulations! You have successfully completed your program.
+        <p className="text-[#A7F3D0] text-lg font-bold">
+          You've successfully completed your program and achieved your goals!
         </p>
       </div>
     );
   }
 
+  const statsData = {
+    programDays: `${currentGlobalDay}/${program?.plan?.duration || 30}`,
+    compliance: `${Math.round(compliance)}%`,
+    currentWeight: clientUser?.currentWeight || user?.currentWeight || "--",
+    activeStreak: streak,
+  };
+
   return (
-    <>
-      <div className="w-full grid lg:grid-cols-[1fr_350px] grid-cols-1 gap-8 lg:p-2 p-4 lg:pb-2 pb-24">
-        {/* Main Content Area */}
-        <div className="flex flex-col space-y-8">
-          {/* Top Section: Hero and KPI Cards */}
-          <div className="grid lg:grid-cols-[1.5fr_1fr] grid-cols-1 gap-6">
-            <HeroCard program={program} />
-            <div className="grid grid-cols-2 gap-4 ">
-              <KpiCard
-                title="Program Days"
-                value={
-                  !isProgramStarted
-                    ? "Not Started"
-                    : `${clientUser?.currentGlobalDay || user?.currentGlobalDay || 1}/ ${
-                        program?.plan?.duration || 0
-                      }`
-                }
-                icon={
-                  <CalendarDays
-                    size={20}
-                    className="text-[#ffffff] md:w-6 md:h-6"
-                  />
-                }
-                bg="#0A4F48"
-                iconColor="white"
-                cardBg="white"
-              />
-              <KpiCard
-                title="Overall Compliance"
-                value={`${complianceData?.overall || 0}%`}
-                icon={
-                  <ChartPie
-                    size={20}
-                    className="text-[#ffffff] md:w-6 md:h-6"
-                  />
-                }
-                bg="#0A4F48"
-                iconColor="white"
-                cardBg="white"
-              />
-              <KpiCard
-                title="Weight Progress"
-                value={user?.currentWeight || 0}
-                icon={
-                  <Weight size={20} className="text-[#0A4F48] md:w-6 md:h-6" />
-                }
-                bg="#F4DBC7"
-                cardBg="white"
-              />
-              <KpiCard
-                title="Active Streak"
-                value={`${complianceData?.streaks?.activeStreak || 0} Days`}
-                icon={
-                  <Flame
-                    Lanyard
-                    size={20}
-                    className="text-[#0A4F48] md:w-6 md:h-6"
-                  />
-                }
-                bg="#F4DBC7"
-                cardBg="white"
-              />
-            </div>
-          </div>
-
-          {/* Mobile Only: Diet Plan Card */}
-          <div className="lg:hidden">
-            <DietPlanCard
-              isProgramStarted={isProgramStarted}
-              startDate={clientUser?.programStartDate || user?.programStartDate}
-              dietPlanPdf={clientUser?.dietPlanPdf || user?.dietPlanPdf}
-            />
-          </div>
-
-          {/* Middle Section: Charts */}
-          <div className="grid lg:grid-cols-2 grid-cols-1 gap-6 lg:order-2 order-3">
-            <div className="bg-white p-6 rounded-2xl shadow-sm">
-              <h2 className="text-[#0A4F48] font-bold text-sm mb-4">
-                Last Week Compliance
-              </h2>
-              {complianceData?.weeklyData ? (
-                <ComplianceChart data={complianceData.weeklyData} />
-              ) : (
-                <div className="h-[220px] flex items-center justify-center">
-                  <SyncLoader color="#0A4F48" loading margin={2} size={10} />
-                </div>
-              )}
-            </div>
-            <div className="bg-white p-6 rounded-2xl shadow-sm">
-              <h2 className="text-[#0A4F48] font-bold text-sm mb-4">
-                Weight Progress
-              </h2>
-              <ProgressChart />
-            </div>
-          </div>
+    <div className="max-w-7xl mx-auto lg:p-8 p-4 pb-32 bg-[#F8FAFA] min-h-screen">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-10 items-start">
+        {/* Main Column */}
+        <div className="flex flex-col gap-10">
+          <HeroCard program={program} currentGlobalDay={currentGlobalDay} />
+          <StatsGrid statsData={statsData} />
           <WaterIntake />
 
-          {/* Mobile Only: Measurements */}
-          <div className="lg:hidden order-4">
+          {/* Mobile Only: Sidebars stack below main content */}
+          <div className="lg:hidden flex flex-col gap-10">
+            <DietPlanCard
+              dietPlanPdf={clientUser?.dietPlanPdf || user?.dietPlanPdf}
+            />
+            <ExpertsList expert={coaches} />
             <Measeurement />
+            <NotificationsList />
           </div>
         </div>
 
-        {/* Right Sidebar Area - Desktop Only */}
-        <div className="space-y-4 hidden lg:block">
+        {/* Sidebar Column (Desktop Only) */}
+        <div className="hidden lg:flex flex-col gap-10">
           <DietPlanCard
-            isProgramStarted={isProgramStarted}
-            startDate={clientUser?.programStartDate || user?.programStartDate}
             dietPlanPdf={clientUser?.dietPlanPdf || user?.dietPlanPdf}
           />
           <ExpertsList expert={coaches} />
@@ -291,6 +206,6 @@ export default function Dashboard() {
           onSubmit={handleWeeklyCheckInSubmit}
         />
       )}
-    </>
+    </div>
   );
 }
