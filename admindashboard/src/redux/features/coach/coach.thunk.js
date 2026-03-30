@@ -171,7 +171,6 @@ export const deleteCoach = createAsyncThunk(
 export const updateCoach = createAsyncThunk(
   "coach/updateCoach",
   async ({ id, values }, { rejectWithValue }) => {
-    console.log(values);
     
     try {
       const config =

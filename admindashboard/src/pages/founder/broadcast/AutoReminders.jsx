@@ -22,6 +22,7 @@ const AutoReminders = () => {
     dispatch(getReminders());
   }, [dispatch]);
   const [openModal, setOpenModal] = useState(false);
+  const [selectedReminder, setSelectedReminder] = useState(null);
 
    const getIcon = (type) => {
      switch (type) {
@@ -50,7 +51,10 @@ const AutoReminders = () => {
    };
 
    const handelToggle = async (type)=> {
-    dispatch(toggleReminder(type));
+    dispatch(toggleReminder(type))
+    .then(() => {
+          dispatch(getReminders());
+        });
    }
 
   return (
@@ -95,7 +99,7 @@ const AutoReminders = () => {
                   checked={items?.isActive}
                   onChange={() => handelToggle(items?.type)}
                 />
-                <div className="w-10 h-5.5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[18px] after:w-[18px] after:transition-all peer-checked:bg-[#0A4F48]"></div>
+                <div className="w-10 h-5.5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-[18px] after:w-[18px] after:transition-all peer-checked:bg-[#0A4F48]"></div>
               </label>
             </div>
 
@@ -128,7 +132,7 @@ const AutoReminders = () => {
                     Reminder Template
                   </span>
                 </div>
-                <p className="text-gray-600 text-sm leading-relaxed truncate italic overflow-hidden">
+                <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap truncate italic overflow-hidden">
                   {items?.message}
                 </p>
               </div>
@@ -136,7 +140,10 @@ const AutoReminders = () => {
 
             <div className="flex items-center gap-3 pt-2">
               <button
-                onClick={() => setOpenModal(true)}
+                onClick={() => {
+                  setOpenModal(true);
+                  setSelectedReminder(items);
+                }}
                 className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-white text-gray-700 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 hover:border-gray-300 transition-all"
               >
                 <Edit3 size={14} />
@@ -147,11 +154,13 @@ const AutoReminders = () => {
                 Send Test
               </button>
             </div>
-            <EditReminderModal
-              isOpen={openModal}
-              onClose={() => setOpenModal(false)}
-              reminder={reminders}
-            />
+            {selectedReminder && (
+              <EditReminderModal
+                isOpen={openModal}
+                onClose={() => setOpenModal(false)}
+                reminder={selectedReminder}
+              />
+            )}
           </div>
         ))}
       </div>

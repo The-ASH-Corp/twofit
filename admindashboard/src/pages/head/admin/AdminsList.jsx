@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import BaseTable from '../../../components/table/BaseTable'
 import { AdminColumns } from './AdminColumns'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getAdminsByHeadId } from '@/redux/features/admins/admin.thunk';
 import { useAppSelector } from '@/redux/store/hooks';
 import { selectUser } from '@/redux/features/auth/auth.selectores';
 import { SyncLoader } from 'react-spinners';
+import { getAdminError, getAdminStatus } from '@/redux/features/admins/admins.selecters';
 
 export default function AdminsList() {
 

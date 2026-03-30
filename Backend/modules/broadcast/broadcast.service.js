@@ -97,7 +97,6 @@ export const updateBroadcast = async (id, data) => {
 
 export const sentWhatsAppMessage = async (payload) => {
   try {
-    console.log(payload)
     const {
       audienceType = "selected",
       selectedUserIds = [],

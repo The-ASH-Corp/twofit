@@ -1,16 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import BaseTable from '../../../components/table/BaseTable'
 import { ExpertColumns } from './ExpertColumns'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { getAllCoachesByHead } from '@/redux/features/head/head.thunk';
 import { useAppSelector } from '@/redux/store/hooks';
 import { selectUser } from '@/redux/features/auth/auth.selectores';
 import { SyncLoader } from 'react-spinners';
+import { selectCoachError, selectCoachStatus } from '@/redux/features/coach/coach.selector';
 
 export default function ExpertTable() {
 
   const user =useAppSelector(selectUser)
+    const status = useSelector(selectCoachStatus);
+  const error = useSelector(selectCoachError);
   const [coaches,setCoaches]=useState([])
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);

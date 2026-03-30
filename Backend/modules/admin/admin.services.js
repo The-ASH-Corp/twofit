@@ -427,13 +427,20 @@ export const getDashboardData = async (adminId, duration = "12m") => {
 };
 
 export const getAdminByHead = async ({ headId, page, limit }) => {
-  const skip = (page - 1) * limit;
-  const totalCount = await AdminModel.countDocuments({ headId });
-  const admin = await AdminModel.find({ headId }).select("-password").skip(skip).limit(limit);
-  return {
-    admin,
-    totalCount,
-  };
+  try {
+    const skip = (page - 1) * limit;
+    const totalCount = await AdminModel.countDocuments({ headId });
+    const admin = await AdminModel.find({ headId })
+      .select("-password")
+      .skip(skip)
+      .limit(limit);
+    return {
+      admin,
+      totalCount,
+    };
+  } catch (error) {
+    throw new Error("Failed to fetch admin");
+  }
 };
 
 export const founderAdminList = async (page, limit) => {

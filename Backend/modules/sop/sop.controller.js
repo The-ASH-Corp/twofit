@@ -45,7 +45,6 @@ export const deleteSOP = async (req, res) => {
     const { id } = req.params;
 
     const deleted = await sopService.deactivate(id);
-    console.log(deleted)
 
     res.status(200).json({
       success: true,
@@ -86,15 +85,12 @@ export const completeSOP = async (req, res) => {
       req.body.completed,
     );
 
-    console.log(result);
-
     res.status(200).json({
       success: true,
       message: "Task marked as completed",
       data: result,
     });
   } catch (error) {
-    console.log(error);
     res.status(400).json({ success: false, message: error.message });
   }
 };

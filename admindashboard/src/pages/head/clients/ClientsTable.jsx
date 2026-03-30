@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import BaseTable from "../../../components/table/BaseTable";
 import { ClientColumns } from "./ClientColumns";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
 import {
   selectClientError,
+  selectClientStatus,
 } from "@/redux/features/client/client.selectors";
 import { useNavigate } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
@@ -13,6 +14,7 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 export default function ClientsTable() {
   const user =useAppSelector(selectUser)
+    const status = useSelector(selectClientStatus);
   const navigate = useNavigate();
   const error = useAppSelector(selectClientError);
   const [clients, setClients] = useState([]);
