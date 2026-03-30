@@ -23,7 +23,7 @@ export default function DietPlanCard({ dietPlanPdf }) {
   };
 
   return (
-    <div className="bg-white p-8 rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col gap-6 group transition-all duration-300 hover:shadow-lg">
+    <div className="bg-white p-5 sm:p-6 md:p-8 rounded-3xl md:rounded-4xl shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col gap-5 sm:gap-6 group transition-all duration-300 hover:shadow-lg">
       <div className="flex justify-between items-center">
         <h3 className="text-gray-400 font-black text-[15px] uppercase tracking-widest">
           Daily Diet Plan
@@ -40,7 +40,7 @@ export default function DietPlanCard({ dietPlanPdf }) {
       </div>
 
       <div 
-        className="bg-[#F8FAFA] p-5 rounded-[24px] flex items-center justify-between border border-gray-100 transition-all hover:border-[#0A4F48]/10 group/item cursor-pointer shadow-sm hover:shadow-md"
+        className="bg-[#F8FAFA] p-4 sm:p-5 rounded-2xl md:rounded-3xl flex items-center justify-between border border-gray-100 transition-all hover:border-[#0A4F48]/10 group/item cursor-pointer shadow-sm hover:shadow-md"
         onClick={handleViewDietPage}
       >
         <div className="flex items-center gap-4">

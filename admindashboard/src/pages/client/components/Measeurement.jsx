@@ -44,13 +44,13 @@ export default function Measeurement() {
   ];
 
   return (
-    <div className="bg-white p-8 rounded-[32px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col gap-8 group transition-all duration-300 hover:shadow-lg">
+    <div className="bg-white p-5 sm:p-6 md:p-8 rounded-3xl md:rounded-4xl shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col gap-6 sm:gap-7 md:gap-8 group transition-all duration-300 hover:shadow-lg">
       <h3 className="text-gray-400 font-black text-[15px] uppercase tracking-widest">
         Measurements
       </h3>
 
       {loading ? (
-        <div className="space-y-10 animate-pulse">
+        <div className="space-y-7 sm:space-y-8 md:space-y-10 animate-pulse">
           {[1, 2, 3].map((i) => (
             <div key={i} className="space-y-4">
               <div className="flex justify-between items-start">
@@ -65,7 +65,7 @@ export default function Measeurement() {
           ))}
         </div>
       ) : (
-        <div className="space-y-10">
+        <div className="space-y-7 sm:space-y-8 md:space-y-10">
           {stats.map((stat, index) => (
             <div key={index} className="space-y-4">
               <div className="flex justify-between items-start">
