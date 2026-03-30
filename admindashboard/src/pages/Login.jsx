@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { assets } from "../assets/asset";
 import { login } from "@/redux/features/auth/auth.thunk";
 import { useDispatch } from "react-redux";
@@ -123,10 +124,15 @@ const Login = () => {
               />
               <button
                 type="button"
-                className="absolute bottom-2.5 sm:bottom-3 right-3 p-1"
+                className="absolute bottom-2.5 sm:bottom-3 right-3 p-1 text-[#64748B] hover:text-[#334155] transition-colors"
                 onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                <img src={assets.HiddenIcon} alt="Toggle password visibility" className="w-5 h-5" />
+                {showPassword ? (
+                  <EyeOff size={20} className="w-5 h-5" />
+                ) : (
+                  <Eye size={20} className="w-5 h-5" />
+                )}
               </button>
             </div>
             <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2">

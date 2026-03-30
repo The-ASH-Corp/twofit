@@ -9,6 +9,7 @@ import FormTimeRange from "./FormTimeRange";
 import FormFileInput from "./FormFileInput";
 import { useNavigate } from "react-router-dom";
 import { FiSave, FiX } from "react-icons/fi";
+import { SyncLoader } from "react-spinners";
 
 export default function BaseForm({
   fields,
@@ -18,6 +19,7 @@ export default function BaseForm({
   heading,
   submitButton,
   enableReinitialize = false,
+  isLoading,
 }) {
   const navigate = useNavigate();
 
@@ -149,7 +151,8 @@ export default function BaseForm({
               className="px-6 py-2.5 rounded-xl bg-[#0A4F48] text-white font-bold text-sm hover:bg-[#083D38] transition-all shadow-md shadow-[#0A4F48]/20 hover:shadow-lg hover:shadow-[#0A4F48]/30 flex items-center gap-2 active:scale-95"
             >
               <FiSave size={18} />
-              <span>{submitButton || "Save Changes"}</span>
+              <span>{isLoading ? "Saving" : submitButton || "Save Changes"}</span>
+              {isLoading && <SyncLoader size={7} color="#ffffff" />}
             </button>
           </div>
         </div>

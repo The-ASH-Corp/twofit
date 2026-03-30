@@ -19,11 +19,19 @@ export default function ClientsTable() {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+  const [loading, setLoading] = useState(false);
 
   const fetchClientData = async () => {
-    const client = await dispatch(getAllUsersByHead({ headId:user?._id,page, limit })).unwrap();
-    setClients(client.data);
-    setTotalCount(client.total);
+    setLoading(true);
+    try {
+      const client = await dispatch(getAllUsersByHead({ headId:user?._id,page, limit })).unwrap();
+      setClients(client.data);
+      setTotalCount(client.total);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
 
@@ -56,7 +64,7 @@ export default function ClientsTable() {
     fetchClientData();
   }, [page, limit, dispatch]);
 
-  if (clients.length<=0) return (
+  if (loading) return (
         <div className="flex justify-center items-center h-[calc(100vh-120px)]">
           <SyncLoader color="#0A4F48" loading margin={2} size={20} />
         </div>

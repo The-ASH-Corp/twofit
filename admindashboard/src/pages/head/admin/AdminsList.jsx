@@ -15,12 +15,21 @@ export default function AdminsList() {
   const [totalCount,setTotalCount]=useState(0)
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
+    const [loading, setLoading] = useState(false);
+  
 
   const dispatch = useDispatch();
   const fetchAdminData=async()=>{
-    const admin =await dispatch(getAdminsByHeadId({page,limit,headId:user?._id})).unwrap()
-    setAdmins(admin.data)
-    setTotalCount(admin.total)
+    setLoading(true);
+    try {
+      const admin =await dispatch(getAdminsByHeadId({page,limit,headId:user?._id})).unwrap()
+      setAdmins(admin.data)
+      setTotalCount(admin.total)
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   }
  const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -52,7 +61,7 @@ export default function AdminsList() {
     fetchAdminData();
   }, [page, limit]);
 
-  if (admins.length<=0) return (
+  if (loading) return (
       <div className="flex justify-center items-center h-[calc(100vh-120px)]">
         <SyncLoader color="#0A4F48" loading margin={2} size={20} />
       </div>
