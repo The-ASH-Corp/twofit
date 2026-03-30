@@ -87,21 +87,37 @@ const io = new Server(server, {
 
 initSocket(io);
 
-await connectRedis()
-mongoose
-  .connect(process.env.MONGOURI)
-  .then(async() => {
-    console.log("connected");
+const mongoUri = process.env.MONGOURI || process.env.MONGO_URI;
+
+if (!mongoUri) {
+  console.error("Mongo URI is missing. Set MONGOURI or MONGO_URI in environment variables.");
+  process.exit(1);
+}
+
+const startServer = async () => {
+  try {
+    await mongoose.connect(mongoUri);
+    console.log("MongoDB connected");
+
+    const redisConnected = await connectRedis();
+    if (!redisConnected) {
+      console.warn("Starting server without Redis. Some auth/session features may be degraded.");
+    }
+
     await seedReminders();
-    // Start the cleanup scheduler after DB connection
     ensureNotificationIndexes();
     startImageCleanupTask();
     startNotificationCron();
     activateExtensionsCron();
-    
-  })
-  .catch(() => console.log("not connected"));
 
-server.listen(process.env.PORT, () =>
-  console.log(`server is running at port ${process.env.PORT}`)
-);
+    const port = Number(process.env.PORT) || 5000;
+    server.listen(port, () => {
+      console.log(`server is running at port ${port}`);
+    });
+  } catch (error) {
+    console.error("Startup failed:", error?.message || error);
+    process.exit(1);
+  }
+};
+
+startServer();
