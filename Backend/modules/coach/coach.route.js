@@ -8,7 +8,6 @@ import { allowRoles } from "../../middleware/roleMiddleware.js";
 const router = express.Router();
 
 router.post("/create", authMiddleware, uploader.fields([
-  { name: "certifications", maxCount: 1 },
   { name: "photo", maxCount: 1 }
 ]), coachController.createCoach);
 router.get("/get-all-coaches/:page/:limit", authMiddleware, coachController.getAllCoach);
