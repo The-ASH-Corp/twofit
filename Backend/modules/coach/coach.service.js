@@ -8,8 +8,10 @@ import { getUserComplianceStats } from "../../utils/complianceCalculator.js";
 import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 import { sendEmail } from "../../utils/email.js";
 import { createNotification } from "../notification/notification.service.js";
+import { assertEmailUnique } from "../../utils/checkEmailUnique.js";
 
 export const createCoach = async (coach) => {
+  await assertEmailUnique(coach.email);
   // Parse JSON stringified fields from FormData
   const fieldsToParseAsJSON = [
     "workingHours",

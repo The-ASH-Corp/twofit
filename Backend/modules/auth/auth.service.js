@@ -14,11 +14,11 @@ import {
   createNotification,
   createNotificationFromEvent,
 } from "../notification/notification.service.js";
+import { assertEmailUnique } from "../../utils/checkEmailUnique.js";
 
 export const adminCreateUser = async (userData) => {
   try {
-    const exists = await User.findOne({ email: userData.email });
-    if (exists) throw new Error("Email already exists");
+    await assertEmailUnique(userData.email);
     const password = generatePassword();
     console.log("Generated Password for User:", password);
     const hashed = await bcrypt.hash(password, 10);

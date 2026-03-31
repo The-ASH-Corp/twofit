@@ -7,6 +7,7 @@ import { AdminModel } from "./admin.model.js";
 import TaskSubmission from "../taskSubmission/taskSubmission.model.js";
 import { sendEmail } from "../../utils/email.js";
 import { createNotification } from "../notification/notification.service.js";
+import { assertEmailUnique } from "../../utils/checkEmailUnique.js";
 
 export const getAllAdmins = async (page, limit) => {
   const skip = (page - 1) * limit;
@@ -30,6 +31,8 @@ export const getAllAdmins = async (page, limit) => {
 };
 
 export const addNewAdmin = async (adminData) => {
+  await assertEmailUnique(adminData.email);
+
   let plainPassword;
   if (adminData.password) {
     plainPassword = adminData.password;

@@ -9,8 +9,11 @@ import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 import { sendEmail } from "../../utils/email.js";
 import User from "../auth/auth.model.js";
 import { categoryModel } from "../category/category.model.js";
+import { assertEmailUnique } from "../../utils/checkEmailUnique.js";
 
 export const createHead = async (head) => {
+  await assertEmailUnique(head.email);
+
   let hashedPassword;
   let plainPassword;
 
