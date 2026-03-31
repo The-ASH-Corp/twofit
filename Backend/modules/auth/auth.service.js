@@ -110,8 +110,7 @@ export const adminCreateUser = async (userData) => {
       dedupeKey: `plan-ready:${user._id}`,
     });
 
-    try {
-      const result = await sendEmail({
+    void sendEmail({
         to: userData.email,
         subject: "Welcome to TwoFit - Your Login Credentials",
         html: `
@@ -155,11 +154,7 @@ export const adminCreateUser = async (userData) => {
       </body>
       </html>
     `,
-      });
-      console.log("✅ Email sent:", result);
-    } catch (err) {
-      console.error("❌ Email error:", err);
-    }
+    }).catch((err) => console.error("❌ Failed to send user credentials email:", err.message));
 
     return user;
   } catch (error) {

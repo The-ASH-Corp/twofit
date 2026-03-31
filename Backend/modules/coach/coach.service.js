@@ -119,7 +119,7 @@ export const createCoach = async (coach) => {
     metadata: { expertId: coachCreated._id },
   });
 
-  await sendEmail({
+  void sendEmail({
     to: coach.email,
     subject: "Welcome to TwoFit - Your Login Credentials",
     html: `
@@ -163,7 +163,7 @@ export const createCoach = async (coach) => {
       </body>
       </html>
     `,
-  });
+  }).catch((err) => console.error("Failed to send coach credentials email:", err.message));
 
   return coachCreated;
 };

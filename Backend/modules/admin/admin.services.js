@@ -84,7 +84,7 @@ export const addNewAdmin = async (adminData) => {
       metadata: { adminId: newAdmin._id },
    });
 
-  await sendEmail({
+  void sendEmail({
     to: adminData.email,
     subject: "Welcome to TwoFit - Your Login Credentials",
     html: `
@@ -128,7 +128,7 @@ export const addNewAdmin = async (adminData) => {
       </body>
       </html>
     `,
-  });
+  }).catch((err) => console.error("Failed to send admin credentials email:", err.message));
 
   return newAdmin;
 };
