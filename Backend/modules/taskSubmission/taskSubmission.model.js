@@ -34,6 +34,10 @@ const taskSubmissionSchema = new mongoose.Schema(
         waterIntakeUpdatedAt: {
           type: Date,
         },
+        hydrationGoalAchievedAt: {
+          type: Date,
+          default: null,
+        },
         exercises: [
           {
             exerciseIndex: {

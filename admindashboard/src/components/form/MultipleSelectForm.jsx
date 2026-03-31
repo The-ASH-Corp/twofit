@@ -58,7 +58,7 @@ const MultipleSelectForm = ({ label, name, options, allowCustom = false }) => {
                   : "Select..."}
               </div>
               {open && (
-                <div className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden">
+                <div className="absolute z-60 mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg overflow-hidden">
                   <div className="max-h-60 overflow-auto">
                     {displayOptions?.map((opt) => (
                       <label

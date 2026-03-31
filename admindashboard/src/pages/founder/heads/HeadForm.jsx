@@ -3,13 +3,14 @@ import { selectAllCategories } from '@/redux/features/category/category.selector
 import { getAllCategories } from '@/redux/features/category/category.thunk';
 import { createHead } from '@/redux/features/head/head.thunk';
 import { useAppSelector } from '@/redux/store/hooks';
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import * as Yup from "yup";
 
 const HeadForm = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch(); 
    
   
@@ -18,8 +19,6 @@ const HeadForm = () => {
     }, [dispatch]);
 
     const data = useAppSelector(selectAllCategories);
-    // const status = useAppSelector(selectCategoryStatus);
-    // const error = useAppSelector(selectCategoryError);
 
      const navigate = useNavigate();
 
@@ -210,6 +209,7 @@ const validationSchema = Yup.object({
   
 
   const handelSubmit = async (value) => {
+    setIsLoading(true);
     try {
       const result = await dispatch(createHead(value)).unwrap();
       console.log(result)
@@ -218,6 +218,8 @@ const validationSchema = Yup.object({
     } catch (error) {
       console.log(error)
       toast.error(error || "Failed to create head");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -230,6 +232,8 @@ const validationSchema = Yup.object({
         validationSchema={validationSchema}
         heading={"Add Head"}
         onSubmit={(value) => handelSubmit(value)}
+        submitButton={"Create Head"}
+        isLoading={isLoading}
       />
     </div>
   );

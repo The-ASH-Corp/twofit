@@ -39,12 +39,74 @@ const initialValues = {
 };
 
 const schema = Yup.object({
-  fullname: Yup.string().required("Required"),
-  dob: Yup.string().required("Required"),
-  gender: Yup.string().required("Required"),
+  fullname: Yup.string()
+    .trim()
+    .required("Full Name is required")
+    .min(3, "Full Name must be at least 3 characters"),
+
+  dob: Yup.date()
+    .required("Date Of Birth is required")
+    .max(new Date(), "Date Of Birth cannot be in the future"),
+
+  gender: Yup.string()
+    .oneOf(["male", "female"], "Gender is required")
+    .required("Gender is required"),
+
+  email: Yup.string()
+    .email("Invalid email format")
+    .required("Email Address is required"),
+
+  phone: Yup.string()
+    .required("Phone Number is required")
+    .matches(/^[0-9]{10}$/, "Phone Number must be 10 digits"),
+
+  address: Yup.string()
+    .trim()
+    .required("Address is required")
+    .min(5, "Address must be at least 5 characters"),
+
+  medicalconditions: Yup.array().of(Yup.string()),
+  allergy: Yup.array().of(Yup.string()),
+
+  foodPreference: Yup.string().required("Food Preference is required"),
+  fitnessGoal: Yup.string().required("Fitness Goal is required"),
+  workoutExperience: Yup.string().required("Workout Experience is required"),
+
+  height: Yup.number()
+    .typeError("Height must be a number")
+    .required("Height is required")
+    .positive("Height must be greater than 0"),
+
+  currentWeight: Yup.number()
+    .typeError("Current Weight must be a number")
+    .required("Current Weight is required")
+    .positive("Current Weight must be greater than 0"),
+
+  targetWeight: Yup.number()
+    .typeError("Target Weight must be a number")
+    .required("Target Weight is required")
+    .positive("Target Weight must be greater than 0"),
+
+  programType: Yup.string().required("Program Type is required"),
+  duration: Yup.string().required("Duration is required"),
+  startDate: Yup.date().required("Start Date is required"),
+  endDate: Yup.date()
+    .required("End Date is required")
+    .min(Yup.ref("startDate"), "End Date must be after Start Date"),
+
+  therapyType: Yup.string(),
+
+  dietician: Yup.string().required("Dietician is required"),
+  trainer: Yup.string().required("Trainer is required"),
+  therapist: Yup.string().when("therapyType", {
+    is: (therapyType) => Boolean(therapyType),
+    then: (fieldSchema) => fieldSchema.required("Therapist is required"),
+    otherwise: (fieldSchema) => fieldSchema,
+  }),
 });
 
 export default function ClientForm() {
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [program, setProgram] = useState(null);
   const [coachesOfAdmin, setCoachesOfAdmin] = useState([]);
@@ -55,29 +117,28 @@ export default function ClientForm() {
 
   const user = useSelector(selectUser);
 
-  const fetchProgram = async () => {
-    await dispatch(
-      getAllProgramsByAdmin({ adminId: user?._id, page: 1, limit: 120 }),
-    ).then((res) => {
-      setProgram(res.payload.data);
-    });
-    const coachessOfAdmin = await dispatch(getAllCoachesByAdmin(user.experts));
-    setCoachesOfAdmin(coachessOfAdmin.payload);
-  };
-
-  const fetchTherapy = async () => {
-    const res = await dispatch(fetchTherapyPlans({page:1, limit:100}));
-    if (res.payload?.data) {
-      setTherapy(res.payload.data.therapy);
-    }
-  };
-
   useEffect(() => {
-    fetchProgram();
-    fetchTherapy();
-  }, []);
+    const timer = setTimeout(async () => {
+      const programRes = await dispatch(
+        getAllProgramsByAdmin({ adminId: user?._id, page: 1, limit: 120 }),
+      );
+      setProgram(programRes?.payload?.data || []);
 
+      const coachessOfAdmin = await dispatch(
+        getAllCoachesByAdmin(user?.experts),
+      );
+      setCoachesOfAdmin(coachessOfAdmin?.payload || []);
 
+      const therapyRes = await dispatch(
+        fetchTherapyPlans({ page: 1, limit: 100 }),
+      );
+      if (therapyRes?.payload?.data) {
+        setTherapy(therapyRes.payload.data.therapy);
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
+  }, [dispatch, user]);
 
   const setProgramId = (programId) => {
     const selectedProgram = program?.find((p) => p?._id === programId);
@@ -356,13 +417,20 @@ export default function ClientForm() {
   ];
 
   const handleUserCreation = async (values) => {
-    const updatedValues = { ...values, adminId: user?._id };
-    const client = await dispatch(createClient(updatedValues));
-    if (client.payload.success) {
-      toast.success("Client created successfully");
-      navigate(-1);
-    } else {
-      toast.error("Failed to create client");
+    setIsLoading(true);
+    try {
+      const updatedValues = { ...values, adminId: user?._id };
+      const client = await dispatch(createClient(updatedValues));
+      if (client.payload.success) {
+        toast.success("Client created successfully");
+        navigate(-1);
+      } else {
+        toast.error("Failed to create client");
+      }
+    } catch (error) {
+      toast.error(error?.message || "Failed to create client");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -372,6 +440,8 @@ export default function ClientForm() {
       initialValues={initialValues}
       validationSchema={schema}
       submitLabel="Login"
+      submitButton={"Create Client"}
+      isLoading={isLoading}
       onSubmit={(values) => handleUserCreation(values)}
     />
   );

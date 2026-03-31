@@ -7,15 +7,15 @@ export default function MobileBottomNav() {
   const location = useLocation();
 
   const navItems = [
-    { name: "Home", icon: Home, path: "/client/dashboard" },
-    { name: "Plan", icon: Calendar, path: "/client/daily-tasks" },
+    { name: "Home", icon: Home, path: "/client/" },
+    { name: "Plan", icon: Calendar, path: "/client/daily-plan" },
     { name: "Chat", icon: MessageSquare, path: "/client/chats" },
-    { name: "Stats", icon: BarChart2, path: "/client/progress" },
+    { name: "Progress", icon: BarChart2, path: "/client/progress" },
     { name: "Profile", icon: User, path: "/client/profile" },
   ];
 
   return (
-    <div className="lg:hidden fixed bottom-4 left-4 right-4 z-50">
+    <div className="lg:hidden fixed bottom-4 left-4 right-4 z-30">
       <div className="bg-white/90 backdrop-blur-2xl border border-white/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[32px] flex items-center justify-around px-2 py-3">
         {navItems.map((item) => {
           const Icon = item.icon;

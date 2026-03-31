@@ -11,6 +11,34 @@
   scrollbar-width: none;     /* Firefox */
 }
 
+/* Hydration celebration animations */
+@keyframes hydration-float-up {
+  0%   { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(-160px) scale(0.4) rotate(20deg); }
+}
+
+@keyframes hydration-burst {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.08); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes hydration-ring-glow {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(10,79,72,0.5)); }
+  50%       { filter: drop-shadow(0 0 22px rgba(10,79,72,0.9)); }
+}
+
+@keyframes hydration-fade-out {
+  0%   { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.animate-hydration-float-up { animation: hydration-float-up 1.8s ease-out forwards; }
+.animate-hydration-burst     { animation: hydration-burst 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.animate-hydration-ring-glow { animation: hydration-ring-glow 1.2s ease-in-out infinite; }
+.animate-hydration-fade-out  { animation: hydration-fade-out 3.5s ease-in-out forwards; }
+
 
 /* 
 @import "tw-animate-css";

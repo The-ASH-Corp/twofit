@@ -1,36 +1,34 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Bookmark,
   Search,
   ChevronRight,
-  Plus,
-  Clock,
 } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { cn } from "@/lib/utils";
+import { assets } from "@/assets/asset";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
   getRecipesThunk,
   toggleRecipeBookmarkThunk,
 } from "@/redux/features/recipe/recipe.thunk";
-import { selectRecipes, selectRecipeLoading } from "@/redux/features/recipe/recipe.selector";
+import { selectRecipes } from "@/redux/features/recipe/recipe.selector";
 import MobileBottomNav from "../components/MobileBottomNav";
 
 // import { CATEGORY_OPTIONS } from "./recipeLibrary";
 
 export default function RecipeList() {
   const dispatch = useDispatch();
+  const featuredSectionRef = useRef(null);
   const [searchParams, setSearchParams] = useSearchParams();
-  const bookmarkedFilter = searchParams.get("filter") === "bookmarked";
 
   const recipes = useSelector(selectRecipes);
-  const loading = useSelector(selectRecipeLoading);
 
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchText, setSearchText] = useState("");
-  const [bookmarkLoadingId, setBookmarkLoadingId] = useState(null);
+  const [, setBookmarkLoadingId] = useState(null);
   const [featuredId, setFeaturedId] = useState(null);
 
   const showBookmarkedOnly = useMemo(() => {
@@ -41,11 +39,6 @@ export default function RecipeList() {
     const categories = recipes.map((recipe) => recipe.category);
     return [...new Set(categories)].filter(Boolean);
   }, [recipes]);
-
-  const bookmarkedCount = useMemo(
-    () => recipes.filter((recipe) => recipe.isBookmarked).length,
-    [recipes],
-  );
 
   useEffect(() => {
     dispatch(getRecipesThunk()).unwrap().catch(() => {
@@ -68,7 +61,7 @@ export default function RecipeList() {
     setSearchParams(nextParams, { replace: true });
   };
 
-  const toDisplayText = (item) => {
+  const toDisplayText = useCallback((item) => {
     if (typeof item === "string") {
       return item;
     }
@@ -91,9 +84,9 @@ export default function RecipeList() {
       item.ingredient ||
       ""
     );
-  };
+  }, []);
 
-  const normalizeList = (value) => {
+  const normalizeList = useCallback((value) => {
     if (!Array.isArray(value)) {
       return [];
     }
@@ -101,7 +94,7 @@ export default function RecipeList() {
     return value
       .map((item) => toDisplayText(item).trim())
       .filter(Boolean);
-  };
+  }, [toDisplayText]);
 
   const filteredRecipes = useMemo(() => {
     const baseFiltered = recipes.filter((recipe) => {
@@ -130,7 +123,7 @@ export default function RecipeList() {
 
     const others = baseFiltered.filter(r => r._id !== featuredId);
     return [featured, ...others];
-  }, [recipes, activeCategory, searchText, showBookmarkedOnly, featuredId]);
+  }, [recipes, activeCategory, searchText, showBookmarkedOnly, featuredId, normalizeList]);
 
   const toggleBookmark = async (id) => {
     try {
@@ -141,6 +134,19 @@ export default function RecipeList() {
       toast.error(error || "Failed to update bookmark");
     } finally {
       setBookmarkLoadingId(null);
+    }
+  };
+
+  const handleSelectRecipe = (id) => {
+    setFeaturedId(id);
+
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 1023px)").matches) {
+      requestAnimationFrame(() => {
+        featuredSectionRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      });
     }
   };
 
@@ -221,7 +227,7 @@ export default function RecipeList() {
             FEATURED GRID
             ========================================= */}
         {featuredRecipe && (
-          <section className="grid lg:grid-cols-12 gap-8 lg:gap-12">
+          <section ref={featuredSectionRef} className="grid lg:grid-cols-12 gap-8 lg:gap-12">
             
             {/* Main Featured Card (Left) */}
             <div className={cn(
@@ -289,7 +295,7 @@ export default function RecipeList() {
             {/* Secondary Recipe Card (Right) */}
             {secondaryRecipe && (
               <div 
-                onClick={() => setFeaturedId(secondaryRecipe._id)}
+                onClick={() => handleSelectRecipe(secondaryRecipe._id)}
                 className="lg:col-span-4 cursor-pointer"
               >
                 <div className="bg-white rounded-[40px] overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.03)] border border-gray-50 flex flex-col h-full group/side hover:shadow-xl transition-all duration-500">
@@ -340,11 +346,11 @@ export default function RecipeList() {
             ========================================= */}
         {otherRecipes.length > 0 && (
           <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-             {otherRecipes.slice(0, 3).map((recipe, idx) => (
+             {otherRecipes.slice(0, 3).map((recipe) => (
                <div 
                   key={recipe._id} 
-                  onClick={() => setFeaturedId(recipe._id)}
-                  className="bg-white rounded-[32px] p-5 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex items-center justify-between group cursor-pointer hover:bg-gray-100/50 hover:shadow-md transition-all active:scale-[0.98]"
+                onClick={() => handleSelectRecipe(recipe._id)}
+                  className="bg-white rounded-4xl p-5 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex items-center justify-between group cursor-pointer hover:bg-gray-100/50 hover:shadow-md transition-all active:scale-[0.98]"
                >
                   <div className="flex items-center gap-4">
                      <img src={recipe.image || assets.MealPlaceholder} alt={recipe.name} className="w-14 h-14 rounded-[20px] object-cover shadow-md group-hover:scale-105 transition-transform" />

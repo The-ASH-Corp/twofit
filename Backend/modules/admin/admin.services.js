@@ -7,6 +7,7 @@ import { AdminModel } from "./admin.model.js";
 import TaskSubmission from "../taskSubmission/taskSubmission.model.js";
 import { sendEmail } from "../../utils/email.js";
 import { createNotification } from "../notification/notification.service.js";
+import { assertEmailUnique } from "../../utils/checkEmailUnique.js";
 
 export const getAllAdmins = async (page, limit) => {
   const skip = (page - 1) * limit;
@@ -30,6 +31,8 @@ export const getAllAdmins = async (page, limit) => {
 };
 
 export const addNewAdmin = async (adminData) => {
+  await assertEmailUnique(adminData.email);
+
   let plainPassword;
   if (adminData.password) {
     plainPassword = adminData.password;
@@ -84,7 +87,7 @@ export const addNewAdmin = async (adminData) => {
       metadata: { adminId: newAdmin._id },
    });
 
-  await sendEmail({
+  void sendEmail({
     to: adminData.email,
     subject: "Welcome to TwoFit - Your Login Credentials",
     html: `
@@ -117,7 +120,7 @@ export const addNewAdmin = async (adminData) => {
             <p>Please log in and change your password immediately for security purposes.</p>
             
             <div style="text-align: center; margin-top: 30px;">
-              <a href="http://localhost:5173/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
+              <a href="https://app.twofit.co/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
             </div>
           </div>
           <div class="footer">
@@ -128,7 +131,7 @@ export const addNewAdmin = async (adminData) => {
       </body>
       </html>
     `,
-  });
+  }).catch((err) => console.error("Failed to send admin credentials email:", err.message));
 
   return newAdmin;
 };

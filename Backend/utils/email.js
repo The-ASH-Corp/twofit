@@ -19,10 +19,12 @@ function initMailer() {
   }
 
   transporter = nodemailer.createTransport({
-    service: "gmail",  
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false, // STARTTLS — required for port 587; port 465 (SSL) is blocked on most cloud servers
     auth: {
       user,
-      pass,  
+      pass,
     },
   });
 

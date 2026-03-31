@@ -166,7 +166,7 @@ export default function Progress() {
       icon: <BadgeCheck size={20} className="text-[#0A4F48] hidden lg:block" />,
       subtitle: (
         <div className="text-gray-500 text-[10px] lg:text-[11px] font-medium mt-2 leading-tight">
-          <span className="hidden lg:inline">Consistency score for current week</span>
+          <span className="hidden lg:inline">Compliance score of the program</span>
           <span className="inline lg:hidden">Early stages</span>
         </div>
       ),

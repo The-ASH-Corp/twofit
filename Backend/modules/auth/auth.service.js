@@ -14,11 +14,11 @@ import {
   createNotification,
   createNotificationFromEvent,
 } from "../notification/notification.service.js";
+import { assertEmailUnique } from "../../utils/checkEmailUnique.js";
 
 export const adminCreateUser = async (userData) => {
   try {
-    const exists = await User.findOne({ email: userData.email });
-    if (exists) throw new Error("Email already exists");
+    await assertEmailUnique(userData.email);
     const password = generatePassword();
     console.log("Generated Password for User:", password);
     const hashed = await bcrypt.hash(password, 10);
@@ -110,8 +110,7 @@ export const adminCreateUser = async (userData) => {
       dedupeKey: `plan-ready:${user._id}`,
     });
 
-    try {
-      const result = await sendEmail({
+    void sendEmail({
         to: userData.email,
         subject: "Welcome to TwoFit - Your Login Credentials",
         html: `
@@ -155,11 +154,7 @@ export const adminCreateUser = async (userData) => {
       </body>
       </html>
     `,
-      });
-      console.log("✅ Email sent:", result);
-    } catch (err) {
-      console.error("❌ Email error:", err);
-    }
+    }).catch((err) => console.error("❌ Failed to send user credentials email:", err.message));
 
     return user;
   } catch (error) {

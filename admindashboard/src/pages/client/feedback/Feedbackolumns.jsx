@@ -44,7 +44,7 @@ export const feedbackColumns = [
     cell: ({row}) => {
       const rating = row.original.rating;
       return (
-        <div className="flex items-center gap-0.5">
+        <div className="flex items-center gap-1.550.5">
           {[...Array(5)].map((_, i) => (
             <span key={i} className={`text-lg ${i < rating ? "text-[#F5BA02]" : "text-gray-200"}`}>
               ★

@@ -7,19 +7,11 @@ import {
   Wind, 
   Accessibility, 
   PenLine, 
-  Settings, 
   Maximize, 
   Play, 
   Check, 
-  Circle, 
-  Camera, 
-  Lightbulb, 
-  Timer,
-  Info,
-  Clock,
   Sparkles,
   ChevronRight,
-  MoreVertical,
   Volume2
 } from "lucide-react";
 import { SyncLoader } from "react-spinners";
@@ -37,6 +29,7 @@ import MobileBottomNav from "../components/MobileBottomNav";
 import { cn } from "@/lib/utils";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
 
 export default function TherapyTasksPage() {
   const dispatch = useDispatch();

@@ -109,6 +109,26 @@ const ExpertLeftSide = ({ expert }) => {
     };
   }, [dispatch, isChatMonitorOpen, expert?._id, selectedClient?._id]);
 
+  useEffect(() => {
+    if (!isChatMonitorOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleEscape = (event) => {
+      if (event.key === "Escape") {
+        closeMonitor();
+      }
+    };
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isChatMonitorOpen]);
+
   const closeMonitor = () => {
     setIsChatMonitorOpen(false);
     setSelectedClient(null);
@@ -288,105 +308,114 @@ const ExpertLeftSide = ({ expert }) => {
 
       {/* Chat Monitor Modal/Overlay */}
       {isChatMonitorOpen && (
-        <div className="absolute inset-0 z-50 bg-white flex flex-col animate-in fade-in duration-200">
-          <div className="p-4 border-b border-[#F1F5F9] flex items-center justify-between bg-[#FAFCFF] shrink-0">
-            <div>
-              <h3 className="font-bold text-[#1E293B]">Chat Monitor</h3>
-              <p className="text-[11px] text-[#64748B]">
-                View client interactions
-              </p>
-            </div>
-            <button
-              onClick={closeMonitor}
-              className="w-8 h-8 rounded-full bg-white border border-[#E2E8F0] flex items-center justify-center text-[#64748B] hover:text-red-500 hover:border-red-200 transition-all"
-            >
-              <X size={16} />
-            </button>
-          </div>
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-900/45 backdrop-blur-[2px] p-0 sm:p-4">
+          <button
+            type="button"
+            onClick={closeMonitor}
+            className="absolute inset-0 h-full w-full cursor-default"
+            aria-label="Close chat monitor"
+          />
 
-          <div className="flex-1 flex overflow-hidden">
-            {/* Client List */}
-            <div className="w-1/3 border-r border-[#F1F5F9] overflow-y-auto bg-[#F8FAFC]">
-              {assignedClients.length === 0 ? (
-                <div className="p-4 text-center text-xs text-gray-400">
-                  No clients assigned
-                </div>
-              ) : (
-                assignedClients.map((client) => (
-                  <div
-                    key={client._id}
-                    onClick={() => setSelectedClient(client)}
-                    className={`p-3 border-b border-[#F1F5F9] cursor-pointer hover:bg-white transition-colors ${selectedClient?._id === client._id ? "bg-white border-l-4 border-l-[#0A4F48]" : "border-l-4 border-l-transparent"}`}
-                  >
-                    <div className="font-semibold text-xs text-[#334155] truncate">
-                      {client.name}
-                    </div>
-                  </div>
-                ))
-              )}
+          <div className="relative z-10 w-full max-w-none sm:max-w-6xl h-dvh sm:h-[88dvh] rounded-none sm:rounded-3xl border-0 sm:border border-slate-200 bg-white shadow-none sm:shadow-[0_30px_90px_rgba(15,23,42,0.28)] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-3 sm:p-4 border-b border-[#F1F5F9] flex items-center justify-between bg-[#FAFCFF] shrink-0">
+              <div>
+                <h3 className="font-bold text-[#1E293B]">Chat Monitor</h3>
+                <p className="text-[11px] text-[#64748B]">
+                  View client interactions
+                </p>
+              </div>
+              <button
+                onClick={closeMonitor}
+                className="w-9 h-9 rounded-full bg-white border border-[#E2E8F0] flex items-center justify-center text-[#64748B] hover:text-red-500 hover:border-red-200 transition-all"
+              >
+                <X size={18} />
+              </button>
             </div>
 
-            {/* Messages Area */}
-            <div className="flex-1 flex flex-col bg-white overflow-hidden">
-              {/* Messages Header */}
-              {selectedClient && (
-                <div className="p-2 border-b border-[#F1F5F9] text-xs font-bold text-center text-[#0A4F48] bg-emerald-50/50">
-                  Chat with {selectedClient.name}
-                </div>
-              )}
-
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#fafafa]">
-                {isLoadingMessages ? (
-                  <div className="flex justify-center items-center h-full">
-                    <Loader2
-                      className="animate-spin text-[#0A4F48]"
-                      size={24}
-                    />
-                  </div>
-                ) : chatError ? (
-                  <div className="text-center text-red-400 text-xs mt-10">
-                    {chatError}
-                  </div>
-                ) : monitorMessages.length === 0 ? (
-                  <div className="text-center text-slate-300 text-xs mt-10">
-                    No messages found
+            <div className="flex-1 flex flex-col sm:flex-row overflow-hidden">
+              {/* Client List */}
+              <div className="w-full sm:w-[34%] sm:min-w-[180px] sm:max-w-[300px] border-b sm:border-b-0 sm:border-r border-[#F1F5F9] overflow-y-auto max-h-40 sm:max-h-none bg-[#F8FAFC]">
+                {assignedClients.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-gray-400">
+                    No clients assigned
                   </div>
                 ) : (
-                  monitorMessages.map((msg, idx) => {
-                    const isExpert = msg.sender === expert._id;
-                    const type = getMessageType(msg);
-                    return (
-                      <div
-                        key={idx}
-                        className={`flex flex-col ${isExpert ? "items-end" : "items-start"} max-w-[85%] ${isExpert ? "ml-auto" : "mr-auto"}`}
-                      >
-                        <div
-                          className={`px-3 py-2 rounded-xl text-xs ${isExpert ? "bg-[#0A4F48] text-white rounded-br-none" : "bg-white border border-gray-200 text-gray-700 rounded-bl-none shadow-sm"}`}
-                        >
-                          {type === "text" && <p>{msg.content}</p>}
-                          {type === "image" && (
-                            <img
-                              src={getFileUrl(msg.mediaUrl)}
-                              alt="attachment"
-                              className="max-w-[150px] rounded-lg"
-                            />
-                          )}
-                          {type === "voice" && (
-                            <span className="italic opacity-80">
-                              🎤 Voice Message
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[10px] text-gray-400 mt-1">
-                          {new Date(msg.createdAt).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </span>
+                  assignedClients.map((client) => (
+                    <div
+                      key={client._id}
+                      onClick={() => setSelectedClient(client)}
+                      className={`p-3 border-b border-[#F1F5F9] cursor-pointer hover:bg-white transition-colors ${selectedClient?._id === client._id ? "bg-white border-l-4 border-l-[#0A4F48]" : "border-l-4 border-l-transparent"}`}
+                    >
+                      <div className="font-semibold text-xs text-[#334155] truncate">
+                        {client.name}
                       </div>
-                    );
-                  })
+                    </div>
+                  ))
                 )}
+              </div>
+
+              {/* Messages Area */}
+              <div className="flex-1 flex flex-col bg-white overflow-hidden">
+                {/* Messages Header */}
+                {selectedClient && (
+                  <div className="p-2 border-b border-[#F1F5F9] text-xs font-bold text-center text-[#0A4F48] bg-emerald-50/50">
+                    Chat with {selectedClient.name}
+                  </div>
+                )}
+
+                <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 bg-[#fafafa]">
+                  {isLoadingMessages ? (
+                    <div className="flex justify-center items-center h-full">
+                      <Loader2
+                        className="animate-spin text-[#0A4F48]"
+                        size={24}
+                      />
+                    </div>
+                  ) : chatError ? (
+                    <div className="text-center text-red-400 text-xs mt-10">
+                      {chatError}
+                    </div>
+                  ) : monitorMessages.length === 0 ? (
+                    <div className="text-center text-slate-300 text-xs mt-10">
+                      No messages found
+                    </div>
+                  ) : (
+                    monitorMessages.map((msg, idx) => {
+                      const isExpert = msg.sender === expert._id;
+                      const type = getMessageType(msg);
+                      return (
+                        <div
+                          key={idx}
+                          className={`flex flex-col ${isExpert ? "items-end" : "items-start"} max-w-[85%] ${isExpert ? "ml-auto" : "mr-auto"}`}
+                        >
+                          <div
+                            className={`px-3 py-2 rounded-xl text-xs ${isExpert ? "bg-[#0A4F48] text-white rounded-br-none" : "bg-white border border-gray-200 text-gray-700 rounded-bl-none shadow-sm"}`}
+                          >
+                            {type === "text" && <p>{msg.content}</p>}
+                            {type === "image" && (
+                              <img
+                                src={getFileUrl(msg.mediaUrl)}
+                                alt="attachment"
+                                className="max-w-[150px] rounded-lg"
+                              />
+                            )}
+                            {type === "voice" && (
+                              <span className="italic opacity-80">
+                                🎤 Voice Message
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-gray-400 mt-1">
+                            {new Date(msg.createdAt).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
               </div>
             </div>
           </div>

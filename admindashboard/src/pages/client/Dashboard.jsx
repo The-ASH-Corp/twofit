@@ -13,7 +13,6 @@ import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
 import {
   fetchClientComplianceStats,
   getClient,
-  fetchClientAdherenceStreaks,
 } from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { SyncLoader } from "react-spinners";
@@ -126,7 +125,7 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-[60vh]">
+      <div className="flex justify-center items-center min-h-[50vh] sm:min-h-[60vh]">
         <SyncLoader color="#0A4F48" loading margin={2} size={20} />
       </div>
     );
@@ -134,11 +133,11 @@ export default function Dashboard() {
 
   if (clientStatus === "Inactive") {
     return (
-      <div className="flex flex-col items-center justify-center h-[80vh] text-center p-8 bg-white rounded-[32px] shadow-sm">
-        <h1 className="text-3xl font-black text-gray-800 mb-4">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] sm:min-h-[80vh] text-center p-6 sm:p-8 bg-white rounded-4xl shadow-sm">
+        <h1 className="text-2xl sm:text-3xl font-black text-gray-800 mb-4">
           Account Inactive
         </h1>
-        <p className="text-gray-600 text-lg font-medium max-w-md">
+        <p className="text-gray-600 text-base sm:text-lg font-medium max-w-md">
           Please contact your administrator to reactivate your account and
           continue your wellness journey.
         </p>
@@ -148,11 +147,11 @@ export default function Dashboard() {
 
   if (clientStatus === "Completed") {
     return (
-      <div className="flex flex-col items-center justify-center h-[80vh] text-center p-8 bg-[#0A4F48] rounded-[32px] shadow-xl">
-        <h1 className="text-3xl font-black text-white mb-4 tracking-tight">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] sm:min-h-[80vh] text-center p-6 sm:p-8 bg-[#0A4F48] rounded-4xl shadow-xl">
+        <h1 className="text-2xl sm:text-3xl font-black text-white mb-4 tracking-tight">
           Congratulations!
         </h1>
-        <p className="text-[#A7F3D0] text-lg font-bold">
+        <p className="text-[#A7F3D0] text-base sm:text-lg font-bold">
           You've successfully completed your program and achieved your goals!
         </p>
       </div>
@@ -167,16 +166,16 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto lg:p-8 p-4 pb-32 bg-[#F8FAFA] min-h-screen">
-      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-10 items-start">
+    <div className="max-w-[1600px] mx-auto px-3 sm:px-4 lg:px-8 xl:px-10 pt-2 sm:pt-4 lg:pt-8 pb-28 sm:pb-32 min-h-screen bg-transparent">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6 md:gap-8 xl:gap-10 items-start">
         {/* Main Column */}
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-6 md:gap-8 xl:gap-10 min-w-0">
           <HeroCard program={program} currentGlobalDay={currentGlobalDay} />
           <StatsGrid statsData={statsData} />
           <WaterIntake />
 
           {/* Mobile Only: Sidebars stack below main content */}
-          <div className="lg:hidden flex flex-col gap-10">
+          <div className="lg:hidden flex flex-col gap-6 md:gap-8">
             <DietPlanCard
               dietPlanPdf={clientUser?.dietPlanPdf || user?.dietPlanPdf}
             />
@@ -187,7 +186,7 @@ export default function Dashboard() {
         </div>
 
         {/* Sidebar Column (Desktop Only) */}
-        <div className="hidden lg:flex flex-col gap-10">
+        <div className="hidden lg:flex flex-col gap-6 xl:gap-8 sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto no-scrollbar">
           <DietPlanCard
             dietPlanPdf={clientUser?.dietPlanPdf || user?.dietPlanPdf}
           />
