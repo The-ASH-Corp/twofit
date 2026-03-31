@@ -212,13 +212,11 @@ const validationSchema = Yup.object({
   const handelSubmit = async (value) => {
     try {
       const result = await dispatch(createHead(value)).unwrap();
-      if (result.success) {
+      console.log(result)
         toast.success("Head created successfully");
         navigate("/founder/heads");
-      } else {
-        toast.error("Failed to create head");
-      }
     } catch (error) {
+      console.log(error)
       toast.error(error || "Failed to create head");
     }
   };
