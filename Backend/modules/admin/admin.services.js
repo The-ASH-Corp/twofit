@@ -117,7 +117,7 @@ export const addNewAdmin = async (adminData) => {
             <p>Please log in and change your password immediately for security purposes.</p>
             
             <div style="text-align: center; margin-top: 30px;">
-              <a href="http://localhost:5173/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
+              <a href="https://app.twofit.co/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
             </div>
           </div>
           <div class="footer">

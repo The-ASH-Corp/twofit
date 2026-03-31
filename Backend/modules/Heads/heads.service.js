@@ -39,7 +39,8 @@ export const createHead = async (head) => {
     salary: head.salary,
   });
 
-  await sendEmail({
+  // Do not block create API on SMTP latency/failure.
+  void sendEmail({
     to: head.email,
     subject: "Welcome to TwoFit - Your Login Credentials",
     html: `
@@ -72,7 +73,7 @@ export const createHead = async (head) => {
             <p>Please log in and change your password immediately for security purposes.</p>
             
             <div style="text-align: center; margin-top: 30px;">
-              <a href="http://localhost:5173/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
+              <a href="https://app.twofit.co/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
             </div>
           </div>
           <div class="footer">
@@ -83,6 +84,8 @@ export const createHead = async (head) => {
       </body>
       </html>
     `,
+  }).catch((error) => {
+    console.error("Failed to send head credentials email:", error.message);
   });
 
   return newHead;
