@@ -41,7 +41,6 @@ export default function ExpertForm() {
         { name: "specialization", label: "Specialization", type: "text" },
         { name: "experience", label: "Experience", type: "text" },
         { name: "qualification", label: "Qualification", type: "text" },
-        { name: "certifications", label: "Certifications", type: "text" },
         { name: "languages", label: "Languages", type: "text" },
       ],
     },

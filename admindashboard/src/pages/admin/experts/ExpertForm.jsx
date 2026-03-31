@@ -96,12 +96,6 @@ export default function ExpertForm() {
         { name: "experience", label: "Experience", type: "text" },
         { name: "qualification", label: "Qualification", type: "text" },
         {
-          name: "certifications",
-          label: "Certifications",
-          type: "file",
-          accept: ".pdf,.jpg,.jpeg,.png",
-        },
-        {
           name: "languages",
           label: "Languages",
           type: "multiple",
@@ -238,7 +232,6 @@ export default function ExpertForm() {
     dailyConsults: "",
     responseTime: "",
     baseSalary: "",
-    certifications: null,
   };
 
   const validationSchema = Yup.object({
@@ -343,22 +336,6 @@ export default function ExpertForm() {
       .typeError("Base Salary must be a number")
       .required("Base Salary is required")
       .positive("Base Salary must be greater than 0"),
-
-    certifications: Yup.mixed()
-      .nullable()
-      .test("fileSize", "File size must be less than 5MB", (file) => {
-        if (!file) return true;
-        return file.size <= 5 * 1024 * 1024;
-      })
-      .test("fileType", "Only pdf, jpg, jpeg, png files are allowed", (file) => {
-        if (!file) return true;
-        return [
-          "application/pdf",
-          "image/jpeg",
-          "image/jpg",
-          "image/png",
-        ].includes(file.type);
-      }),
   });
 
   const handleCoachCreation = async (values) => {
@@ -368,10 +345,7 @@ export default function ExpertForm() {
 
       // Append all form values to FormData
       Object.keys(values).forEach((key) => {
-        if (key === "certifications" && values[key] instanceof File) {
-          // For file inputs, append the file directly
-          formData.append(key, values[key]);
-        } else if (key === "workingHours" || key === "breakSlots") {
+        if (key === "workingHours" || key === "breakSlots") {
           // For nested objects, stringify them
           formData.append(key, JSON.stringify(values[key]));
         } else if (Array.isArray(values[key])) {

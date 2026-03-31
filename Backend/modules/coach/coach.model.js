@@ -24,7 +24,7 @@ const coachSchema = new mongoose.Schema(
 
     qualification: { type: String, required: true },
 
-    certifications: { type: String, required: true },
+    certifications: { type: String },
 
     languages: { type: Array, required: true },
 

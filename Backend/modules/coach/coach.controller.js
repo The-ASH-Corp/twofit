@@ -6,9 +6,6 @@ export const createCoach = async (req, res) => {
 
     // Handle file uploads
     if (req.files) {
-      if (req.files.certifications && req.files.certifications[0]) {
-        req.body.certifications = "/uploads/" + req.files.certifications[0].filename;
-      }
       if (req.files.photo && req.files.photo[0]) {
         req.body.photo = "/uploads/" + req.files.photo[0].filename;
       }
