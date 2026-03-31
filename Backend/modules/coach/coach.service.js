@@ -8,8 +8,10 @@ import { getUserComplianceStats } from "../../utils/complianceCalculator.js";
 import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 import { sendEmail } from "../../utils/email.js";
 import { createNotification } from "../notification/notification.service.js";
+import { assertEmailUnique } from "../../utils/checkEmailUnique.js";
 
 export const createCoach = async (coach) => {
+  await assertEmailUnique(coach.email);
   // Parse JSON stringified fields from FormData
   const fieldsToParseAsJSON = [
     "workingHours",
@@ -119,7 +121,7 @@ export const createCoach = async (coach) => {
     metadata: { expertId: coachCreated._id },
   });
 
-  await sendEmail({
+  void sendEmail({
     to: coach.email,
     subject: "Welcome to TwoFit - Your Login Credentials",
     html: `
@@ -163,7 +165,7 @@ export const createCoach = async (coach) => {
       </body>
       </html>
     `,
-  });
+  }).catch((err) => console.error("Failed to send coach credentials email:", err.message));
 
   return coachCreated;
 };

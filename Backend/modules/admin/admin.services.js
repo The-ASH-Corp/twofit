@@ -7,6 +7,7 @@ import { AdminModel } from "./admin.model.js";
 import TaskSubmission from "../taskSubmission/taskSubmission.model.js";
 import { sendEmail } from "../../utils/email.js";
 import { createNotification } from "../notification/notification.service.js";
+import { assertEmailUnique } from "../../utils/checkEmailUnique.js";
 
 export const getAllAdmins = async (page, limit) => {
   const skip = (page - 1) * limit;
@@ -30,6 +31,8 @@ export const getAllAdmins = async (page, limit) => {
 };
 
 export const addNewAdmin = async (adminData) => {
+  await assertEmailUnique(adminData.email);
+
   let plainPassword;
   if (adminData.password) {
     plainPassword = adminData.password;
@@ -84,7 +87,7 @@ export const addNewAdmin = async (adminData) => {
       metadata: { adminId: newAdmin._id },
    });
 
-  await sendEmail({
+  void sendEmail({
     to: adminData.email,
     subject: "Welcome to TwoFit - Your Login Credentials",
     html: `
@@ -128,7 +131,7 @@ export const addNewAdmin = async (adminData) => {
       </body>
       </html>
     `,
-  });
+  }).catch((err) => console.error("Failed to send admin credentials email:", err.message));
 
   return newAdmin;
 };
