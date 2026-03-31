@@ -78,7 +78,6 @@ export const createCoach = async (coach) => {
     specialization: coach.specialization,
     experience: coach.experience,
     qualification: coach.qualification,
-    certifications: coach.certifications,
     languages: coach.languages,
     assignedPrograms: coach.chooseProgram ?? null,
     assignedTherapy: coach.chooseTherapy ?? null,
