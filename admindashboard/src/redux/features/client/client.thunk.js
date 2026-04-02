@@ -150,9 +150,25 @@ export const fetchClientWeightHistory = createAsyncThunk(
 
 export const fetchClientComplianceStats = createAsyncThunk(
   "client/fetchClientComplianceStats",
-  async (id, { rejectWithValue }) => {
+  async (payload, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(`/clients/compliance-stats?userId=${id}`);
+      const id =
+        typeof payload === "object" && payload !== null
+          ? payload.id
+          : payload;
+      const days =
+        typeof payload === "object" && payload !== null
+          ? payload.days
+          : undefined;
+
+      const params = new URLSearchParams();
+      if (id) params.set("userId", id);
+      if (Number.isFinite(Number(days))) params.set("days", String(days));
+
+      const query = params.toString();
+      const response = await axiosInstance.get(
+        `/clients/compliance-stats${query ? `?${query}` : ""}`,
+      );
       return response.data;
     } catch (err) {
       return rejectWithValue(

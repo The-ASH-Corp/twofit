@@ -12,19 +12,15 @@ export default function ClientLayout() {
 
   return (
     <div
-      className="flex h-screen overflow-hidden relative font-sans selection:bg-[#0A4F48] selection:text-white"
-      style={{
-        background:
-          "linear-gradient(180deg, rgba(196, 255, 224, 1) 0%, rgba(237, 237, 237, 0.5) 96%)",
-      }}
+      className="relative flex h-screen overflow-hidden bg-[#f6f8f4] font-sans selection:bg-[#0A4F48] selection:text-white"
     >
       {/* Sidebar - Handles its own mobile/desktop logic with isOpen */}
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      <div className="flex-1 flex flex-col px-4 pt-4 md:px-8 md:pt-6 overflow-hidden min-w-0 transition-all duration-300 ease-in-out">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden px-2 pt-2 transition-all duration-300 ease-in-out md:px-3 md:pt-2">
         <TopBar onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
 
-        <div className="mt-14 md:mt-8 flex-1 overflow-auto no-scrollbar pb-6">
+        <div className="no-scrollbar mt-2 flex-1 overflow-auto pb-4 md:mt-1 md:pb-0">
           <Outlet />
         </div>
       </div>

@@ -28,7 +28,14 @@ const getTotalProgramDurationWithExtensions = async (userId, originalProgramId) 
 
 export { getTotalProgramDurationWithExtensions };
 
-export const getUserComplianceStats = async (userId, programPlan, therapyPlan = null, programTitle = "", durationInMonths = null) => {
+export const getUserComplianceStats = async (
+    userId,
+    programPlan,
+    therapyPlan = null,
+    programTitle = "",
+    durationInMonths = null,
+    graphDays = 7,
+) => {
     try {
         const userSubmission = await TaskSubmission.findOne({ userId });
         
@@ -39,7 +46,8 @@ export const getUserComplianceStats = async (userId, programPlan, therapyPlan = 
                 diet: 0,
                 therapy: 0,
                 weeklyData: [],
-                monthwiseData: []
+                monthwiseData: [],
+                graphDays: Math.max(7, Math.min(Number(graphDays) || 7, 30)),
             };
         }
         // Calculate total expected tasks per type
@@ -123,12 +131,17 @@ export const getUserComplianceStats = async (userId, programPlan, therapyPlan = 
             ? Math.round((totalCompleted / totalExpected) * 100) 
             : 0;
 
-        // Calculate weekly compliance data (last 7 days)
+        // Calculate trend compliance data for last N days (default 7)
         const user = await User.findById(userId);
         const currentGlobalDay = user?.currentGlobalDay || 1;
-        const last7Days = [];
+        const safeGraphDays = Math.max(7, Math.min(Number(graphDays) || 7, 30));
+        const trendDays = [];
 
-        for (let i = 6; i >= 0; i--) {
+        const startDateCandidate = user?.programStartDate || user?.createdAt;
+        const parsedStartDate = startDateCandidate ? new Date(startDateCandidate) : null;
+        const hasValidStartDate = parsedStartDate && !Number.isNaN(parsedStartDate.getTime());
+
+        for (let i = safeGraphDays - 1; i >= 0; i--) {
             const dayIndex = currentGlobalDay - i;
             if (dayIndex <= 0) continue;
 
@@ -160,8 +173,13 @@ export const getUserComplianceStats = async (userId, programPlan, therapyPlan = 
             const expectedTherapyFromTherapyPlan = therapyDayData?.therapies.length || 0;
             const expectedTherapyForDay = expectedTherapyFromPlan + expectedTherapyFromTherapyPlan;
 
-            last7Days.push({
+            const dayDate = hasValidStartDate
+                ? new Date(parsedStartDate.getTime() + ((dayIndex - 1) * 24 * 60 * 60 * 1000))
+                : null;
+
+            trendDays.push({
                 day: `Day ${dayIndex}`,
+                dayDate: dayDate ? dayDate.toISOString() : null,
                 workout: expectedWorkoutForDay > 0 ? Math.round((workoutVerified / expectedWorkoutForDay) * 100) : 0,
                 diet: expectedMealForDay > 0 ? Math.round((mealVerified / expectedMealForDay) * 100) : 0,
                 therapy: expectedTherapyForDay > 0 ? Math.round((therapyVerified / expectedTherapyForDay) * 100) : 0,
@@ -231,7 +249,8 @@ export const getUserComplianceStats = async (userId, programPlan, therapyPlan = 
             workout: workoutCompliance,
             diet: dietCompliance,
             therapy: therapyCompliance,
-            weeklyData: last7Days,
+            weeklyData: trendDays,
+            graphDays: safeGraphDays,
             monthwiseData,
             stats: {
                 completedWorkouts,
@@ -252,7 +271,8 @@ export const getUserComplianceStats = async (userId, programPlan, therapyPlan = 
             workout: 0,
             diet: 0,
             therapy: 0,
-            weeklyData: []
+            weeklyData: [],
+            graphDays: Math.max(7, Math.min(Number(graphDays) || 7, 30)),
         };
     }
 };

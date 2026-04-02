@@ -325,6 +325,10 @@ export const getComplianceStats = async (req, res) => {
     }
 
     const user = await service.getSingleClient(userId);
+    const requestedDays = Math.max(
+      7,
+      Math.min(Number(req.query?.days) || 7, 30),
+    );
 
     if (!user || !user.programType) {
       return res.status(200).json({
@@ -334,7 +338,8 @@ export const getComplianceStats = async (req, res) => {
           workout: 0,
           diet: 0,
           therapy: 0,
-          weeklyData: []
+          weeklyData: [],
+          graphDays: requestedDays,
         }
       });
     }
@@ -351,7 +356,14 @@ export const getComplianceStats = async (req, res) => {
       therapyPlan = await getTherapyById(therapyId);
     }
 
-    const complianceData = await getUserComplianceStats(userId, program?.plan, therapyPlan, program?.title);
+    const complianceData = await getUserComplianceStats(
+      userId,
+      program?.plan,
+      therapyPlan,
+      program?.title,
+      null,
+      requestedDays,
+    );
     const streakData = await calculateUserStreaks(userId);
 
     res.status(200).json({

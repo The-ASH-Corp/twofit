@@ -51,6 +51,8 @@ import breakfast from "./breakfast.svg";
 import trainerCartoon from "./trainer_cartoon.png";
 import dietitianCartoon from "./dietitian_cartoon.png";
 import therapistCartoon from "./therapist_cartoon.png";
+import runner from "./runner.png";
+import runnerTransparent from "./runner_transparent.png";
 
 export const assets = {
   menu,
@@ -106,6 +108,8 @@ export const assets = {
   trainerCartoon,
   dietitianCartoon,
   therapistCartoon,
+  runner,
+  runnerTransparent,
 };
 
 //Users,
