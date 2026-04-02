@@ -211,6 +211,7 @@ export default function AdminForm() {
       toast("Admin created successfully", { type: "success" });
       navigate("/head/admins");
     } catch (error) {
+      console.log(error)
       toast(error?.message || "Failed to create admin", { type: "error" });
     } finally {
       setIsLoading(false);

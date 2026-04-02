@@ -212,11 +212,11 @@ const validationSchema = Yup.object({
     setIsLoading(true);
     try {
       const result = await dispatch(createHead(value)).unwrap();
-      console.log(result)
+      console.log(result, "try")
         toast.success("Head created successfully");
         navigate("/founder/heads");
     } catch (error) {
-      console.log(error)
+      console.log(error, "catch")
       toast.error(error || "Failed to create head");
     } finally {
       setIsLoading(false);
