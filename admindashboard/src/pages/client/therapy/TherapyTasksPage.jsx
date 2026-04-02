@@ -1,5 +1,6 @@
 import { 
   Brain, 
+  CalendarDays,
   CheckCircle2, 
   Lock, 
   PlayCircle, 
@@ -7,12 +8,9 @@ import {
   Wind, 
   Accessibility, 
   PenLine, 
-  Maximize, 
   Play, 
   Check, 
-  Sparkles,
-  ChevronRight,
-  Volume2
+  ChevronRight
 } from "lucide-react";
 import { SyncLoader } from "react-spinners";
 import { toast } from "react-toastify";
@@ -30,6 +28,19 @@ import { cn } from "@/lib/utils";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+
+function MetricItem({ label, value }) {
+  return (
+    <div className="rounded-[14px]  p-3 sm:p-4">
+      <p className="text-[10px] font-black uppercase tracking-[0.12em] text-[#82938B]">
+        {label}
+      </p>
+      <p className="mt-1 text-[21px] font-black leading-none text-[#087B44]">
+        {value}
+      </p>
+    </div>
+  );
+}
 
 export default function TherapyTasksPage() {
   const dispatch = useDispatch();
@@ -137,7 +148,6 @@ export default function TherapyTasksPage() {
           dayIndex: todayTherapy.dayIndex,
           globalDayIndex: currentGlobalDay,
           icon: getIcon(therapy.type),
-          duration: therapy.duration || "15 mins", // Mocked or from DB
           focus: therapy.focus || "Section focus note", // Mocked or from DB
           technique: therapy.technique || "Cognitive Reframing",
           impact: therapy.impact || "High Precision"
@@ -326,100 +336,105 @@ export default function TherapyTasksPage() {
     );
   }
 
+  const todayDisplay = new Date().toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
+  const canPlayNext =
+    selectedIndex < therapyTasks.length - 1 && watchedVideos.has(selectedIndex);
+
+  const rewardXp = Math.max(therapyTasks.length * 10, 50);
+
   return (
-    <div className="bg-[#F8FBFA] min-h-screen pb-32">
-      <div className="max-w-[1400px] mx-auto p-4 lg:p-10">
-        
-        {/* Header Section */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
+    <div className="min-h-screen bg-[#EDF2EF] pb-32">
+      <div className="mx-auto max-w-[1380px] p-4 lg:p-8">
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-[#0A4F48] font-black text-3xl lg:text-4xl tracking-tight">
+            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#0A7B4E]">
+              Current Module
+            </p>
+            <h1 className="mt-1 text-[36px] leading-none font-black tracking-tight text-[#1E2C26] sm:text-[48px] lg:text-[56px]">
               Day {currentGlobalDay} Therapy Videos
             </h1>
           </div>
-          
-          <div className="flex items-center gap-3">
-            <div className="bg-[#0A4F48] text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg">
-              <Sparkles size={16} className="text-[#71FEE2]" />
-              <span className="text-[11px] font-black tracking-widest uppercase">
-                {watchedVideos.size}/{therapyTasks.length} Tasks
-              </span>
-            </div>
+
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#DFE7E3] bg-[#F5F9F7] px-4 py-2 text-[13px] font-black text-[#5D6E66]">
+            <CalendarDays size={16} className="text-[#0A7B4E]" />
+            {todayDisplay}
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-12 gap-10">
-          
-          {/* LEFT COLUMN: Video + Current Task Detail */}
-          <div className="lg:col-span-8 flex flex-col gap-8">
-            
-            {/* Custom Video Player UI */}
-            <div className="relative w-full aspect-video rounded-[40px] overflow-hidden bg-black shadow-2xl group">
-              {selectedTask?.mediaUrl ? (
-                <video
-                  key={selectedIndex}
-                  onEnded={handleVideoEnd}
-                  className="w-full h-full object-cover"
-                  src={selectedTask.mediaUrl?.replace(/^http:\/\//i, "https://")}
-                >
-                  Your browser does not support the video tag.
-                </video>
-              ) : (
-                <div className="w-full h-full bg-linear-to-br from-[#0A4F48] to-[#116D63] text-white flex flex-col items-center justify-center gap-4">
-                  <PlayCircle size={60} className="opacity-40 animate-pulse" />
-                  <p className="text-lg font-black tracking-tight opacity-70">No video assigned for this task</p>
-                </div>
-              )}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.9fr_1fr]">
+          <div className="space-y-6">
+            <section className="client-card rounded-[24px] p-4">
+              <div className="relative overflow-hidden rounded-[18px] border border-[#D9E3DD] bg-[#243A35]">
+                {selectedTask?.mediaUrl ? (
+                  <video
+                    key={selectedIndex}
+                    onEnded={handleVideoEnd}
+                    className="h-[260px] w-full object-cover sm:h-[360px] lg:h-[460px]"
+                    src={selectedTask.mediaUrl?.replace(/^http:\/\//i, "https://")}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                ) : (
+                  <div className="flex h-[260px] w-full flex-col items-center justify-center gap-4 bg-linear-to-br from-[#0A4F48] to-[#135E56] text-white sm:h-[360px] lg:h-[460px]">
+                    <PlayCircle size={62} className="opacity-40" />
+                    <p className="text-[16px] font-black opacity-75">
+                      No video assigned for this task
+                    </p>
+                  </div>
+                )}
 
-              {/* Custom Controls Overlay (Simulation) */}
-              <div className="absolute bottom-6 left-6 right-6 z-10 flex items-center gap-4 group-hover:opacity-100 transition-opacity">
-                <button className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
-                  <Play size={16} fill="white" />
-                </button>
-                <div className="flex-1 h-1.5 bg-white/30 rounded-full overflow-hidden backdrop-blur-sm">
-                  <div className="h-full bg-[#10B981] rounded-full w-[40%]" />
-                </div>
-                <div className="flex items-center gap-4 text-white font-bold text-[11px] font-mono">
-                  <span>04:20 / 12:00</span>
-                  <Volume2 size={16} />
-                  <Maximize size={16} />
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                  <div className="flex h-[88px] w-[88px] items-center justify-center rounded-full bg-[#087B44] text-white shadow-[0_16px_28px_rgba(8,123,68,0.38)]">
+                    <Play size={30} fill="currentColor" />
+                  </div>
                 </div>
               </div>
-            </div>
+            </section>
 
-            {/* Current Task Detail Card */}
-            <div className="bg-white rounded-[40px] p-8 lg:p-10 shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-100 relative overflow-hidden">
-              <div className="flex flex-col lg:flex-row justify-between items-start gap-6 mb-8 relative z-10">
-                <div className="flex-1">
-                  <h2 className="text-[#0A4F48] font-black text-2xl lg:text-3xl tracking-tighter mb-4">
-                    Current Task: {selectedTask?.name}
+            <section className="client-card rounded-[24px] p-6 sm:p-7">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                <div className="max-w-[720px]">
+                  <h2 className="text-[34px] leading-[1.08] font-black text-[#1F2D27] sm:text-[42px] lg:text-[50px]">
+                    Current Task: {selectedTask?.name || "Main Therapy Video"}
                   </h2>
-                  <p className="text-gray-500 font-bold leading-relaxed text-sm lg:text-base max-w-2xl">
-                    {selectedTask?.notes || "In this session, we reflect on the physical sensations experienced during the breathing exercises. Document any shifts in heart rate or clarity. Focus on the \"flow state\" triggers identified in yesterday's module."}
+                  <p className="mt-3 text-[17px] font-medium leading-relaxed text-[#66776F]">
+                    {selectedTask?.notes ||
+                      "In this session, we explore the foundations of neuroplasticity and how to identify automatic negative thoughts (ANTs) during high-pressure performance moments."}
                   </p>
                 </div>
-                
-                <button 
+
+                <button
                   onClick={openNextVideo}
-                  disabled={selectedIndex >= therapyTasks.length - 1 || !watchedVideos.has(selectedIndex)}
-                  className="bg-[#0A4F48] text-white hover:bg-[#083b36] disabled:bg-gray-200 disabled:text-gray-400 rounded-full px-8 py-4 flex items-center gap-3 transition-all hover:scale-105 shadow-xl hover:shadow-[#0A4F48]/30 group"
+                  disabled={!canPlayNext}
+                  className="inline-flex h-[112px] w-[112px] shrink-0 flex-col items-center justify-center rounded-3xl bg-[#087B44] text-center text-white shadow-[0_16px_28px_rgba(8,123,68,0.35)] transition-all hover:bg-[#076d3d] disabled:cursor-not-allowed disabled:bg-[#C9D4CE] disabled:text-[#87958E] sm:h-[84px] sm:w-[154px]"
                 >
-                  <span className="text-[11px] font-black tracking-widest uppercase">Play Next Video</span>
-                  <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                  <span className="text-[24px] font-black leading-none">
+                    Play Next
+                  </span>
+                 
+                  <span className="mt-1 inline-flex items-center gap-1 text-[14px] font-black">
+                    Video <ChevronRight size={15} />
+                  </span>
                 </button>
               </div>
-            </div>
+
+              
+            </section>
           </div>
 
-          {/* RIGHT COLUMN: Protocol + Submission */}
-          <div className="lg:col-span-4 flex flex-col gap-8">
-            
-            {/* Today's Protocol List */}
-            <div className="bg-[#E6EEED] rounded-[48px] p-8 lg:p-10">
-              <h3 className="text-[10px] font-black text-[#0A4F48]/40 uppercase tracking-[0.3em] mb-8">
-                Today's Protocol
+          <div className="space-y-6">
+            <section className="client-card rounded-[24px] p-5 sm:p-6">
+              <h3 className="mb-4 inline-flex items-center gap-2 text-[30px] leading-none font-black text-[#1F2D27] sm:text-[36px] lg:text-[42px]">
+                <CheckCircle2 size={18} className="text-[#0A7B4E]" />
+                Today&apos;s Protocol
               </h3>
-              <div className="flex flex-col gap-5">
+
+              <div className="space-y-3">
                 {therapyTasks.map((task, idx) => {
                   const isCompleted = watchedVideos.has(idx) || idx < selectedIndex;
                   const isActive = idx === selectedIndex;
@@ -428,24 +443,18 @@ export default function TherapyTasksPage() {
 
                   if (isActive) {
                     return (
-                      <div key={idx} className="bg-[#0A4F48] rounded-[32px] p-6 shadow-2xl shadow-[#0A4F48]/30 relative overflow-hidden group">
-                        <div className="flex items-center gap-5 relative z-10">
-                          <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white">
-                            <IconComp size={22} />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="text-white font-black text-sm lg:text-[15px] leading-tight flex items-center gap-2">
-                              {task.name}
-                            </h4>
-                            <p className="text-white/60 font-bold text-[10px] mt-1 lg:mt-2">
-                              {task.duration} • {task.focus}
-                            </p>
-                          </div>
-                          <div className="w-7 h-7 rounded-full border-[3px] border-white/20 flex items-center justify-center">
-                            <div className="w-2.5 h-2.5 rounded-full bg-white" />
-                          </div>
+                      <button
+                        key={idx}
+                        onClick={() => handleTaskClick(idx)}
+                        className="flex w-full items-center gap-3 rounded-[14px] border border-[#A9DCC2] bg-[#EFF8F3] p-3 text-left transition-all"
+                      >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-white text-[#0A7B4E] shadow-[0_6px_12px_rgba(17,38,29,0.1)]">
+                          <IconComp size={18} />
                         </div>
-                      </div>
+                        <p className="text-[16px] font-black text-[#0A7B4E]">
+                          {task.name}
+                        </p>
+                      </button>
                     );
                   }
 
@@ -454,141 +463,104 @@ export default function TherapyTasksPage() {
                       <button
                         key={idx}
                         onClick={() => handleTaskClick(idx)}
-                        className="bg-white rounded-[32px] p-6 flex items-center gap-5 shadow-sm border border-transparent hover:border-[#0A4F48]/10 transition-all group"
+                        className="flex w-full items-center gap-3 rounded-[14px] bg-[#F4F8F6] p-3 text-left transition-all hover:bg-[#EDF5F1]"
                       >
-                        <div className="w-12 h-12 rounded-2xl bg-[#EAF1F0] flex items-center justify-center text-[#10B981]">
-                          <IconComp size={22} />
+                        <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#087B44] text-white">
+                          <Check size={16} strokeWidth={3} />
                         </div>
-                        <div className="flex-1 text-left">
-                          <h4 className="text-gray-800 font-black text-sm lg:text-[15px] leading-tight group-hover:text-[#0A4F48] transition-colors">
-                            {task.name}
-                          </h4>
-                          <p className="text-gray-400 font-bold text-[10px] mt-1 lg:mt-2">
-                            {task.duration} • Completed
-                          </p>
-                        </div>
-                        <div className="w-7 h-7 rounded-full bg-[#0A4F48] flex items-center justify-center text-white">
-                          <Check size={14} strokeWidth={4} />
-                        </div>
+                        <p className="text-[16px] font-black text-[#3D4F47]">
+                          {task.name}
+                        </p>
                       </button>
                     );
                   }
 
                   return (
-                    <div 
-                      key={idx} 
+                    <button
+                      key={idx}
+                      onClick={() => handleTaskClick(idx)}
                       className={cn(
-                        "rounded-[32px] border-2 border-dashed border-[#0A4F48]/10 p-6 flex items-center gap-5",
-                        !unlocked && "opacity-40"
+                        "flex w-full items-center gap-3 rounded-[14px] bg-[#F6F8F7] p-3 text-left transition-all",
+                        !unlocked && "opacity-45",
                       )}
                     >
-                      <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300">
-                        {unlocked ? <IconComp size={22} /> : <Lock size={18} />}
+                      <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-white text-[#AAB7B1]">
+                        {unlocked ? <IconComp size={18} /> : <Lock size={16} />}
                       </div>
-                      <div className="flex-1">
-                        <h4 className="text-gray-300 font-black text-sm lg:text-base leading-tight">
-                          {task.name}
-                        </h4>
-                        <p className="text-gray-300 font-bold text-[10px] mt-2 italic">
-                          Locked • Complete previous
-                        </p>
-                      </div>
-                      <div className="w-7 h-7 rounded-full border-2 border-gray-100" />
-                    </div>
+                      <p className="text-[16px] font-black text-[#8A9992]">
+                        {task.name}
+                      </p>
+                    </button>
                   );
                 })}
               </div>
-            </div>
+            </section>
 
-            {/* Submission Section */}
             {shouldShowSubmissionForm && (
-              <div className="bg-[#DDE5E4] rounded-[48px] p-8 lg:p-10 flex flex-col gap-8">
-                <div className="text-center lg:text-left">
-                  <h3 className="text-[#0A4F48] font-black text-2xl tracking-tighter mb-2">
-                    Therapy Complete?
-                  </h3>
-                  <p className="text-gray-500 font-bold text-xs leading-relaxed">
-                    Finalize your session by logging your notes and data insights.
+              <section className="rounded-[24px] border border-[#CFE0D6] bg-[#E8F2ED] p-5 sm:p-6">
+                <h3 className="text-[30px] leading-none font-black text-[#087B44] sm:text-[36px] lg:text-[42px]">
+                  Therapy Complete?
+                </h3>
+                <p className="mt-3 text-[16px] font-medium leading-relaxed text-[#64756D]">
+                  Briefly summarize your primary takeaway from today&apos;s session
+                  to lock in your progress.
+                </p>
+
+                <div className="mt-5">
+                  <p className="text-[10px] font-black uppercase tracking-[0.14em] text-[#7A8A83]">
+                    Your Takeaway
                   </p>
-                </div>
 
-                <div 
-                  onClick={handleOpenFilePicker}
-                  className="bg-white rounded-[32px] p-8 border-2 border-dashed border-[#0A4F48]/20 flex flex-col items-center justify-center text-center gap-4 hover:bg-white/80 cursor-pointer transition-all group lg:min-h-[140px]"
-                >
-                  {file ? (
-                    <>
-                      <div className="w-14 h-14 rounded-full bg-[#E6FFFA] flex items-center justify-center text-[#10B981]">
-                        <CheckCircle2 size={32} />
-                      </div>
-                      <div className="min-w-0 px-2 w-full">
-                        <p className="text-[#0A4F48] font-black text-xs truncate max-w-full text-center">{fileName}</p>
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); setFile(null); setFileName("Upload File"); }}
-                          className="text-red-500 font-black text-[9px] uppercase tracking-widest mt-2 hover:underline"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:scale-110 transition-transform shadow-inner">
-                        <Upload size={24} />
-                      </div>
-                      <div>
-                        <h5 className="text-[#0A4F48] font-black text-sm">Tap to upload proof</h5>
-                        <p className="text-gray-400 font-bold text-[9px] mt-1">Journal photos or session notes (PDF/JPG)</p>
-                      </div>
-                    </>
-                  )}
-                </div>
-                <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
+                  <button
+                    onClick={handleOpenFilePicker}
+                    className="mt-2 inline-flex items-center gap-2 rounded-full border border-[#BCD4C8] bg-white px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.1em] text-[#0A7B4E]"
+                  >
+                    <Upload size={13} />
+                    {file ? fileName : "Upload Proof"}
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
 
-                <div>
-                  <h5 className="text-[10px] font-black text-[#0A4F48]/40 uppercase tracking-[0.2em] mb-4 pl-1">
-                    Optional Notes
-                  </h5>
                   <textarea
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    placeholder="How did you feel during today's session?"
-                    className="w-full h-28 bg-white/40 rounded-[28px] border-none px-6 py-5 text-sm font-bold text-[#0A4F48] placeholder-[#0A4F48]/30 focus:ring-0 resize-none transition-all shadow-inner"
+                    placeholder="Enter your thoughts here..."
+                    className="mt-3 h-32 w-full resize-none rounded-[14px] border border-[#D6E3DC] bg-white px-4 py-3 text-[14px] font-semibold text-[#31423B] placeholder:text-[#95A39D] outline-none focus:border-[#0A7B4E]/40"
                   />
                 </div>
 
                 <button
                   onClick={handleSubmit}
                   disabled={uploading}
-                  className="w-full bg-[#0A4F48] text-white disabled:bg-gray-400 rounded-full py-5 flex items-center justify-center gap-3 shadow-2xl shadow-[#0A4F48]/40 hover:scale-[1.02] transition-transform group"
+                  className="mt-5 w-full rounded-full bg-[#087B44] py-3.5 text-[15px] font-black uppercase tracking-[0.08em] text-white shadow-[0_12px_22px_rgba(8,123,68,0.28)] transition-all hover:bg-[#076f3d] disabled:cursor-not-allowed disabled:bg-[#9FB4A9]"
                 >
-                  {uploading ? (
-                    <div className="w-5 h-5 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <>
-                      <span className="text-[12px] font-black tracking-widest uppercase">Submit Therapy Result</span>
-                    </>
-                  )}
+                  {uploading ? "Submitting..." : "Submit Therapy Result"}
                 </button>
-              </div>
+              </section>
             )}
 
-            {/* Status Feedback */}
-            {(overallTherapyStatus === "pending" || overallTherapyStatus === "verified" || overallTherapyStatus === "rejected") && (
-              <div className={cn(
-                "rounded-[48px] p-8 text-center border-2",
-                overallTherapyStatus === "verified" ? "bg-green-50 border-green-200" : "bg-yellow-50 border-yellow-200"
-              )}>
-                <CheckCircle2 size={48} className="mx-auto mb-4 text-[#0A4F48]" />
-                <h3 className="text-[#0A4F48] font-black text-xl tracking-tighter uppercase mb-2">
-                  Session {overallTherapyStatus}
+            {(overallTherapyStatus === "pending" ||
+              overallTherapyStatus === "verified" ||
+              overallTherapyStatus === "rejected") && (
+              <section
+                className={cn(
+                  "rounded-[24px] border p-5 text-center",
+                  statusConfig[overallTherapyStatus].panelClass,
+                )}
+              >
+                <CheckCircle2 size={34} className="mx-auto text-[#0A7B4E]" />
+                <h3 className="mt-3 text-[22px] font-black text-[#1F2D27]">
+                  Session {statusConfig[overallTherapyStatus].label}
                 </h3>
-                <p className="text-gray-500 font-bold text-sm">
+                <p className="mt-2 text-[14px] font-medium text-[#5D6F66]">
                   {statusConfig[overallTherapyStatus].message}
                 </p>
-              </div>
+              </section>
             )}
-            
           </div>
         </div>
       </div>
