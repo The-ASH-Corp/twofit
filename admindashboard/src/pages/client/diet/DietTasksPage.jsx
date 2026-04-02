@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { 
   CheckCircle2, 
-  Clock, 
   TrendingUp, 
   Droplets, 
   Apple, 
@@ -197,14 +196,6 @@ export default function DietTasksPage() {
 
   const selectedMealStatus = selectedTask?.status || "todo";
 
-  const totalSkippedMeals = useMemo(
-    () =>
-      (tasks || []).filter(
-        (task) => task.taskType === "Meal" && task.status === "skipped",
-      ).length,
-    [tasks],
-  );
-
   const todayProgress = useMemo(() => {
     if (!dietTasks.length) return 0;
     const completedToday = dietTasks.filter(t => t.status === "verified").length;
@@ -223,6 +214,34 @@ export default function DietTasksPage() {
     if (dietTasks.length <= 1) return 0;
     return (furthestIndex / (dietTasks.length - 1)) * 100;
   }, [furthestIndex, dietTasks.length]);
+
+  const expectedMealsCount = useMemo(
+    () =>
+      Number(
+        complianceData?.stats?.expectedMeals || dietTasks.length * currentGlobalDay,
+      ),
+    [complianceData?.stats?.expectedMeals, currentGlobalDay, dietTasks.length],
+  );
+
+  const nonCompliantCount = useMemo(
+    () =>
+      Number(complianceData?.stats?.skippedCount || 0) +
+      Number(complianceData?.stats?.missedCount || 0),
+    [complianceData?.stats?.missedCount, complianceData?.stats?.skippedCount],
+  );
+
+  const dietCompliancePercent = useMemo(() => {
+    if (!expectedMealsCount) return 0;
+    const compliance = Math.round(
+      ((expectedMealsCount - nonCompliantCount) / expectedMealsCount) * 100,
+    );
+    return Math.max(0, Math.min(compliance, 100));
+  }, [expectedMealsCount, nonCompliantCount]);
+
+  const summaryCountBoxDepthStyle = {
+    boxShadow:
+      "inset 8px 8px 16px rgba(177, 190, 184, 0.62), inset -8px -8px 16px rgba(255, 255, 255, 0.96), inset 0 1px 0 rgba(255, 255, 255, 0.88)",
+  };
 
   const statusConfig = {
     pending: {
@@ -454,261 +473,301 @@ export default function DietTasksPage() {
   }
 
   return (
-    <div className="bg-[#F8FBFA] min-h-screen pb-32 font-sans selection:bg-[#0A4F48]/10">
-      <div className="max-w-[1400px] mx-auto p-4 lg:p-10 flex flex-col lg:grid lg:grid-cols-12 gap-8 lg:gap-12">
-        
-        {/* =========================================
-            LEFT COLUMN (Banner + Progression + Summary)
-            ========================================= */}
-        <div className="lg:col-span-8 flex flex-col gap-8">
-          
-          {/* Main Hero Banner: Ongoing Session */}
-          <div className="relative w-full aspect-video lg:aspect-[1.8/1] rounded-[40px] overflow-hidden shadow-2xl group">
-             {/* Gradient Overlay for Text Visibility */}
-            <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent z-10" />
-            
-            <img
-              src={selectedTask?.index === 1 ? "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=1200" : assets.MealPlaceholder}
-              alt="Current Meal"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+    <div className="min-h-screen bg-[#EDF2EF] pb-28 selection:bg-[#0A7B4E]/15">
+      <div className="mx-auto max-w-[1380px] p-4 lg:p-8">
+        <section className="client-card rounded-[24px] p-4 sm:p-6 lg:p-7">
+          <div className="flex items-center justify-between gap-3 text-[#1F2F27]">
+            <div className="flex items-center gap-2">
+              <TrendingUp size={20} className="text-[#0A7B4E]" />
+              <h2 className="text-[22px] font-black tracking-tight">Daily Progression</h2>
+            </div>
+            <p className="text-[12px] font-black text-[#0A7B4E]">{todayProgress}% complete</p>
+          </div>
+          <p className="mt-1 text-[11px] font-black uppercase tracking-[0.16em] text-[#0A7B4E]">
+            In Progress
+          </p>
+
+          <div className="relative mt-6 pb-1">
+            <div className="absolute left-[24px] right-[24px] top-[20px] h-[5px] rounded-full bg-[#DDE5E1]" />
+            <div
+              className="absolute left-[24px] top-[20px] h-[5px] rounded-full bg-[#0A7B4E] transition-all duration-700"
+              style={{ width: `${progressBarWidth}%` }}
             />
 
-            <div className="absolute bottom-8 left-8 lg:bottom-12 lg:left-12 z-20 max-w-2xl">
-              <div className="bg-[#10B981] text-white text-[9px] lg:text-[10px] uppercase font-black tracking-[0.2em] px-4 py-1.5 rounded-full mb-4 w-fit shadow-lg shadow-[#10B981]/20">
-                Ongoing Session
-              </div>
-              <h1 className="text-white font-black text-3xl lg:text-5xl leading-tight tracking-tighter drop-shadow-md">
-                {selectedTask?.name === "LUNCH" ? "Lunch" : `${selectedTask?.name}`}
-              </h1>
-              <p className="text-white/80 font-bold text-sm lg:text-base mt-2 lg:mt-4 leading-relaxed max-w-xl">
-                Precision-balanced nutrients for optimal cognitive performance and sustained energy levels throughout the afternoon.
-              </p>
-            </div>
-            
-            
-          </div>
-
-          {/* Daily Progression Stepper */}
-          <div className="bg-white rounded-[40px] p-8 lg:p-10 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-[#0A4F48]/5 group">
-            <div className="flex justify-between items-end mb-10">
-              <h2 className="text-[#0A4F48] font-black text-2xl lg:text-2xl tracking-tighter">
-                Daily Progression
-              </h2>
-              <div className="flex items-center gap-2">
-                <span className="text-[#0A4F48] font-black text-xl lg:text-xl">{todayProgress}% Completed</span>
-              </div>
-            </div>
-
-            <div className="relative flex justify-between items-start pt-4 px-4 lg:px-8">
-              {/* Connector Lines */}
-              <div className="absolute top-[34px] left-16 right-16 h-1 bg-gray-100 z-0" />
-              <div 
-                className="absolute top-[34px] left-16 h-1 bg-[#0A4F48] z-0 transition-all duration-700 ease-in-out" 
-                style={{ width: `calc(${progressBarWidth}% - ${progressBarWidth > 0 ? "32px" : "0px"})` }}
-              />
-
+            <div className="relative flex justify-between gap-2">
               {dietTasks.map((item, idx) => {
-                 const isActive = idx === selectedIndex;
-                 const isVerified = item.status === "verified";
-                 const isSkipped = item.status === "skipped";
-                 const config = getMealConfig(idx, dietTasks.length, Apple, Utensils, Moon);
-                 const Icon = config.icon;
+                const isActive = idx === selectedIndex;
+                const isVerified = item.status === "verified";
+                const isSkipped = item.status === "skipped";
+                const config = getMealConfig(
+                  idx,
+                  dietTasks.length,
+                  Apple,
+                  Utensils,
+                  Moon,
+                );
+                const Icon = config.icon;
 
-                 return (
-                   <div key={idx} className="flex flex-col items-center gap-4 relative z-10 w-24">
-                      <button
-                        onClick={() => setSelectedIndex(idx)}
-                        className={cn(
-                          "w-12 h-12 lg:w-16 lg:h-16 rounded-full flex items-center justify-center transition-all duration-300 transform",
-                          isActive ? "bg-[#0A4F48] scale-115 shadow-xl shadow-[#0A4F48]/30 border-4 border-white" : 
-                          isVerified ? "bg-[#0A4F48] text-white" :
-                          isSkipped ? "bg-orange-500 text-white" :
-                          "bg-gray-100 text-gray-400 hover:bg-gray-200"
-                        )}
-                      >
-                        {isVerified ? (
-                          <Check size={24} strokeWidth={4} />
-                        ) : isSkipped ? (
-                          <X size={24} strokeWidth={4} />
-                        ) : (
-                          <Icon size={isActive ? 28 : 24} className={isActive ? "text-[#71FEE2]" : ""} />
-                        )}
-                      </button>
-                      
-                      <div className="text-center">
-                        <h4 className={cn(
-                          "text-[9px] lg:text-[10px] font-black tracking-widest uppercase transition-colors",
-                          isActive ? "text-[#0A4F48]" : "text-gray-400"
-                        )}>
-                          {item.name}
-                        </h4>
-                        <p className={cn(
-                          "text-[9px] font-bold mt-1 uppercase",
-                          isActive ? "text-[#0A4F48]" : "text-gray-300"
-                        )}>
-                          {isActive ? "In Progress" : config.time}
-                        </p>
-                      </div>
-                   </div>
-                 );
+                return (
+                  <div key={idx} className="flex min-w-0 flex-1 flex-col items-center gap-3">
+                    <button
+                      onClick={() => setSelectedIndex(idx)}
+                      className={cn(
+                        "relative z-10 flex h-10 w-10 items-center justify-center rounded-full border-2 text-[#7D8B84] transition-all sm:h-11 sm:w-11",
+                        isActive && "border-[#0A7B4E] bg-[#ECF4EF] text-[#0A7B4E] shadow-[0_8px_16px_rgba(10,123,78,0.2)]",
+                        isVerified &&
+                          !isActive &&
+                          "border-[#0A7B4E] bg-[#0A7B4E] text-white",
+                        isSkipped &&
+                          !isActive &&
+                          "border-[#D97706] bg-[#D97706] text-white",
+                        !isActive &&
+                          !isVerified &&
+                          !isSkipped &&
+                          "border-[#D6DFDA] bg-[#F6FAF8] hover:border-[#0A7B4E]/50",
+                      )}
+                    >
+                      {isVerified ? (
+                        <Check size={16} strokeWidth={3} />
+                      ) : isSkipped ? (
+                        <X size={16} strokeWidth={3} />
+                      ) : isActive ? (
+                        <Icon size={17} />
+                      ) : (
+                        <span className="h-2 w-2 rounded-full bg-[#9AA7A1]" />
+                      )}
+                    </button>
+
+                    <button
+                      onClick={() => setSelectedIndex(idx)}
+                      className={cn(
+                        "truncate text-center text-[11px] font-bold leading-tight text-[#5D6D65]",
+                        isActive && "text-[#0A7B4E]",
+                      )}
+                    >
+                      {item.name
+                        .toLowerCase()
+                        .replace(/\b\w/g, (match) => match.toUpperCase())}
+                    </button>
+                  </div>
+                );
               })}
             </div>
           </div>
+        </section>
 
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Diet Summary Card */}
-            <div className="bg-[#0A4F48] rounded-[48px] p-8 lg:p-10 shadow-2xl shadow-[#0A4F48]/20 flex flex-col gap-10 flex-1">
-              <div className="flex justify-between items-start">
-                 <h3 className="text-[#71FEE2] font-black text-[9px] uppercase tracking-[0.3em] pl-1">
-                    Diet Summary
-                 </h3>
-                 <div className="flex items-center gap-2 bg-[#71FEE2]/10 px-3 py-1 rounded-full">
-                    <span className="text-[#71FEE2] font-black text-[10px] tracking-widest uppercase">{streak}D Streak</span>
-                 </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white/10 backdrop-blur-md rounded-[32px] p-6 lg:p-7 relative overflow-hidden group border border-white/5">
-                  <h4 className="text-white/40 font-black text-[9px] uppercase tracking-widest mb-2">Meals Assigned</h4>
-                  <p className="text-white font-black text-3xl tracking-tighter">
-                    {String(complianceData?.stats?.expectedMeals || (dietTasks.length * currentGlobalDay)).padStart(2, '0')}
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[340px_1fr]">
+          <div className="space-y-6">
+            <section className="client-card rounded-[24px] p-5 sm:p-6">
+              <h3 className="text-[34px] leading-none font-black text-[#1F2F27]">
+                Diet Summary
+              </h3>
+
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div
+                  className="rounded-[14px] border border-[#D8E2DC] bg-[linear-gradient(165deg,#EEF4F0_0%,#E9F0EC_100%)] p-4 text-center"
+                  style={summaryCountBoxDepthStyle}
+                >
+                  <p className="text-[44px] leading-none font-black text-[#0A7B4E]">
+                    {expectedMealsCount}
                   </p>
-                  <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[#71FEE2]" />
-                </div>
-                <div className="bg-white/10 backdrop-blur-md rounded-[32px] p-6 lg:p-7 relative overflow-hidden group border border-white/5">
-                  <h4 className="text-white/40 font-black text-[9px] uppercase tracking-widest mb-2">Non-Compliant</h4>
-                  <p className="text-white font-black text-3xl tracking-tighter">
-                     {String((complianceData?.stats?.skippedCount || 0) + (complianceData?.stats?.missedCount || 0)).padStart(2, '0')}
+                  <p className="mt-2 text-[11px] font-black uppercase tracking-[0.08em] text-[#61736A]">
+                    Meals Assigned
                   </p>
-                  <div className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-red-400" />
+                </div>
+                <div
+                  className="rounded-[14px] border border-[#E7DBDB] bg-[linear-gradient(165deg,#F5EFEF_0%,#F0E8E8_100%)] p-4 text-center"
+                  style={summaryCountBoxDepthStyle}
+                >
+                  <p className="text-[44px] leading-none font-black text-[#C11212]">
+                    {nonCompliantCount}
+                  </p>
+                  <p className="mt-2 text-[11px] font-black uppercase tracking-[0.08em] text-[#61736A]">
+                    Non-Compliant
+                  </p>
                 </div>
               </div>
+            </section>
 
-              <div className="flex items-center gap-4 pl-1">
-                <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-[#71FEE2]">
-                  <TrendingUp size={20} />
+            <section className="client-card rounded-[24px] border-l-[4px] border-l-[#0A7B4E] p-5 sm:p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#E8F3EC] text-[#0A7B4E]">
+                  <Droplets size={20} />
                 </div>
-                <p className="text-white/90 font-black text-sm tracking-tight leading-tight">
-                  {complianceData?.stats?.expectedMeals 
-                    ? Math.round(((complianceData.stats.expectedMeals - (complianceData.stats.missedCount + complianceData.stats.skippedCount)) / complianceData.stats.expectedMeals) * 100) 
-                    : 0}% Diet Compliance
-                </p>
+                <div>
+                  <h4 className="text-[26px] leading-none font-black text-[#1F2F27]">
+                    Hydration Tip
+                  </h4>
+                  <p className="mt-2 text-[14px] font-medium leading-relaxed text-[#5F7269]">
+                    Boost your metabolism and aid digestion by drinking exactly{" "}
+                    <span className="font-black text-[#1F2F27]">250ml of water</span>{" "}
+                    before your breakfast meal.
+                  </p>
+                </div>
               </div>
-            </div>
+            </section>
 
-            {/* Hydration Tip */}
-            <div className="bg-[#FFE5D2] rounded-[48px] p-8 lg:p-10 flex flex-col justify-center gap-6 group hover:translate-y-[-4px] transition-transform shadow-sm flex-1">
-              <div className="w-14 h-14 rounded-2xl bg-[#CC895B]/10 flex items-center justify-center text-[#845E47] shrink-0">
-                <Droplets size={28} strokeWidth={2.5} />
+            <section className="client-card rounded-[24px] p-5 sm:p-6">
+              <div className="mx-auto flex w-[132px] flex-col items-center justify-center">
+                <div className="relative h-[132px] w-[132px]">
+                  <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="42"
+                      fill="none"
+                      stroke="#E2EBE6"
+                      strokeWidth="8"
+                    />
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="42"
+                      fill="none"
+                      stroke="#0A7B4E"
+                      strokeWidth="8"
+                      strokeLinecap="round"
+                      strokeDasharray={`${2 * Math.PI * 42}`}
+                      strokeDashoffset={`${
+                        2 * Math.PI * 42 * (1 - dietCompliancePercent / 100)
+                      }`}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <p className="text-[38px] leading-none font-black text-[#1F2F27]">
+                      {dietCompliancePercent}%
+                    </p>
+                    <p className="mt-1 text-[10px] font-black uppercase tracking-[0.14em] text-[#63756C]">
+                      Compliance
+                    </p>
+                  </div>
+                </div>
               </div>
+            </section>
+          </div>
+
+          <section className="client-card rounded-[24px] p-5 sm:p-6 lg:p-7">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h4 className="text-[#845E47]/40 font-black text-[9px] uppercase tracking-[0.2em] mb-2">Hydration Tip</h4>
-                <p className="text-[#845E47] font-black text-[15px] lg:text-[18px] leading-snug tracking-tight">
-                  Drink 250ml of water before this meal.
+                <h2 className="text-[42px] leading-none font-black text-[#1F2F27]">
+                  Submit Diet Proof
+                </h2>
+                <p className="mt-2 text-[13px] font-black uppercase tracking-[0.12em] text-[#0A7B4E]">
+                  Ongoing Session: {selectedTask?.name || "Meal"}
                 </p>
-                <p className="text-[#845E47]/60 text-xs font-bold mt-2">Proper hydration increases metabolic efficiency by 15% during digestion.</p>
+              </div>
+              <div className="rounded-full bg-[#F8DFDF] px-4 py-2 text-[13px] font-black text-[#C11212]">
+                Submit within 15 minutes
               </div>
             </div>
-          </div>
-        </div>
 
-        {/* =========================================
-            RIGHT COLUMN (Submission)
-            ========================================= */}
-        <div className="lg:col-span-4 flex flex-col gap-8">
-          
-          {/* Header Task Info */}
-          <div className="bg-transparent pl-2 pr-2">
-             <h4 className="text-[#10B981] font-black text-[10px] tracking-[0.3em] uppercase mb-1">
-                Current Task
-             </h4>
-             <h2 className="text-[#0A4F48] font-black text-2xl lg:text-3xl leading-tight tracking-tighter">
-                {selectedTask?.name === "BREAKFAST" ? "Morning Meal" : selectedTask?.name} - Upload a clear image
-             </h2>
-             
-             <div className="flex flex-col gap-3 mt-8">
-                <div className="bg-gray-50 rounded-[28px] p-4 lg:p-5 flex items-center gap-4 border border-gray-100 transition-colors hover:bg-white hover:shadow-md cursor-default group">
-                   <div className="w-10 h-10 rounded-2xl bg-[#EAF5F4] flex items-center justify-center text-[#0A4F48] shrink-0">
-                      <Clock size={20} strokeWidth={2.5} />
-                   </div>
-                   <p className="text-gray-600 font-bold text-xs lg:text-sm leading-snug">
-                      Submit within 15 minutes of eating
-                   </p>
-                </div>
-             </div>
-          </div>
-
-          {/* Submission Form */}
-          <div className="bg-white rounded-[40px] p-8 lg:p-10 shadow-[0_4px_30px_rgba(0,0,0,0.02)] border border-[#0A4F48]/5">
-            <h3 className="text-[#0A4F48] font-black text-sm uppercase tracking-widest pl-1 mb-6">
-              Submit Diet Proof
-            </h3>
-
-            {shouldShowSubmissionForm && (
-              <div className="flex flex-col gap-6">
-                <div 
+            {shouldShowSubmissionForm ? (
+              <div className="mt-6">
+                <div
                   onClick={handleOpenFilePicker}
-                  className="relative aspect-square w-full rounded-[40px] border-2 border-dashed border-gray-100 bg-[#F9FBFA] flex flex-col items-center justify-center gap-4 transition-all hover:border-[#0A4F48]/30 hover:bg-[#EAF1F0] cursor-pointer group overflow-hidden"
+                  className="relative h-[340px] cursor-pointer overflow-hidden rounded-[24px] border border-[#CAD6D0] bg-[#334A67]"
                 >
                   {file ? (
-                    <div className="absolute inset-0 w-full h-full p-6">
-                      <div className="relative w-full h-full rounded-[30px] overflow-hidden group/img">
-                         <img src={URL.createObjectURL(file)} alt="Preview" className="w-full h-full object-cover" />
-                         <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity">
-                            <span className="text-white font-black text-xs tracking-widest uppercase">Change Photo</span>
-                         </div>
-                      </div>
-                    </div>
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt="Meal proof preview"
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
                   ) : (
                     <>
-                      <div className="w-16 h-16 rounded-full bg-white shadow-xl flex items-center justify-center text-[#0A4F48] group-hover:scale-110 transition-transform">
-                        <Camera size={28} />
-                      </div>
-                      <p className="text-gray-500 font-bold text-xs lg:text-sm text-center px-8">
-                        Drop image here or <span className="text-[#0A4F48] underline underline-offset-4 decoration-2">browse</span>
-                      </p>
+                      <img
+                        src={assets.MealPlaceholder}
+                        alt="Meal placeholder"
+                        className="absolute inset-0 h-full w-full object-cover opacity-85"
+                      />
+                      <div className="absolute inset-0 bg-[#354B68]/55" />
                     </>
                   )}
-                  <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
+
+                  <div className="absolute inset-4 rounded-[18px] border-[3px] border-dashed border-white/45" />
+
+                  <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-[#0A7B4E] shadow-[0_10px_20px_rgba(10,123,78,0.25)]">
+                      <Camera size={25} />
+                    </div>
+                    <p className="mt-4 text-[18px] font-bold text-white">
+                      Drop image here or{" "}
+                      <span className="font-black underline underline-offset-4">
+                        browse
+                      </span>
+                    </p>
+                    <p className="mt-1 text-[12px] font-semibold text-white/80">
+                      Supports JPG, PNG and WEBP
+                    </p>
+                    {fileName !== "Upload Meal Photo" && (
+                      <p className="mt-2 max-w-[80%] truncate text-[12px] font-black text-[#D9FBE9]">
+                        {fileName}
+                      </p>
+                    )}
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
                 </div>
 
                 <textarea
                   value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  placeholder="Add optional notes (e.g. substitutions, mood...)"
-                  className="w-full rounded-[20px] border-none bg-gray-50 px-6 py-5 text-sm font-bold text-gray-700 placeholder-gray-400/60 focus:ring-0 resize-none h-32 transition-all shadow-inner"
+                  onChange={(event) => setComment(event.target.value)}
+                  placeholder="Optional note for your coach..."
+                  className="mt-4 h-20 w-full resize-none rounded-[14px] border border-[#D8E2DD] bg-[#F5F8F6] px-4 py-3 text-[13px] font-semibold text-[#32443C] placeholder:text-[#8A9B93] outline-none focus:border-[#0A7B4E]/40"
                 />
 
-                <div className="flex flex-col gap-4 mt-2">
-                   <button
-                     onClick={handleSubmit}
-                     disabled={uploading}
-                     className="w-full bg-[#0A4F48] text-white disabled:bg-gray-200 disabled:text-gray-400 rounded-full py-5 text-[14px] font-black tracking-widest uppercase shadow-2xl shadow-[#0A4F48]/30 transition-all hover:scale-[1.02]"
-                   >
-                     {uploading ? "Submitting..." : "Submit Diet"}
-                   </button>
-                   <button 
-                     onClick={() => setShowSkipConfirm(true)}
-                     className="text-gray-400 font-black text-[12px] uppercase tracking-widest hover:text-[#0A4F48] transition-colors mt-2"
-                   >
-                     Skip Meal
-                   </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={uploading}
+                  className="mt-5 flex w-full items-center justify-center gap-3 rounded-full bg-[#087B44] py-4 text-[28px] font-black text-white shadow-[0_14px_25px_rgba(8,123,68,0.25)] transition-all hover:bg-[#076f3d] disabled:cursor-not-allowed disabled:opacity-55"
+                >
+                  <CheckCircle2 size={20} />
+                  {uploading ? "Submitting..." : "Submit Diet"}
+                </button>
+
+                <div className="mt-3 flex justify-center">
+                  <button
+                    onClick={() => setShowSkipConfirm(true)}
+                    className="text-[20px] font-bold text-[#5F7269] transition-colors hover:text-[#0A7B4E]"
+                  >
+                    Skip Meal →
+                  </button>
                 </div>
               </div>
+            ) : (
+              <div
+                className={cn(
+                  "mt-6 rounded-[18px] border p-5 text-center",
+                  statusConfig[selectedMealStatus]?.panelClass,
+                )}
+              >
+                <p className="text-[18px] font-black uppercase tracking-[0.08em] text-[#1F2F27]">
+                  {statusConfig[selectedMealStatus]?.label || "Completed"}
+                </p>
+                <p className="mt-2 text-[14px] font-semibold text-[#5F7269]">
+                  {statusConfig[selectedMealStatus]?.message}
+                </p>
+              </div>
             )}
-            
-            {/* Feedback Status */}
-            {(selectedMealStatus !== "todo" && !shouldShowSubmissionForm) && statusConfig[selectedMealStatus] && (
-               <div className={cn(
-                  "p-8 rounded-[32px] border-2 text-center flex flex-col items-center gap-4",
-                  statusConfig[selectedMealStatus].panelClass
-               )}>
-                  <CheckCircle2 size={40} className="text-[#0A4F48]" />
-                  <h3 className="text-[#0A4F48] font-black text-lg tracking-tighter uppercase">Meal {selectedMealStatus}</h3>
-                  <p className="text-gray-600 font-bold text-xs">{statusConfig[selectedMealStatus].message}</p>
-               </div>
-            )}
-          </div>
+
+            <div className="mt-5 flex items-center justify-between border-t border-[#E4ECE7] pt-4">
+              <div className="text-[12px] font-bold text-[#6D7E76]">
+                Current streak: <span className="text-[#0A7B4E]">{streak} days</span>
+              </div>
+              {dietPlanPdf && (
+                <button
+                  onClick={handleViewAssignedMealPdf}
+                  className="inline-flex items-center gap-1 rounded-full border border-[#CFE0D6] bg-[#F4F8F5] px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.08em] text-[#0A7B4E] transition-all hover:bg-[#EAF2ED]"
+                >
+                  View Plan
+                </button>
+              )}
+            </div>
+          </section>
         </div>
       </div>
       <MobileBottomNav />
