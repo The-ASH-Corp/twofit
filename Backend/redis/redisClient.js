@@ -20,6 +20,7 @@ function createRedisClient(host, usePassword = true) {
   };
   
   if (usePassword && redisPassword) {
+    console.log(usePassword, redisPassword);
     clientConfig.password = redisPassword;
   }
   

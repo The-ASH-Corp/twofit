@@ -370,14 +370,17 @@ export default function ExpertForm() {
       const coach = await dispatch(createCoach(formData));
 
       if (coach.meta.requestStatus === "fulfilled") {
+        console.log(coach, "if")
         await dispatch(refreshProfile({ id: user?._id, role: user.role }));
         toast("Coach created successfully", { type: "success" });
         navigate(-1);
       } else {
-        toast("Failed to create coach", { type: "error" });
+        console.log(coach, "else");
+        toast(coach.message || "Failed to create coach 1", { type: "error" });
       }
     } catch (err) {
-      toast(err?.message || "Failed to create coach", { type: "error" });
+      console.log(err, "catch");
+      toast(err?.message || "Failed to create coach 1", { type: "error" });
     } finally {
       setIsLoading(false);
     }

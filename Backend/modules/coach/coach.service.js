@@ -11,119 +11,120 @@ import { createNotification } from "../notification/notification.service.js";
 import { assertEmailUnique } from "../../utils/checkEmailUnique.js";
 
 export const createCoach = async (coach) => {
-  await assertEmailUnique(coach.email);
-  // Parse JSON stringified fields from FormData
-  const fieldsToParseAsJSON = [
-    "workingHours",
-    "breakSlots",
-    "workingdays",
-    "specialization",
-    "chooseProgram",
-    "chooseTherapy",
-    "languages",
-  ];
-  const booleanFields = [
-    // "ratingIncentive",
-    // "responseTimeIncentive",
-    // "complianceIncentive",
-    "autoSendWelcome",
-    "autoSendGuide",
-    "automatedReminder",
-  ];
+ try {
+   await assertEmailUnique(coach.email);
+   // Parse JSON stringified fields from FormData
+   const fieldsToParseAsJSON = [
+     "workingHours",
+     "breakSlots",
+     "workingdays",
+     "specialization",
+     "chooseProgram",
+     "chooseTherapy",
+     "languages",
+   ];
+   const booleanFields = [
+     // "ratingIncentive",
+     // "responseTimeIncentive",
+     // "complianceIncentive",
+     "autoSendWelcome",
+     "autoSendGuide",
+     "automatedReminder",
+   ];
 
-  // Parse JSON strings
-  fieldsToParseAsJSON.forEach((field) => {
-    if (coach[field] && typeof coach[field] === "string") {
-      try {
-        coach[field] = JSON.parse(coach[field]);
-      } catch (e) {
-        console.error(`Failed to parse ${field}:`, e);
-      }
-    }
-  });
+   // Parse JSON strings
+   fieldsToParseAsJSON.forEach((field) => {
+     if (coach[field] && typeof coach[field] === "string") {
+       try {
+         coach[field] = JSON.parse(coach[field]);
+       } catch (e) {
+         console.error(`Failed to parse ${field}:`, e);
+       }
+     }
+   });
 
-  // Convert boolean strings to actual booleans
-  booleanFields.forEach((field) => {
-    if (coach[field] !== undefined) {
-      coach[field] = coach[field] === "true" || coach[field] === true;
-    }
-  });
+   // Convert boolean strings to actual booleans
+   booleanFields.forEach((field) => {
+     if (coach[field] !== undefined) {
+       coach[field] = coach[field] === "true" || coach[field] === true;
+     }
+   });
 
-  let plainPassword;
-  if (coach.password) {
-    plainPassword = coach.password;
-  } else {
-    plainPassword = generatePassword();
-    console.log("Generated Password for Coach:", plainPassword);
-  }
+   let plainPassword;
+   if (coach.password) {
+     plainPassword = coach.password;
+   } else {
+     plainPassword = generatePassword();
+     console.log("Generated Password for Coach:", plainPassword);
+   }
 
-  const hashedPassword = await hashPassword(plainPassword);
+   const hashedPassword = await hashPassword(plainPassword);
 
-  const coachCreated = await CoachModel.create({
-    name: capitalizeFirst(coach.fullname),
-    dob: coach.dob,
-    gender: coach.gender,
-    password: hashedPassword,
-    // ratingIncentive: coach.ratingIncentive,
-    // responseTimeIncentive: coach.responseTimeIncentive,
-    // complianceIncentive: coach.complianceIncentive,
-    autoSendWelcome: coach.autoSendWelcome,
-    autoSendGuide: coach.autoSendGuide,
-    automatedReminder: coach.automatedReminder,
-    email: coach.email,
-    phone: coach.phone,
-    address: coach.address,
-    role: coach.role,
-    adminId: coach.adminId,
-    specialization: coach.specialization,
-    experience: coach.experience,
-    qualification: coach.qualification,
-    languages: coach.languages,
-    assignedPrograms: coach.chooseProgram ?? null,
-    assignedTherapy: coach.chooseTherapy ?? null,
-    maxClient: coach.clientLimit,
-    workingDays: coach.workingdays,
-    workingHours: coach.workingHours,
-    breakSlots: coach.breakSlots,
-    maxDailyConsults: coach.dailyConsults,
-    responseTime: coach.responseTime,
-    salary: coach.baseSalary,
-    status: "Active",
-  });
+   const coachCreated = await CoachModel.create({
+     name: capitalizeFirst(coach.fullname),
+     dob: coach.dob,
+     gender: coach.gender,
+     password: hashedPassword,
+     // ratingIncentive: coach.ratingIncentive,
+     // responseTimeIncentive: coach.responseTimeIncentive,
+     // complianceIncentive: coach.complianceIncentive,
+     autoSendWelcome: coach.autoSendWelcome,
+     autoSendGuide: coach.autoSendGuide,
+     automatedReminder: coach.automatedReminder,
+     email: coach.email,
+     phone: coach.phone,
+     address: coach.address,
+     role: coach.role,
+     adminId: coach.adminId,
+     specialization: coach.specialization,
+     experience: coach.experience,
+     qualification: coach.qualification,
+     languages: coach.languages,
+     assignedPrograms: coach.chooseProgram ?? null,
+     assignedTherapy: coach.chooseTherapy ?? null,
+     maxClient: coach.clientLimit,
+     workingDays: coach.workingdays,
+     workingHours: coach.workingHours,
+     breakSlots: coach.breakSlots,
+     maxDailyConsults: coach.dailyConsults,
+     responseTime: coach.responseTime,
+     salary: coach.baseSalary,
+     status: "Active",
+   });
 
-  await AdminModel.findByIdAndUpdate(
-    coach.adminId,
-    { $addToSet: { experts: coachCreated._id } },
-    { new: true },
-  );
+   await AdminModel.findByIdAndUpdate(
+     coach.adminId,
+     { $addToSet: { experts: coachCreated._id } },
+     { new: true },
+   );
 
-  // Notify Admin
-  await createNotification({
-    type: "new_coach",
-    title: "New Team Member",
-    message: `${coachCreated.name} has been employed as a ${coachCreated.role} under your supervision.`,
-    recipientRole: "admin",
-    recipientId: coach.adminId,
-    category: "admin",
-    priority: "high",
-    metadata: { expertId: coachCreated._id },
-  });
+   // Notify Admin
+   await createNotification({
+     type: "new_coach",
+     title: "New Team Member",
+     message: `${coachCreated.name} has been employed as a ${coachCreated.role} under your supervision.`,
+     recipientRole: "admin",
+     recipientId: coach.adminId,
+     category: "admin",
+     priority: "high",
+     metadata: { expertId: coachCreated._id },
+   });
 
-  // Notify Coach
-  await createNotification({
-    type: "welcome_message",
-    title: "Welcome to the Team",
-    message: "Your expert account has been created successfully.",
-    recipientRole: "coach",
-    recipientId: coachCreated._id,
-    category: "system",
-    metadata: { expertId: coachCreated._id },
-  });
+   // Notify Coach
+   await createNotification({
+     type: "welcome_message",
+     title: "Welcome to the Team",
+     message: "Your expert account has been created successfully.",
+     recipientRole: "coach",
+     recipientId: coachCreated._id,
+     category: "system",
+     metadata: { expertId: coachCreated._id },
+   });
 
-  void sendEmail({
-    to: coach.email,
-    subject: "Welcome to TwoFit - Your Login Credentials",
-    html: `
+   void sendEmail({
+     to: coach.email,
+     subject: "Welcome to TwoFit - Your Login Credentials",
+     html: `
       <!DOCTYPE html>
       <html>
       <head>
@@ -164,9 +165,15 @@ export const createCoach = async (coach) => {
       </body>
       </html>
     `,
-  }).catch((err) => console.error("Failed to send coach credentials email:", err.message));
+   }).catch((err) =>
+     console.error("Failed to send coach credentials email:", err.message),
+   );
 
-  return coachCreated;
+   return coachCreated;
+ } catch (error) {
+  console.log(error)
+  throw error;
+ }
 };
 
 export const getAllCoach = async (page, limit) => {
