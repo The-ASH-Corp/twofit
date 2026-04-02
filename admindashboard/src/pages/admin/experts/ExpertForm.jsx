@@ -374,7 +374,7 @@ export default function ExpertForm() {
         toast("Coach created successfully", { type: "success" });
         navigate(-1);
       } else {
-        toast(coach.message || "Failed to create coach", { type: "error" });
+        toast(coach.message , { type: "error" });
       }
     } catch (err) {
       toast(err?.message || "Failed to create coach", { type: "error" });
