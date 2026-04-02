@@ -1,83 +1,64 @@
 import React from "react";
-import { MessageCircle } from "lucide-react";
 import { assets } from "@/assets/asset";
 import { useNavigate } from "react-router-dom";
 
 export default function ExpertsList({ expert }) {
   const navigate = useNavigate();
 
-  // Use dummy data matching reference image
-  const experts = expert?.length ? expert : [
-    {
-      name: "Elena Rodriguez",
-      role: "Live Trainer",
-      image: assets.trainerCartoon,
-    },
-    {
-      name: "Dr. Sarah Chen",
-      role: "Live Dietition",
-      image: assets.dietitianCartoon,
-    },
-    {
-      name: "Mark Williams",
-      role: "Live Therapist",
-      image: assets.therapistCartoon,
-    }
+  const experts = expert?.length ? expert : [];
+  const fallbackExperts = [
+    { name: "Trainer Rootien", image: assets.trainerCartoon },
+    { name: "Trainer Dean", image: assets.therapistCartoon },
   ];
+  const expertsToRender = experts.length ? experts.slice(0, 2) : fallbackExperts;
 
-  // Helper to get matching cartoon image based on role
   const getExpertImage = (exp) => {
-    if (exp.user?.profileimage) return exp.user.profileimage;
-    
+    if (exp?.image) return exp.image;
+    if (exp?.user?.profileImage) return exp.user.profileImage;
+    if (exp?.user?.avatar) return exp.user.avatar;
+    if (exp?.user?.photo) return exp.user.photo;
+    if (exp?.profileImage) return exp.profileImage;
+
     const role = (exp.role || "").toLowerCase();
     if (role.includes("trainer")) return assets.trainerCartoon;
     if (role.includes("diet") || role.includes("nutrition")) return assets.dietitianCartoon;
     if (role.includes("therapist") || role.includes("therapy")) return assets.therapistCartoon;
-    
     return assets.profile;
   };
 
   return (
-    <div className="bg-white p-5 sm:p-6 md:p-8 rounded-3xl md:rounded-4xl shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col gap-5 sm:gap-6 group transition-all duration-300 hover:shadow-lg">
-      <h3 className="text-gray-400 font-black text-[15px] uppercase tracking-widest">
-        Your Experts
-      </h3>
+    <section className="mt-3">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="client-title text-[14px]">Expert Team</h3>
+      </div>
 
-      <div className="flex flex-col gap-4 sm:gap-5 md:gap-6">
-        {experts.map((exp, index) => (
-          <div 
-            key={index} 
-            className="flex items-center justify-between group/row"
-          >
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 sm:w-13 sm:h-13 md:w-14 md:h-14 rounded-full overflow-hidden border-2 border-transparent group-hover/row:border-[#0A4F48]/10 transition-all shadow-sm">
+      <div className="flex flex-col gap-3">
+        {expertsToRender.map((exp, index) => (
+          <div key={index} className="flex items-center justify-between gap-2.5">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[#e4ece3] bg-white shadow-[0_3px_8px_rgba(35,54,42,0.12)]">
                 <img
                   src={getExpertImage(exp)}
-                  alt={exp.name}
-                  className="w-full h-full object-cover"
+                  alt={exp.user?.name || exp.name || "Expert"}
+                  className="h-full w-full object-cover"
                 />
               </div>
-              <div className="flex flex-col">
-                <p className="text-[14px] sm:text-[15px] font-black text-gray-800 leading-none mb-1">
-                  {exp.user?.name || exp.name}
-                </p>
-                <p className="text-[10px] font-black text-[#0A4F48] uppercase tracking-widest leading-none opacity-80">
-                  {exp.role}
+              <div className="min-w-0 flex-1">
+                <p className="client-title truncate text-[13px] leading-tight">
+                  {exp.user?.name || exp.name || "Specialist"}
                 </p>
               </div>
             </div>
-            
-            <button 
+
+            <button
               onClick={() => navigate("/client/chats")}
-              className="w-10 h-10 bg-[#F1F5F9] rounded-2xl flex items-center justify-center text-gray-400 hover:bg-[#0A4F48] hover:text-white transition-all shadow-sm"
+              className="client-action-pill shrink-0 rounded-full px-3.5 py-1 text-[10.5px] font-semibold text-white transition-all hover:opacity-90"
             >
-              <MessageCircle size={18} fill="currentColor" className="opacity-20 hover:opacity-100" />
+              Chat Now
             </button>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }
-
-

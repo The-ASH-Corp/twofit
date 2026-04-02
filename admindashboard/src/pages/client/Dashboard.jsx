@@ -21,11 +21,13 @@ import WaterIntake from "./components/WaterIntake";
 import WeeklyCheckInModal from "./components/WeeklyCheckInModal.jsx";
 import { submitWeeklyCheckIn } from "@/redux/features/client/client.thunk";
 import { toast } from "react-toastify";
+import DashboardTrendCards from "./components/DashboardTrendCards";
 
 export default function Dashboard() {
   const [program, setProgram] = useState(null);
   const [coaches, setCoaches] = useState([]);
   const [compliance, setCompliance] = useState(0);
+  const [complianceData, setComplianceData] = useState(null);
   const [streak, setStreak] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const user = useAppSelector(selectUser);
@@ -61,12 +63,13 @@ export default function Dashboard() {
             user?.dietition,
           ]),
         ).unwrap(),
-        dispatch(fetchClientComplianceStats(user?._id)).unwrap(),
+        dispatch(fetchClientComplianceStats({ id: user?._id, days: 14 })).unwrap(),
       ]);
 
       setProgram(programRes.data);
       setCoaches(coachesRes);
       setCompliance(complianceRes?.overall || 0);
+      setComplianceData(complianceRes || null);
       setStreak(complianceRes?.streaks?.activeStreak || 0);
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -165,35 +168,38 @@ export default function Dashboard() {
     activeStreak: streak,
   };
 
-  return (
-    <div className="max-w-[1600px] mx-auto px-3 sm:px-4 lg:px-8 xl:px-10 pt-2 sm:pt-4 lg:pt-8 pb-28 sm:pb-32 min-h-screen bg-transparent">
-      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6 md:gap-8 xl:gap-10 items-start">
-        {/* Main Column */}
-        <div className="flex flex-col gap-6 md:gap-8 xl:gap-10 min-w-0">
-          <HeroCard program={program} currentGlobalDay={currentGlobalDay} />
-          <StatsGrid statsData={statsData} />
-          <WaterIntake />
+  const weightHistory = clientUser?.weightHistory || user?.weightHistory || [];
 
-          {/* Mobile Only: Sidebars stack below main content */}
-          <div className="lg:hidden flex flex-col gap-6 md:gap-8">
-            <DietPlanCard
-              dietPlanPdf={clientUser?.dietPlanPdf || user?.dietPlanPdf}
-            />
-            <ExpertsList expert={coaches} />
-            <Measeurement />
-            <NotificationsList />
+  return (
+    <div className="client-dashboard-surface min-h-screen px-3 py-3 lg:px-5 lg:py-3.5 pb-24 lg:pb-5">
+      <div className="client-dashboard-shell">
+        {/* Main Content */}
+        <div className="client-dashboard-main">
+          {/* Row 1: Hero & Hydration */}
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <HeroCard program={program} currentGlobalDay={currentGlobalDay} />
+            <WaterIntake />
           </div>
+
+          {/* Row 2: Stats Grid */}
+          <StatsGrid statsData={statsData} />
+
+          {/* Row 3: Trends/Charts */}
+          <DashboardTrendCards
+            complianceData={complianceData}
+            weightHistory={weightHistory}
+          />
         </div>
 
-        {/* Sidebar Column (Desktop Only) */}
-        <div className="hidden lg:flex flex-col gap-6 xl:gap-8 sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto no-scrollbar">
+        {/* Sidebar */}
+        <aside className="client-side-panel">
           <DietPlanCard
             dietPlanPdf={clientUser?.dietPlanPdf || user?.dietPlanPdf}
           />
           <ExpertsList expert={coaches} />
           <Measeurement />
           <NotificationsList />
-        </div>
+        </aside>
       </div>
 
       {/* Mobile Bottom Navigation */}

@@ -1,77 +1,168 @@
 import React from "react";
-import { 
-  Calendar, 
-  LayoutGrid, 
-  Weight, 
-  Flame 
-} from "lucide-react";
 
-export default function StatsGrid({ statsData }) {
-  const stats = [
-    {
-      label: "Program Days",
-      value: statsData?.programDays.split(" ")[0] || "0/30",
-      unit: "Days",
-      icon: Calendar,
-      color: "bg-[#E6FFFA]",
-      textColor: "text-[#38B2AC]",
-    },
-    {
-      label: "Compliance",
-      value: statsData?.compliance || "0%",
-      unit: "",
-      icon: LayoutGrid,
-      color: "bg-[#EBF3F2]",
-      textColor: "text-[#0A4F48]",
-    },
-    {
-      label: "Current Weight",
-      value: statsData?.currentWeight || "--",
-      unit: "kg",
-      icon: Weight,
-      color: "bg-[#FDF8F3]",
-      textColor: "text-[#DD6B20]",
-    },
-    {
-      label: "Active Streak",
-      value: statsData?.activeStreak || "0",
-      unit: "Days",
-      icon: Flame,
-      color: "bg-[#FFF5F5]",
-      textColor: "text-[#E53E3E]",
-    }
-  ];
+function CircleStat({ title, value, subtitle, percent, tone = "default" }) {
+  const isComplianceTone = tone === "compliance";
+  const radius = isComplianceTone ? 39 : 38;
+  const circumference = 2 * Math.PI * radius;
+  const safePercent = Math.max(0, Math.min(Number(percent) || 0, 100));
+  const strokeDashoffset = circumference - (safePercent / 100) * circumference;
+  const ringSize = isComplianceTone ? "h-[124px] w-[124px]" : "h-[116px] w-[116px]";
+  const trackStroke = isComplianceTone ? "#edf0ed" : "#e4eae3";
+  const progressStroke = "#0A4F48";
+  const strokeWidth = isComplianceTone ? 7.5 : 7;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mt-2 sm:mt-4 md:mt-8">
-      {stats.map((stat, index) => {
-        const Icon = stat.icon;
-        return (
-          <div 
-            key={index}
-            className="bg-white p-4 sm:p-5 md:p-8 rounded-3xl md:rounded-[36px] shadow-[0_8px_30px_rgba(0,0,0,0.02)] border border-gray-50 flex flex-col items-start gap-3 sm:gap-4 md:gap-5 transition-all hover:shadow-lg hover:-translate-y-1 group"
-          >
-            <div className={`w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 ${stat.color} rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-sm`}>
-              <Icon className={`w-5 h-5 md:w-6 md:h-6 ${stat.textColor}`} />
-            </div>
-            
-            <div className="space-y-1">
-              <p className="text-[9px] sm:text-[10px] md:text-[11px] font-black text-gray-400 uppercase tracking-[0.16em] sm:tracking-[0.2em] leading-none">
-                {stat.label}
-              </p>
-              <p className="text-[34px] sm:text-[32px] font-black text-gray-800 leading-none">
-                {stat.value}
-              </p>
-              {stat.unit && (
-                <p className="text-[12px] sm:text-[13px] md:text-[14px] font-bold text-gray-400 mt-1 lowercase tracking-tight">
-                  {stat.unit}
-                </p>
-              )}
-            </div>
+    <div className="client-card flex min-h-[176px] flex-col p-4">
+      <h4 className="client-title text-[14px]">{title}</h4>
+      <div className="flex flex-1 items-center justify-center">
+        <div className={`relative flex ${ringSize} items-center justify-center`}>
+          {isComplianceTone && (
+            <>
+              <div className="absolute inset-[5px] rounded-full shadow-[inset_0_10px_14px_rgba(255,255,255,0.72),inset_0_-7px_10px_rgba(10,79,72,0.08),0_8px_14px_rgba(10,79,72,0.08)]" />
+              <div className="absolute inset-[8px] rounded-full border border-[#f5f7f4]" />
+            </>
+          )}
+          <svg className="h-full w-full -rotate-90" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r={radius} stroke={trackStroke} strokeWidth={strokeWidth} fill="none" />
+            {isComplianceTone && (
+              <circle
+                cx="50"
+                cy="50"
+                r={radius}
+                stroke="#063a35"
+                strokeOpacity="0.2"
+                strokeWidth={strokeWidth + 2}
+                fill="none"
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={strokeDashoffset}
+              />
+            )}
+            <circle
+              cx="50"
+              cy="50"
+              r={radius}
+              stroke={progressStroke}
+              strokeWidth={strokeWidth}
+              fill="none"
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={strokeDashoffset}
+              className="transition-all duration-700 ease-out"
+            />
+            {isComplianceTone && (
+              <circle
+                cx="50"
+                cy="50"
+                r={radius}
+                stroke="#2a7f76"
+                strokeOpacity="0.35"
+                strokeWidth={Math.max(strokeWidth - 3, 3)}
+                fill="none"
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={strokeDashoffset}
+              />
+            )}
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+            <p className="client-title text-[19px] leading-none">{value}</p>
+            <p className="client-subtitle mt-1 text-[12px]">{subtitle}</p>
           </div>
-        );
-      })}
+        </div>
+      </div>
     </div>
   );
 }
 
+function ProgramCalendar({ currentDay }) {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const firstDayOfMonth = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const safeCurrentDay = Math.max(1, Math.min(Number(currentDay) || 1, daysInMonth));
+
+  const calendarCells = [];
+  for (let i = 0; i < firstDayOfMonth; i++) {
+    calendarCells.push({ day: null, status: "empty" });
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    if (d < safeCurrentDay) {
+      calendarCells.push({ day: d, status: "completed" });
+    } else if (d === safeCurrentDay) {
+      calendarCells.push({ day: d, status: "current" });
+    } else {
+      calendarCells.push({ day: d, status: "upcoming" });
+    }
+  }
+
+  const weekdays = ["S", "M", "T", "W", "T", "F", "S"];
+
+  return (
+    <div className="client-card flex min-h-[166px] flex-col p-4">
+      <h4 className="client-title text-[14px]">Program Days</h4>
+      <div className="mt-2.5 grid grid-cols-7 gap-y-1 text-center">
+        {weekdays.map((wd, i) => (
+          <span key={i} className="client-subtitle text-[10px] font-semibold">
+            {wd}
+          </span>
+        ))}
+        {calendarCells.slice(0, 35).map((cell, i) => (
+          <div key={i} className="flex h-5 items-center justify-center">
+            <span
+              className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold ${
+                cell.day === null
+                  ? ""
+                  : cell.status === "current"
+                    ? "client-action-pill text-white"
+                    : cell.status === "completed"
+                      ? "bg-[#0A4F48] text-white"
+                    : "client-title"
+              }`}
+            >
+              {cell.day === null ? "" : cell.status === "completed" ? "✓" : cell.day}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function StatsGrid({ statsData }) {
+  const complianceValue = Number(String(statsData?.compliance || "0").replace("%", "")) || 0;
+  const numericWeight = Number(statsData?.currentWeight) || 0;
+  const weightPercent = numericWeight > 0 ? Math.min(Math.round((numericWeight / 120) * 100), 100) : 0;
+  const streakDays = Number(statsData?.activeStreak) || 0;
+  const streakPercent = Math.min(streakDays * 5, 100);
+  const currentProgramDay = Number(String(statsData?.programDays || "1/30").split("/")[0]) || 1;
+
+  return (
+    <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <ProgramCalendar currentDay={currentProgramDay} />
+
+      <CircleStat
+        title="Overall Compliance"
+        value={`${Math.round(complianceValue)}%`}
+        subtitle="Progress"
+        percent={complianceValue}
+        tone="compliance"
+      />
+      <CircleStat
+        title="Weight Progress"
+        value={numericWeight > 0 ? `${numericWeight}k` : "--"}
+        subtitle="Progress"
+        percent={weightPercent}
+        tone="compliance"
+      />
+      <CircleStat
+        title="Active Streak"
+        value={`${streakDays}`}
+        subtitle="Streak"
+        percent={streakPercent}
+        tone="compliance"
+      />
+    </div>
+  );
+}
