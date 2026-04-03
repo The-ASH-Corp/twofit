@@ -171,7 +171,7 @@ export default function Dashboard() {
   const weightHistory = clientUser?.weightHistory || user?.weightHistory || [];
 
   return (
-    <div className="client-dashboard-surface min-h-screen px-3 py-3 lg:px-5 lg:py-3.5 pb-24 lg:pb-5">
+    <div className="client-dashboard-surface min-h-screen px-4 pb-32 sm:px-6 sm:pb-36 lg:px-8 lg:pb-8 xl:px-10 2xl:px-14">
       <div className="client-dashboard-shell">
         {/* Main Content */}
         <div className="client-dashboard-main">

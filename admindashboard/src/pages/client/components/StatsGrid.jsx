@@ -6,7 +6,7 @@ function CircleStat({ title, value, subtitle, percent, tone = "default" }) {
   const circumference = 2 * Math.PI * radius;
   const safePercent = Math.max(0, Math.min(Number(percent) || 0, 100));
   const strokeDashoffset = circumference - (safePercent / 100) * circumference;
-  const ringSize = isComplianceTone ? "h-[124px] w-[124px]" : "h-[116px] w-[116px]";
+  const ringSize = isComplianceTone ? "h-[110px] w-[110px] sm:h-[124px] sm:w-[124px]" : "h-[105px] w-[105px] sm:h-[116px] sm:w-[116px]";
   const trackStroke = isComplianceTone ? "#edf0ed" : "#e4eae3";
   const progressStroke = "#0A4F48";
   const strokeWidth = isComplianceTone ? 7.5 : 7;
@@ -139,7 +139,7 @@ export default function StatsGrid({ statsData }) {
   const currentProgramDay = Number(String(statsData?.programDays || "1/30").split("/")[0]) || 1;
 
   return (
-    <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-4">
       <ProgramCalendar currentDay={currentProgramDay} />
 
       <CircleStat

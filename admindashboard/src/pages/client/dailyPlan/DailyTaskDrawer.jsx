@@ -1,5 +1,5 @@
 import React from "react";
-import { X, Activity, Utensils, Heart, Plus } from "lucide-react";
+import { X, Activity, Utensils, Heart, CheckCircle2, Circle } from "lucide-react";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 
@@ -14,154 +14,158 @@ export default function DailyTaskDrawer({
   if (!selectedDate) return null;
 
   const statusStyles = {
-    verified: "bg-[#A7F3D0] text-[#0A4F48]",
-    pending: "bg-yellow-50 text-yellow-700",
-    rejected: "bg-red-50 text-red-700",
-    todo: "bg-white text-[#0A4F48] border border-[#0A4F48]/10",
-    missed: "bg-gray-100 text-gray-700",
-    completed: "bg-[#A7F3D0] text-[#0A4F48]",
-    skipped: "bg-[#FEE2E2] text-[#991B1B]",
-    improve: "bg-orange-50 text-orange-700",
+    verified: "bg-[#E6FFFA] text-[#0A4F48] border-none",
+    pending: "bg-yellow-50 text-yellow-700 border-none",
+    rejected: "bg-red-50 text-red-700 border-none",
+    todo: "bg-white text-gray-400 border border-gray-100 uppercase",
+    missed: "bg-gray-100 text-gray-700 border-none",
+    completed: "bg-[#E6FFFA] text-[#0A4F48] border-none",
+    skipped: "bg-rose-50 text-rose-500 border-none",
   };
 
   const getTaskIcon = (type) => {
     switch (type) {
       case "Workout":
-        return <Activity className="w-4 h-4 text-white" />;
+        return <Activity className="w-5 h-5 text-[#0A4F48]" />;
       case "Meal":
-        return <Utensils className="w-4 h-4 text-white" />;
+        return <Utensils className="w-5 h-5 text-[#0A4F48]" />;
       case "Therapy":
-        return <Heart className="w-4 h-4 text-white" />;
+        return <Heart className="w-5 h-5 text-[#0A4F48]" />;
       default:
-        return <Activity className="w-4 h-4 text-white" />;
+        return <Activity className="w-5 h-5 text-[#0A4F48]" />;
     }
   };
 
   const dateObj = new Date(selectedDate);
-  const dayName = dateObj.toLocaleString("en-US", { weekday: "long" }).toUpperCase();
-  const dayOfMonth = dateObj.getDate();
-  const monthName = dateObj.toLocaleString("en-US", { month: "short" });
-  const yearName = dateObj.getFullYear();
-  const formattedDate = `${dayOfMonth} ${monthName} ${yearName}`;
+  const formattedDate = dateObj.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
 
   const totalTasks = tasks?.length || 0;
   const verifiedTasks = tasks?.filter((t) => t.status.toLowerCase() === "verified").length || 0;
   const completionPercent = totalTasks > 0 ? Math.round((verifiedTasks / totalTasks) * 100) : 0;
-  
-  const firstName = user?.name?.split(" ")[0] || "there";
 
   return (
-    <div className="fixed inset-0 z-50 flex lg:justify-end items-end lg:items-stretch">
+    <div className="fixed inset-0 z-100 flex justify-end">
       {/* Overlay */}
       <div
-        className="absolute inset-0 bg-black/40 lg:bg-black/10 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/20 backdrop-blur-[2px]"
         onClick={onClose}
       />
 
       {/* Drawer */}
-      <div className="relative w-full lg:w-[450px] lg:h-full max-h-[90vh] lg:max-h-none bg-white shadow-2xl flex flex-col rounded-t-[40px] lg:rounded-none animate-in slide-in-from-bottom lg:slide-in-from-right duration-300">
+      <div className="relative w-full max-w-[500px] h-full bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-500 ease-out p-8 lg:p-12">
         
         {/* Header */}
-        <div className="p-8 pb-4 flex justify-between items-start">
-          <div className="flex flex-col">
-            <span className="text-[12px] font-black tracking-[0.1em] text-gray-400 uppercase mb-1">
-              {dayName} PROGRESS
+        <div className="flex justify-between items-start mb-10">
+          <div>
+            <span className="text-[10px] font-black tracking-[3px] text-gray-400 uppercase mb-2 block">
+              Overview
             </span>
-            <h2 className="text-[32px] font-black text-[#0A4F48] leading-tight">
+            <h2 className="text-[32px] font-bold text-gray-900 leading-tight">
               {formattedDate}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors mt-1"
+            className="w-12 h-12 flex items-center justify-center bg-gray-50 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <X className="w-6 h-6 text-gray-900" />
+            <X className="w-6 h-6 text-gray-400" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-8 py-4 space-y-6 pb-32 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex-1 overflow-y-auto pr-2 -mr-2 no-scrollbar space-y-10">
           
-          {/* Summary Card */}
-          {!allMissed && totalTasks > 0 && (
-            <div className="bg-[#E6FFFA] rounded-[32px] p-6 flex items-center gap-6">
-              {/* Circular Progress (Simplified SVG) */}
-              <div className="relative w-16 h-16 shrink-0">
-                <svg className="w-full h-full transform -rotate-90">
-                  <circle
-                    cx="32"
-                    cy="32"
-                    r="28"
-                    stroke="#D1FAE5"
-                    strokeWidth="4"
-                    fill="transparent"
-                  />
-                  <circle
-                    cx="32"
-                    cy="32"
-                    r="28"
-                    stroke="#0A4F48"
-                    strokeWidth="4"
-                    fill="transparent"
-                    strokeDasharray={175.9}
-                    strokeDashoffset={175.9 * (1 - completionPercent / 100)}
-                    strokeLinecap="round"
-                    className="transition-all duration-700"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-[14px] font-black text-[#0A4F48]">
-                    {completionPercent}%
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex flex-col">
-                <h3 className="text-[16px] font-black text-[#0A4F48] mb-0.5">
-                  Great pace, {firstName}!
-                </h3>
-                <p className="text-[13px] font-medium text-[#0A4F48]/70">
-                  {verifiedTasks} of {totalTasks} tasks completed today.
-                </p>
+          {/* Pace Card */}
+          <div className="bg-[#F6FBF9] rounded-[32px] p-8 flex items-center gap-8 border border-[#E6FFFA]">
+            {/* Circular Progress */}
+            <div className="relative w-24 h-24 shrink-0">
+              <svg className="w-full h-full transform -rotate-90">
+                <circle
+                  cx="48"
+                  cy="48"
+                  r="40"
+                  stroke="#E6FFFA"
+                  strokeWidth="8"
+                  fill="transparent"
+                />
+                <circle
+                  cx="48"
+                  cy="48"
+                  r="40"
+                  stroke="#0A4F48"
+                  strokeWidth="8"
+                  fill="transparent"
+                  strokeDasharray={251.2}
+                  strokeDashoffset={251.2 * (1 - completionPercent / 100)}
+                  strokeLinecap="round"
+                  className="transition-all duration-1000"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-[20px] font-black text-[#0A4F48]">
+                  {completionPercent}%
+                </span>
               </div>
             </div>
-          )}
 
-          {/* Task List */}
-          <div className="space-y-3">
-            {allMissed ? (
-               <div className="text-center py-12 text-gray-500 bg-gray-50 rounded-3xl">
-                 <p className="text-[14px] font-bold">You were not logged in that day</p>
+            <div className="flex flex-col gap-1">
+              <h3 className="text-[20px] font-bold text-gray-900">
+                Great pace
+              </h3>
+              <p className="text-[14px] font-medium text-gray-400 leading-relaxed">
+                You're just getting started today. Let's make it count!
+              </p>
+            </div>
+          </div>
+
+          {/* Protocol List */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between mb-4">
+               <h3 className="text-[12px] font-black tracking-[2px] text-gray-400 uppercase">Today's Protocol</h3>
+               <div className="bg-[#E6FFFA] text-[#0A4F48] text-[10px] font-black px-3 py-1 rounded-full uppercase">
+                 {totalTasks} Tasks
                </div>
-            ) : tasks && tasks.length > 0 ? (
-              tasks.map((task, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-4 p-5 bg-[#F2F4F4] rounded-[24px] hover:bg-gray-100 transition-all cursor-pointer group"
-                  onClick={() => onTaskClick && onTaskClick(task)}
-                >
-                  <div className="w-12 h-12 rounded-full bg-[#0A4F48] flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform">
-                    {getTaskIcon(task.type)}
-                  </div>
-                  
-                  <span className="flex-1 text-[16px] font-bold text-gray-800 tracking-tight">
-                    {task.name}
-                  </span>
+            </div>
 
-                  <span
-                    className={`text-[10px] font-black tracking-widest uppercase px-4 py-1.5 rounded-full ${
-                      statusStyles[task.status.toLowerCase()] ||
-                      statusStyles.pending
-                    }`}
+            <div className="space-y-4">
+              {allMissed ? (
+                 <div className="text-center py-20 bg-gray-50 rounded-[32px]">
+                   <p className="text-sm font-bold text-gray-400 italic">"Offline day - rest is part of the plan"</p>
+                 </div>
+              ) : tasks && tasks.length > 0 ? (
+                tasks.map((task, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center gap-6 p-4 rounded-[24px] hover:bg-gray-50 transition-all cursor-pointer group"
+                    onClick={() => onTaskClick && onTaskClick(task)}
                   >
-                    {task.status}
-                  </span>
+                    <div className="w-14 h-14 rounded-[20px] bg-[#F6FBF9] flex items-center justify-center shrink-0 transition-transform group-hover:scale-110">
+                      {getTaskIcon(task.type)}
+                    </div>
+                    
+                    <span className="flex-1 text-[17px] font-bold text-gray-800 tracking-tight">
+                      {task.name}
+                    </span>
+
+                    <div
+                      className={`text-[9px] font-black tracking-widest px-4 py-2 rounded-lg ${
+                        statusStyles[task.status.toLowerCase()] ||
+                        statusStyles.todo
+                      }`}
+                    >
+                      {task.status === 'todo' ? 'TODO' : task.status.toUpperCase()}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-20 text-gray-400 font-medium">
+                  No tasks tracked for this day.
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-12 text-gray-400">
-                <p className="text-[14px]">No tasks for this day</p>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
