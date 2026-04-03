@@ -125,7 +125,9 @@ export default function ClientForm() {
       );
       setProgram(programRes?.payload?.data || []);
 
-      const coachessOfAdmin = await dispatch(getAllCoachesByAdmin(user?._id));
+      const coachessOfAdmin = await dispatch(
+        getAllCoachesByAdmin(user?.experts),
+      );
       setCoachesOfAdmin(coachessOfAdmin?.payload || []);
 
       const therapyRes = await dispatch(
