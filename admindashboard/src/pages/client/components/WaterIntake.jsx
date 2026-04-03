@@ -168,12 +168,12 @@ const WaterIntake = () => {
             {waterIntakeMl} ml
           </p>
 
-          <div className="mt-3.5 flex flex-wrap items-center gap-2.5">
-            <div className="relative w-full max-w-[120px] shrink-0">
+          <div className="mt-4 flex flex-col gap-2.5 sm:flex-row sm:items-center">
+            <div className="relative w-full sm:max-w-[110px]">
               <select
                 value={waterStepMl}
                 onChange={(e) => setWaterStepMl(Number(e.target.value))}
-                className="client-card-soft w-full appearance-none rounded-full border border-[rgba(10,79,72,0.16)] px-3 py-1.5 pr-8 text-[12px] font-semibold text-[#0A4F48] outline-none focus:border-[#0A4F48]/35"
+                className="client-card-soft w-full appearance-none rounded-full border border-[rgba(10,79,72,0.16)] px-4 py-2 pr-9 text-[13px] font-semibold text-[#0A4F48] outline-none transition-all focus:border-[#0A4F48]/35"
               >
                 {WATER_STEP_OPTIONS.map((step) => (
                   <option key={step} value={step}>
@@ -182,8 +182,8 @@ const WaterIntake = () => {
                 ))}
               </select>
               <ChevronDown
-                size={14}
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#0A4F48]"
+                size={15}
+                className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-[#0A4F48]/60"
               />
             </div>
 
@@ -191,9 +191,16 @@ const WaterIntake = () => {
               type="button"
               onClick={handleAddWater}
               disabled={isWaterSyncing}
-              className="client-action-pill min-w-0 flex-1 rounded-full px-3 py-1.5 text-[12px] font-semibold whitespace-nowrap disabled:opacity-60"
+              className="client-action-pill flex h-[38px] min-w-0 flex-1 items-center justify-center rounded-full px-5 text-[13px] font-bold whitespace-nowrap transition-all active:scale-[0.98] disabled:opacity-60"
             >
-              {isWaterSyncing ? "Updating..." : "Add Water"}
+              {isWaterSyncing ? (
+                <span className="flex items-center gap-2">
+                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  Updating
+                </span>
+              ) : (
+                "Add Water"
+              )}
             </button>
           </div>
         </div>

@@ -139,7 +139,7 @@ export default function StatsGrid({ statsData }) {
   const currentProgramDay = Number(String(statsData?.programDays || "1/30").split("/")[0]) || 1;
 
   return (
-    <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 2xl:grid-cols-4">
+    <div className="grid w-full grid-cols-1 gap-3.5 sm:grid-cols-2 sm:gap-4 2xl:grid-cols-4">
       <ProgramCalendar currentDay={currentProgramDay} />
 
       <CircleStat
@@ -151,15 +151,15 @@ export default function StatsGrid({ statsData }) {
       />
       <CircleStat
         title="Weight Progress"
-        value={numericWeight > 0 ? `${numericWeight}k` : "--"}
-        subtitle="Progress"
+        value={numericWeight > 0 ? `${numericWeight}kg` : "--"}
+        subtitle="Current"
         percent={weightPercent}
         tone="compliance"
       />
       <CircleStat
         title="Active Streak"
         value={`${streakDays}`}
-        subtitle="Streak"
+        subtitle="Days"
         percent={streakPercent}
         tone="compliance"
       />
