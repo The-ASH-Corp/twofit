@@ -88,7 +88,8 @@ const HeadForm = () => {
             options: [
               { label: "pcod", value: "pcod" },
               { label: "thyroid", value: "thyroid" },
-              { label: "diabetes", value: "diabetes" },
+              {label :"weight loss", value:"weight loss"},
+              {label :"weight gain", value:"weight gain"},
             ],
             allowCustom: true,
           },

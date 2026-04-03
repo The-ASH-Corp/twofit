@@ -34,10 +34,9 @@ function getDateFromComplianceEntry(item) {
 }
 
 function toComplianceSeries(weeklyData = [], graphDays = 14) {
-  const sourceData =
-    Array.isArray(weeklyData) && weeklyData.length > 0
-      ? weeklyData
-      : weeklyCompliance;
+  const sourceData = Array.isArray(weeklyData) && weeklyData.length > 0 ? weeklyData : [];
+
+  if (sourceData.length === 0) return [];
 
   const entries = sourceData.map((item, index) => {
     const therapy = clampPercent(item?.therapy);
@@ -140,65 +139,103 @@ function TrendCard({
   valueFormatter,
   allowYDecimals = false,
 }) {
+  const hasData = Array.isArray(data) && data.length > 0;
   const gradientId = `trend-${title.toLowerCase().replace(/\s+/g, "-")}`;
 
   return (
-    <div className="client-card flex flex-col p-4 sm:p-[18px]">
+    <div className="client-card flex min-h-[176px] flex-col p-4 sm:p-[18px]">
       <div className="mb-3.5 flex items-center justify-between">
-        <h3 className="client-title text-[15px]">{title}</h3>
-        
+        <h3 className="client-title text-[14px] sm:text-[15px]">{title}</h3>
       </div>
 
-      <div className="h-[180px] sm:h-[200px] lg:h-[220px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={data} margin={{ top: 10, right: 14, left: 8, bottom: 12 }}>
-            <defs>
-              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#0A4F48" stopOpacity={0.22} />
-                <stop offset="100%" stopColor="#0A4F48" stopOpacity={0.04} />
-              </linearGradient>
-            </defs>
-            <XAxis
-              dataKey="label"
-              axisLine={{ stroke: "#d7e0d8", strokeWidth: 1 }}
-              tickLine={false}
-              tick={{ fontSize: 10, fill: "#7f8f84", fontWeight: 600 }}
-              tickMargin={8}
-              minTickGap={18}
-            />
-            <YAxis
-              axisLine={{ stroke: "#d7e0d8", strokeWidth: 1 }}
-              tickLine={false}
-              tick={{ fontSize: 10, fill: "#7f8f84", fontWeight: 600 }}
-              tickMargin={6}
-              width={36}
-              domain={[Math.min(...yTicks), Math.max(...yTicks)]}
-              ticks={yTicks}
-              allowDecimals={allowYDecimals}
-            />
-            <Tooltip
-              formatter={(value) => (typeof valueFormatter === "function" ? valueFormatter(value) : value)}
-              contentStyle={{
-                borderRadius: "14px",
-                border: "1px solid #e8eee7",
-                boxShadow: "0 6px 18px rgba(42, 61, 49, 0.12)",
-                background: "rgba(255, 255, 255, 0.95)",
-                fontSize: "12px",
-                fontWeight: 600,
-              }}
-            />
-            <Area type="monotone" dataKey="value" stroke="#e6efec" strokeWidth={5} fill="none" dot={false} />
-            <Area
-              type="monotone"
-              dataKey="value"
-              stroke="#0A4F48"
-              strokeWidth={2.4}
-              fill={`url(#${gradientId})`}
-              dot={{ r: 3.8, fill: "#0A4F48", stroke: "white", strokeWidth: 1.7 }}
-              activeDot={{ r: 4.8, fill: "#0A4F48", stroke: "white", strokeWidth: 2.3 }}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+      <div className="relative h-[180px] w-full sm:h-[200px] lg:h-[224px]">
+        {hasData ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={data}
+              margin={{ top: 10, right: 14, left: -22, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#0A4F48" stopOpacity={0.22} />
+                  <stop offset="100%" stopColor="#0A4F48" stopOpacity={0.04} />
+                </linearGradient>
+              </defs>
+              <XAxis
+                dataKey="label"
+                axisLine={{ stroke: "#d7e0d8", strokeWidth: 1 }}
+                tickLine={false}
+                tick={{ fontSize: 10, fill: "#7f8f84", fontWeight: 600 }}
+                tickMargin={8}
+                minTickGap={18}
+              />
+              <YAxis
+                axisLine={{ stroke: "#d7e0d8", strokeWidth: 1 }}
+                tickLine={false}
+                tick={{ fontSize: 10, fill: "#7f8f84", fontWeight: 600 }}
+                tickMargin={6}
+                width={48}
+                domain={[Math.min(...yTicks), Math.max(...yTicks)]}
+                ticks={yTicks}
+                allowDecimals={allowYDecimals}
+              />
+              <Tooltip
+                formatter={(value) =>
+                  typeof valueFormatter === "function"
+                    ? valueFormatter(value)
+                    : value
+                }
+                contentStyle={{
+                  borderRadius: "14px",
+                  border: "1px solid #e8eee7",
+                  boxShadow: "0 6px 18px rgba(42, 61, 49, 0.12)",
+                  background: "rgba(255, 255, 255, 0.95)",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                }}
+              />
+              <Area
+                type="monotone"
+                dataKey="value"
+                stroke="#e6efec"
+                strokeWidth={5}
+                fill="none"
+                dot={false}
+              />
+              <Area
+                type="monotone"
+                dataKey="value"
+                stroke="#0A4F48"
+                strokeWidth={2.4}
+                fill={`url(#${gradientId})`}
+                dot={{
+                  r: 3.8,
+                  fill: "#0A4F48",
+                  stroke: "white",
+                  strokeWidth: 1.7,
+                }}
+                activeDot={{
+                  r: 4.8,
+                  fill: "#0A4F48",
+                  stroke: "white",
+                  strokeWidth: 2.3,
+                }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex h-full w-full flex-col items-center justify-center rounded-[20px] bg-[#fbfdfb]/50 border border-dashed border-[#e4eae4] text-center">
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-[#0A4F48]/40">
+              <ResponsiveContainer width={18} height={18}>
+                <AreaChart data={[{v:0},{v:1},{v:0.5}]}>
+                  <Area type="monotone" dataKey="v" stroke="currentColor" fill="none" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+            <p className="text-[13px] font-bold text-[#4a5a51]">No records yet</p>
+            <p className="mt-0.5 text-[11px] font-medium text-[#93a198]">Start logging to see your trends</p>
+          </div>
+        )}
       </div>
     </div>
   );
