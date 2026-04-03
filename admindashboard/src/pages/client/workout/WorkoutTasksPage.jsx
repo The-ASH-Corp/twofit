@@ -318,8 +318,8 @@ export default function WorkoutTasksPage() {
   const avgHeartRate = effortRating ? 118 + effortRating * 3 : 142;
 
   return (
-    <div className="min-h-screen bg-[#EEF3F0] pb-32">
-      <div className="mx-auto max-w-[1380px] p-4 lg:p-8">
+    <div className="client-page-container">
+      <div className="client-page-shell">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.7fr_1fr]">
           <div className="space-y-6">
             <section className="client-card rounded-[30px] p-4 sm:p-5">
@@ -580,8 +580,6 @@ export default function WorkoutTasksPage() {
           </div>
         )}
       </div>
-
-      <div className="block h-10 w-full lg:hidden" />
       <MobileBottomNav />
     </div>
   );

@@ -187,8 +187,8 @@ export default function Progress() {
   }
 
   return (
-    <div className="min-h-screen bg-[#EEF3F0] pb-32">
-      <div className="mx-auto max-w-[1380px] p-4 lg:p-8">
+    <div className="client-page-container">
+      <div className="client-page-shell">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <section className="client-card rounded-[22px] p-5 sm:p-6">
             <div className="flex items-start justify-between">

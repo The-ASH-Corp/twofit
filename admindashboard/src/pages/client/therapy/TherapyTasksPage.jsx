@@ -348,8 +348,8 @@ export default function TherapyTasksPage() {
   const rewardXp = Math.max(therapyTasks.length * 10, 50);
 
   return (
-    <div className="min-h-screen bg-[#EDF2EF] pb-32">
-      <div className="mx-auto max-w-[1380px] p-4 lg:p-8">
+    <div className="client-page-container">
+      <div className="client-page-shell">
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#0A7B4E]">

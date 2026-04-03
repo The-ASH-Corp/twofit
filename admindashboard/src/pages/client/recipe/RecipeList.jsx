@@ -188,8 +188,8 @@ export default function RecipeList() {
   }, [gridRecipes]);
 
   return (
-    <div className="min-h-screen bg-[#EEF3F1] pb-32 selection:bg-[#0A7B4E]/15">
-      <div className="mx-auto max-w-[1380px] p-4 lg:p-8">
+    <div className="client-page-container">
+      <div className="client-page-shell">
         <header className="mb-6">
           <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#0A7B4E]">
             Curation
@@ -306,14 +306,6 @@ export default function RecipeList() {
                   <StatBox label="PROTEIN" value={`${featuredRecipe?.protein || 0}g`} />
                   <StatBox label="CARBS" value={`${featuredCarbs}g`} />
                 </div>
-
-                {/* <button
-                  onClick={() => handleSelectRecipe(featuredRecipe._id)}
-                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-[#087B44] py-3.5 text-[18px] font-black text-white shadow-[0_14px_26px_rgba(8,123,68,0.28)] transition-all hover:bg-[#076d3d]"
-                >
-                  View Full Recipe
-                  <span aria-hidden>→</span>
-                </button> */}
               </div>
             </div>
           </section>
@@ -322,6 +314,7 @@ export default function RecipeList() {
         {recipeGridItems.length > 0 && (
           <section className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
             {recipeGridItems.map((item) => {
+              if (item.isBuilder) return null; // Simplified for now
               const recipe = item;
               const ingredients = normalizeList(recipe.ingredients);
               const snippet =
@@ -423,8 +416,6 @@ export default function RecipeList() {
                         </p>
                       </div>
                     </div>
-
-                   
                   </div>
                 </article>
               );
@@ -460,7 +451,6 @@ export default function RecipeList() {
           </div>
         )}
       </div>
-
       <MobileBottomNav />
     </div>
   );

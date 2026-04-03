@@ -473,8 +473,8 @@ export default function DietTasksPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#EDF2EF] pb-28 selection:bg-[#0A7B4E]/15">
-      <div className="mx-auto max-w-[1380px] p-4 lg:p-8">
+    <div className="client-page-container">
+      <div className="client-page-shell">
         <section className="client-card rounded-[24px] p-4 sm:p-6 lg:p-7">
           <div className="flex items-center justify-between gap-3 text-[#1F2F27]">
             <div className="flex items-center gap-2">

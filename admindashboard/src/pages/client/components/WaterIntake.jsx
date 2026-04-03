@@ -168,8 +168,8 @@ const WaterIntake = () => {
             {waterIntakeMl} ml
           </p>
 
-          <div className="mt-3.5 flex items-center gap-2.5">
-            <div className="relative w-[112px] shrink-0">
+          <div className="mt-3.5 flex flex-wrap items-center gap-2.5">
+            <div className="relative w-full max-w-[120px] shrink-0">
               <select
                 value={waterStepMl}
                 onChange={(e) => setWaterStepMl(Number(e.target.value))}

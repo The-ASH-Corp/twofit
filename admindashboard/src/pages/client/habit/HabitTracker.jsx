@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { SyncLoader } from "react-spinners";
 import { addDays, format, startOfWeek } from "date-fns";
+import MobileBottomNav from "../components/MobileBottomNav";
 
 const dualEdgeDepthShadow = {
   boxShadow:
@@ -174,8 +175,8 @@ export default function HabitTracker() {
   }
 
   return (
-    <div className="min-h-screen bg-[#EDF2EF] px-3 py-4 sm:px-5 sm:py-6 pb-24 lg:pb-8">
-      <div className="mx-auto w-full max-w-[1280px] space-y-5">
+    <div className="client-page-container">
+      <div className="client-page-shell">
         <div className="flex flex-wrap items-end justify-between gap-3 px-1">
           <div>
             <h1 className="text-[30px] sm:text-[36px] leading-none font-black text-[#22342C]">
@@ -409,6 +410,7 @@ export default function HabitTracker() {
           </div>
         </div>
       </div>
+      <MobileBottomNav />
     </div>
   );
 }
