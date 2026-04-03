@@ -10,7 +10,8 @@ import {
   PenLine, 
   Play, 
   Check, 
-  ChevronRight
+  ChevronRight,
+  Pause
 } from "lucide-react";
 import { SyncLoader } from "react-spinners";
 import { toast } from "react-toastify";
@@ -56,6 +57,7 @@ export default function TherapyTasksPage() {
   const [fileName, setFileName] = useState("Upload File");
   const [comment, setComment] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [isStarted, setIsStarted] = useState(false);
   const fileInputRef = useRef(null);
 
 
@@ -169,6 +171,7 @@ export default function TherapyTasksPage() {
       return;
     }
     setSelectedIndex(idx);
+    setIsStarted(true); // Automatically engage session once a task is manually clicked
   };
 
   const allVideosWatched =
@@ -223,6 +226,14 @@ export default function TherapyTasksPage() {
       next.add(selectedTask.index);
       return next;
     });
+
+    // Auto-progression logic (same as Workout page)
+    const nextIndex = selectedTask.index + 1;
+    if (nextIndex < therapyTasks.length) {
+      setTimeout(() => {
+        setSelectedIndex(nextIndex);
+      }, 1500);
+    }
   };
 
   const handleSubmit = async () => {
@@ -368,62 +379,104 @@ export default function TherapyTasksPage() {
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.9fr_1fr]">
           <div className="space-y-6">
-            <section className="client-card rounded-[24px] p-4">
-              <div className="relative overflow-hidden rounded-[18px] border border-[#D9E3DD] bg-[#243A35]">
-                {selectedTask?.mediaUrl ? (
-                  <video
-                    key={selectedIndex}
-                    onEnded={handleVideoEnd}
-                    className="h-[260px] w-full object-cover sm:h-[360px] lg:h-[460px]"
-                    src={selectedTask.mediaUrl?.replace(/^http:\/\//i, "https://")}
-                  >
-                    Your browser does not support the video tag.
-                  </video>
-                ) : (
-                  <div className="flex h-[260px] w-full flex-col items-center justify-center gap-4 bg-linear-to-br from-[#0A4F48] to-[#135E56] text-white sm:h-[360px] lg:h-[460px]">
-                    <PlayCircle size={62} className="opacity-40" />
-                    <p className="text-[16px] font-black opacity-75">
-                      No video assigned for this task
-                    </p>
-                  </div>
-                )}
+            <section className="client-card rounded-[32px] overflow-hidden p-0 bg-[#0F1A17] border-0 shadow-2xl shadow-emerald-900/10 group">
+               <div className="relative">
+                 {selectedTask?.mediaUrl ? (
+                    <div className="relative h-[260px] w-full sm:h-[340px] lg:h-[420px]">
+                      <video
+                        key={`therapy-video-${selectedIndex}`}
+                        autoPlay={isStarted}
+                        controls={isStarted}
+                        controlsList="nodownload"
+                        onEnded={handleVideoEnd}
+                        className={cn(
+                          "h-full w-full object-contain transition-all duration-700",
+                          !isStarted && "blur-sm opacity-40 grayscale-[0.8]"
+                        )}
+                        src={selectedTask.mediaUrl}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
 
-                <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                  <div className="flex h-[88px] w-[88px] items-center justify-center rounded-full bg-[#087B44] text-white shadow-[0_16px_28px_rgba(8,123,68,0.38)]">
-                    <Play size={30} fill="currentColor" />
+                      {!isStarted && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-black/20 backdrop-blur-[2px]">
+                           <div className="flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-full bg-[#0A7B4E] text-white shadow-[0_0_50px_rgba(10,123,78,0.4)] animate-pulse hover:scale-110 transition-transform cursor-pointer group/start" onClick={() => setIsStarted(true)}>
+                              <PlayCircle size={48} fill="currentColor" className="ml-1" />
+                           </div>
+                           <h3 className="mt-8 text-[32px] font-black text-white uppercase tracking-tight text-center drop-shadow-2xl">
+                              Ready for your therapy?
+                           </h3>
+                           <p className="mt-2 text-[14px] font-bold text-emerald-100/70 uppercase tracking-[0.2em] text-center">
+                              Day {currentGlobalDay} • {therapyTasks.length} Handpicked Sessions
+                           </p>
+                           <button 
+                              onClick={() => setIsStarted(true)}
+                              className="mt-8 px-10 py-4 bg-white text-[#0A7B4E] text-[15px] font-black uppercase tracking-widest rounded-full shadow-2xl hover:bg-emerald-50 transition-colors shadow-emerald-900/40"
+                           >
+                              Start My Therapy
+                           </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex h-[260px] w-full flex-col items-center justify-center gap-4 bg-linear-to-br from-[#0F1A17] to-[#142621] text-white/90 sm:h-[340px] lg:h-[420px]">
+                      <div className="h-16 w-16 rounded-full bg-white/5 flex items-center justify-center backdrop-blur-md border border-white/10">
+                        <PlayCircle size={32} className="opacity-30" />
+                      </div>
+                      <p className="text-[14px] font-black uppercase tracking-widest opacity-50">
+                        No instruction video assigned
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Header Info Over Video */}
+                  <div className="absolute top-0 left-0 right-0 p-6 bg-linear-to-b from-black/80 to-transparent flex justify-between items-start">
+                     <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-[#0A7B4E] drop-shadow-sm">Therapy Guide</p>
+                        <h2 className="text-[20px] font-black text-white leading-tight drop-shadow-md">
+                           {selectedTask?.name || "Recovery Session"}
+                        </h2>
+                     </div>
+                     <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                        <div className="h-1.5 w-1.5 rounded-full bg-[#0A7B4E] animate-pulse" />
+                        <span className="text-[11px] font-bold text-white uppercase tracking-wider">
+                           {selectedIndex + 1}/{therapyTasks.length}
+                        </span>
+                     </div>
                   </div>
-                </div>
-              </div>
+               </div>
             </section>
 
-            <section className="client-card rounded-[24px] p-6 sm:p-7">
-              <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <section className="client-card rounded-[32px] p-6 sm:p-8 bg-white border-[#E8EEEB] shadow-sm">
+              <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
                 <div className="max-w-[720px]">
-                  <h2 className="text-[34px] leading-[1.08] font-black text-[#1F2D27] sm:text-[42px] lg:text-[50px]">
-                    Current Task: {selectedTask?.name || "Main Therapy Video"}
+                  <div className="flex items-center gap-2 mb-3">
+                     <span className="bg-[#F0F5F2] text-[#0A7B4E] text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest border border-[#DCE7E3]">
+                        Active Focal Module
+                     </span>
+                  </div>
+                  <h2 className="text-[28px] leading-tight font-black text-[#1F2D27] sm:text-[34px]">
+                    {selectedTask?.name}
                   </h2>
-                  <p className="mt-3 text-[17px] font-medium leading-relaxed text-[#66776F]">
+                  <p className="mt-4 text-[16px] font-medium leading-relaxed text-[#50635A]">
                     {selectedTask?.notes ||
                       "In this session, we explore the foundations of neuroplasticity and how to identify automatic negative thoughts (ANTs) during high-pressure performance moments."}
                   </p>
                 </div>
 
-                <button
+                {/* <button
                   onClick={openNextVideo}
                   disabled={!canPlayNext}
-                  className="inline-flex h-[112px] w-[112px] shrink-0 flex-col items-center justify-center rounded-3xl bg-[#087B44] text-center text-white shadow-[0_16px_28px_rgba(8,123,68,0.35)] transition-all hover:bg-[#076d3d] disabled:cursor-not-allowed disabled:bg-[#C9D4CE] disabled:text-[#87958E] sm:h-[84px] sm:w-[154px]"
+                  className="inline-flex h-[112px] w-[112px] shrink-0 flex-col items-center justify-center rounded-[32px] bg-[#087B44] text-center text-white shadow-xl shadow-emerald-900/20 transition-all hover:bg-[#076d3d] hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:bg-[#C9D4CE] disabled:text-[#87958E] sm:h-[84px] sm:w-[154px]"
                 >
-                  <span className="text-[24px] font-black leading-none">
+                  <span className="text-[20px] font-black leading-none uppercase tracking-tighter">
                     Play Next
                   </span>
-                 
-                  <span className="mt-1 inline-flex items-center gap-1 text-[14px] font-black">
-                    Video <ChevronRight size={15} />
+                  <span className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-emerald-100">
+                    CONTINUE <ChevronRight size={13} />
                   </span>
-                </button>
+                </button> */}
               </div>
-
-              
             </section>
           </div>
 
@@ -434,63 +487,89 @@ export default function TherapyTasksPage() {
                 Today&apos;s Protocol
               </h3>
 
-              <div className="space-y-3">
+              <div className="mt-5 space-y-4">
                 {therapyTasks.map((task, idx) => {
                   const isCompleted = watchedVideos.has(idx) || idx < selectedIndex;
                   const isActive = idx === selectedIndex;
                   const unlocked = isUnlocked(idx);
                   const IconComp = task.icon;
 
-                  if (isActive) {
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => handleTaskClick(idx)}
-                        className="flex w-full items-center gap-3 rounded-[14px] border border-[#A9DCC2] bg-[#EFF8F3] p-3 text-left transition-all"
-                      >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-white text-[#0A7B4E] shadow-[0_6px_12px_rgba(17,38,29,0.1)]">
-                          <IconComp size={18} />
-                        </div>
-                        <p className="text-[16px] font-black text-[#0A7B4E]">
-                          {task.name}
-                        </p>
-                      </button>
-                    );
-                  }
-
-                  if (isCompleted) {
-                    return (
-                      <button
-                        key={idx}
-                        onClick={() => handleTaskClick(idx)}
-                        className="flex w-full items-center gap-3 rounded-[14px] bg-[#F4F8F6] p-3 text-left transition-all hover:bg-[#EDF5F1]"
-                      >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-[#087B44] text-white">
-                          <Check size={16} strokeWidth={3} />
-                        </div>
-                        <p className="text-[16px] font-black text-[#3D4F47]">
-                          {task.name}
-                        </p>
-                      </button>
-                    );
-                  }
-
                   return (
-                    <button
-                      key={idx}
+                    <div 
+                      key={`therapy-gallery-${idx}`}
                       onClick={() => handleTaskClick(idx)}
                       className={cn(
-                        "flex w-full items-center gap-3 rounded-[14px] bg-[#F6F8F7] p-3 text-left transition-all",
-                        !unlocked && "opacity-45",
+                        "group relative flex items-center gap-4 rounded-[22px] overflow-hidden border p-2 transition-all duration-500 cursor-pointer",
+                        isActive 
+                          ? "bg-white border-[#0A7B4E] shadow-xl shadow-emerald-900/10 ring-2 ring-[#0A7B4E]/10" 
+                          : isCompleted 
+                            ? "bg-[#F3F8F5] border-[#DCE7E1]" 
+                            : "bg-white border-[#E8EEEB] hover:border-[#D6DED9]"
                       )}
                     >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-[10px] bg-white text-[#AAB7B1]">
-                        {unlocked ? <IconComp size={18} /> : <Lock size={16} />}
-                      </div>
-                      <p className="text-[16px] font-black text-[#8A9992]">
-                        {task.name}
-                      </p>
-                    </button>
+                       {/* Compact Thumbnail */}
+                       <div className="relative aspect-video h-16 w-24 shrink-0 overflow-hidden rounded-[14px] bg-[#1E2C26]">
+                          {task.mediaUrl ? (
+                             <video 
+                               muted 
+                               playsInline
+                               preload="metadata"
+                               className={cn(
+                                 "h-full w-full object-cover transition-all duration-700",
+                                 !isActive && "opacity-60 grayscale group-hover:grayscale-0",
+                                 isActive && "scale-110"
+                               )}
+                               src={task.mediaUrl}
+                             />
+                          ) : (
+                             <div className="h-full w-full flex items-center justify-center opacity-20">
+                                <IconComp size={16} />
+                             </div>
+                          )}
+
+                          {/* Status Icon Overlay */}
+                          <div className={cn(
+                            "absolute inset-0 flex items-center justify-center backdrop-blur-[0.5px] transition-all",
+                            isActive ? "bg-[#0A7B4E]/20" : "bg-black/20 group-hover:bg-transparent"
+                          )}>
+                             {isCompleted ? (
+                                <div className="bg-[#0A7B4E] text-white p-1 rounded-full shadow-lg">
+                                   <Check size={14} strokeWidth={4} />
+                                </div>
+                             ) : !unlocked ? (
+                                <Lock size={14} className="text-white/80" />
+                             ) : (
+                                <div className={cn(
+                                  "p-1.5 rounded-full shadow-lg transition-transform",
+                                  isActive ? "bg-[#0A7B4E] text-white scale-110" : "bg-white/90 text-[#0A7B4E] opacity-0 group-hover:opacity-100"
+                                )}>
+                                   {isActive ? <Pause size={14} fill="currentColor" /> : <PlayCircle size={14} />}
+                                </div>
+                             )}
+                          </div>
+                       </div>
+
+                       {/* Info */}
+                       <div className="min-w-0 flex-1 pr-2">
+                          <h4 className={cn(
+                            "truncate text-[15px] font-black leading-tight",
+                            isActive ? "text-[#0A7B4E]" : "text-[#1F2D26]",
+                            isCompleted && "opacity-60"
+                          )}>
+                             {task.name}
+                          </h4>
+                          <p className="mt-1 text-[11px] font-bold text-[#8FA097] uppercase tracking-wider">
+                             {task.technique}
+                          </p>
+                       </div>
+
+                       <div className={cn(
+                         "mr-2 p-1.5 rounded-lg shrink-0 transition-colors duration-500",
+                         isActive ? "bg-[#0A7B4E]/10 text-[#0A7B4E]" : "bg-[#F0F5F2] text-[#667771]"
+                       )}>
+                          <IconComp size={14} />
+                       </div>
+                    </div>
                   );
                 })}
               </div>

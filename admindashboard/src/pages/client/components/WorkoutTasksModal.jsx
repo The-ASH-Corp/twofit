@@ -12,16 +12,66 @@ export default function WorkoutTasksModal({
   onSuccess,
 }) {
   const rpeScale = [
-    { value: 10, label: "Maximum Effort", description:"Activity is almost impossible to sustain. You are out of breath and unable to talk." },
-    { value: 9, label: "Extremely Hard", description:"Very challenging. very short bouts only. conversation is impossible." },
-    { value: 8, label: "Very Hard", description:"Intensive activity that you can sustain , but it's challenging to maintain conversation." },
-    { value: 7, label: "Vigorous", description:"Strenuous activity. Conversation is possible, but it's very labored." },
-    { value: 6, label: "Moderately Hard", description:"A step up in effort and intensity. speaking in full sentance is difficult." },
-    { value: 5, label: "Hard", description:"Noticeable increase in effort. Breathing heavily but can maintain activity and short conversation." },
-    { value: 4, label: "Somewhat Hard", description:"Moderate, a comfortable activity level that still feels like you're doing something. "},
-    { value: 3, label: "Moderate", description:"Activity is easy to maintain. can converse with minimal effort." },
-    { value: 2, label: "Light", description:"Feels easy and relaxed. effortless conversation is possible." },
-    { value: 1, label: "Very Light", description:"Minimal effort. no noticeable change in breathing or heart rate." },
+    {
+      value: 10,
+      label: "Maximum Effort",
+      description:
+        "Activity is almost impossible to sustain. You are out of breath and unable to talk.",
+    },
+    {
+      value: 9,
+      label: "Extremely Hard",
+      description:
+        "Very challenging. very short bouts only. conversation is impossible.",
+    },
+    {
+      value: 8,
+      label: "Very Hard",
+      description:
+        "Intensive activity that you can sustain , but it's challenging to maintain conversation.",
+    },
+    {
+      value: 7,
+      label: "Vigorous",
+      description:
+        "Strenuous activity. Conversation is possible, but it's very labored.",
+    },
+    {
+      value: 6,
+      label: "Moderately Hard",
+      description:
+        "A step up in effort and intensity. speaking in full sentance is difficult.",
+    },
+    {
+      value: 5,
+      label: "Hard",
+      description:
+        "Noticeable increase in effort. Breathing heavily but can maintain activity and short conversation.",
+    },
+    {
+      value: 4,
+      label: "Somewhat Hard",
+      description:
+        "Moderate, a comfortable activity level that still feels like you're doing something. ",
+    },
+    {
+      value: 3,
+      label: "Moderate",
+      description:
+        "Activity is easy to maintain. can converse with minimal effort.",
+    },
+    {
+      value: 2,
+      label: "Light",
+      description:
+        "Feels easy and relaxed. effortless conversation is possible.",
+    },
+    {
+      value: 1,
+      label: "Very Light",
+      description:
+        "Minimal effort. no noticeable change in breathing or heart rate.",
+    },
   ];
 
   const [expandedIndex, setExpandedIndex] = useState(null);
@@ -366,15 +416,25 @@ export default function WorkoutTasksModal({
                           name="workoutEffortRating"
                           value={value}
                           checked={effortRating?.ratingNumber === value}
-                          onChange={() => setEffortRating({ ratingNumber: value, ratingLabel: label, ratingDescription: description })}
+                          onChange={() =>
+                            setEffortRating({
+                              ratingNumber: value,
+                              ratingLabel: label,
+                              ratingDescription: description,
+                            })
+                          }
                           className="accent-[#0A4F48]"
                         />
-                        <span className="font-bold text-[#0A4F48]">{value}</span>
+                        <span className="font-bold text-[#0A4F48]">
+                          {value}
+                        </span>
                       </div>
                       <span className="text-gray-500 text-[11px] uppercase tracking-wide">
                         {label}
                       </span>
-                      <span className="text-gray-400 text-[10px]">{description}</span>
+                      <span className="text-gray-400 text-[10px]">
+                        {description}
+                      </span>
                     </label>
                   ))}
                 </div>

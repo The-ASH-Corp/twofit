@@ -10,7 +10,7 @@ export default function ExpertsList({ expert }) {
     { name: "Trainer Rootien", image: assets.trainerCartoon },
     { name: "Trainer Dean", image: assets.therapistCartoon },
   ];
-  const expertsToRender = experts.length ? experts.slice(0, 2) : fallbackExperts;
+  const expertsToRender = experts.length ? experts : fallbackExperts;
 
   const getExpertImage = (exp) => {
     if (exp?.image) return exp.image;

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import {
+  CalendarDays,
   Check,
   CheckCircle2,
   Clock3,
@@ -12,9 +13,6 @@ import {
   Pause,
   PlayCircle,
   SendHorizontal,
-  SkipBack,
-  SkipForward,
-  Volume2,
   Zap,
 } from "lucide-react";
 import { SyncLoader } from "react-spinners";
@@ -31,9 +29,18 @@ import {
 import MobileBottomNav from "../components/MobileBottomNav";
 import { cn } from "@/lib/utils";
 
-const rpeScale = Array.from({ length: 10 }, (_, index) => ({
-  value: index + 1,
-}));
+const rpeScale = [
+  { value: 1, title: "VERY LIGHT", description: "Minimal effort; no noticeable change in breathing or heart rate." },
+  { value: 2, title: "LIGHT", description: "Feels easy and relaxed; effortless conversation possible." },
+  { value: 3, title: "MODERATE", description: "Activity is easy to maintain; can converse with minimal effort." },
+  { value: 4, title: "SOMEWHAT HARD", description: "Moderate; a comfortable activity level that still feels like you're doing something." },
+  { value: 5, title: "HARD", description: "Noticeable increase in effort; breathing heavily but can maintain activity and short conversation." },
+  { value: 6, title: "MODERATELY HARD", description: "A step up in effort and intensity; speaking in full sentences is difficult." },
+  { value: 7, title: "VIGOROUS", description: "Strenuous activity; conversation is possible, but it's very labored." },
+  { value: 8, title: "VERY HARD", description: "Intense activity that you can sustain, but it's challenging to maintain conversation." },
+  { value: 9, title: "EXTREMELY HARD", description: "Very challenging; very short bouts only; conversation is impossible." },
+  { value: 10, title: "MAXIMUM EFFORT", description: "Activity is almost impossible to sustain; you are out of breath and unable to talk." },
+];
 
 const formatTaskTarget = (task) => {
   const sets = Number(task?.sets) || Number(task?.setCount) || 3;
@@ -62,6 +69,7 @@ export default function WorkoutTasksPage() {
   const [comment, setComment] = useState("");
   const [effortRating, setEffortRating] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [isStarted, setIsStarted] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -160,6 +168,7 @@ export default function WorkoutTasksPage() {
       return;
     }
     setSelectedIndex(idx);
+    setIsStarted(true); // Automatically engage session once a task is manually clicked
   };
 
   const allVideosWatched =
@@ -221,7 +230,7 @@ export default function WorkoutTasksPage() {
         "effortRating",
         JSON.stringify({
           ratingNumber: effortRating,
-          ratingLabel: effortRating > 6 ? "Hard" : "Easy",
+          ratingLabel: rpeScale.find((r) => r.value === effortRating)?.title || String(effortRating),
         }),
       );
 
@@ -317,112 +326,157 @@ export default function WorkoutTasksPage() {
   const estimatedCalories = Math.max(workoutTasks.length * 120 + 2, 0);
   const avgHeartRate = effortRating ? 118 + effortRating * 3 : 142;
 
+  const todayDisplay = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date());
+
   return (
     <div className="client-page-container">
       <div className="client-page-shell">
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#0A7B4E]">
+              Current Module
+            </p>
+            <h1 className="mt-1 text-[36px] leading-none font-black tracking-tight text-[#1E2C26] sm:text-[48px] lg:text-[56px]">
+              Day {currentGlobalDay} Workout Videos
+            </h1>
+          </div>
+
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#DFE7E3] bg-[#F5F9F7] px-4 py-2 text-[13px] font-black text-[#5D6E66]">
+            <CalendarDays size={16} className="text-[#0A7B4E]" />
+            {todayDisplay}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.7fr_1fr]">
           <div className="space-y-6">
-            <section className="client-card rounded-[30px] p-4 sm:p-5">
-              <div className="relative overflow-hidden rounded-[22px] bg-black">
-                {selectedTask?.url ? (
-                  <video
-                    key={`video-${selectedIndex}`}
-                    autoPlay
-                    controlsList="nodownload noremoteplayback"
-                    onEnded={handleVideoEnd}
-                    className="h-[320px] w-full object-cover sm:h-[420px] lg:h-[560px]"
-                    src={selectedTask.url?.replace(/^http:\/\//i, "https://")}
-                  >
-                    Your browser does not support the video tag.
-                  </video>
-                ) : (
-                  <div className="flex h-[320px] w-full flex-col items-center justify-center gap-3 bg-linear-to-br from-[#0A4F48] to-[#116D63] text-white sm:h-[420px] lg:h-[560px]">
-                    <PlayCircle size={56} className="opacity-40" />
-                    <p className="text-[14px] font-black opacity-80">
-                      No video assigned for this exercise
-                    </p>
-                  </div>
-                )}
+            {/* Focal Player Area */}
+            <section className="client-card rounded-[32px] overflow-hidden p-0 bg-black border-0 shadow-2xl shadow-emerald-900/10 transition-all duration-700">
+               <div className="relative group">
+                 {selectedTask?.url ? (
+                    <div className="relative h-[280px] w-full sm:h-[340px] lg:h-[400px]">
+                      <video
+                        key={`video-main-${selectedIndex}`}
+                        autoPlay={isStarted}
+                        controls={isStarted}
+                        controlsList="nodownload"
+                        onEnded={handleVideoEnd}
+                        className={cn(
+                          "h-full w-full object-contain transition-all duration-700",
+                          !isStarted && "blur-[8px] opacity-40 grayscale-[0.8]"
+                        )}
+                        src={selectedTask.url}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
 
-                <div className="absolute bottom-6 left-6 right-6">
-                  <div className="h-[6px] w-full rounded-full bg-white/35">
-                    <div
-                      className="h-full rounded-full bg-[#0A7B4E] transition-all duration-500"
-                      style={{ width: `${Math.max(completionProgress, 8)}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <button className="flex h-12 w-12 items-center justify-center rounded-full bg-[#EFF4F1] text-[#43564E]">
-                    <SkipBack size={18} />
-                  </button>
-                  <button
-                    onClick={handlePlaySimulate}
-                    className="flex h-16 w-16 items-center justify-center rounded-full bg-[#087B44] text-white shadow-[0_14px_24px_rgba(8,123,68,0.34)]"
-                  >
-                    <Pause size={22} fill="currentColor" />
-                  </button>
-                  <button className="flex h-12 w-12 items-center justify-center rounded-full bg-[#EFF4F1] text-[#43564E]">
-                    <SkipForward size={18} />
-                  </button>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-3 rounded-full bg-[#EFF4F1] px-4 py-3">
-                    <Volume2 size={18} className="text-[#667971]" />
-                    <div className="h-1.5 w-24 rounded-full bg-[#D7E2DC] sm:w-32">
-                      <div className="h-full w-[70%] rounded-full bg-[#0A7B4E]" />
+                      {!isStarted && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-black/20 backdrop-blur-[2px]">
+                           <div className="flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-full bg-[#0A7B4E] text-white shadow-[0_0_50px_rgba(10,123,78,0.4)] animate-pulse hover:scale-110 transition-transform cursor-pointer group/start" onClick={() => setIsStarted(true)}>
+                              <PlayCircle size={48} fill="currentColor" className="ml-1" />
+                           </div>
+                           <h3 className="mt-8 text-[32px] font-black text-white uppercase tracking-tight text-center drop-shadow-2xl">
+                              Ready for your session?
+                           </h3>
+                           <p className="mt-2 text-[14px] font-bold text-emerald-100/70 uppercase tracking-[0.2em] text-center">
+                              Day {currentGlobalDay} • {workoutTasks.length} Handpicked Drills
+                           </p>
+                           <button 
+                              onClick={() => setIsStarted(true)}
+                              className="mt-8 px-10 py-4 bg-white text-[#0A7B4E] text-[15px] font-black uppercase tracking-widest rounded-full shadow-2xl hover:bg-emerald-50 transition-colors shadow-emerald-900/40"
+                           >
+                              Start My Workout
+                           </button>
+                        </div>
+                      )}
                     </div>
+                  ) : (
+                    <div className="flex h-[280px] w-full flex-col items-center justify-center gap-4 bg-linear-to-br from-[#0F2D26] to-[#0A4F48] text-white/90 sm:h-[340px] lg:h-[400px]">
+                      <div className="h-16 w-16 rounded-full bg-white/5 flex items-center justify-center backdrop-blur-md border border-white/10">
+                        <PlayCircle size={32} className="opacity-40" />
+                      </div>
+                      <p className="text-[14px] font-black uppercase tracking-widest opacity-60">
+                        No guide video assigned
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Overlay Info */}
+                  <div className="absolute top-0 left-0 right-0 p-6 bg-linear-to-b from-black/80 to-transparent flex justify-between items-start">
+                     <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-[#0A7B4E] drop-shadow-sm">Now Performing</p>
+                        <h2 className="text-[20px] font-black text-white leading-tight drop-shadow-md">
+                           {selectedTask?.name || "Ready to Start"}
+                        </h2>
+                     </div>
+                     <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 shrink-0">
+                        <div className="h-1.5 w-1.5 rounded-full bg-[#0A7B4E] animate-pulse" />
+                        <span className="text-[11px] font-bold text-white uppercase tracking-wider">
+                           {selectedIndex + 1}/{workoutTasks.length}
+                        </span>
+                     </div>
                   </div>
-                  <button className="flex h-12 w-12 items-center justify-center rounded-full bg-[#EFF4F1] text-[#43564E]">
-                    <Expand size={18} />
-                  </button>
-                </div>
-              </div>
+
+                  {/* Progress Bar At Bottom of Video */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/10">
+                     <div 
+                        className="h-full bg-linear-to-r from-[#0A7B4E] to-[#0D6B44] transition-all duration-500 shadow-[0_0_10px_rgba(10,123,78,0.5)]"
+                        style={{ width: `${completionProgress}%` }}
+                     />
+                  </div>
+               </div>
             </section>
 
+
+            {/* Reflection Forms */}
             {shouldShowSubmissionForm && (
-              <>
-                <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-                  <section className="client-card rounded-[28px] p-5 sm:p-6">
-                    <h3 className="text-[22px] font-black text-[#24342D]">
-                      Session Notes
-                    </h3>
+              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  <section className="client-card rounded-[32px] p-6 sm:p-8 bg-white border-[#E8EEEB]">
+                    <div className="flex items-center gap-3 mb-5">
+                       <div className="h-10 w-10 rounded-xl bg-[#F0F5F2] flex items-center justify-center text-[#0A7B4E]">
+                          <Zap size={20} />
+                       </div>
+                       <h3 className="text-[22px] font-black text-[#1E2C26]">Session Reflection</h3>
+                    </div>
                     <textarea
                       value={comment}
                       onChange={(event) => setComment(event.target.value)}
-                      placeholder="Log your workout reflection for this session."
-                      className="mt-4 h-[180px] w-full resize-none rounded-[18px] border border-[#E0E8E3] bg-[#F1F5F2] px-4 py-4 text-[16px] font-medium text-[#4A5D55] outline-none transition-all focus:border-[#0A7B4E]/45"
+                      placeholder="Share your thoughts on today's intensity and focus..."
+                      className="h-[180px] w-full resize-none rounded-[24px] border border-[#E8EEEB] bg-[#FBFDFB] px-5 py-5 text-[15px] font-medium text-[#4A5D55] outline-none transition-all focus:border-[#0A7B4E]/30 focus:shadow-sm"
                     />
                   </section>
 
-                  <section className="client-card rounded-[28px] p-5 sm:p-6">
-                    <h3 className="text-[22px] font-black text-[#24342D]">
-                      Log Visual Progress
-                    </h3>
+                  <section className="client-card rounded-[32px] p-6 sm:p-8 bg-white border-[#E8EEEB]">
+                    <div className="flex items-center gap-3 mb-5">
+                       <div className="h-10 w-10 rounded-xl bg-[#F0F5F2] flex items-center justify-center text-[#0A7B4E]">
+                          <ImagePlus size={20} />
+                       </div>
+                       <h3 className="text-[22px] font-black text-[#1E2C26]">Visual Proof</h3>
+                    </div>
                     <button
                       onClick={handleOpenFilePicker}
-                      className="mt-4 flex h-[180px] w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-[18px] border-2 border-dashed border-[#D9E3DD] bg-[#F2F6F3] px-4 text-center transition-all hover:border-[#0A7B4E]/40 hover:bg-[#EEF5F0]"
+                      className="group flex h-[180px] w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-[24px] border-2 border-dashed border-[#DCE7E1] bg-[#FBFDFB] px-6 text-center transition-all hover:border-[#0A7B4E]/40 hover:bg-[#F4FAF7]"
                     >
                       {file ? (
                         <>
-                          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-[#E2F1E9] text-[#087B44]">
+                          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#E2F1E9] text-[#087B44] shadow-lg shadow-emerald-900/10">
                             <Check size={24} strokeWidth={3} />
-                          </span>
-                          <p className="max-w-[220px] truncate text-[15px] font-black text-[#2A3A34]">
-                            {fileName}
+                          </div>
+                          <p className="max-w-full truncate text-[15px] font-black text-[#2A3A34]">
+                             {fileName}
                           </p>
                         </>
                       ) : (
                         <>
-                          <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-[#087B44] shadow-[0_8px_14px_rgba(17,38,29,0.12)]">
+                          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-[#087B44] shadow-md group-hover:scale-110 transition-transform duration-500">
                             <ImagePlus size={24} />
-                          </span>
-                          <p className="text-[16px] font-semibold text-[#5F7168]">
-                            Drop progress photo or click to upload
+                          </div>
+                          <p className="text-[15px] font-bold text-[#5F7168]">
+                            Upload workout snapshot or video
                           </p>
                         </>
                       )}
@@ -442,7 +496,16 @@ export default function WorkoutTasksPage() {
                   setEffortRating={setEffortRating}
                   shouldShowSubmissionForm={shouldShowSubmissionForm}
                 />
-              </>
+
+                <button
+                  onClick={handleSubmit}
+                  disabled={uploading || !shouldShowSubmissionForm}
+                  className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-[#087B44] py-4 text-[18px] font-black text-white shadow-[0_14px_25px_rgba(8,123,68,0.26)] transition-all hover:bg-[#076d3d] hover:scale-[1.01] active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-[#A9BDB3] disabled:hover:scale-100 sm:text-[20px] lg:text-[24px]"
+                >
+                  {uploading ? "Submitting..." : "Complete My Workout"}
+                  {!uploading && <SendHorizontal size={22} />}
+                </button>
+              </div>
             )}
           </div>
 
@@ -453,93 +516,100 @@ export default function WorkoutTasksPage() {
                 Workout Tasks
               </h3>
 
-              <div className="mt-5 space-y-3">
+              <div className="mt-5 space-y-4">
                 {workoutTasks.map((task, idx) => {
                   const isCompleted = watchedVideos.has(idx) || idx < selectedIndex;
                   const isActive = idx === selectedIndex;
                   const unlocked = isUnlocked(idx);
 
                   return (
-                    <button
-                      key={idx}
+                    <div 
+                      key={`gallery-item-${idx}`}
                       onClick={() => handleTaskClick(idx)}
                       className={cn(
-                        "flex w-full items-center gap-3 rounded-[16px] border px-4 py-4 text-left transition-all",
-                        isActive &&
-                          "border-[#0A7B4E]/40 bg-[#ECF5EF] shadow-[inset_3px_0_0_#0A7B4E]",
-                        isCompleted && "border-[#D8E6DE] bg-[#F3F8F5]",
-                        !isActive && !isCompleted && "border-[#E3EAE6] bg-[#F6F8F7]",
-                        !unlocked && "opacity-50",
+                        "group relative flex items-center gap-4 rounded-[22px] overflow-hidden border p-2 transition-all duration-500 cursor-pointer",
+                        isActive 
+                          ? "bg-white border-[#0A7B4E] shadow-xl shadow-emerald-900/10 ring-2 ring-[#0A7B4E]/10" 
+                          : isCompleted 
+                            ? "bg-[#F3F8F5] border-[#DCE7E1]" 
+                            : "bg-white border-[#E8EEEB] hover:border-[#D6DED9]"
                       )}
                     >
-                      <div
-                        className={cn(
-                          "flex h-12 w-12 shrink-0 items-center justify-center rounded-full",
-                          isCompleted && "bg-[#087B44] text-white",
-                          isActive && "bg-white text-[#087B44]",
-                          !isCompleted && !isActive && "bg-white text-[#8EA098]",
-                        )}
-                      >
-                        {isCompleted ? (
-                          <Check size={20} strokeWidth={3} />
-                        ) : isActive ? (
-                          <Zap size={20} fill="currentColor" />
-                        ) : unlocked ? (
-                          <Clock3 size={18} />
-                        ) : (
-                          <Lock size={16} />
-                        )}
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <p
-                          className={cn(
-                            "truncate text-[17px] font-black leading-none text-[#2B3B34] sm:text-[18px] lg:text-[20px]",
-                            isCompleted && "line-through decoration-2 opacity-60",
+                       {/* Compact Thumbnail */}
+                       <div className="relative aspect-video h-16 w-24 shrink-0 overflow-hidden rounded-[14px] bg-[#1E2C26]">
+                          {task.url ? (
+                             <video 
+                               muted 
+                               playsInline
+                               preload="metadata"
+                               className={cn(
+                                 "h-full w-full object-cover transition-all duration-700",
+                                 !isActive && "opacity-60 grayscale group-hover:grayscale-0",
+                                 isActive && "scale-110"
+                               )}
+                               src={task.url}
+                             />
+                          ) : (
+                             <div className="h-full w-full flex items-center justify-center opacity-20">
+                                <Zap size={16} />
+                             </div>
                           )}
-                        >
-                          {task.name || `Exercise ${idx + 1}`}
-                        </p>
-                        <p className="mt-1 text-[11px] font-black uppercase tracking-[0.04em] text-[#0A7B4E] sm:text-[12px] lg:text-[13px]">
-                          {formatTaskTarget(task)}
-                        </p>
-                      </div>
 
-                      {isActive && (
-                        <span className="rounded-full bg-[#E0E8E3] px-3 py-1 text-[10px] font-black text-[#6A7B73] sm:text-[11px] lg:text-[12px]">
-                          SET {idx + 1}/{workoutTasks.length}
-                        </span>
-                      )}
-                    </button>
+                          {/* Status Icon Overlay */}
+                          <div className={cn(
+                            "absolute inset-0 flex items-center justify-center backdrop-blur-[0.5px] transition-all",
+                            isActive ? "bg-[#0A7B4E]/20" : "bg-black/20 group-hover:bg-transparent"
+                          )}>
+                             {isCompleted ? (
+                                <div className="bg-[#0A7B4E] text-white p-1 rounded-full shadow-lg">
+                                   <Check size={14} strokeWidth={4} />
+                                </div>
+                             ) : !unlocked ? (
+                                <Lock size={14} className="text-white/80" />
+                             ) : (
+                                <div className={cn(
+                                  "p-1.5 rounded-full shadow-lg transition-transform",
+                                  isActive ? "bg-[#0A7B4E] text-white scale-110" : "bg-white/90 text-[#0A7B4E] opacity-0 group-hover:opacity-100"
+                                )}>
+                                   {isActive ? <Pause size={14} fill="currentColor" /> : <PlayCircle size={14} />}
+                                </div>
+                             )}
+                          </div>
+                       </div>
+
+                       {/* Info */}
+                       <div className="min-w-0 flex-1 pr-2">
+                          <h4 className={cn(
+                            "truncate text-[15px] font-black leading-tight",
+                            isActive ? "text-[#0A7B4E]" : "text-[#1F2D26]",
+                            isCompleted && "opacity-60"
+                          )}>
+                             {task.name || `Exercise ${idx + 1}`}
+                          </h4>
+                          <p className="mt-1 text-[11px] font-bold text-[#8FA097] uppercase tracking-wider">
+                             {formatTaskTarget(task)}
+                          </p>
+                       </div>
+
+                       {isActive && (
+                         <div className="mr-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#0A7B4E] animate-pulse shadow-[0_0_8px_#0A7B4E]" />
+                       )}
+                    </div>
                   );
                 })}
               </div>
 
-              <div className="mt-6 border-t border-[#DDE6E0] pt-5 text-[16px] font-black text-[#2B3B34] sm:text-[17px] lg:text-[20px]">
-                <div className="flex items-end justify-between">
-                  <span>Total Calories Burned</span>
-                  <span className="text-[#087B44]">{estimatedCalories} kcal</span>
-                </div>
-                <div className="mt-4 flex items-end justify-between">
-                  <span>Heart Rate (Avg)</span>
-                  <span className="text-[#087B44]">{avgHeartRate} bpm</span>
-                </div>
-              </div>
+             
 
-              <button
-                onClick={handleSubmit}
-                disabled={uploading || !shouldShowSubmissionForm}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-[#087B44] py-3.5 text-[18px] font-black text-white shadow-[0_14px_25px_rgba(8,123,68,0.26)] transition-all hover:bg-[#076d3d] disabled:cursor-not-allowed disabled:bg-[#A9BDB3] sm:text-[19px] lg:text-[22px]"
-              >
-                {uploading ? "Submitting..." : "Complete My Workout"}
-                {!uploading && <SendHorizontal size={18} />}
-              </button>
               {!shouldShowSubmissionForm && (
-                <p className="mt-3 text-center text-[13px] font-bold text-[#70827A] sm:text-[14px] lg:text-[17px]">
-                  {pendingTasksCount > 0
-                    ? `${pendingTasksCount} exercise video${pendingTasksCount === 1 ? "" : "s"} left to unlock submission`
-                    : "Submission locked until all videos are completed"}
-                </p>
+                <div className="mt-6 rounded-[20px] border border-dashed border-[#A9BDB3] bg-[#F3F8F5] p-5 text-center transition-all duration-500">
+                  <Lock size={24} strokeWidth={2.5} className="mx-auto mb-3 text-[#70827A] opacity-60" />
+                  <p className="text-[14px] font-bold text-[#70827A] sm:text-[15px] lg:text-[16px]">
+                    {pendingTasksCount > 0
+                      ? `${pendingTasksCount} exercise video${pendingTasksCount === 1 ? "" : "s"} left to unlock submission`
+                      : "Submission locked until all videos are completed"}
+                  </p>
+                </div>
               )}
             </section>
 
@@ -637,6 +707,17 @@ function FinishStrongForm({
         <span>Minimal Effort</span>
         <span>Max Intensity</span>
       </div>
+
+      {effortRating && (
+        <div className="mt-5 rounded-[16px] bg-[#F5F9F7] p-4 text-center border border-[#DFE7E3] animate-in fade-in zoom-in-95 duration-300">
+          <h4 className="text-[15px] font-black uppercase tracking-widest text-[#087B44]">
+            {rpeScale.find((r) => r.value === effortRating)?.title}
+          </h4>
+          <p className="mt-1.5 text-[14px] font-medium leading-relaxed text-[#5D7067]">
+            {rpeScale.find((r) => r.value === effortRating)?.description}
+          </p>
+        </div>
+      )}
     </section>
   );
 }

@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
 import { AiFillStar } from "react-icons/ai";
 import { ENV } from "@/utils/env";
+import { dualEdgeDepthShadow, protocolIconDepthShadow, reflectionFieldDepthShadow } from "../habit/HabitTracker";
 
 export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,7 +66,7 @@ export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mb-8" >
         {experts.map((expert, index) => {
           const isRated = ratedExpertIds.includes(expert?._id);
           // Use actual backend data for rating and reviews
@@ -73,10 +74,10 @@ export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
           return (
             <div
               key={index}
-              className="bg-white rounded-[40px] p-8 border border-gray-50 flex flex-col items-center text-center relative shadow-sm hover:shadow-md transition-shadow"
+              className="bg-white rounded-[40px] p-8 border border-gray-50 flex flex-col items-center text-center relative shadow-sm hover:shadow-md transition-shadow" style={dualEdgeDepthShadow}
             >
               {/* Active Badge */}
-              <div className="absolute top-8 right-8 bg-[#E6F8F3] text-[#45C4A2] px-3 py-1 rounded-full text-[10px] font-bold tracking-wider">
+              <div className="absolute top-8 right-8 bg-[#E6F8F3] text-[#45C4A2] px-3 py-1 rounded-full text-[10px] font-bold tracking-wider" style={reflectionFieldDepthShadow}>
                 ACTIVE
               </div>
 
@@ -120,7 +121,7 @@ export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
                   isRated
                     ? "bg-gray-100 border-transparent text-gray-400 cursor-not-allowed"
                     : "border-[#0A4F48] text-[#0A4F48] hover:bg-[#0A4F48] hover:text-white"
-                }`}
+                }`} style={isRated? protocolIconDepthShadow : dualEdgeDepthShadow}
               >
                 {isRated ? "Already Rated" : "Rate Now"}
               </button>
