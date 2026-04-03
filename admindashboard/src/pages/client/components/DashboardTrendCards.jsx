@@ -149,7 +149,7 @@ function TrendCard({
         
       </div>
 
-      <div className="h-[164px] w-full">
+      <div className="h-[180px] sm:h-[200px] lg:h-[220px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 10, right: 14, left: 8, bottom: 12 }}>
             <defs>

@@ -260,9 +260,9 @@ export default function Chats() {
   }, [client]);
 
   return (
-    <>
-      <div className="h-[calc(100vh-120px)] pb-24 lg:pb-4 min-h-0">
-        <div className="grid h-full min-h-0 grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
+    <div className="client-page-container h-[calc(100vh-140px)] min-h-0 overflow-hidden lg:h-[calc(100vh-120px)]">
+      <div className="client-page-shell h-full min-h-0">
+        <div className="grid h-full min-h-0 grid-cols-1 gap-6 lg:grid-cols-[320px_1fr]">
           <div
             className={`${showChatWindow ? "hidden lg:block" : "block"} min-h-0`}
           >
@@ -295,6 +295,6 @@ export default function Chats() {
         </div>
       </div>
       <MobileBottomNav />
-    </>
+    </div>
   );
 }

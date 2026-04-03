@@ -67,7 +67,8 @@ export default function Feedback() {
   };
 
   return (
-    <div className="flex flex-col gap-8 p-4 md:p-6 min-h-screen bg-[#F8FAFC]">
+    <div className="client-page-container">
+      <div className="client-page-shell flex flex-col gap-8">
       {isLoading ? (
         <div className="flex justify-center items-center h-[60vh]">
           <SyncLoader color="#0A4F48" loading margin={2} size={15} />
@@ -88,6 +89,7 @@ export default function Feedback() {
           />
         </>
       )}
+      </div>
       <MobileBottomNav />
     </div>
   );
