@@ -116,6 +116,7 @@ export default function ClientForm() {
   const dispatch = useDispatch();
 
   const user = useSelector(selectUser);
+  console.log(user)
 
   useEffect(() => {
     const timer = setTimeout(async () => {
@@ -415,6 +416,10 @@ export default function ClientForm() {
       ],
     },
   ];
+
+  console.log(
+    coachesOfAdmin
+   );
 
   const handleUserCreation = async (values) => {
     setIsLoading(true);

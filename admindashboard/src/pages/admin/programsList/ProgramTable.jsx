@@ -7,6 +7,7 @@ import { useAppSelector } from '@/redux/store/hooks'
 import { useEffect } from 'react'
 import { selectProgramError, selectProgramStatus } from '@/redux/features/program/program.selector'
 import { selectUser } from '@/redux/features/auth/auth.selectores'
+import { SyncLoader } from 'react-spinners'
 
 export default function ProgramTable() {
 
@@ -46,8 +47,13 @@ export default function ProgramTable() {
       setUserPrograms(filtered);
     };
     
-  if (status === "loading") return <p>Loading programs...</p>;
-  if (error) return <p>{error}</p>;
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-156px)]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+      </div>
+    );
+  if (error) return <p className="text-red-500">{error}</p>;
   return (
     <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
