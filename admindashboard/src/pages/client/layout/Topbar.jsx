@@ -54,7 +54,7 @@ export default function Topbar({ onToggleSidebar }) {
         >
           <Menu size={22} />
         </button>
-        
+
         <div className="min-w-0 flex-1">
           <h2 className="text-[26px] font-bold text-[#0A4F48] tracking-tight uppercase">
             {currentPage}
@@ -71,16 +71,17 @@ export default function Topbar({ onToggleSidebar }) {
           <span className="absolute top-1 right-1.5 w-2.5 h-2.5 bg-red-400 rounded-full border-2 border-white"></span>
         </button>
 
+        {/* Profile - Hidden on mobile, visible on md+ */}
         <div
-          className="flex items-center gap-3 cursor-pointer group"
+          className="hidden md:flex items-center gap-3 cursor-pointer group"
           onClick={() => navigate("/client/profile")}
         >
-          <div className="hidden md:block text-right">
+          <div className="text-right">
             <p className="text-[14px] font-bold text-[#0A4F48] leading-none uppercase">
-              {user?.name || "ARJUN"}
+              {user?.name || "User"}
             </p>
             <p className="text-[11px] text-text-muted font-bold mt-1 uppercase">
-              {user?.role || 'USER'}
+              {user?.role || "USER"}
             </p>
           </div>
           <div className="relative">

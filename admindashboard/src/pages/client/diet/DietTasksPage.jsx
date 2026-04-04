@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { 
+  CalendarDays,
   CheckCircle2, 
   TrendingUp, 
   Droplets, 
@@ -475,6 +476,21 @@ export default function DietTasksPage() {
   return (
     <div className="client-page-container">
       <div className="client-page-shell">
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#0A7B4E]">
+              Current Module
+            </p>
+            <h1 className="mt-1 text-[36px] leading-none font-black tracking-tight text-[#1E2C26] sm:text-[48px] lg:text-[56px]">
+              Day {currentGlobalDay} Diet Meals
+            </h1>
+          </div>
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#DFE7E3] bg-[#F5F9F7] px-4 py-2 text-[13px] font-black text-[#5D6E66]">
+            <CalendarDays size={16} className="text-[#0A7B4E]" />
+            {new Intl.DateTimeFormat("en-US", { month: "long", day: "numeric", year: "numeric" }).format(new Date())}
+          </div>
+        </div>
+
         <section className="client-card rounded-[24px] p-4 sm:p-6 lg:p-7">
           <div className="flex items-center justify-between gap-3 text-[#1F2F27]">
             <div className="flex items-center gap-2">
