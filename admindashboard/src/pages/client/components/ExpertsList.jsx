@@ -19,11 +19,11 @@ export default function ExpertsList({ expert }) {
     if (exp?.user?.photo) return exp.user.photo;
     if (exp?.profileImage) return exp.profileImage;
 
-    const role = (exp.role || "").toLowerCase();
-    if (role.includes("trainer")) return assets.trainerCartoon;
-    if (role.includes("diet") || role.includes("nutrition")) return assets.dietitianCartoon;
-    if (role.includes("therapist") || role.includes("therapy")) return assets.therapistCartoon;
-    return assets.profile;
+    const role = (exp?.role || "").toLowerCase();
+    if (role?.includes("trainer")) return assets?.trainerCartoon;
+    if (role?.includes("diet") || role?.includes("nutrition")) return assets?.dietitianCartoon;
+    if (role?.includes("therapist") || role?.includes("therapy")) return assets?.therapistCartoon;
+    return assets?.profile;
   };
 
   return (
@@ -39,13 +39,13 @@ export default function ExpertsList({ expert }) {
               <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[#e4ece3] bg-white shadow-[0_3px_8px_rgba(35,54,42,0.12)]">
                 <img
                   src={getExpertImage(exp)}
-                  alt={exp.user?.name || exp.name || "Expert"}
+                  alt={exp?.user?.name || exp?.name || "Expert"}
                   className="h-full w-full object-cover"
                 />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="client-title truncate text-[13px] leading-tight">
-                  {exp.user?.name || exp.name || "Specialist"}
+                  {exp?.user?.name || exp?.name || "Specialist"}
                 </p>
               </div>
             </div>

@@ -4,6 +4,9 @@ import { therapyColumns } from "./Therapycolumns";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { fetchTherapyPlans } from "@/redux/features/therapy/therapy.thunk";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectTherapyError, selectTherapyLoading } from "@/redux/features/therapy/therapy.selectors";
+import { SyncLoader } from "react-spinners";
 
 const TherapyTable = () => {
   const navigate = useNavigate();
@@ -28,6 +31,17 @@ const TherapyTable = () => {
   useEffect(() => {
     loadPlans();
   }, [dispatch]);
+
+    const status = useAppSelector(selectTherapyLoading);
+    const error = useAppSelector(selectTherapyError);
+
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-156px)]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+      </div>
+    );
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
