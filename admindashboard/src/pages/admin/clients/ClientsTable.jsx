@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { selectAllCoaches } from "@/redux/features/coach/coach.selector";
 import { getAllCoachesByAdminId } from "@/redux/features/admins/admin.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { SyncLoader } from "react-spinners";
 
 export default function ClientsTable() {
   const dispatch = useDispatch();
@@ -70,8 +71,13 @@ export default function ClientsTable() {
     fetchClientData();
   }, [page, limit, dispatch]);
 
-  if (status === "loading") return <p>Loading clients...</p>;
-  if (error) return <p>{error}</p>;
+  if (status === "loading")
+    return (
+      <div className="flex justify-center items-center h-[calc(100vh-156px)]">
+        <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+      </div>
+    );
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">

@@ -5,6 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getAllCoachesByAdminId } from "@/redux/features/admins/admin.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { SyncLoader } from "react-spinners";
+import { getAdminError, getAdminStatus } from "@/redux/features/admins/admins.selecters";
 
 export default function ExpertTable() {
   const user = useSelector(selectUser);
@@ -14,6 +16,9 @@ export default function ExpertTable() {
   const [total, setTotal] = useState(0);
 
   const dispatch = useDispatch();
+
+    const status = useSelector(getAdminStatus);
+    const error = useSelector(getAdminError);
 
   const fetchCoachData = async () => {
     const response = await dispatch(
@@ -56,6 +61,14 @@ export default function ExpertTable() {
   useEffect(() => {
     fetchCoachData();
   }, [page, limit]);
+
+  if (status === "loading")
+      return (
+        <div className="flex justify-center items-center h-[calc(100vh-156px)]">
+          <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+        </div>
+      );
+    if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
