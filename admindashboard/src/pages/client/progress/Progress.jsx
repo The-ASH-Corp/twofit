@@ -368,10 +368,10 @@ export default function Progress() {
                   return (
                     <div key={item.label}>
                       <div className="mb-2 flex items-center justify-between">
-                        <p className="text-[14px] font-black text-[#2A3A33]">
+                        <p className="text-[12px] font-black text-[#2A3A33]">
                           {item.label}
                         </p>
-                        <p className="text-[14px] font-black text-[#6A7B73]">
+                        <p className="text-[12px] font-black text-[#6A7B73]">
                           {item.current.toFixed(1)} cm
                           <span className="ml-2 text-[#0A7B4E]">
                             {diffDisplay}

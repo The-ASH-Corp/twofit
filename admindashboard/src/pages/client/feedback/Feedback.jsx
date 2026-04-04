@@ -67,7 +67,7 @@ export default function Feedback() {
   };
 
   return (
-    <div className="client-page-container">
+    <div className="client-page-container p-5 sm:p-6 lg:p-7">
       <div className="client-page-shell flex flex-col gap-8">
       {isLoading ? (
         <div className="flex justify-center items-center h-[60vh]">

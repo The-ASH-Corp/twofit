@@ -28,20 +28,8 @@ export default function Support() {
   ];
 
   return (
-    <div className="client-page-container">
+    <div className="client-page-container p-5 sm:p-6 lg:p-7">
       <div className="client-page-shell">
-        <header className="mb-10 text-center lg:text-left">
-          <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#0A7B4E]">
-            Help Center
-          </p>
-          <h1 className="mt-2 text-[42px] leading-tight font-black tracking-tight text-[#1E2C26] sm:text-[48px]">
-            How can we help?
-          </h1>
-          <p className="mt-4 max-w-[600px] text-[18px] font-semibold leading-relaxed text-[#708077]">
-            Our team of wellness experts and support staff is here to ensure your
-            journey is smooth and successful.
-          </p>
-        </header>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
           {contactOptions.map((option) => (
@@ -73,7 +61,7 @@ export default function Support() {
               <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md">
                 <Headphones size={32} />
               </div>
-              <h2 className="text-[32px] font-black leading-tight text-white sm:text-[40px]">
+              <h2 className="text-[28px] font-black leading-tight text-white sm:text-[32px] lg:text-[36px]">
                 Dedicated Wellness Support
               </h2>
               <p className="mt-4 text-[18px] font-medium text-[#A7F3D0]">
