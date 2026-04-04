@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { 
+  CalendarDays,
   CheckCircle2, 
   TrendingUp, 
   Droplets, 
@@ -473,7 +474,7 @@ export default function DietTasksPage() {
   }
 
   return (
-    <div className="client-page-container">
+    <div className="client-page-container p-5 sm:p-6">
       <div className="client-page-shell">
         <section className="client-card rounded-[24px] p-4 sm:p-6 lg:p-7">
           <div className="flex items-center justify-between gap-3 text-[#1F2F27]">
@@ -559,7 +560,7 @@ export default function DietTasksPage() {
         <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[340px_1fr]">
           <div className="space-y-6">
             <section className="client-card rounded-[24px] p-5 sm:p-6">
-              <h3 className="text-[34px] leading-none font-black text-[#1F2F27]">
+              <h3 className="text-[28px] leading-none font-black text-[#1F2F27]">
                 Diet Summary
               </h3>
 
@@ -649,7 +650,7 @@ export default function DietTasksPage() {
           <section className="client-card rounded-[24px] p-5 sm:p-6 lg:p-7">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h2 className="text-[42px] leading-none font-black text-[#1F2F27]">
+                <h2 className="text-[36px] leading-none font-black text-[#1F2F27]">
                   Submit Diet Proof
                 </h2>
                 <p className="mt-2 text-[13px] font-black uppercase tracking-[0.12em] text-[#0A7B4E]">
@@ -723,7 +724,7 @@ export default function DietTasksPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={uploading}
-                  className="mt-5 flex w-full items-center justify-center gap-3 rounded-full bg-[#087B44] py-4 text-[28px] font-black text-white shadow-[0_14px_25px_rgba(8,123,68,0.25)] transition-all hover:bg-[#076f3d] disabled:cursor-not-allowed disabled:opacity-55"
+                  className="mt-5 flex w-full items-center justify-center gap-3 rounded-full bg-[#0A4F48] py-4 text-[22px] font-black text-white shadow-[0_14px_25px_rgba(8,123,68,0.25)] transition-all hover:bg-[#073d2d] disabled:cursor-not-allowed disabled:opacity-55"
                 >
                   <CheckCircle2 size={20} />
                   {uploading ? "Submitting..." : "Submit Diet"}
@@ -732,7 +733,7 @@ export default function DietTasksPage() {
                 <div className="mt-3 flex justify-center">
                   <button
                     onClick={() => setShowSkipConfirm(true)}
-                    className="text-[20px] font-bold text-[#5F7269] transition-colors hover:text-[#0A7B4E]"
+                    className="text-[18px] font-bold text-[#5F7269] transition-colors hover:text-[#0A7B4E]"
                   >
                     Skip Meal →
                   </button>
