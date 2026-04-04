@@ -288,7 +288,7 @@ export default function Progress() {
           <div className="space-y-6">
             <section className="client-card rounded-[24px] p-5 sm:p-6 lg:p-7">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-[30px] leading-none font-black text-[#1F2F29] sm:text-[34px]">
+                <h3 className="text-[28px] leading-none font-black text-[#1F2F29] sm:text-[30px]">
                   Weight Progress
                 </h3>
 
@@ -342,7 +342,7 @@ export default function Progress() {
           <div className="space-y-6">
             <section className="client-card rounded-[24px] p-5 sm:p-6">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-[28px] leading-none font-black text-[#1F2F29] sm:text-[30px]">
+                <h3 className="text-[26px] leading-none font-black text-[#1F2F29] sm:text-[28px]">
                   Measurements
                 </h3>
                 {shouldShowMeasurementUpdateButton() && (
@@ -391,7 +391,7 @@ export default function Progress() {
             </section>
 
             <section className="client-card rounded-[24px] p-5 sm:p-6">
-              <h3 className="text-[28px] leading-none font-black text-[#1F2F29] sm:text-[30px]">
+              <h3 className="text-[26px] leading-none font-black text-[#1F2F29] sm:text-[28px]">
                 Compliance
               </h3>
 

@@ -84,8 +84,8 @@ export async function connectRedis() {
       activeClient.quit().catch(() => {});
       
       // Create new client with fallback host (without password for local dev instance)
-      // activeClient = createRedisClient("127.0.0.1", false);
-      activeClient = createRedisClient(redisHost, !!redisPassword);
+      activeClient = createRedisClient("127.0.0.1", false);
+      // activeClient = createRedisClient(redisHost, !!redisPassword);
 
       try {
         await activeClient.connect();
