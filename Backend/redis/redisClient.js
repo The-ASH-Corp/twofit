@@ -5,7 +5,9 @@ dotenv.config();
 
 const redisPort = Number(process.env.REDIS_PORT) || 6379;
 const redisPassword = process.env.REDIS_PASSWORD;
+console.log(redisPassword)
 let redisHost = process.env.REDIS_HOST || "127.0.0.1";
+console.log(redisHost)
 
 let activeClient = null;
 
@@ -81,7 +83,8 @@ export async function connectRedis() {
       activeClient.quit().catch(() => {});
       
       // Create new client with fallback host (without password for local dev instance)
-      activeClient = createRedisClient("127.0.0.1", false);
+      // activeClient = createRedisClient("127.0.0.1", false);
+      activeClient = createRedisClient(redisHost, !!redisPassword);
 
       try {
         await activeClient.connect();
