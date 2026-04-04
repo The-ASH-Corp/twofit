@@ -19,6 +19,7 @@ import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { assets } from "@/assets/asset";
 import { toast } from "react-toastify";
 import { SyncLoader } from "react-spinners";
+import { dualEdgeDepthShadow } from "../habit/HabitTracker";
 
 const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
@@ -428,7 +429,7 @@ export default function DailyPlan() {
           {/* Sidebar Section */}
           <div className="lg:w-[380px] flex flex-col gap-8">
             {/* Task Indicators */}
-            <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-50">
+            <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-50" style={dualEdgeDepthShadow}>
               <h3 className="text-lg font-bold text-gray-900 mb-6">Task Indicators</h3>
               <div className="space-y-5">
                  <div className="flex items-center justify-between">
@@ -456,7 +457,7 @@ export default function DailyPlan() {
             </div>
 
             {/* Schedule View */}
-            <div className="bg-white rounded-[32px] overflow-hidden border border-gray-50 shadow-sm flex flex-col">
+            <div className="bg-white rounded-[32px] overflow-hidden border border-gray-50 shadow-sm flex flex-col" style={dualEdgeDepthShadow}>
               <div className="bg-[#F0F7F5] p-6 flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-[#0A4F48]" />
                 <h3 className="text-[15px] font-bold text-gray-800">

@@ -24,17 +24,17 @@ import { SyncLoader } from "react-spinners";
 import { addDays, format, startOfWeek } from "date-fns";
 import MobileBottomNav from "../components/MobileBottomNav";
 
-const dualEdgeDepthShadow = {
+export const dualEdgeDepthShadow = {
   boxShadow:
     "-9px 10px 18px rgba(14, 29, 23, 0.24), -3px 4px 8px rgba(14, 29, 23, 0.16), 9px -9px 16px rgba(255, 255, 255, 0.92), 4px -3px 8px rgba(255, 255, 255, 0.78)",
 };
 
-const reflectionFieldDepthShadow = {
+export const reflectionFieldDepthShadow = {
   boxShadow:
     "inset 7px 7px 14px rgba(196, 207, 201, 0.72), inset -7px -7px 14px rgba(255, 255, 255, 0.92), -4px 6px 12px rgba(14, 29, 23, 0.12), 3px -3px 8px rgba(255, 255, 255, 0.72)",
 };
 
-const protocolIconDepthShadow = {
+export const protocolIconDepthShadow = {
   boxShadow:
     "-5px 7px 12px rgba(14, 29, 23, 0.2), 5px -5px 10px rgba(255, 255, 255, 0.86), inset 1px 1px 2px rgba(255, 255, 255, 0.52)",
 };
@@ -175,8 +175,8 @@ export default function HabitTracker() {
   }
 
   return (
-    <div className="client-page-container">
-      <div className="client-page-shell">
+    <div className="client-page-container ">
+      <div className="client-page-shell ">
         <div className="flex flex-wrap items-end justify-between gap-3 px-1">
           <div>
             <h1 className="text-[30px] sm:text-[36px] leading-none font-black text-[#22342C]">
@@ -189,7 +189,7 @@ export default function HabitTracker() {
           
         </div>
 
-        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.85fr_1fr]">
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.85fr_1fr] mt-2.5">
           <div className="space-y-5">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <MetricCard
@@ -217,7 +217,7 @@ export default function HabitTracker() {
               />
             </div>
 
-            <section className="rounded-[32px] border border-[#DCE7E1] bg-[#F3F7F5] p-4 sm:p-6 shadow-[0_10px_30px_rgba(15,41,29,0.04)]">
+            <section className="rounded-[32px]  bg-[#F3F7F5] p-4 sm:p-6 shadow-[0_10px_30px_rgba(15,41,29,0.04)]">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className="text-[24px] sm:text-[34px] leading-none font-black text-[#1F2D26]">
@@ -250,6 +250,7 @@ export default function HabitTracker() {
                         }
                       }}
                       className="flex items-center justify-between gap-3 rounded-[26px] border border-[#E0E8E4] bg-white px-3.5 py-3.5 sm:px-4 sm:py-4 cursor-pointer transition-all hover:shadow-[0_8px_24px_rgba(15,41,29,0.08)]"
+                      style={dualEdgeDepthShadow}
                     >
                       <div className="flex min-w-0 items-center gap-3">
                         <div
@@ -318,7 +319,7 @@ export default function HabitTracker() {
           </div>
 
           <div className="space-y-5">
-            <section className="rounded-[30px] border border-[#DCE7E1] bg-white p-5 sm:p-6 shadow-[0_10px_30px_rgba(15,41,29,0.04)]">
+            <section className="rounded-[30px] border border-[#DCE7E1] bg-white p-5 sm:p-6 shadow-[0_10px_30px_rgba(15,41,29,0.04)]" style={dualEdgeDepthShadow}>
               <div className="mb-4 flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#E3F0E8] text-[#0A7B4E]">
                   <PencilLine size={20} />
@@ -354,7 +355,7 @@ export default function HabitTracker() {
               </button>
             </section>
 
-            <section className="rounded-[30px] border border-[#DCE7E1] bg-white p-5 sm:p-6 shadow-[0_10px_30px_rgba(15,41,29,0.04)]">
+            <section className="rounded-[30px] border border-[#DCE7E1] bg-white p-5 sm:p-6 shadow-[0_10px_30px_rgba(15,41,29,0.04)]" style={dualEdgeDepthShadow}>
               <div className="flex items-center justify-between">
                 <h3 className="text-[24px] sm:text-[38px] leading-none font-black text-[#22322B]">
                   Weekly Streak

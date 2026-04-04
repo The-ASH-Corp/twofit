@@ -273,13 +273,19 @@ export default function TherapyTasksModal({
                             <div className="rounded-xl overflow-hidden border border-gray-100">
                               {submission.file.match(/\.(mp4|webm|ogg)$/i) ? (
                                 <video
-                                  src={`${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}${submission.file}`.replace(/^http:\/\//i, "https://")}
+                                  src={`${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}${submission.file}`.replace(
+                                    /^http:\/\//i,
+                                    "https://",
+                                  )}
                                   controls
                                   className="w-full h-auto"
                                 />
                               ) : (
                                 <img
-                                  src={`${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}${submission.file}`.replace(/^http:\/\//i, "https://")}
+                                  src={`${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}${submission.file}`.replace(
+                                    /^http:\/\//i,
+                                    "https://",
+                                  )}
                                   alt="Your Proof"
                                   className="w-full h-auto"
                                 />
