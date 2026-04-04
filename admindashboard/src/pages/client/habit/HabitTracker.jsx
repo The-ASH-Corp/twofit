@@ -177,18 +177,6 @@ export default function HabitTracker() {
   return (
     <div className="client-page-container ">
       <div className="client-page-shell ">
-        <div className="flex flex-wrap items-end justify-between gap-3 px-1">
-          <div>
-            <h1 className="text-[30px] sm:text-[36px] leading-none font-black text-[#22342C]">
-              Daily Habit Tracker
-            </h1>
-            <p className="mt-2 text-[13px] font-semibold text-[#6F8178]">
-              {todayStr}
-            </p>
-          </div>
-          
-        </div>
-
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.85fr_1fr] mt-2.5">
           <div className="space-y-5">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -220,7 +208,7 @@ export default function HabitTracker() {
             <section className="rounded-[32px]  bg-[#F3F7F5] p-4 sm:p-6 shadow-[0_10px_30px_rgba(15,41,29,0.04)]">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="text-[24px] sm:text-[34px] leading-none font-black text-[#1F2D26]">
+                  <h2 className="text-[24px] sm:text-[28px] leading-none font-black text-[#1F2D26]">
                     Today&apos;s Protocol
                   </h2>
                   <p className="mt-2 text-[15px] font-semibold text-[#7B8C83]">
@@ -260,10 +248,10 @@ export default function HabitTracker() {
                           <Icon size={20} />
                         </div>
                         <div className="min-w-0">
-                          <p className="truncate text-[16px] sm:text-[19px] leading-none font-black text-[#1F2D26]">
+                          <p className="truncate text-[14px] sm:text-[16px] leading-none font-black text-[#1F2D26]">
                             {habit.name}
                           </p>
-                          <p className="mt-1 text-[12px] sm:text-[14px] font-semibold text-[#7F9087]">
+                          <p className="mt-1 text-[10px] sm:text-[12px] font-semibold text-[#7F9087]">
                             {status === "done"
                               ? "Target met for today"
                               : "Target: Complete this habit today"}
@@ -278,7 +266,7 @@ export default function HabitTracker() {
                           >
                             {statusUI.label}
                           </p>
-                          <p className="mt-1 text-[14px] sm:text-[18px] leading-none font-black text-[#34463E]">
+                          <p className="mt-1 text-[12px] sm:text-[14px] leading-none font-black text-[#34463E]">
                             {statusUI.meta}
                           </p>
                         </div>
@@ -305,13 +293,13 @@ export default function HabitTracker() {
               <div className="pointer-events-none absolute -right-20 -top-16 h-56 w-56 rounded-full bg-white/25 blur-2xl" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
                 <div className="max-w-xl">
-                  <span className="inline-flex rounded-full bg-[#D9EEDC] px-3 py-1 text-[12px] font-black tracking-[0.08em] text-[#0A7B4E]">
+                  <span className="inline-flex rounded-full bg-[#D9EEDC] px-3 py-1 text-[10px] font-black tracking-[0.08em] text-[#0A7B4E]">
                     DAILY INSIGHT
                   </span>
-                  <h3 className="mt-3 text-[24px] sm:text-[33px] leading-[1.1] font-black text-[#24342C]">
+                  <h3 className="mt-3 text-[24px] sm:text-[30px] leading-[1.1] font-black text-[#24342C]">
                     Consistency is the bridge between goals and accomplishment.
                   </h3>
-                  <p className="mt-2 text-[18px] sm:text-[24px] font-bold text-[#5D6D65]">- Jim Rohn</p>
+                  <p className="mt-2 text-[18px] sm:text-[20px] font-bold text-[#5D6D65]">- Jim Rohn</p>
                 </div>
                 
               </div>
@@ -324,14 +312,13 @@ export default function HabitTracker() {
                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#E3F0E8] text-[#0A7B4E]">
                   <PencilLine size={20} />
                 </div>
-                <h2 className="text-[24px] sm:text-[38px] leading-none font-black text-[#22322B]">
+                <h2 className="text-[24px] sm:text-[28px] leading-none font-black text-[#22322B]">
                   Daily Reflection
                 </h2>
               </div>
 
               <div
                 className="rounded-[24px] border border-[#E1E9E4] bg-[#F4F7F5] p-4"
-                style={reflectionFieldDepthShadow}
               >
                 <textarea
                   value={reflectionNotes}
@@ -349,7 +336,7 @@ export default function HabitTracker() {
                 type="button"
                 onClick={handleSaveReflection}
                 disabled={reflectionSaving}
-                className="mt-3 w-full rounded-full bg-[#D7DEDB] py-3.5 text-[16px] sm:text-[26px] font-black text-[#0A7B4E] transition-all hover:bg-[#CCD6D2] disabled:opacity-60"
+                className="mt-3 w-full rounded-full bg-[#D7DEDB] py-3.5 text-[16px] sm:text-[24px] font-black text-[#0A7B4E] transition-all hover:bg-[#CCD6D2] disabled:opacity-60"
               >
                 {reflectionSaving ? "Saving..." : "Log Entry"}
               </button>
@@ -357,10 +344,10 @@ export default function HabitTracker() {
 
             <section className="rounded-[30px] border border-[#DCE7E1] bg-white p-5 sm:p-6 shadow-[0_10px_30px_rgba(15,41,29,0.04)]" style={dualEdgeDepthShadow}>
               <div className="flex items-center justify-between">
-                <h3 className="text-[24px] sm:text-[38px] leading-none font-black text-[#22322B]">
+                <h3 className="text-[24px] sm:text-[30px] leading-none font-black text-[#22322B]">
                   Weekly Streak
                 </h3>
-                <p className="text-[20px] font-black text-[#0A7B4E]">
+                <p className="text-[18px] font-black text-[#0A7B4E]">
                   {weeklyStatus.average}% Avg.
                 </p>
               </div>
@@ -403,7 +390,7 @@ export default function HabitTracker() {
             </section>
 
             <section className="rounded-[28px] border border-[#CFE0D6] bg-[#E9F3ED] p-5">
-              <p className="text-[18px] leading-relaxed font-semibold italic text-[#2E6D52]">
+              <p className="text-[16px] leading-relaxed font-semibold italic text-[#2E6D52]">
                 &quot;Optimal hydration improves cognitive function by up to 20%.
                 Keep your water bottle visible.&quot;
               </p>
@@ -425,27 +412,27 @@ function MetricCard({ title, value, suffix, accent, subtitle, progress, icon: Ic
       style={dualEdgeDepthShadow}
     >
       <div className="flex items-start justify-between gap-3">
-        <p className="text-[12px] font-black tracking-[0.12em] text-[#7F8F87] uppercase">
+        <p className="text-[11px] font-black tracking-[0.12em] text-[#7F8F87] uppercase">
           {title}
         </p>
         {Icon && (
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#E3F0E8] text-[#0A7B4E]">
+          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#E3F0E8] text-[#0A7B4E]">
             <Icon size={16} />
           </div>
         )}
       </div>
 
-      <p className={`mt-2 text-[56px] leading-none font-black ${accent}`}>
+      <p className={`mt-2 text-[40px] leading-none font-black ${accent}`}>
         {value}
         {suffix && (
-          <span className="ml-1 text-[32px] font-bold text-[#7F8F87]">
+          <span className="ml-1 text-[20px] font-bold text-[#7F8F87]">
             {suffix}
           </span>
         )}
       </p>
 
       {subtitle && (
-        <p className="mt-1 text-[17px] font-semibold text-[#7A8A82]">
+        <p className="mt-1 text-[14px] font-semibold text-[#7A8A82]">
           {subtitle}
         </p>
       )}

@@ -430,6 +430,18 @@ export default function WorkoutTasksPage() {
                </div>
             </section>
 
+            {/* Active Focal Module Detail */}
+            <div className="client-card rounded-[24px] border border-[#E8EEEB] bg-[#FCFDFC] p-6 sm:p-7 shadow-[0_6px_24px_rgba(30,44,38,0.02)]">
+              <div className="inline-flex items-center rounded-full border border-[#D1E0D7] bg-[#F5F9F7] px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.13em] text-[#0A7B4E]">
+                Active Focal Module
+              </div>
+              <h2 className="mt-4 text-[26px] leading-tight font-black text-[#1A2621] sm:text-[28px] lg:text-[32px]">
+                {selectedTask?.name || "Exercise Overview"}
+              </h2>
+              <p className="mt-3 text-[15.5px] leading-relaxed font-medium text-[#5A6D63]">
+                {selectedTask?.description || "Follow the guided video instructions carefully. Maintain proper form and controlled pacing throughout the movement for optimal engagement."}
+              </p>
+            </div>
 
             {/* Reflection Forms */}
             {shouldShowSubmissionForm && (
