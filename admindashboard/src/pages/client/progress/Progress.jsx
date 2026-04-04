@@ -11,6 +11,7 @@ import {
   Zap,
 } from "lucide-react";
 import ProgressChart from "../components/ProgressChart";
+import AdherenceStreaks from "../components/AdherenceStreaks";
 import WeightUpdate from "./WeightUpdate";
 import MeasurementUpdate from "./MeasurementUpdate";
 import HoldPlan from "./HoldPlan";
@@ -312,31 +313,10 @@ export default function Progress() {
               </div>
             </section>
 
-            <section className="client-card rounded-[24px] p-5 sm:p-6 lg:p-7">
-              <div className="flex items-start justify-between gap-4">
-                <div className="max-w-[720px]">
-                  <h3 className="text-[30px] leading-none font-black text-[#1F2F29] sm:text-[32px]">
-                    Expert Analysis
-                  </h3>
-                  <p className="mt-4 text-[17px] font-medium leading-relaxed text-[#6D7C75]">
-                    Our nutrition team has analyzed your first{" "}
-                    {Math.min(currentDay, 7)} days. Your consistency is
-                    improving, and hydration plus workout completion will push
-                    your next milestone faster.
-                  </p>
-                  <button
-                    type="button"
-                    className="mt-5 rounded-full bg-[#087B44] px-6 py-2.5 text-[14px] font-black text-white shadow-[0_10px_20px_rgba(8,123,68,0.25)]"
-                  >
-                    View Full Report
-                  </button>
-                </div>
-
-                <div className="hidden rounded-[16px] bg-[#E8F1EC] p-4 text-[#BFD3C8] md:block">
-                  <Activity size={34} />
-                </div>
-              </div>
-            </section>
+            <AdherenceStreaks 
+              user={clientData} 
+              className="client-card rounded-[24px]! p-5! sm:p-6! lg:p-7! bg-transparent! lg:bg-white!" 
+            />
           </div>
 
           <div className="space-y-6">
@@ -448,6 +428,32 @@ export default function Progress() {
             </section>
           </div>
         </div>
+
+        <section className="client-card rounded-[24px] p-5 sm:p-6 lg:p-7 mt-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="max-w-[720px]">
+              <h3 className="text-[30px] leading-none font-black text-[#1F2F29] sm:text-[32px]">
+                Expert Analysis
+              </h3>
+              <p className="mt-4 text-[17px] font-medium leading-relaxed text-[#6D7C75]">
+                Our nutrition team has analyzed your first{" "}
+                {Math.min(currentDay, 7)} days. Your consistency is
+                improving, and hydration plus workout completion will push
+                your next milestone faster.
+              </p>
+              <button
+                type="button"
+                className="mt-5 rounded-full bg-[#087B44] px-6 py-2.5 text-[14px] font-black text-white shadow-[0_10px_20px_rgba(8,123,68,0.25)]"
+              >
+                View Full Report
+              </button>
+            </div>
+
+            <div className="hidden rounded-[16px] bg-[#E8F1EC] p-4 text-[#BFD3C8] md:block">
+              <Activity size={34} />
+            </div>
+          </div>
+        </section>
       </div>
 
       {isOpen && (
