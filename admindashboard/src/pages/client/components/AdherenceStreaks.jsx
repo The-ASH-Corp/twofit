@@ -14,25 +14,25 @@ const STREAK_TYPES = [
     key: "workout",
     label: "Workout",
     icon: Dumbbell,
-    milestones: [7, 21, 50],
+    milestones: [7, 21, 50, 100],
   },
   {
     key: "diet",
     label: "Diet",
     icon: UtensilsCrossed,
-    milestones: [7, 21, 50], // Usually 1d milestone marked in image conditionally, using standard 7, 21, 50
+    milestones: [7, 21, 50, 100],
   },
   {
     key: "water",
     label: "Water",
     icon: Droplet,
-    milestones: [5, 7, 21], // Placeholder to match specific image dots: 5d, 7d, 21d
+    milestones: [7, 21, 50, 100],
   },
   {
     key: "habit",
     label: "Habit",
     icon: Brain,
-    milestones: [7, 21, 100],
+    milestones: [7, 21, 50, 100],
   },
 ];
 
@@ -94,26 +94,25 @@ export default function AdherenceStreaks({ user, className }) {
   );
 
   return (
-    <div className={cn("bg-transparent lg:bg-white lg:rounded-[32px] lg:p-8 lg:shadow-[0_4px_30px_rgba(0,0,0,0.02)] lg:border lg:border-gray-50 flex flex-col justify-center", className)}>
-      <h3 className="font-black text-[16px] lg:text-[18px] text-gray-800 tracking-tight leading-snug mb-5 lg:mb-8 pl-1 lg:pl-0">
+    <div className={cn("flex flex-col justify-center", className)}>
+      <h3 className="text-[26px] leading-none font-black text-[#1F2F29] sm:text-[28px] mb-6">
         Daily Adherence Streaks
       </h3>
 
-      <div className="flex flex-col gap-3 lg:gap-6 w-full lg:max-w-sm mx-auto flex-1 justify-center">
+      <div className="flex flex-col gap-4 w-full">
         {STREAK_TYPES.map((type, idx) => {
           const Icon = type.icon;
           const stats = renderedStreakByType[type.key];
           
-          // Using specific styles for each icon background on mobile based on reference image
           let iconBg = "bg-[#DAE7E4]";
           let iconColor = "text-[#0A4F48]";
           
           if (type.key === 'water') {
              iconBg = "bg-[#DFE3FE]";
-             iconColor = "text-[#471EFA]"; // Deep purple/blue indicator 
+             iconColor = "text-[#471EFA]"; 
           } else if (type.key === 'habit') {
              iconBg = "bg-[#EEE7DD]";
-             iconColor = "text-[#754117]"; // Brownish indicator
+             iconColor = "text-[#754117]"; 
           } else if (type.key === 'diet') {
              iconBg = "bg-[#DDEEEA]";
           }
@@ -121,29 +120,37 @@ export default function AdherenceStreaks({ user, className }) {
           return (
             <div
               key={type.key}
-              className="bg-[#F5F8F7] lg:bg-gray-50 rounded-[40px] p-2 pr-4 lg:pr-6 flex items-center justify-between"
+              className="bg-[#F8FBF9] rounded-[30px] p-2.5 pr-4 sm:pr-6 flex items-center justify-between shadow-sm"
             >
-              <div className="flex items-center gap-3 lg:gap-4">
+              <div className="flex items-center gap-4 sm:gap-6">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${iconBg}`}
+                  className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center shrink-0 ${iconBg}`}
                 >
-                  <Icon size={20} strokeWidth={2.5} className={iconColor} />
+                  <Icon size={24} strokeWidth={2.5} className={iconColor} />
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-[12px] font-black text-gray-800 tracking-wide">
+                <div className="flex flex-col gap-1">
+                  <span className="text-[14px] sm:text-[15px] font-black text-[#1F2F29] tracking-wide">
                     {type.label}
                   </span>
-                  <div className="flex items-end gap-1 lg:gap-1.5 pt-0.5">
-                    <span className="text-[18px] lg:text-[14px] font-black text-[#0A4F48] leading-none">{stats.current}</span>
-                    <span className="text-[10px] font-black tracking-widest text-gray-500 uppercase pb-[2px]">
-                      Day{stats.current !== 1 ? 's' : ''}
-                    </span>
+                  <div className="flex flex-col gap-0.5">
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-[14px] sm:text-[15px] font-black text-[#0A4F48] leading-none">{stats.current}</span>
+                      <span className="text-[9px] sm:text-[10px] font-black tracking-widest text-[#9AABA3] uppercase">
+                        Cur
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-[13px] sm:text-[14px] font-bold text-[#A2AFA8] leading-none">{stats.longest}</span>
+                      <span className="text-[9px] sm:text-[10px] font-bold tracking-widest text-[#A2AFA8] uppercase">
+                        Max
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Milestones Bubbles */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-3">
                 {type.milestones.map((m) => {
                    const unlocked = stats.longest >= m;
                    
@@ -156,7 +163,7 @@ export default function AdherenceStreaks({ user, className }) {
                    return (
                      <span
                         key={m}
-                        className={`w-7 h-7 lg:w-9 lg:h-9 rounded-full flex items-center justify-center text-[7px] lg:text-[9px] font-black tracking-tighter ${activeBgColor}`}
+                        className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-full flex items-center justify-center text-[8px] sm:text-[10px] lg:text-[11px] font-black tracking-tighter ${activeBgColor}`}
                      >
                        {m}d
                      </span>
