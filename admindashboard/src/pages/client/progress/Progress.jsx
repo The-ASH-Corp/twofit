@@ -194,7 +194,7 @@ export default function Progress() {
   }
 
   return (
-    <div className="client-page-container">
+    <div className="client-page-container p-5 sm:p-6 lg:p-7">
       <div className="client-page-shell">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <section className="client-card rounded-[22px] p-5 sm:p-6">

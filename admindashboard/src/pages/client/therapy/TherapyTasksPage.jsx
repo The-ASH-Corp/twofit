@@ -374,9 +374,6 @@ export default function TherapyTasksPage() {
 
                       {!isStarted && (
                         <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-black/20 backdrop-blur-[2px]">
-                           <div className="flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-full bg-[#0A7B4E] text-white shadow-[0_0_50px_rgba(10,123,78,0.4)] animate-pulse hover:scale-110 transition-transform cursor-pointer group/start" onClick={() => setIsStarted(true)}>
-                              <PlayCircle size={48} fill="currentColor" className="ml-1" />
-                           </div>
                            <h3 className="mt-8 text-[32px] font-black text-white uppercase tracking-tight text-center drop-shadow-2xl">
                               Ready for your therapy?
                            </h3>

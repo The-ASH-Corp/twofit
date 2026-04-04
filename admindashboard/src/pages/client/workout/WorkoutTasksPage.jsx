@@ -391,24 +391,8 @@ export default function WorkoutTasksPage() {
   }).format(new Date());
 
   return (
-    <div className="client-page-container">
+    <div className="client-page-container p-5 sm:p-6 lg:p-7">
       <div className="client-page-shell">
-        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-          {/* <div>
-            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#0A7B4E]">
-              Current Module
-            </p>
-            <h1 className="mt-1 text-[36px] leading-none font-black tracking-tight text-[#1E2C26] sm:text-[48px] lg:text-[56px]">
-              Day {currentGlobalDay} Workout Videos
-            </h1>
-          </div>
-
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#DFE7E3] bg-[#F5F9F7] px-4 py-2 text-[13px] font-black text-[#5D6E66]">
-            <CalendarDays size={16} className="text-[#0A7B4E]" />
-            {todayDisplay}
-          </div> */}
-        </div>
-
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.7fr_1fr]">
           <div className="space-y-6">
             {/* Focal Player Area */}
@@ -433,16 +417,6 @@ export default function WorkoutTasksPage() {
 
                     {!isStarted && (
                       <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-black/20 backdrop-blur-[2px]">
-                        <div
-                          className="flex h-24 w-24 sm:h-32 sm:w-32 items-center justify-center rounded-full bg-[#0A7B4E] text-white shadow-[0_0_50px_rgba(10,123,78,0.4)] animate-pulse hover:scale-110 transition-transform cursor-pointer group/start"
-                          onClick={() => setIsStarted(true)}
-                        >
-                          <PlayCircle
-                            size={48}
-                            fill="currentColor"
-                            className="ml-1"
-                          />
-                        </div>
                         <h3 className="mt-8 text-[32px] font-black text-white uppercase tracking-tight text-center drop-shadow-2xl">
                           Ready for your session?
                         </h3>

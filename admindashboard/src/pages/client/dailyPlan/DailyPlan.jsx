@@ -325,7 +325,7 @@ export default function DailyPlan() {
   const totalSkipped = Object.values(calendarData).reduce((acc, curr) => acc + (curr.skipped || 0), 0);
 
   return (
-    <div className="client-page-container">
+    <div className="client-page-container p-5 sm:p-6 lg:p-7">
       <div className="client-page-shell">
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">

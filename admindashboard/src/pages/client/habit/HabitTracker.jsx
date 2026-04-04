@@ -175,7 +175,7 @@ export default function HabitTracker() {
   }
 
   return (
-    <div className="client-page-container ">
+    <div className="client-page-container p-5 sm:p-6 lg:p-7">
       <div className="client-page-shell ">
         <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.85fr_1fr] mt-2.5">
           <div className="space-y-5">
