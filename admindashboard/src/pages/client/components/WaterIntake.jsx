@@ -11,7 +11,7 @@ import {
 const WATER_GOAL_ML = 2500;
 const WATER_STEP_OPTIONS = [100, 250, 500];
 
-const WaterIntake = () => {
+const WaterIntake = ({ currentGlobalDay: propGlobalDay }) => {
   const [isWaterSyncing, setIsWaterSyncing] = useState(false);
   const [waterStepMl, setWaterStepMl] = useState(250);
   const [showGoalBurst, setShowGoalBurst] = useState(false);
@@ -20,7 +20,7 @@ const WaterIntake = () => {
   const user = useAppSelector(selectUser);
   const waterIntakeByDay = useAppSelector((state) => state.tasks.waterIntakeByDay);
 
-  const currentGlobalDay = Math.max(Number(user?.currentGlobalDay) || 1, 1);
+  const currentGlobalDay = Math.max(Number(propGlobalDay || user?.currentGlobalDay) || 1, 1);
   const waterIntakeMl = Number(waterIntakeByDay[currentGlobalDay] || 0);
   const isGoalReached = waterIntakeMl >= WATER_GOAL_ML;
   const fillPercent = Math.max(
