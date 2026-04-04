@@ -347,36 +347,10 @@ export default function TherapyTasksPage() {
     );
   }
 
-  const todayDisplay = new Date().toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-
-  const canPlayNext =
-    selectedIndex < therapyTasks.length - 1 && watchedVideos.has(selectedIndex);
-
-  const rewardXp = Math.max(therapyTasks.length * 10, 50);
 
   return (
-    <div className="client-page-container">
+    <div className="client-page-container p-5 sm:p-6">
       <div className="client-page-shell">
-        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-[11px] font-black uppercase tracking-[0.14em] text-[#0A7B4E]">
-              Current Module
-            </p>
-            <h1 className="mt-1 text-[36px] leading-none font-black tracking-tight text-[#1E2C26] sm:text-[48px] lg:text-[56px]">
-              Day {currentGlobalDay} Therapy Videos
-            </h1>
-          </div>
-
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#DFE7E3] bg-[#F5F9F7] px-4 py-2 text-[13px] font-black text-[#5D6E66]">
-            <CalendarDays size={16} className="text-[#0A7B4E]" />
-            {todayDisplay}
-          </div>
-        </div>
-
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.9fr_1fr]">
           <div className="space-y-6">
             <section className="client-card rounded-[32px] overflow-hidden p-0 bg-[#0F1A17] border-0 shadow-2xl shadow-emerald-900/10 group">
@@ -463,26 +437,13 @@ export default function TherapyTasksPage() {
                       "In this session, we explore the foundations of neuroplasticity and how to identify automatic negative thoughts (ANTs) during high-pressure performance moments."}
                   </p>
                 </div>
-
-                {/* <button
-                  onClick={openNextVideo}
-                  disabled={!canPlayNext}
-                  className="inline-flex h-[112px] w-[112px] shrink-0 flex-col items-center justify-center rounded-[32px] bg-[#087B44] text-center text-white shadow-xl shadow-emerald-900/20 transition-all hover:bg-[#076d3d] hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:bg-[#C9D4CE] disabled:text-[#87958E] sm:h-[84px] sm:w-[154px]"
-                >
-                  <span className="text-[20px] font-black leading-none uppercase tracking-tighter">
-                    Play Next
-                  </span>
-                  <span className="mt-1.5 inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-emerald-100">
-                    CONTINUE <ChevronRight size={13} />
-                  </span>
-                </button> */}
               </div>
             </section>
           </div>
 
           <div className="space-y-6">
             <section className="client-card rounded-[24px] p-5 sm:p-6">
-              <h3 className="mb-4 inline-flex items-center gap-2 text-[30px] leading-none font-black text-[#1F2D27] sm:text-[36px] lg:text-[42px]">
+              <h3 className="mb-4 inline-flex items-center gap-2 text-[24px] leading-none font-black text-[#1F2D27] sm:text-[28px] lg:text-[30px]">
                 <CheckCircle2 size={18} className="text-[#0A7B4E]" />
                 Today&apos;s Protocol
               </h3>
@@ -577,7 +538,7 @@ export default function TherapyTasksPage() {
 
             {shouldShowSubmissionForm && (
               <section className="rounded-[24px] border border-[#CFE0D6] bg-[#E8F2ED] p-5 sm:p-6">
-                <h3 className="text-[30px] leading-none font-black text-[#087B44] sm:text-[36px] lg:text-[42px]">
+                <h3 className="text-[24px] leading-none font-black text-[#0A4F48] sm:text-[28px] lg:text-[30px]">
                   Therapy Complete?
                 </h3>
                 <p className="mt-3 text-[16px] font-medium leading-relaxed text-[#64756D]">
@@ -615,7 +576,7 @@ export default function TherapyTasksPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={uploading}
-                  className="mt-5 w-full rounded-full bg-[#087B44] py-3.5 text-[15px] font-black uppercase tracking-[0.08em] text-white shadow-[0_12px_22px_rgba(8,123,68,0.28)] transition-all hover:bg-[#076f3d] disabled:cursor-not-allowed disabled:bg-[#9FB4A9]"
+                  className="mt-5 w-full rounded-full bg-[#0A4F48] py-3.5 text-[15px] font-black uppercase tracking-[0.08em] text-white shadow-[0_12px_22px_rgba(8,123,68,0.28)] transition-all hover:bg-[#073d2d] disabled:cursor-not-allowed disabled:bg-[#9FB4A9]"
                 >
                   {uploading ? "Submitting..." : "Submit Therapy Result"}
                 </button>
