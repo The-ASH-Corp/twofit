@@ -22,11 +22,7 @@ function clampPercent(value) {
 
 function getDateFromComplianceEntry(item) {
   const candidate =
-    item?.date ||
-    item?.dayDate ||
-    item?.createdAt ||
-    item?.updatedAt ||
-    null;
+    item?.date || item?.dayDate || item?.createdAt || item?.updatedAt || null;
 
   if (!candidate) return null;
   const parsed = new Date(candidate);
@@ -34,8 +30,9 @@ function getDateFromComplianceEntry(item) {
 }
 
 function toComplianceSeries(weeklyData = [], graphDays = 14) {
-  const sourceData = Array.isArray(weeklyData) && weeklyData.length > 0 ? weeklyData : [];
-
+  const sourceData =
+    Array.isArray(weeklyData) && weeklyData.length > 0 ? weeklyData : [];
+  console.log(sourceData);
   if (sourceData.length === 0) return [];
 
   const entries = sourceData.map((item, index) => {
@@ -65,20 +62,9 @@ function toComplianceSeries(weeklyData = [], graphDays = 14) {
   const recentEntries = orderedEntries.slice(-safeGraphDays);
 
   return recentEntries.map((entry, index) => {
-    let dayLabel = null;
-    if (typeof entry?.item?.day === "string" && entry.item.day.trim().length > 0) {
-      const rawDay = entry.item.day.trim();
-      const dayMatch = rawDay.match(/^day\s*(\d+)$/i);
-      dayLabel = dayMatch ? `D${dayMatch[1]}` : rawDay.slice(0, 3);
-    }
-
     return {
-      label:
-        entry.dateObj?.toLocaleDateString("en-US", { month: "short", day: "numeric" }) ||
-        dayLabel ||
-        WEEK[index] ||
-        `D${index + 1}`,
-      value: entry.value,
+      label: `Day ${index + 1}`,
+      value: entry.value ,
     };
   });
 }
@@ -106,7 +92,10 @@ function toWeightSeries(weightHistory = []) {
     const totalDifference = Number((point.weight - firstWeight).toFixed(1));
 
     return {
-      label: point.dateObj.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      label: point.dateObj.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      }),
       value: Number(point.weight.toFixed(1)),
       difference,
       totalDifference,
@@ -124,12 +113,12 @@ function getWeightTicks(series = []) {
   const min = Math.min(...values);
   const max = Math.max(...values);
   const range = Math.max(max - min, 1);
-  const padding = Number((Math.max(range * 0.18, 0.5)).toFixed(1));
+  const padding = Number(Math.max(range * 0.18, 0.5).toFixed(1));
   const low = Number((min - padding).toFixed(1));
   const high = Number((max + padding).toFixed(1));
   const step = Number(((high - low) / 4).toFixed(1));
 
-  return [0, 1, 2, 3, 4].map((i) => Number((low + (step * i)).toFixed(1)));
+  return [0, 1, 2, 3, 4].map((i) => Number((low + step * i).toFixed(1)));
 }
 
 function TrendCard({
@@ -183,7 +172,7 @@ function TrendCard({
                 formatter={(value) =>
                   typeof valueFormatter === "function"
                     ? valueFormatter(value)
-                    : value
+                    : value + "%"
                 }
                 contentStyle={{
                   borderRadius: "14px",
@@ -227,13 +216,23 @@ function TrendCard({
           <div className="flex h-full w-full flex-col items-center justify-center rounded-[20px] bg-[#fbfdfb]/50 border border-dashed border-[#e4eae4] text-center">
             <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-emerald-50 text-[#0A4F48]/40">
               <ResponsiveContainer width={18} height={18}>
-                <AreaChart data={[{v:0},{v:1},{v:0.5}]}>
-                  <Area type="monotone" dataKey="v" stroke="currentColor" fill="none" strokeWidth={2} />
+                <AreaChart data={[{ v: 0 }, { v: 1 }, { v: 0.5 }]}>
+                  <Area
+                    type="monotone"
+                    dataKey="v"
+                    stroke="currentColor"
+                    fill="none"
+                    strokeWidth={2}
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-            <p className="text-[13px] font-bold text-[#4a5a51]">No records yet</p>
-            <p className="mt-0.5 text-[11px] font-medium text-[#93a198]">Start logging to see your trends</p>
+            <p className="text-[13px] font-bold text-[#4a5a51]">
+              No records yet
+            </p>
+            <p className="mt-0.5 text-[11px] font-medium text-[#93a198]">
+              Start logging to see your trends
+            </p>
           </div>
         )}
       </div>
@@ -245,33 +244,38 @@ export default function DashboardTrendCards({ complianceData }) {
   const user = useAppSelector(selectUser);
   const selectedClient = useAppSelector(selectSelectedClient);
   const complianceSeries = useMemo(
-    () => toComplianceSeries(complianceData?.weeklyData, complianceData?.graphDays),
+    () =>
+      toComplianceSeries(complianceData?.weeklyData, complianceData?.graphDays),
     [complianceData?.weeklyData, complianceData?.graphDays],
   );
-  
+
   const effectiveWeightHistory = useMemo(() => {
-    const storeWeightHistory = selectedClient?.weightHistory || user?.weightHistory || [];
+    const storeWeightHistory =
+      selectedClient?.weightHistory || user?.weightHistory || [];
     return Array.isArray(storeWeightHistory) ? storeWeightHistory : [];
   }, [selectedClient?.weightHistory, user?.weightHistory]);
-  
+
   const weightSeries = useMemo(
     () => toWeightSeries(effectiveWeightHistory),
     [effectiveWeightHistory],
   );
-  const weightTicks = useMemo(() => getWeightTicks(weightSeries), [weightSeries]);
+  const weightTicks = useMemo(
+    () => getWeightTicks(weightSeries),
+    [weightSeries],
+  );
 
   const complianceTicks = [0, 20, 40, 60, 80, 100];
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      <TrendCard 
-        title="Compliance" 
-        data={complianceSeries} 
-        yTicks={complianceTicks} 
+      <TrendCard
+        title="Compliance"
+        data={complianceSeries}
+        yTicks={complianceTicks}
       />
-      <TrendCard 
-        title="Weight Progress" 
-        data={weightSeries} 
+      <TrendCard
+        title="Weight Progress"
+        data={weightSeries}
         yTicks={weightTicks}
         allowYDecimals
       />
