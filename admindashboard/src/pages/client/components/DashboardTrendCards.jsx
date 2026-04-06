@@ -7,12 +7,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { weeklyCompliance } from "@/assets/weeklyCompliance";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 
-const WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function clampPercent(value) {
   const numeric = Number(value);
@@ -32,8 +30,9 @@ function getDateFromComplianceEntry(item) {
 function toComplianceSeries(weeklyData = [], graphDays = 14) {
   const sourceData =
     Array.isArray(weeklyData) && weeklyData.length > 0 ? weeklyData : [];
-  console.log(sourceData);
-  if (sourceData.length === 0) return [];
+
+
+    if (sourceData.length === 0) return [];
 
   const entries = sourceData.map((item, index) => {
     const therapy = clampPercent(item?.therapy);
