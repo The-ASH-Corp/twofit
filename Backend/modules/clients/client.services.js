@@ -598,7 +598,7 @@ export const getAdherenceStreaksService = async (userId) => {
 
     const mealDoneCount = countCompletedTasksByType(exercises, "Meal");
 
-    if (mealCountPerDay > 0 && mealDoneCount >= mealCountPerDay) {
+    if (mealCountPerDay > 0 && mealDoneCount >= 1) {
       completedDietDays.push(
         getLatestTaskCompletionDateKey(exercises, "Meal", fallbackDateKey),
       );
