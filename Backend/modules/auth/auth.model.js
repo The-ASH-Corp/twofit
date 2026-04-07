@@ -22,6 +22,8 @@ const userSchema = new mongoose.Schema(
 
     address: { type: String, required: true },
 
+    profilePhoto: { type: String, default: "" },
+
     role: {
       type: String,
       enum: ["user", "admin", "coach"],
@@ -80,10 +82,9 @@ const userSchema = new mongoose.Schema(
       ref: "ProgramsList",
       required: true,
     },
-    therapyType:{
-      type:mongoose.Schema.Types.ObjectId,
-      ref:"Therapy",
-      
+    therapyType: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Therapy",
     },
 
     duration: { type: Number, required: true },
@@ -128,7 +129,7 @@ const userSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const User = mongoose.model("User", userSchema);

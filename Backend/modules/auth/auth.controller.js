@@ -116,6 +116,9 @@ export const resetPasswordController = async (req, res) => {
 export const editProfileController = async (req, res) => {
   try {
     const userId = req.user.id;
+    if (req.files && req.files.profilePhoto && req.files.profilePhoto[0]) {
+      req.body.profilePhoto = "/uploads/" + req.files.profilePhoto[0].filename;
+    }
     const updateData = req.body;
     const updatedUser = await service.editUserProfile(userId, updateData);
 
