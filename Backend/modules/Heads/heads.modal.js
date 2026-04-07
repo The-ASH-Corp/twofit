@@ -3,6 +3,7 @@ import { capitalizeFirst } from '../../middleware/capitalizeFirst.js';
 
 
 
+
 const headsSchema = new mongoose.Schema({
   name: { type: String, required: true },
   dob: { type: String, required: true },
@@ -10,6 +11,7 @@ const headsSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, trim: true },
   phone: { type: String, required: true, unique: true },
   address: { type: String, required: true },
+  profilePhoto: {type: String, default:""},
   specialization: { type: Array, required: true },
   experience: { type: String, required: true },
   qualification: { type: String, required: true },

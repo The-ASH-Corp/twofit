@@ -20,6 +20,7 @@ import {
   verifyOTPSchema,
   resetPasswordSchema
 } from "../../validator/auth.validator.js";
+import { uploader } from "../../middleware/upload.js";
 
 const router = express.Router();
 
@@ -41,7 +42,13 @@ router.post("/auth/verify-otp", validate(verifyOTPSchema), verifyOTPController);
 
 router.post("/auth/reset-password", validate(resetPasswordSchema), resetPasswordController);
 
-router.patch("/auth/edit-profile", authMiddleware, allowRoles("admin", "user", "expert", "head", "founder"),editProfileController);
+router.patch(
+  "/auth/edit-profile",
+  authMiddleware,
+  allowRoles("admin", "user", "expert", "head", "founder"),
+  uploader.fields([{ name: "profilePhoto", maxCount: 1 }]),
+  editProfileController,
+);
 
 router.put("/auth/change-password", authMiddleware, allowRoles("admin", "user", "expert", "head", "founder"), editPasswordController);
 
