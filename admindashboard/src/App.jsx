@@ -48,6 +48,8 @@ import FounderBroadcastDelete from "./pages/founder/broadcast/broadcastDeletePop
 import FounderBroadcastEdit from "./pages/founder/broadcast/broadcastEdit";
 import FounderRecipeList from "./pages/founder/recipe/RecipeList";
 import FounderRecipeForm from "./pages/founder/recipe/Recipeform";
+import FounderGrowthSupport from "./pages/founder/growth/GrowthSupport";
+
 
 //Head Pages Imports    
 import HeadLayout from "./pages/head/layout/HeadLayout";
@@ -204,6 +206,7 @@ function App() {
           <Route path="recipe" element={<FounderRecipeList/>}/>
           <Route path="recipe/create" element={<FounderRecipeForm/>}/>
           <Route path="recipe/edit/:id" element={<FounderRecipeForm/>}/>
+          <Route path="growth" element={<FounderGrowthSupport/>}/>
           <Route path="broadcasts" element={<FounderBroadcastTemplates />} />
           <Route
             path="broadcasts/delete/:id"

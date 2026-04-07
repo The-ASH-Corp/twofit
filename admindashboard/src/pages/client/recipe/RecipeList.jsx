@@ -188,21 +188,8 @@ export default function RecipeList() {
   }, [gridRecipes]);
 
   return (
-    <div className="client-page-container">
+    <div className="client-page-container p-5 sm:p-6 lg:p-7">
       <div className="client-page-shell">
-        <header className="mb-6">
-          <p className="text-[11px] font-black uppercase tracking-[0.16em] text-[#0A7B4E]">
-            Curation
-          </p>
-          <h1 className="mt-1 text-[48px] leading-none font-black tracking-tight text-[#1E2C26]">
-            Recipe Library
-          </h1>
-          <p className="mt-3 max-w-[680px] text-[18px] font-semibold leading-relaxed text-[#708077]">
-            Fuel your body with precision-crafted nutritional spreads. Every meal
-            is a step toward your wellness peak.
-          </p>
-        </header>
-
         <section className="mb-6 flex flex-wrap items-center gap-2.5">
           {["All", ...CATEGORY_OPTIONS].map((category) => (
             <button

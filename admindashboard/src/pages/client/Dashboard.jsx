@@ -178,7 +178,7 @@ export default function Dashboard() {
           {/* Row 1: Hero & Hydration */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <HeroCard program={program} currentGlobalDay={currentGlobalDay} />
-            <WaterIntake />
+            <WaterIntake currentGlobalDay={currentGlobalDay} />
           </div>
 
           {/* Row 2: Stats Grid */}

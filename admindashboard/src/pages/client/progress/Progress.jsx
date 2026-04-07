@@ -11,6 +11,7 @@ import {
   Zap,
 } from "lucide-react";
 import ProgressChart from "../components/ProgressChart";
+import AdherenceStreaks from "../components/AdherenceStreaks";
 import WeightUpdate from "./WeightUpdate";
 import MeasurementUpdate from "./MeasurementUpdate";
 import HoldPlan from "./HoldPlan";
@@ -53,7 +54,9 @@ export default function Progress() {
           ? user?.programType?._id
           : user?.programType;
 
-      const programResponse = await dispatch(getProgramById(programId)).unwrap();
+      const programResponse = await dispatch(
+        getProgramById(programId),
+      ).unwrap();
       await dispatch(getClient({ id: user?._id })).unwrap();
       const compliance = await dispatch(
         fetchClientComplianceStats(user?._id),
@@ -77,9 +80,9 @@ export default function Progress() {
   const sortedWeightHistory = [...(clientData?.weightHistory || [])].sort(
     (a, b) => new Date(a?.date) - new Date(b?.date),
   );
-  const sortedMeasurementHistory = [...(clientData?.measurementHistory || [])].sort(
-    (a, b) => new Date(a?.date) - new Date(b?.date),
-  );
+  const sortedMeasurementHistory = [
+    ...(clientData?.measurementHistory || []),
+  ].sort((a, b) => new Date(a?.date) - new Date(b?.date));
 
   const lastWeightUpdateDate =
     sortedWeightHistory[sortedWeightHistory.length - 1]?.date || "";
@@ -96,7 +99,8 @@ export default function Progress() {
   const shouldShowMeasurementUpdateButton = () => {
     if (!lastMeasurementUpdateDate) return true;
     const daysSinceLastUpdate =
-      (new Date() - new Date(lastMeasurementUpdateDate)) / (1000 * 60 * 60 * 24);
+      (new Date() - new Date(lastMeasurementUpdateDate)) /
+      (1000 * 60 * 60 * 24);
     return daysSinceLastUpdate >= 7;
   };
 
@@ -109,16 +113,19 @@ export default function Progress() {
     waist: 0,
     hip: 0,
   };
-  const currentMeasurements =
-    sortedMeasurementHistory[sortedMeasurementHistory.length - 1] || {
-      chest: 0,
-      waist: 0,
-      hip: 0,
-    };
+  const currentMeasurements = sortedMeasurementHistory[
+    sortedMeasurementHistory.length - 1
+  ] || {
+    chest: 0,
+    waist: 0,
+    hip: 0,
+  };
 
   const currentDay = Number(clientData?.currentGlobalDay) || 1;
   const totalDuration =
-    parseInt(program?.plan?.duration, 10) || Number(program?.plan?.duration) || 0;
+    parseInt(program?.plan?.duration, 10) ||
+    Number(program?.plan?.duration) ||
+    0;
   const programProgressPercent = clampPercent(
     totalDuration > 0 ? (currentDay / totalDuration) * 100 : 0,
   );
@@ -126,7 +133,8 @@ export default function Progress() {
   const overallCompliance = clampPercent(complianceData?.overall);
   const activeStreak = Number(complianceData?.streaks?.activeStreak) || 0;
 
-  const complianceStatusText = overallCompliance >= 70 ? "On Target" : "Below Target";
+  const complianceStatusText =
+    overallCompliance >= 70 ? "On Target" : "Below Target";
   const complianceStatusClass =
     overallCompliance >= 70 ? "text-[#0A7B4E]" : "text-[#D14B3A]";
 
@@ -187,7 +195,7 @@ export default function Progress() {
   }
 
   return (
-    <div className="client-page-container">
+    <div className="client-page-container p-5 sm:p-6 lg:p-7">
       <div className="client-page-shell">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <section className="client-card rounded-[22px] p-5 sm:p-6">
@@ -199,7 +207,10 @@ export default function Progress() {
             </div>
             <p className="mt-2 text-[34px] leading-none font-black text-[#1F2F29] sm:text-[38px]">
               {currentDay}
-              <span className="text-[22px] text-[#A2AFA9] sm:text-[24px]"> / {totalDuration || 0}</span>
+              <span className="text-[22px] text-[#A2AFA9] sm:text-[24px]">
+                {" "}
+                / {totalDuration || 0}
+              </span>
             </p>
             <div className="mt-5 h-1.5 rounded-full bg-[#DBE6DF]">
               <div
@@ -219,9 +230,14 @@ export default function Progress() {
             <div className="mt-2 flex items-end justify-between gap-3">
               <p className="text-[34px] leading-none font-black text-[#1F2F29] sm:text-[38px]">
                 {currentWeight.toFixed(1)}
-                <span className="text-[22px] text-[#6F7E77] sm:text-[24px]"> kg</span>
+                <span className="text-[22px] text-[#6F7E77] sm:text-[24px]">
+                  {" "}
+                  kg
+                </span>
               </p>
-              <span className="text-[20px] font-black text-[#0A7B4E] sm:text-[22px]">{formattedWeightDelta}</span>
+              <span className="text-[20px] font-black text-[#0A7B4E] sm:text-[22px]">
+                {formattedWeightDelta}
+              </span>
             </div>
             <p className="mt-3 text-[11px] font-black uppercase tracking-[0.12em] text-[#99A7A1]">
               Last 7 Days
@@ -237,9 +253,14 @@ export default function Progress() {
             </div>
             <p className="mt-2 text-[34px] leading-none font-black text-[#1F2F29] sm:text-[38px]">
               {overallCompliance}
-              <span className="text-[22px] text-[#6F7E77] sm:text-[24px]"> %</span>
+              <span className="text-[22px] text-[#6F7E77] sm:text-[24px]">
+                {" "}
+                %
+              </span>
             </p>
-            <p className={`mt-3 text-[13px] font-black ${complianceStatusClass}`}>
+            <p
+              className={`mt-3 text-[13px] font-black ${complianceStatusClass}`}
+            >
               {complianceStatusText}
             </p>
           </section>
@@ -253,7 +274,10 @@ export default function Progress() {
             </div>
             <p className="mt-2 text-[34px] leading-none font-black text-[#1F2F29] sm:text-[38px]">
               {activeStreak}
-              <span className="text-[22px] text-[#6F7E77] sm:text-[24px]"> Days</span>
+              <span className="text-[22px] text-[#6F7E77] sm:text-[24px]">
+                {" "}
+                Days
+              </span>
             </p>
             <p className="mt-3 text-[11px] font-black uppercase tracking-[0.12em] text-[#99A7A1]">
               Keep Going!
@@ -265,13 +289,11 @@ export default function Progress() {
           <div className="space-y-6">
             <section className="client-card rounded-[24px] p-5 sm:p-6 lg:p-7">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-[30px] leading-none font-black text-[#1F2F29] sm:text-[34px]">
+                <h3 className="text-[28px] leading-none font-black text-[#1F2F29] sm:text-[30px]">
                   Weight Progress
                 </h3>
 
                 <div className="flex items-center gap-2">
-                  
-
                   {shouldShowWeightUpdateButton() && (
                     <button
                       onClick={() => {
@@ -291,36 +313,16 @@ export default function Progress() {
               </div>
             </section>
 
-            <section className="client-card rounded-[24px] p-5 sm:p-6 lg:p-7">
-              <div className="flex items-start justify-between gap-4">
-                <div className="max-w-[720px]">
-                  <h3 className="text-[30px] leading-none font-black text-[#1F2F29] sm:text-[32px]">
-                    Expert Analysis
-                  </h3>
-                  <p className="mt-4 text-[17px] font-medium leading-relaxed text-[#6D7C75]">
-                    Our nutrition team has analyzed your first {Math.min(currentDay, 7)} days.
-                    Your consistency is improving, and hydration plus workout completion
-                    will push your next milestone faster.
-                  </p>
-                  <button
-                    type="button"
-                    className="mt-5 rounded-full bg-[#087B44] px-6 py-2.5 text-[14px] font-black text-white shadow-[0_10px_20px_rgba(8,123,68,0.25)]"
-                  >
-                    View Full Report
-                  </button>
-                </div>
-
-                <div className="hidden rounded-[16px] bg-[#E8F1EC] p-4 text-[#BFD3C8] md:block">
-                  <Activity size={34} />
-                </div>
-              </div>
-            </section>
+            <AdherenceStreaks 
+              user={clientData} 
+              className="client-card rounded-[24px]! p-5! sm:p-6! lg:p-7! bg-transparent! lg:bg-white!" 
+            />
           </div>
 
           <div className="space-y-6">
             <section className="client-card rounded-[24px] p-5 sm:p-6">
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-[28px] leading-none font-black text-[#1F2F29] sm:text-[30px]">
+                <h3 className="text-[26px] leading-none font-black text-[#1F2F29] sm:text-[28px]">
                   Measurements
                 </h3>
                 {shouldShowMeasurementUpdateButton() && (
@@ -346,10 +348,14 @@ export default function Progress() {
                   return (
                     <div key={item.label}>
                       <div className="mb-2 flex items-center justify-between">
-                        <p className="text-[14px] font-black text-[#2A3A33]">{item.label}</p>
-                        <p className="text-[14px] font-black text-[#6A7B73]">
+                        <p className="text-[12px] font-black text-[#2A3A33]">
+                          {item.label}
+                        </p>
+                        <p className="text-[12px] font-black text-[#6A7B73]">
                           {item.current.toFixed(1)} cm
-                          <span className="ml-2 text-[#0A7B4E]">{diffDisplay}</span>
+                          <span className="ml-2 text-[#0A7B4E]">
+                            {diffDisplay}
+                          </span>
                         </p>
                       </div>
                       <div className="h-3 rounded-full bg-[#DEE8E2]">
@@ -365,7 +371,7 @@ export default function Progress() {
             </section>
 
             <section className="client-card rounded-[24px] p-5 sm:p-6">
-              <h3 className="text-[28px] leading-none font-black text-[#1F2F29] sm:text-[30px]">
+              <h3 className="text-[26px] leading-none font-black text-[#1F2F29] sm:text-[28px]">
                 Compliance
               </h3>
 
@@ -422,6 +428,32 @@ export default function Progress() {
             </section>
           </div>
         </div>
+
+        <section className="client-card rounded-[24px] p-5 sm:p-6 lg:p-7 mt-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="max-w-[720px]">
+              <h3 className="text-[30px] leading-none font-black text-[#1F2F29] sm:text-[32px]">
+                Expert Analysis
+              </h3>
+              <p className="mt-4 text-[17px] font-medium leading-relaxed text-[#6D7C75]">
+                Our nutrition team has analyzed your first{" "}
+                {Math.min(currentDay, 7)} days. Your consistency is
+                improving, and hydration plus workout completion will push
+                your next milestone faster.
+              </p>
+              <button
+                type="button"
+                className="mt-5 rounded-full bg-[#087B44] px-6 py-2.5 text-[14px] font-black text-white shadow-[0_10px_20px_rgba(8,123,68,0.25)]"
+              >
+                View Full Report
+              </button>
+            </div>
+
+            <div className="hidden rounded-[16px] bg-[#E8F1EC] p-4 text-[#BFD3C8] md:block">
+              <Activity size={34} />
+            </div>
+          </div>
+        </section>
       </div>
 
       {isOpen && (
@@ -454,7 +486,9 @@ export default function Progress() {
               {panelType === "measurement" && (
                 <MeasurementUpdate onClose={() => setIsOpen(false)} />
               )}
-              {panelType === "hold" && <HoldPlan onClose={() => setIsOpen(false)} />}
+              {panelType === "hold" && (
+                <HoldPlan onClose={() => setIsOpen(false)} />
+              )}
               {panelType === "extend" && (
                 <ExtendPlan onClose={() => setIsOpen(false)} />
               )}

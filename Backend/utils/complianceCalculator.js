@@ -4,26 +4,26 @@ import ProgramExtension from "../modules/plan/programExtension.model.js";
 
 // Helper function to calculate total duration including extensions
 const getTotalProgramDurationWithExtensions = async (userId, originalProgramId) => {
-  try {
-    const user = await User.findById(userId).select('duration');
-    if (!user) return user?.duration || 0;
+    try {
+        const user = await User.findById(userId).select('duration');
+        if (!user) return user?.duration || 0;
 
-    // Check for any extensions for this program
-    const extension = await ProgramExtension.findOne({
-      userId,
-      originalProgramId,
-    });
+        // Check for any extensions for this program
+        const extension = await ProgramExtension.findOne({
+            userId,
+            originalProgramId,
+        });
 
-    if (extension && extension.isActivated) {
-      // Return combined duration: original + extended
-      return parseInt(user.duration) + extension.extensionDuration;
+        if (extension && extension.isActivated) {
+            // Return combined duration: original + extended
+            return parseInt(user.duration) + extension.extensionDuration;
+        }
+
+        return parseInt(user.duration) || 0;
+    } catch (error) {
+        console.error('Error getting total duration with extensions:', error.message);
+        return 0;
     }
-
-    return parseInt(user.duration) || 0;
-  } catch (error) {
-    console.error('Error getting total duration with extensions:', error.message);
-    return 0;
-  }
 };
 
 export { getTotalProgramDurationWithExtensions };
@@ -38,7 +38,7 @@ export const getUserComplianceStats = async (
 ) => {
     try {
         const userSubmission = await TaskSubmission.findOne({ userId });
-        
+
         if (!userSubmission || !programPlan) {
             return {
                 overall: 0,
@@ -60,7 +60,7 @@ export const getUserComplianceStats = async (
                 exercises: day.exercises || []
             }))
         ) || [];
-        
+
         const daysWithTherapy = therapyPlan?.weeks?.flatMap((week, weekIndex) =>
             week.days.map((day, dayIndex) => ({
                 weekIndex: weekIndex + 1,
@@ -72,8 +72,8 @@ export const getUserComplianceStats = async (
 
         // Count expected tasks
         const isWeightLoss = programTitle?.toLowerCase().includes("weight loss");
-        const mealCountPerDay = isWeightLoss ? 5 : 6;
-        
+        const mealCountPerDay = isWeightLoss ? 4 : 5;
+
         // Calculate Total Program Days for overall completion stats
         const totalProgramDays = parseInt(programPlan.duration.split(" ")[0] || 0);
 
@@ -85,7 +85,7 @@ export const getUserComplianceStats = async (
             expectedWorkouts += day.exercises.filter(ex => !ex.type || ex.type === 'Workout').length;
             expectedTherapy += day.exercises.filter(ex => ex.type === 'Therapy').length;
         });
-        
+
         daysWithTherapy.forEach(day => {
             expectedTherapy += day.therapies.length;
         });
@@ -112,23 +112,23 @@ export const getUserComplianceStats = async (
         });
 
         // Calculate percentages
-        const workoutCompliance = expectedWorkouts > 0 
-            ? Math.round((completedWorkouts / expectedWorkouts) * 100) 
+        const workoutCompliance = expectedWorkouts > 0
+            ? Math.round((completedWorkouts / expectedWorkouts) * 100)
             : 0;
-        
-        const dietCompliance = expectedMeals > 0 
-            ? Math.round((completedMeals / expectedMeals) * 100) 
+
+        const dietCompliance = expectedMeals > 0
+            ? Math.round((completedMeals / expectedMeals) * 100)
             : 0;
-        
-        const therapyCompliance = expectedTherapy > 0 
-            ? Math.round((completedTherapy / expectedTherapy) * 100) 
+
+        const therapyCompliance = expectedTherapy > 0
+            ? Math.round((completedTherapy / expectedTherapy) * 100)
             : 0;
 
         // Calculate overall compliance
         const totalExpected = expectedWorkouts + expectedMeals + expectedTherapy;
         const totalCompleted = completedWorkouts + completedMeals + completedTherapy;
-        const overallCompliance = totalExpected > 0 
-            ? Math.round((totalCompleted / totalExpected) * 100) 
+        const overallCompliance = totalExpected > 0
+            ? Math.round((totalCompleted / totalExpected) * 100)
             : 0;
 
         // Calculate trend compliance data for last N days (default 7)
@@ -190,11 +190,11 @@ export const getUserComplianceStats = async (
 
         const monthwiseData = [];
         const monthsToCalc = durationInMonths || 12;
-        
+
         for (let m = 0; m < monthsToCalc; m++) {
             const mEnd = currentGlobalDay - (m * 30);
             const mStart = Math.max(1, currentGlobalDay - ((m + 1) * 30) + 1);
-            
+
             if (mEnd < 1) break;
 
             let mExpWorkouts = 0, mExpMeals = 0, mExpTherapy = 0;
@@ -202,22 +202,22 @@ export const getUserComplianceStats = async (
 
             const checkM = (idx) => idx >= mStart && idx <= mEnd;
 
-             daysWithPlan.forEach(day => {
+            daysWithPlan.forEach(day => {
                 if (checkM(day.globalIndex)) {
                     mExpWorkouts += day.exercises.filter(ex => !ex.type || ex.type === 'Workout').length;
                     mExpTherapy += day.exercises.filter(ex => ex.type === 'Therapy').length;
                 }
             });
-             daysWithTherapy.forEach(day => {
+            daysWithTherapy.forEach(day => {
                 if (checkM(day.globalIndex)) {
                     mExpTherapy += day.therapies.length;
                 }
             });
-            
+
             const mDaysCount = Math.max(0, mEnd - mStart + 1);
             mExpMeals = mDaysCount * mealCountPerDay;
-            
-             userSubmission.dailySubmissions.forEach(day => {
+
+            userSubmission.dailySubmissions.forEach(day => {
                 if (checkM(day.globalDayIndex)) {
                     day.exercises.forEach(ex => {
                         if (ex.status === 'verified') {
@@ -228,15 +228,15 @@ export const getUserComplianceStats = async (
                     });
                 }
             });
-            
+
             const mTotalExp = mExpWorkouts + mExpMeals + mExpTherapy;
             const mTotalComp = mCompWorkouts + mCompMeals + mCompTherapy;
             const monthComp = mTotalExp > 0 ? Math.round((mTotalComp / mTotalExp) * 100) : 0;
-            
+
             const userStartMs = user.createdAt ? new Date(user.createdAt).getTime() : Date.now();
             const dateOfBlock = new Date(userStartMs + ((mStart - 1) * 24 * 60 * 60 * 1000));
             const monthName = dateOfBlock.toLocaleString('default', { month: 'short' });
-            
+
             monthwiseData.unshift({
                 month: monthName,
                 compliance: monthComp
@@ -284,7 +284,7 @@ export const calculateUserStreaks = async (userId) => {
 
         // Get all dates with at least one verified task
         const activeDates = new Set();
-        
+
         userSubmission.dailySubmissions.forEach(day => {
             day.exercises.forEach(ex => {
                 if (ex.status === 'verified' && ex.updatedAt) {
@@ -324,26 +324,26 @@ export const calculateUserStreaks = async (userId) => {
             if (currentStreak > longestStreak) {
                 longestStreak = currentStreak;
             }
-            
+
             streakEnd = dateStr;
             prevDate = currentDate;
         }
 
         // Calculate Active Streak
-        
+
         const today = new Date();
         const todayStr = today.toISOString().split('T')[0];
-        
+
         const yesterday = new Date(today);
         yesterday.setDate(yesterday.getDate() - 1);
         const yesterdayStr = yesterday.toISOString().split('T')[0];
-        
+
         let activeStreak = 0;
-        
+
         // Check if the very last active date was today or yesterday
 
         if (streakEnd === todayStr || streakEnd === yesterdayStr) {
-             activeStreak = currentStreak;
+            activeStreak = currentStreak;
         } else {
             activeStreak = 0;
         }
