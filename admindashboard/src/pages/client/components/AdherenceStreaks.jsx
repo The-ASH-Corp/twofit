@@ -8,6 +8,7 @@ import {
   Dumbbell,
   UtensilsCrossed,
 } from "lucide-react";
+import { dualEdgeDepthShadow } from "../habit/HabitTracker";
 
 const STREAK_TYPES = [
   {
@@ -103,24 +104,25 @@ export default function AdherenceStreaks({ user, className }) {
         {STREAK_TYPES.map((type, idx) => {
           const Icon = type.icon;
           const stats = renderedStreakByType[type.key];
-          
+
           let iconBg = "bg-[#DAE7E4]";
           let iconColor = "text-[#0A4F48]";
-          
-          if (type.key === 'water') {
-             iconBg = "bg-[#DFE3FE]";
-             iconColor = "text-[#471EFA]"; 
-          } else if (type.key === 'habit') {
-             iconBg = "bg-[#EEE7DD]";
-             iconColor = "text-[#754117]"; 
-          } else if (type.key === 'diet') {
-             iconBg = "bg-[#DDEEEA]";
+
+          if (type.key === "water") {
+            iconBg = "bg-[#DFE3FE]";
+            iconColor = "text-[#471EFA]";
+          } else if (type.key === "habit") {
+            iconBg = "bg-[#EEE7DD]";
+            iconColor = "text-[#754117]";
+          } else if (type.key === "diet") {
+            iconBg = "bg-[#DDEEEA]";
           }
 
           return (
             <div
               key={type.key}
-              className="bg-[#F8FBF9] rounded-[30px] p-2.5 pr-4 sm:pr-6 flex items-center justify-between shadow-sm"
+              className="bg-[#F8FBF9] rounded-[30px] p-2.5 pr-4 sm:pr-6 flex items-center justify-between shadow-sm hover:scale-101 transition-all duration-300 ease-in-out"
+              style={dualEdgeDepthShadow}
             >
               <div className="flex items-center gap-4 sm:gap-6">
                 <div
@@ -134,13 +136,17 @@ export default function AdherenceStreaks({ user, className }) {
                   </span>
                   <div className="flex flex-col gap-0.5">
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-[14px] sm:text-[15px] font-black text-[#0A4F48] leading-none">{stats.current}</span>
+                      <span className="text-[14px] sm:text-[15px] font-black text-[#0A4F48] leading-none">
+                        {stats.current}
+                      </span>
                       <span className="text-[9px] sm:text-[10px] font-black tracking-widest text-[#9AABA3] uppercase">
                         Cur
                       </span>
                     </div>
                     <div className="flex items-baseline gap-1.5">
-                      <span className="text-[13px] sm:text-[14px] font-bold text-[#A2AFA8] leading-none">{stats.longest}</span>
+                      <span className="text-[13px] sm:text-[14px] font-bold text-[#A2AFA8] leading-none">
+                        {stats.longest}
+                      </span>
                       <span className="text-[9px] sm:text-[10px] font-bold tracking-widest text-[#A2AFA8] uppercase">
                         Max
                       </span>
@@ -150,24 +156,28 @@ export default function AdherenceStreaks({ user, className }) {
               </div>
 
               {/* Milestones Bubbles */}
-              <div className="flex items-center gap-1.5 sm:gap-3">
+              <div className="flex items-center gap-1.5 sm:gap-3 " >
                 {type.milestones.map((m) => {
-                   const unlocked = stats.longest >= m;
-                   
-                   // Diet specific bright cyan active unlock from image reference
-                   const activeBgColor = type.key === 'diet' && unlocked ? "bg-[#7BFCE2] text-[#0A4F48]" 
-                                         : type.key === 'water' && unlocked ? "bg-[#B0BBFE] text-white"
-                                         : unlocked ? "bg-[#0A4F48] text-[#A7F3D0]" // standard dark green fallback
-                                         : "bg-[#EAEEEB] text-[#AAB4B0]"; // Locked grey bubble
-                   
-                   return (
-                     <span
-                        key={m}
-                        className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-full flex items-center justify-center text-[8px] sm:text-[10px] lg:text-[11px] font-black tracking-tighter ${activeBgColor}`}
-                     >
-                       {m}d
-                     </span>
-                   )
+                  const unlocked = stats.longest >= m;
+
+                  // Diet specific bright cyan active unlock from image reference
+                  const activeBgColor =
+                    type.key === "diet" && unlocked
+                      ? "bg-[#7BFCE2] text-[#0A4F48]"
+                      : type.key === "water" && unlocked
+                        ? "bg-[#B0BBFE] text-white"
+                        : unlocked
+                          ? "bg-[#0A4F48] text-[#A7F3D0]" // standard dark green fallback
+                          : "bg-[#EAEEEB] text-[#AAB4B0]"; // Locked grey bubble
+
+                  return (
+                    <span
+                      key={m}
+                      className={`w-8 h-8 sm:w-10 sm:h-10 lg:w-11 lg:h-11 rounded-full flex items-center justify-center text-[8px] sm:text-[10px] lg:text-[11px] font-black tracking-tighter ${activeBgColor}`}
+                    >
+                      {m}d
+                    </span>
+                  );
                 })}
               </div>
             </div>
