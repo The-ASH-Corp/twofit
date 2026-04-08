@@ -16,7 +16,13 @@ const coachSchema = new mongoose.Schema(
 
     address: { type: String, required: true },
 
-    role: { type: String, required: true, enum: ["Trainer","Dietician", "Therapist"] },
+    profilePhoto: { type: String, default: "" },
+
+    role: {
+      type: String,
+      required: true,
+      enum: ["Trainer", "Dietician", "Therapist"],
+    },
 
     specialization: { type: Array, required: true },
 

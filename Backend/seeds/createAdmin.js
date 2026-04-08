@@ -15,10 +15,11 @@ const founderSchema = new mongoose.Schema(
 
     role: { type: String, required: true },
     dob: { type: Date },
-    gender: { type: String, enum: ["Male", "Female", "Other"] },
+    gender: { type: String, enum: ["male", "female", "other"] },
     phone: { type: String },
     address: { type: String },
     status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
+    profilePhoto: { type: String, default: "" },
   },
   { timestamps: true, strict: false },
 );

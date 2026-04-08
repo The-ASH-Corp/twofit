@@ -9,15 +9,18 @@ const adminSchema = new mongoose.Schema(
     password: { type: String, required: true },
     dob: { type: String, required: true },
     gender: { type: String, required: true, enum: ["male", "female", "other"] },
+    profilePhoto: { type: String, default: "" },
     specialization: {
       type: Array,
       required: true,
     },
-    program:[ {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "ProgramsList",
-      required: true,
-    }],
+    program: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ProgramsList",
+        required: true,
+      },
+    ],
     salary: { type: Number, default: 0 },
     role: { type: String, default: "admin" },
     experts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Coach" }],
@@ -26,9 +29,9 @@ const adminSchema = new mongoose.Schema(
     automatedReminder: { type: Boolean, default: false },
     status: { type: String, default: "Active" },
     headId: { type: mongoose.Schema.Types.ObjectId, ref: "Heads" },
-    experience: { type: String, required: true },  
+    experience: { type: String, required: true },
     qualification: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 export const AdminModel = mongoose.model("Admin", adminSchema);

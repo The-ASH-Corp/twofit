@@ -24,6 +24,7 @@ import {
   editProfile,
   refreshProfile,
 } from "@/redux/features/auth/auth.thunk";
+import { assets } from "@/assets/asset";
 
 const DetailItem = ({ icon: Icon, label, value, className = "" }) => (
   <div
@@ -49,6 +50,8 @@ const Profile = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isChangePasswordMode, setIsChangePasswordMode] = useState(false);
 
+  const [preview, setPreview] = useState(null);
+
   const [profileForm, setProfileForm] = useState({
     name: "",
     dob: "",
@@ -56,6 +59,7 @@ const Profile = () => {
     email: "",
     phone: "",
     address: "",
+    profilePhoto: null,
   });
 
   const [passwordForm, setPasswordForm] = useState({
@@ -95,16 +99,30 @@ const Profile = () => {
       email: user?.email || "",
       phone: user?.phone || "",
       address: user?.address || "",
+      profilePhoto: null,
     });
+    
     setIsEditMode(true);
   };
 
-  const handleProfileChange = (e) => {
+const handleProfileChange = (e) => {
+  const { name, value, files } = e.target;
+
+  if (files) {
+    const file = files[0];
+
+    setPreview(URL.createObjectURL(file)); // ✅ preview
     setProfileForm({
       ...profileForm,
-      [e.target.name]: e.target.value,
+      [name]: file,
     });
-  };
+  } else {
+    setProfileForm({
+      ...profileForm,
+      [name]: value,
+    });
+  }
+};
 
   const handlePasswordChange = (e) => {
     setPasswordForm({
@@ -116,7 +134,14 @@ const Profile = () => {
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
     try {
-      await dispatch(editProfile(profileForm)).unwrap();
+      const formData = new FormData();
+
+      Object.keys(profileForm).forEach((key) => {
+        if (profileForm[key] !== null) {
+          formData.append(key, profileForm[key]);
+        }
+      });
+      await dispatch(editProfile(formData)).unwrap();
       await dispatch(
         refreshProfile({ id: user?._id, role: user.role }),
       ).unwrap();
@@ -166,11 +191,11 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-16 font-sans selection:bg-teal-100 selection:text-teal-900">
       {/* Top Banner with Modern Pattern */}
-      <div className="h-[280px] bg-[#0A4F48] relative overflow-hidden rounded-b-[40px] lg:rounded-b-[80px] shadow-lg">
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0A4F48] via-[#0d645c] to-[#0A4F48]"></div>
+      <div className="h-[280px] bg-[#0A4F48] relative overflow-hidden rounded-b-5xl lg:rounded-b-[80px] shadow-lg">
+        <div className="absolute inset-0 bg-linear-to-r from-[#0A4F48] via-[#0d645c] to-[#0A4F48]"></div>
         {/* Abstract Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-20 pointer-events-none mix-blend-overlay">
-          <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full border-[40px] border-white/20 blur-xl"></div>
+          <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full border-10 border-white/20 blur-xl"></div>
           <div className="absolute bottom-10 -left-20 w-72 h-72 rounded-full border-[30px] border-white/20 blur-xl"></div>
           <div className="absolute top-1/2 left-1/4 w-40 h-40 bg-white rounded-full blur-3xl opacity-30"></div>
         </div>
@@ -179,8 +204,8 @@ const Profile = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-56 relative z-10 transition-all duration-500">
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
           {/* Left Column: Interactive Profile Card */}
-          <div className="lg:w-[380px] flex-shrink-0 flex flex-col gap-6">
-            <div className="bg-white rounded-[32px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 overflow-hidden relative backdrop-blur-xl bg-white/95">
+          <div className="lg:w-[380px] shrink-0 flex flex-col gap-6">
+            <div className="bg-white rounded-4xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 overflow-hidden relative backdrop-blur-xl bg-white/95">
               <div className="h-32 bg-gray-50/50 relative border-b border-gray-100/50">
                 <button
                   onClick={handleEditProfile}
@@ -195,12 +220,19 @@ const Profile = () => {
                 {/* Modern Avatar Ring */}
                 <div className="absolute -top-16">
                   <div className="w-32 h-32 rounded-3xl rotate-3 shadow-xl bg-white p-2 transition-transform duration-500 hover:rotate-6">
-                    <div className="w-full h-full -rotate-3 bg-gradient-to-br from-[#0A4F48] to-[#136e65] rounded-2xl flex items-center justify-center text-5xl font-bold text-white shadow-inner relative overflow-hidden group">
-                      <span className="relative z-10 drop-shadow-md">
-                        {user?.name?.charAt(0).toUpperCase()}
-                      </span>
-                      <div className="absolute inset-0 bg-black/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                    </div>
+                    {!user?.profilePhoto ? (
+                      <div className="w-full h-full -rotate-3 bg-gradient-to-br from-[#0A4F48] to-[#136e65] rounded-2xl flex items-center justify-center text-5xl font-bold text-white shadow-inner relative overflow-hidden group">
+                        <span className="relative z-10 drop-shadow-md">
+                          {user?.name?.charAt(0).toUpperCase()}
+                        </span>
+                        <div className="absolute inset-0 bg-black/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                      </div>
+                    ) : (
+                      <img
+                        className="-rotate-3 border rounded-2xl h-full w-full"
+                        src={`${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}${user?.profilePhoto}`}
+                      />
+                    )}
                   </div>
                 </div>
 
@@ -374,6 +406,37 @@ const Profile = () => {
               className="flex-1 overflow-y-auto px-8 py-6 space-y-6 custom-scrollbar"
             >
               <div className="space-y-5">
+                <div className="">
+                  {/* Preview Image */}
+                  <div className="mb-3 flex flex-col items-center gap-1">
+                    <label className="block text-[14px] font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">
+                      PROFILE PHOTO
+                    </label>
+                    <label className="cursor-pointer">
+                      <img
+                        src={
+                          preview
+                            ? preview
+                            : user?.profilePhoto
+                              ? `${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}${user?.profilePhoto}`
+                              : assets.profileVector
+                        }
+                        className="w-24 h-24 object-fill rounded-xl border hover:opacity-80"
+                      />
+                      <input
+                        type="file"
+                        name="profilePhoto"
+                        accept="image/*"
+                        onChange={handleProfileChange}
+                        className="hidden"
+                      />
+                    </label>
+
+                    <p className="text-xs text-gray-500">
+                      Click image to change
+                    </p>
+                  </div>
+                </div>
                 <div>
                   <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">
                     Full Name
@@ -381,7 +444,7 @@ const Profile = () => {
                   <input
                     type="text"
                     name="name"
-                    value={profileForm.name}
+                    value={profileForm?.name}
                     onChange={handleProfileChange}
                     className="w-full px-5 py-3.5 bg-gray-50 border-0 rounded-2xl text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0A4F48]/20 focus:bg-white transition-all shadow-sm"
                     required
@@ -415,9 +478,9 @@ const Profile = () => {
                       className="w-full px-5 py-3.5 bg-gray-50 border-0 rounded-2xl text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0A4F48]/20 focus:bg-white transition-all shadow-sm appearance-none"
                     >
                       <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
                     </select>
                     <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                       <svg
