@@ -364,15 +364,7 @@ export default function WorkoutTasksPage() {
     );
   }
 
-  const handlePlaySimulate = () => {
-    const videoElement = document.querySelector("video");
-    if (!videoElement) return;
-    if (videoElement.paused) {
-      void videoElement.play();
-    } else {
-      videoElement.pause();
-    }
-  };
+
 
   const completionProgress = workoutTasks.length
     ? Math.round((watchedVideos.size / workoutTasks.length) * 100)
@@ -381,14 +373,7 @@ export default function WorkoutTasksPage() {
     workoutTasks.length - watchedVideos.size,
     0,
   );
-  const estimatedCalories = Math.max(workoutTasks.length * 120 + 2, 0);
-  const avgHeartRate = effortRating ? 118 + effortRating * 3 : 142;
 
-  const todayDisplay = new Intl.DateTimeFormat("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date());
 
   return (
     <div className="client-page-container p-5 sm:p-6 lg:p-7">
@@ -477,8 +462,8 @@ export default function WorkoutTasksPage() {
               <div className="inline-flex items-center rounded-full border border-[#D1E0D7] bg-[#F5F9F7] px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.13em] text-[#0A7B4E]">
                 Active Focal Module
               </div>
-              <h2 className="mt-4 text-[22px] leading-tight font-black text-[#1A2621] sm:text-[26px] lg:text-[30px]">
-                {selectedTask?.name || "Exercise Overview"}
+              <h2 className="mt-4 text-[22px] leading-tight font-black text-[#1A2621] sm:text-[26px] lg:text-[30px] flex items-center gap-2">
+                {selectedTask?.name || "Exercise Overview"} <span className="text-[15.5px] leading-relaxed font-medium text-[#5A6D63]">:- {selectedTask?.notes}</span>
               </h2>
               <p className="mt-3 text-[15.5px] leading-relaxed font-medium text-[#5A6D63]">
                 {selectedTask?.description ||
@@ -612,7 +597,7 @@ export default function WorkoutTasksPage() {
                           />
                         ) : (
                           <div className="h-full w-full flex items-center justify-center opacity-20">
-                            <Zap size={16} />
+                            <Zap size={16} /> 
                           </div>
                         )}
 
@@ -661,9 +646,10 @@ export default function WorkoutTasksPage() {
                         >
                           {task.name || `Exercise ${idx + 1}`}
                         </h4>
-                        <p className="mt-1 text-[11px] font-bold text-[#8FA097] uppercase tracking-wider">
+                        {/* <p className="mt-1 text-[11px] font-bold text-[#8FA097] uppercase tracking-wider">
                           {formatTaskTarget(task)}
-                        </p>
+                          {task.notes}
+                        </p> */}
                       </div>
 
                       {isActive && (
