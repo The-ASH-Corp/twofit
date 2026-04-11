@@ -27,6 +27,7 @@ import {
 } from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { SyncLoader } from "react-spinners";
+import { dualEdgeDepthShadow } from "../habit/HabitTracker";
 
 export default function Progress() {
   const [program, setProgram] = useState(null);
@@ -412,7 +413,8 @@ export default function Progress() {
                   return (
                     <div
                       key={item.title}
-                      className="flex items-center justify-between rounded-[20px] border border-[#DEE7E2] bg-[#EFF3F1] px-4 py-3 shadow-[inset_1px_1px_0_rgba(255,255,255,0.88),inset_-1px_-1px_0_rgba(181,196,187,0.26),0_6px_10px_rgba(157,172,164,0.12)]"
+                      className="flex items-center justify-between rounded-[20px] border border-[#DEE7E2] bg-[#EFF3F1] px-4 py-3 shadow-[inset_1px_1px_0_rgba(255,255,255,0.88),inset_-1px_-1px_0_rgba(181,196,187,0.26),0_6px_10px_rgba(157,172,164,0.12)] hover:scale-101 transition-all duration-300 ease-in-out"
+                      style={dualEdgeDepthShadow}
                     >
                       <span className="inline-flex items-center gap-2.5 text-[16px] font-black text-[#2F3E38]">
                         <Icon size={18} className="text-[#0A7B4E]" />
