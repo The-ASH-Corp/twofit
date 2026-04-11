@@ -13,7 +13,7 @@ export default function HeroCard({ program, currentGlobalDay }) {
       <div className="absolute bottom-0 right-4 h-[148px] w-[204px] rounded-t-[120px] rounded-b-[18px] bg-[rgba(10,79,72,0.06)]" />
 
       <div className="relative z-10 flex h-full items-center">
-        <div className="flex flex-1 flex-col pr-[120px] sm:pr-[200px] lg:pr-[240px]">
+        <div className="flex flex-1 flex-col pr-[120px] sm:pr-[200px] lg:pr-60">
           <h2 className="client-title text-[28px] sm:text-[34px] lg:text-[40px] leading-[1.1] tracking-[-0.02em]">
             {titleBase}
           </h2>
