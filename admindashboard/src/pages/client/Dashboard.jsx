@@ -22,6 +22,7 @@ import WeeklyCheckInModal from "./components/WeeklyCheckInModal.jsx";
 import { submitWeeklyCheckIn } from "@/redux/features/client/client.thunk";
 import { toast } from "react-toastify";
 import DashboardTrendCards from "./components/DashboardTrendCards";
+import ClientDetails from "./components/ClientDetails";
 
 export default function Dashboard() {
   const [program, setProgram] = useState(null);
@@ -179,6 +180,10 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <HeroCard program={program} currentGlobalDay={currentGlobalDay} />
             <WaterIntake currentGlobalDay={currentGlobalDay} />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-1">
+            <ClientDetails user={user} />
           </div>
 
           {/* Row 2: Stats Grid */}
