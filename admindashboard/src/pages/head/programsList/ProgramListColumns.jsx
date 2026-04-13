@@ -1,4 +1,3 @@
-
 const statusColors = {
   Active: "bg-[#45C4A2] text-white",
   Inactive: "bg-[#66706D] text-white",
@@ -6,16 +5,14 @@ const statusColors = {
 };
 
 export const ProgramListColumns = [
-
   { accessorKey: "title", header: "Program Name" },
   { accessorKey: "duration", header: "Duration" },
-  { header: "category",
-    cell:({row})=>(
-      <span className=" capitalize">
-      {row.original.category?.name || "—"}
-    </span>
-   )
-},
+  {
+    header: "category",
+    cell: ({ row }) => (
+      <span className=" capitalize">{row.original.category?.name || "—"}</span>
+    ),
+  },
 
   {
     accessorKey: "status",
