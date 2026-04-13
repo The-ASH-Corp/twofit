@@ -283,6 +283,13 @@ export const updateCoachById = async (coachId, updatedData) => {
 };
 
 export const deleteCoachById = async (coachId) => {
+  const coach = await CoachModel.findById(coachId);
+  if (coach && coach.adminId) {
+    await AdminModel.findByIdAndUpdate(
+      coach.adminId,
+      { $pull: { experts: coachId } }
+    );
+  }
   return await CoachModel.findByIdAndDelete(coachId);
 };
 
