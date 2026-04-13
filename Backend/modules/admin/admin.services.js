@@ -554,3 +554,48 @@ export const founderAdminList = async (page, limit) => {
   }
 };
 
+export const deleteAdmin = async (adminId) => {
+  const admin = await AdminModel.findById(adminId);
+  if (!admin) {
+    throw new Error("Admin not found");
+  }
+  if (admin.experts && admin.experts.length > 0) {
+    throw new Error("Remove the experts and clients for delete admin");
+  }
+  await AdminModel.findByIdAndDelete(adminId);
+  return true;
+};
+
+export const editAdmin = async (adminId, adminData) => {
+  const admin = await AdminModel.findById(adminId);
+  if (!admin) {
+    throw new Error("Admin not found");
+  }
+
+  if (adminData.password) {
+    adminData.password = await hashPassword(adminData.password);
+  } else {
+    delete adminData.password;
+  }
+
+  if (adminData.fullname) {
+    adminData.name = capitalizeFirst(adminData.fullname);
+  }
+
+  if (adminData.chooseProgram) {
+    adminData.program = adminData.chooseProgram;
+  }
+
+  if (adminData.baseSalary) {
+     adminData.salary = adminData.baseSalary;
+  }
+
+  const updatedAdmin = await AdminModel.findByIdAndUpdate(
+    adminId,
+    { $set: adminData },
+    { new: true }
+  );
+
+  return updatedAdmin;
+};
+

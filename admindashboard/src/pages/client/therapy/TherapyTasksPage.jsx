@@ -1,6 +1,5 @@
 import { 
   Brain, 
-  CalendarDays,
   CheckCircle2, 
   Lock, 
   PlayCircle, 
@@ -8,9 +7,7 @@ import {
   Wind, 
   Accessibility, 
   PenLine, 
-  Play, 
   Check, 
-  ChevronRight,
   Pause
 } from "lucide-react";
 import { SyncLoader } from "react-spinners";
@@ -30,18 +27,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 
-function MetricItem({ label, value }) {
-  return (
-    <div className="rounded-[14px]  p-3 sm:p-4">
-      <p className="text-[10px] font-black uppercase tracking-[0.12em] text-[#82938B]">
-        {label}
-      </p>
-      <p className="mt-1 text-[21px] font-black leading-none text-[#087B44]">
-        {value}
-      </p>
-    </div>
-  );
-}
 
 export default function TherapyTasksPage() {
   const dispatch = useDispatch();
@@ -517,7 +502,7 @@ export default function TherapyTasksPage() {
                              {task.name}
                           </h4>
                           <p className="mt-1 text-[11px] font-bold text-[#8FA097] uppercase tracking-wider">
-                             {task.technique}
+                             {task.notes}
                           </p>
                        </div>
 

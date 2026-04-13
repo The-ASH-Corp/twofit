@@ -14,4 +14,6 @@ router.get("/get-all-coaches-by-admin/:adminId/:page/:limit", authMiddleware, ad
 
 router.get("/dashboard-data/:adminId", authMiddleware, adminController.getDashboardData)
 router.get("/get-admin-by-head/:headId/:page/:limit", authMiddleware, adminController.getAdminByHead)
+router.delete("/delete-admin/:id", authMiddleware, adminController.deleteAdmin)
+router.put("/edit-admin/:id", authMiddleware, adminController.editAdmin)
 export default router;

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { IoMdClose } from "react-icons/io";
 import { BsThreeDotsVertical } from "react-icons/bs";
 
-const ActionMenu = ({ row, editActionPath, deleteActionPath }) => {
+const ActionMenu = ({ row, editActionPath, deleteActionPath, onEdit, onDelete }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -21,7 +21,9 @@ const ActionMenu = ({ row, editActionPath, deleteActionPath }) => {
     setIsOpen(false);
     // Use row.original._id primarily, fallout to row.id if needed
     const id = row.original?._id || row.original?.id || row.id;
-    if (editActionPath && id) {
+    if (onEdit) {
+      onEdit(row);
+    } else if (editActionPath && id) {
       navigate(`${editActionPath}${id}`);
     }
   };
@@ -30,7 +32,9 @@ const ActionMenu = ({ row, editActionPath, deleteActionPath }) => {
     e.stopPropagation(); // Stop event from bubbling to document
     setIsOpen(false);
     const id = row.original?._id || row.original?.id || row.id;
-    if (deleteActionPath && id) {
+    if (onDelete) {
+        onDelete(row);
+    } else if (deleteActionPath && id) {
       navigate(`${deleteActionPath}${id}`);
     }
   };
@@ -57,7 +61,7 @@ const ActionMenu = ({ row, editActionPath, deleteActionPath }) => {
             className="absolute right-0 top-full mt-1 w-36 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-[100] flex flex-col"
             onClick={(e) => e.stopPropagation()} 
         >
-            {editActionPath && (
+            {(editActionPath || onEdit) && (
               <button
                 type="button"
                 onClick={handleEdit}
@@ -66,7 +70,7 @@ const ActionMenu = ({ row, editActionPath, deleteActionPath }) => {
                 Edit
               </button>
             )}
-            {deleteActionPath && (
+            {(deleteActionPath || onDelete) && (
               <button
                 type="button"
                 onClick={handleDelete}
