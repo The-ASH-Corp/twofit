@@ -100,3 +100,30 @@ export const getFounderAdminList = async (req, res) => {
     });
   }
 }
+
+export const deleteAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await service.deleteAdmin(id);
+    res.status(200).json({
+      success: true,
+      message: "Admin deleted successfully",
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+export const editAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const admin = await service.editAdmin(id, req.body);
+    res.status(200).json({
+      success: true,
+      data: admin,
+      message: "Admin updated successfully",
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};

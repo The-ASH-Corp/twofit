@@ -60,6 +60,7 @@ import HeadAdminsList from "./pages/head/admin/AdminsList";
 import HeadFinanceTable from "./pages/head/finance/FinanceTable";
 import HeadExpertTable from "./pages/head/experts/ExpertTable";
 import HeadAddAdmin from "./pages/head/admin/AdminForm";
+import HeadEditAdmin from "./pages/head/admin/AdminEditForm";
 import HeadExpertProfile from "./pages/head/experts/ExpertProfile";
 import HeadAdminProfile from "./pages/head/admin/AdminProfile";
 import HeadClientProfile from "./pages/head/clients/ClientProfile";
@@ -248,6 +249,7 @@ function App() {
           <Route path="experts" element={<HeadExpertTable />} />
           <Route path="finance" element={<HeadFinanceTable />} />
           <Route path="admins/add-admin" element={<HeadAddAdmin />} />
+          <Route path="admins/edit/:id" element={<HeadEditAdmin />} />
           <Route
             path="experts/profile/:expertId"
             element={<HeadExpertProfile />}

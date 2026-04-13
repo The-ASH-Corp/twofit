@@ -1,3 +1,6 @@
+import ActionMenu from "../../../components/actionMenu/ActionMenu";
+import { toast } from "react-toastify";
+
 const expertColors = {
   Dietitian: "bg-[#FFF5ED] text-black",
   Therapist: "bg-[#E7F9F4] text-black",
@@ -46,5 +49,29 @@ export const AdminColumns = [
       );
     },
   },
-  { id: "actions", header: "Action", cell: () => "⋯" },
+  { 
+    id: "actions", 
+    header: "Action", 
+    cell: ({ row }) => {
+      const handleDelete = () => {
+        const expertsCount = row.original.experts?.length || 0;
+        if (expertsCount > 0) {
+          toast.error("Remove the experts and clients for delete admin");
+          return;
+        }
+        
+        // Dispatch to AdminsList for Delete or navigate
+        const event = new CustomEvent('open-delete-admin', { detail: { id: row.original._id, name: row.original.name } });
+        window.dispatchEvent(event);
+      };
+
+      return (
+        <ActionMenu 
+          row={row} 
+          editActionPath="/head/admins/edit/" 
+          onDelete={handleDelete} 
+        />
+      );
+    } 
+  },
 ];
