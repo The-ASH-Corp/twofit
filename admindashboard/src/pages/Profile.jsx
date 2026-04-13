@@ -111,7 +111,7 @@ const handleProfileChange = (e) => {
   if (files) {
     const file = files[0];
 
-    setPreview(URL.createObjectURL(file)); // ✅ preview
+    setPreview(URL.createObjectURL(file)); 
     setProfileForm({
       ...profileForm,
       [name]: file,
