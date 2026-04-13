@@ -64,7 +64,7 @@ const AdminCenterSide = ({ admin }) => {
             {personalInfo.map((item, i) => (
                 <div
                 key={i}
-                className="group flex items-center justify-between py-4 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 px-3 -mx-3 rounded-lg transition-all"
+                className="group flex flex-col sm:flex-row sm:items-center justify-between py-4 border-b border-slate-100 last:border-0 hover:bg-slate-50/50 px-3 -mx-3 rounded-lg transition-all gap-2"
                 >
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-slate-100 rounded-lg text-slate-500 group-hover:text-[#0A4F48] group-hover:bg-[#0A4F48]/10 transition-colors">
@@ -75,8 +75,8 @@ const AdminCenterSide = ({ admin }) => {
                         </span>
                     </div>
                 
-                    <div className="flex items-center gap-2 flex-1 justify-end min-w-0">
-                        <span className={`text-sm font-semibold text-slate-700 text-right break-words ${item.content === "N/A" ? "text-slate-400 italic font-normal" : ""}`}>
+                    <div className="flex items-center gap-2 flex-1 sm:justify-end min-w-0 pl-11 sm:pl-0">
+                        <span className={`text-sm font-semibold text-slate-700 sm:text-right break-all ${item.content === "N/A" ? "text-slate-400 italic font-normal" : ""}`}>
                             {item.content}
                         </span>
                         
