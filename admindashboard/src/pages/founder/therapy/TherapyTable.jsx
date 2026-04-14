@@ -75,3 +75,4 @@ if (status === "loading")
 };
 
 export default TherapyTable;
+

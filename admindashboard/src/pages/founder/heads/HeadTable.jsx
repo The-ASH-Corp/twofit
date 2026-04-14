@@ -63,7 +63,9 @@ const HeadTable = () => {
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className={` ${heads?.length > 0 ? "pb-32" : "pb-0"} overflow-y-auto overflow-x-hidden no-scrollbar px-1`}>
+    <div
+      className={` ${heads?.length > 0 ? "pb-4" : "pb-0"} overflow-auto no-scrollbar px-1`}
+    >
       <BaseTable
         data={heads}
         columns={therapyColumns()}
