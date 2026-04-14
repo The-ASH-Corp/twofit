@@ -135,11 +135,24 @@ export const deleteSingleCategory = async (id) => {
 
 export const deleteAllCategory = async () => {
   try {
+    // Check if any category is in use by Heads or Programs
+    const [inUseInHeads, inUseInPrograms] = await Promise.all([
+      HeadsModel.exists({ programCategory: { $exists: true } }),
+      ProgramModel.exists({ category: { $exists: true } }),
+    ]);
+
+    if (inUseInHeads || inUseInPrograms) {
+      throw new Error(
+        "Cannot delete all categories. Some categories are currently in use by Heads or Programs.",
+      );
+    }
+
     return await categoryModel.deleteMany({});
   } catch (error) {
     throw error;
   }
 };
+
 
 export const founderCategoryList = async (page, limit) => {
   try {

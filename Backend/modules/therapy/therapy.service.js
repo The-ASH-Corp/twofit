@@ -54,5 +54,17 @@ export const updateTherapy = async (id, data) => {
 };
 
 export const deleteTherapy = async (id) => {
-  return await Therapy.findByIdAndDelete(id);
+  const usersAssigned = await User.findOne({ therapyType: id });
+  if (usersAssigned) {
+    return {
+      canDelete: false,
+      message: "Remove the assigned clients before deleting the therapy.",
+    };
+  }
+
+  await Therapy.findByIdAndDelete(id);
+  return {
+    canDelete: true,
+    message: "Therapy deleted successfully.",
+  };
 };
