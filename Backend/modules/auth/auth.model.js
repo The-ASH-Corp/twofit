@@ -41,6 +41,8 @@ const userSchema = new mongoose.Schema(
     weightHistory: [
       {
         weight: { type: Number, required: true },
+        frontPhoto: { type: String, default: "" },
+        sidePhoto: { type: String, default: "" },
         date: { type: Date, default: Date.now },
       },
     ],

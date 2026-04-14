@@ -246,10 +246,14 @@ export const getClientsBasedOnCoach = async (coachIds, page, limit) => {
   return { clients, totalCount };
 };
 
-export const updateWeightService = async (userId, currentWeight) => {
-  if (!currentWeight) {
+export const updateWeightService = async (userId, data) => {
+  if (!data.currentWeight) {
     throw new Error("Current weight is required");
   }
+
+   if (!data.sidePhoto && !data.frontPhoto) {
+     throw new Error("photo is required");
+   }
 
   const user = await User.findById(userId);
 
@@ -260,22 +264,24 @@ export const updateWeightService = async (userId, currentWeight) => {
   if (!user.weightHistory || user.weightHistory.length === 0) {
     user.weightHistory = [
       {
-        weight: currentWeight,
+        weight: data.currentWeight,
+        frontPhoto: data.frontPhoto,
+        sidePhoto: data.sidePhoto,
         date: new Date(),
         isInitial: true,
       },
     ];
   } else {
-    // Push subsequent weights
     user.weightHistory.push({
-      weight: currentWeight,
+      weight: data.currentWeight,
+      frontPhoto: data.frontPhoto,
+      sidePhoto: data.sidePhoto,
       date: new Date(),
       isInitial: false,
     });
   }
 
-  // Update current weight
-  user.currentWeight = currentWeight;
+  user.currentWeight = data.currentWeight;
 
   await user.save();
 
