@@ -13,6 +13,7 @@ import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import Unauthorized from "./pages/Unauthorized";
 import ForgotPasswordEmail from "./pages/ForgotPassword";
+import ReceivedSupport from "./pages/shared/growth/ReceivedSupport";
 
 //Founder Pages Imports
 import FounderLayout from "./pages/founder/layout/FounderLayout";
@@ -261,6 +262,7 @@ function App() {
           <Route path="notifications" element={<Notifications />} />
           <Route path="therapy" element={<HeadTherapyList />} />
           <Route path="therapy/plan/:id" element={<HeadTherapyPlan />} />
+          <Route path="growth-support" element={<ReceivedSupport />} />
         </Route>
 
         {/* ADMIN */}
@@ -315,6 +317,7 @@ function App() {
             path="therapy/plan/:id"
             element={<AdminTherapyPlanDetails />}
           />
+          <Route path="growth-support" element={<ReceivedSupport />} />
         </Route>
 
         {/* EXPERT */}
@@ -346,6 +349,7 @@ function App() {
           {/* <Route path="habit" element={<Habit/>}/> */}
           <Route path="clients/add-habit/:id" element={<Habit />} />
           <Route path="clients/habit/:habitId" element={<HabitDisplay />} />
+          <Route path="growth-support" element={<ReceivedSupport />} />
         </Route>
 
         {/* CLIENT */}

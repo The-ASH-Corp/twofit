@@ -42,6 +42,7 @@ const menuItems = [
       ]),
   { label: "Finance", icon: assets.finance, path: "/expert/finance" },
   { label: "Chats", icon: assets.chats, path: "/expert/chats" },
+  { label: "Growth Support", icon: assets.therapy, path: "/expert/growth-support" },
 ];
 
 

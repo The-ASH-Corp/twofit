@@ -19,6 +19,7 @@ import notificationRoutes from "../modules/notification/notification.routes.js";
 import sopRoutes from "../modules/sop/sop.route.js";
 import recipeRoutes from "../modules/recipe/recipe.route.js";
 import reminderRoutes from "../modules/autoReminder/reminder.route.js";
+import growthSupportRoutes from "../modules/growthSupport/growthSupport.routes.js";
 
 const router = express.Router();
 
@@ -42,6 +43,7 @@ router.use("/notifications", notificationRoutes)
 router.use("/sop", sopRoutes);
 router.use("/recipes", recipeRoutes);
 router.use("/reminder", reminderRoutes);
+router.use("/growth-support", growthSupportRoutes);
 
 
 

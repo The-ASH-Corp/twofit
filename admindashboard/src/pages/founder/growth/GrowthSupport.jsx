@@ -13,15 +13,18 @@ import {
   X,
   Plus,
   Check,
+  Loader2,
 } from "lucide-react";
 import BackgroundAnimation from "@/components/ui/BackgroundAnimation";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "@/redux/store/hooks";
+import { toast } from "react-toastify";
 
 // Thunks
 import { getFounderAllAdmins } from "@/redux/features/admins/admin.thunk";
 import { getFounderAllHeads } from "@/redux/features/head/head.thunk";
 import { getFounderAllCoaches } from "@/redux/features/coach/coach.thunk";
+import { sendSupportRequest } from "@/redux/features/growthSupport/growthSupport.thunk";
 
 // Selectors
 import { selectFounderAllAdmins } from "@/redux/features/admins/admins.selecters";
@@ -94,6 +97,7 @@ export default function GrowthSupport() {
   const [message, setMessage] = useState("");
   const [attachedFiles, setAttachedFiles] = useState([]);
   const [memberSearch, setMemberSearch] = useState("");
+  const [isSending, setIsSending] = useState(false);
   const fileInputRef = useRef(null);
 
   // Redux data
@@ -182,6 +186,55 @@ export default function GrowthSupport() {
     }
   };
 
+  const handleSendMessage = async () => {
+    if (!selectedRecipient) {
+      toast.error("Please pick a recipient type");
+      return;
+    }
+    if (!message.trim()) {
+      toast.error("Please enter a message");
+      return;
+    }
+
+    setIsSending(true);
+    const formData = new FormData();
+    formData.append("recipientType", selectedRecipient);
+    
+    // If no specific people selected, send to entire list
+    const finalRecipientIds = selectedPeople.length > 0 
+      ? selectedPeople.map(p => p.id)
+      : memberList.map(m => m._id || m.id);
+
+    if (finalRecipientIds.length === 0) {
+        toast.error(`No ${selectedRecipientMeta?.label}s available to receive this message`);
+        setIsSending(false);
+        return;
+    }
+
+    formData.append("recipientIds", JSON.stringify(finalRecipientIds));
+    formData.append("message", message);
+    
+    attachedFiles.forEach((file) => {
+      formData.append("attachments", file);
+    });
+
+    try {
+      const result = await dispatch(sendSupportRequest(formData)).unwrap();
+      if (result.success) {
+        toast.success("Support request sent successfully!");
+        // Reset form
+        setMessage("");
+        setAttachedFiles([]);
+        setSelectedRecipient(null);
+        setSelectedPeople([]);
+      }
+    } catch (err) {
+      toast.error(err || "Failed to send support request");
+    } finally {
+      setIsSending(false);
+    }
+  };
+
   // "Sending to" label
   const sendingTo = useMemo(() => {
     if (selectedPeople.length === 0) {
@@ -249,12 +302,13 @@ export default function GrowthSupport() {
                     <button
                       key={option.id}
                       type="button"
+                      disabled={isSending}
                       onClick={() => handleRecipientTypeClick(option.id)}
                       className={`w-full rounded-[20px] p-3.5 text-left transition-all duration-300 ${
                         isActive
                           ? "bg-[#F0F7F5] shadow-[0_10px_22px_-18px_rgba(10,79,72,0.7)] ring-1 ring-[#0A4F48]/20"
                           : "bg-[#F8FAF9] hover:bg-[#F1F5F4]"
-                      }`}
+                      } ${isSending ? "opacity-50 cursor-not-allowed" : ""}`}
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex min-w-0 items-center gap-3">
@@ -320,8 +374,9 @@ export default function GrowthSupport() {
                     {memberList.length > 0 && (
                       <button
                         type="button"
+                        disabled={isSending}
                         onClick={handleSelectAll}
-                        className="text-[10px] font-bold text-[#0A4F48] hover:underline"
+                        className="text-[10px] font-bold text-[#0A4F48] hover:underline disabled:opacity-50"
                       >
                         {selectedPeople.length === memberList.length
                           ? "Deselect All"
@@ -331,8 +386,9 @@ export default function GrowthSupport() {
                     {selectedPeople.length > 0 && (
                       <button
                         type="button"
+                        disabled={isSending}
                         onClick={() => setSelectedPeople([])}
-                        className="flex items-center gap-1 rounded-full bg-[#F1F5F4] px-2.5 py-1 text-[10px] font-bold text-[#4E615E] hover:bg-[#E5ECEA] transition-colors"
+                        className="flex items-center gap-1 rounded-full bg-[#F1F5F4] px-2.5 py-1 text-[10px] font-bold text-[#4E615E] hover:bg-[#E5ECEA] transition-colors disabled:opacity-50"
                       >
                         <X size={10} />
                         Clear
@@ -349,6 +405,7 @@ export default function GrowthSupport() {
                   />
                   <input
                     value={memberSearch}
+                    disabled={isSending}
                     onChange={(e) => setMemberSearch(e.target.value)}
                     placeholder={`Search ${selectedRecipientMeta?.label}s…`}
                     className="w-full rounded-[14px] bg-[#F4F7F6] py-2.5 pl-8 pr-3 text-[13px] text-[#1B3431] outline-none placeholder:text-[#9AA8A5] focus:ring-2 focus:ring-[#0A4F48]/15"
@@ -374,12 +431,13 @@ export default function GrowthSupport() {
                         <button
                           key={id}
                           type="button"
+                          disabled={isSending}
                           onClick={() => handlePersonSelect({ id, name })}
                           className={`w-full flex items-center gap-3 rounded-[14px] p-2.5 text-left transition-all duration-200 ${
                             isChosen
                               ? "bg-[#EAF4F2] ring-1 ring-[#0A4F48]/25"
                               : "hover:bg-[#F4F7F6]"
-                          }`}
+                          } ${isSending ? "opacity-50 cursor-not-allowed" : ""}`}
                         >
                           {/* selection indicator */}
                           <div
@@ -469,10 +527,11 @@ export default function GrowthSupport() {
 
               <textarea
                 value={message}
+                disabled={isSending}
                 onChange={(event) => setMessage(event.target.value)}
                 rows={10}
                 placeholder="Type your message here. Include the context, expected outcome, and any timing details your team should know."
-                className="min-h-[280px] w-full rounded-[26px] bg-[#F4F7F6] px-5 py-4 text-[15px] leading-7 text-[#1B3431] outline-none ring-0 placeholder:text-[#9AA8A5] focus:ring-2 focus:ring-[#0A4F48]/15"
+                className="min-h-[280px] w-full rounded-[26px] bg-[#F4F7F6] px-5 py-4 text-[15px] leading-7 text-[#1B3431] outline-none ring-0 placeholder:text-[#9AA8A5] focus:ring-2 focus:ring-[#0A4F48]/15 disabled:opacity-50"
               />
 
               <div className="mt-6 rounded-[28px] bg-[linear-gradient(180deg,rgba(248,250,249,0.95),rgba(241,245,244,0.85))] p-4 md:p-5">
@@ -480,14 +539,16 @@ export default function GrowthSupport() {
                   ref={fileInputRef}
                   type="file"
                   multiple
+                  disabled={isSending}
                   onChange={handleFilesChange}
                   className="hidden"
                 />
 
                 <button
                   type="button"
+                  disabled={isSending}
                   onClick={() => fileInputRef.current?.click()}
-                  className="group flex w-full flex-col items-center justify-center rounded-[24px] border border-dashed border-[#DDE5E2] bg-white/70 px-4 py-10 text-center transition-all duration-300 hover:bg-white"
+                  className="group flex w-full flex-col items-center justify-center rounded-[24px] border border-dashed border-[#DDE5E2] bg-white/70 px-4 py-10 text-center transition-all duration-300 hover:bg-white disabled:opacity-50"
                 >
                   <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#EAF4F2] text-[#0A4F48] shadow-[0_12px_20px_-18px_rgba(10,79,72,0.8)]">
                     <CloudUpload size={28} />
@@ -505,12 +566,24 @@ export default function GrowthSupport() {
 
                 {attachedFiles.length > 0 && (
                   <div className="mt-4 flex flex-wrap gap-2">
-                    {attachedFiles.map((file) => (
+                    {attachedFiles.map((file, idx) => (
                       <span
-                        key={`${file.name}-${file.size}`}
-                        className="rounded-full bg-[#F1F5F4] px-3 py-2 text-xs font-semibold text-[#4E615E]"
+                        key={`${file.name}-${idx}`}
+                        className="flex items-center gap-2 rounded-full bg-[#F1F5F4] px-3 py-2 text-xs font-semibold text-[#4E615E]"
                       >
                         {file.name}
+                        {!isSending && (
+                             <button 
+                                type="button" 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setAttachedFiles(prev => prev.filter((_, i) => i !== idx));
+                                }}
+                                className="text-[#FB5858] hover:scale-110 transition-transform"
+                             >
+                                <X size={12} />
+                             </button>
+                        )}
                       </span>
                     ))}
                   </div>
@@ -534,11 +607,21 @@ export default function GrowthSupport() {
 
                 <button
                   type="button"
-                  disabled={!selectedRecipient}
-                  className="inline-flex items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#0A4F48] to-[#117E72] px-8 py-3.5 text-sm font-extrabold uppercase tracking-[0.18em] text-white shadow-[0_18px_30px_-18px_rgba(10,79,72,0.9)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  disabled={!selectedRecipient || isSending}
+                  onClick={handleSendMessage}
+                  className="inline-flex min-w-[180px] items-center justify-center gap-3 rounded-full bg-gradient-to-r from-[#0A4F48] to-[#117E72] px-8 py-3.5 text-sm font-extrabold uppercase tracking-[0.18em] text-white shadow-[0_18px_30px_-18px_rgba(10,79,72,0.9)] transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                  Send Message
-                  <Send size={16} />
+                  {isSending ? (
+                      <>
+                        Sending...
+                        <Loader2 size={16} className="animate-spin" />
+                      </>
+                  ) : (
+                      <>
+                        Send Message
+                        <Send size={16} />
+                      </>
+                  )}
                 </button>
               </div>
             </section>
