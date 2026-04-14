@@ -8,7 +8,7 @@ import { HeadsModel } from "../Heads/heads.modal.js";
 import { CoachModel } from "../coach/coach.model.js";
 import { FounderModel } from "../../seeds/createAdmin.js";
 import { calculateExtraClientIncentive } from "../incentive/incentive.service.js";
-import { sendEmail } from "../../utils/email.js";
+import { sendEmail, sendOTPEmail } from "../../utils/email.js";
 import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 import {
   createNotification,
@@ -110,52 +110,74 @@ export const adminCreateUser = async (userData) => {
       dedupeKey: `plan-ready:${user._id}`,
     });
 
-    void sendEmail({
-        to: userData.email,
-        subject: "Welcome to TwoFit - Your Login Credentials",
-        html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background-color: #0A4F48; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
-          .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-          .credentials-box { background-color: white; border-left: 5px solid #0A4F48; padding: 20px; margin: 20px 0; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-          .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>Welcome to TwoFit!</h1>
-          </div>
-          <div class="content">
-            <p>Hello <strong>${userData.fullname}</strong>,</p>
-            <p>Your User account has been successfully created. Here are your login credentials:</p>
-            
-            <div class="credentials-box">
-              <p style="margin: 5px 0;"><strong>Email:</strong> ${userData.email}</p>
-              <p style="margin: 5px 0;"><strong>Password:</strong> ${password}</p>
-            </div>
-            
-            <p>Please log in and change your password immediately for security purposes.</p>
-            
-            <div style="text-align: center; margin-top: 30px;">
-              <a href="https://app.twofit.co/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
-            </div>
-          </div>
-          <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} TwoFit. All rights reserved.</p>
-            <p>This email was sent to ${userData.email}</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
-    }).catch((err) => console.error("❌ Failed to send user credentials email:", err.message));
+    // void sendEmail({
+    //     to: userData.email,
+    //     subject: "Welcome to TwoFit - Your Login Credentials",
+    //     html: `
+    //   <!DOCTYPE html>
+    //   <html>
+    //   <head>
+    //     <style>
+    //       body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    //       .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    //       .header { background-color: #0A4F48; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+    //       .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+    //       .credentials-box { background-color: white; border-left: 5px solid #0A4F48; padding: 20px; margin: 20px 0; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    //       .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+    //     </style>
+    //   </head>
+    //   <body>
+    //     <div class="container">
+    //       <div class="header">
+    //         <h1>Welcome to TwoFit!</h1>
+    //       </div>
+    //       <div class="content">
+    //         <p>Hello <strong>${userData.fullname}</strong>,</p>
+    //         <p>Your User account has been successfully created. Here are your login credentials:</p>
 
+    //         <div class="credentials-box">
+    //           <p style="margin: 5px 0;"><strong>Email:</strong> ${userData.email}</p>
+    //           <p style="margin: 5px 0;"><strong>Password:</strong> ${password}</p>
+    //         </div>
+
+    //         <p>Please log in and change your password immediately for security purposes.</p>
+
+    //         <div style="text-align: center; margin-top: 30px;">
+    //           <a href="https://app.twofit.co/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
+    //         </div>
+    //       </div>
+    //       <div class="footer">
+    //         <p>&copy; ${new Date().getFullYear()} TwoFit. All rights reserved.</p>
+    //         <p>This email was sent to ${userData.email}</p>
+    //       </div>
+    //     </div>
+    //   </body>
+    //   </html>
+    // `,
+    // }).catch((err) => console.error("❌ Failed to send user credentials email:", err.message));
+
+    function escapeHTML(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+    try {
+      await sendEmail({
+        email: userData.email,
+        fullName: userData.fullname,
+        password: escapeHTML(password),
+      });
+
+      console.log("EMAIL DEBUG:", {
+        email: userData.email,
+        fullName: userData.fullname,
+        password: password,
+      });
+    } catch (err) {
+      console.error("Failed to send user credentials email:", err.message);
+    }
     return user;
   } catch (error) {
     throw error;
@@ -235,51 +257,57 @@ export const forgotPassword = async (email) => {
     await redisClient.incr(rateLimitKey);
   }
 
-  await sendEmail({
-    to: user.email,
-    subject: "TwoFit - Password Reset OTP",
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background-color: #0A4F48; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
-          .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-          .otp-box { background-color: white; border: 2px dashed #0A4F48; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 8px; margin: 20px 0; border-radius: 8px; }
-          .warning { color: #d32f2f; font-size: 14px; margin-top: 20px; }
-          .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>TwoFit Password Reset</h1>
-          </div>
-          <div class="content">
-            <p>Hello <strong>${user.name || "User"}</strong>,</p>
-            <p>We received a request to reset your password. Use the OTP below to verify your identity:</p>
-            <div class="otp-box">${otp}</div>
-            <p><strong>Important:</strong></p>
-            <ul>
-              <li>This OTP is valid for <strong>15 minutes</strong></li>
-              <li>Do not share this OTP with anyone</li>
-              <li>If you didn't request this, please ignore this email</li>
-            </ul>
-            <div class="warning">
-              ⚠️ This is an automated security email. If you didn't request a password reset, your account may be at risk. Please contact support immediately.
-            </div>
-          </div>
-          <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} TwoFit. All rights reserved.</p>
-            <p>This email was sent to ${user.email}</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
+  await sendOTPEmail({
+    email: user.email,
+    fullName: user.name,
+    otp: otp,
   });
+
+  // await sendEmail({
+  //   to: user.email,
+  //   subject: "TwoFit - Password Reset OTP",
+  //   html: `
+  //     <!DOCTYPE html>
+  //     <html>
+  //     <head>
+  //       <style>
+  //         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+  //         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+  //         .header { background-color: #0A4F48; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+  //         .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+  //         .otp-box { background-color: white; border: 2px dashed #0A4F48; padding: 20px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 8px; margin: 20px 0; border-radius: 8px; }
+  //         .warning { color: #d32f2f; font-size: 14px; margin-top: 20px; }
+  //         .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+  //       </style>
+  //     </head>
+  //     <body>
+  //       <div class="container">
+  //         <div class="header">
+  //           <h1>TwoFit Password Reset</h1>
+  //         </div>
+  //         <div class="content">
+  //           <p>Hello <strong>${user.name || "User"}</strong>,</p>
+  //           <p>We received a request to reset your password. Use the OTP below to verify your identity:</p>
+  //           <div class="otp-box">${otp}</div>
+  //           <p><strong>Important:</strong></p>
+  //           <ul>
+  //             <li>This OTP is valid for <strong>15 minutes</strong></li>
+  //             <li>Do not share this OTP with anyone</li>
+  //             <li>If you didn't request this, please ignore this email</li>
+  //           </ul>
+  //           <div class="warning">
+  //             ⚠️ This is an automated security email. If you didn't request a password reset, your account may be at risk. Please contact support immediately.
+  //           </div>
+  //         </div>
+  //         <div class="footer">
+  //           <p>&copy; ${new Date().getFullYear()} TwoFit. All rights reserved.</p>
+  //           <p>This email was sent to ${user.email}</p>
+  //         </div>
+  //       </div>
+  //     </body>
+  //     </html>
+  //   `,
+  // });
 
   return { message: "OTP has been sent" };
 };
