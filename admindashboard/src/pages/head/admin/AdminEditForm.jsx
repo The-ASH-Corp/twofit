@@ -1,31 +1,50 @@
 import BaseForm from "@/components/form/BaseForm";
-import { createAdmin } from "@/redux/features/admins/admin.thunk";
+import { editAdmin, getAdminProfile } from "@/redux/features/admins/admin.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { getAllProgramsByCategory } from "@/redux/features/program/program.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
+import { SyncLoader } from "react-spinners";
 
-export default function AdminForm() {
-  const user = useAppSelector(selectUser)
-  const [programs, setPrograms] = useState([]);
+export default function AdminEditForm() {
+  const { id } = useParams();
+  const user = useAppSelector(selectUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const[isLoading,setIsLoading]=useState(false)
+  const[isLoading,setIsLoading]=useState(false);
+  const[fetching,setFetching]=useState(true);
+  const[initialData, setInitialData] = useState(null);
 
-  const fetchPrograms = useCallback(async () => {
-    const response = await dispatch(
-      getAllProgramsByCategory({category: user.programCategory, page: 1, limit: 1000})
-    ).unwrap();
-    setPrograms(response.data);
-  }, [dispatch, user.programCategory]);
+  const fetchAdminDetails = useCallback(async () => {
+    try {
+      const admin = await dispatch(getAdminProfile(id)).unwrap();
+      
+      setInitialData({
+        fullname: admin.name || "",
+        dob: admin.dob || "",
+        gender: admin.gender || "",
+        email: admin.email || "",
+        phone: admin.phone || "",
+        address: admin.address || "",
+        specialization: admin.specialization || [],
+        experience: admin.experience || "",
+        qualification: admin.qualification || "",
+        baseSalary: admin.salary || "",
+      });
+
+    } catch (err) {
+      toast.error("Failed to load data");
+    } finally {
+      setFetching(false);
+    }
+  }, [dispatch, id]);
   
   useEffect(() => {
-    fetchPrograms();
-  }, [fetchPrograms]);
+    fetchAdminDetails();
+  }, [fetchAdminDetails]);
 
   const fields = [
     {
@@ -53,7 +72,6 @@ export default function AdminForm() {
         { name: "email", label: "Email Address", type: "email" },
         { name: "phone", label: "Phone Number", type: "text" },
         { name: "address", label: "Address", type: "text" },
-        { name: "password", label: "Password", type: "text" },
       ],
     },
 
@@ -78,50 +96,13 @@ export default function AdminForm() {
         { name: "qualification", label: "Qualification", type: "text" },
       ],
     },
-    {
-      section: "Program Assignment",
-      position: "right",
-      fields: [
-        {
-          name: "chooseProgram",
-          label: "Choose Program",
-          type: "multiple",
-          options:programs?.map((program) => ({
-            key: program?._id,
-            label: program.title,
-            value: program.title,
-          })),
-        },
-      ],
-    },
+   
 
     {
       section: "Salary",
 
       position: "right",
       fields: [{ name: "baseSalary", label: "Base Salary", type: "number" }],
-    },
-
-    {
-      section: "Account Setup",
-      position: "right",
-      fields: [
-        {
-          name: "autoSendWelcome",
-          label: "Auto-send welcome message",
-          type: "toggle",
-        },
-        {
-          name: "autoSendGuide",
-          label: "Auto-send Onboarding Guide",
-          type: "toggle",
-        },
-        {
-          name: "automatedReminder",
-          label: "Automated Reminders",
-          type: "toggle",
-        },
-      ],
     },
   ];
 
@@ -132,16 +113,10 @@ export default function AdminForm() {
     email: "",
     phone: "",
     address: "",
-    password: "",
     specialization: [],
     experience: "",
     qualification: "",
-    chooseProgram: [],
     baseSalary: "",
-    // Account Setup
-    autoSendWelcome: false,
-    autoSendGuide: false,
-    automatedReminder: false,
   };
 
   const validationSchema = Yup.object({
@@ -171,10 +146,6 @@ export default function AdminForm() {
       .required("Address is required")
       .min(5, "Address must be at least 5 characters"),
 
-    password: Yup.string()
-      .required("Password is required")
-      .min(6, "Password must be at least 6 characters"),
-
     specialization: Yup.array()
       .of(Yup.string())
       .min(1, "Select at least one specialization")
@@ -184,48 +155,48 @@ export default function AdminForm() {
 
     qualification: Yup.string().trim().required("Qualification is required"),
 
-    chooseProgram: Yup.array()
-      .of(Yup.string())
-      .min(1, "Choose at least one program")
-      .required("Choose Program is required"),
-
     baseSalary: Yup.number()
       .typeError("Base Salary must be a number")
       .required("Base Salary is required")
       .positive("Base Salary must be greater than 0"),
   });
 
-  const handleAdminCreation = async (values) => {
+  const handleAdminUpdate = async (values) => {
     setIsLoading(true);
-    const selectedProgramIds = values.chooseProgram.map(title => 
-      programs.find(program => program.title === title)?._id
-    ).filter(Boolean);
     try {
       await dispatch(
-        createAdmin({
-          ...values,
-          chooseProgram: selectedProgramIds,
-          headId: user?._id,
+        editAdmin({
+          id,
+          adminData: values
         })
       ).unwrap();
-      toast("Admin created successfully", { type: "success" });
+      toast("Admin updated successfully", { type: "success" });
       navigate("/head/admins");
     } catch (error) {
       console.log(error)
-      toast(error?.message || "Failed to create admin", { type: "error" });
+      toast(error?.message || "Failed to update admin", { type: "error" });
     } finally {
       setIsLoading(false);
     }
 
   };
+
+  if (fetching) {
+     return (
+        <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+           <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+        </div>
+     );
+  }
+
   return (
     <BaseForm
       fields={fields}
-      initialValues={initialValues}
+      initialValues={initialData}
       validationSchema={validationSchema}
-      onSubmit={(values) => handleAdminCreation(values)}
-      heading={"Admin"}
-      submitButton={"Create Admin"}
+      onSubmit={(values) => handleAdminUpdate(values)}
+      heading={"Edit Admin"}
+      submitButton={"Update Admin"}
       isLoading={isLoading}
     ></BaseForm>
   );

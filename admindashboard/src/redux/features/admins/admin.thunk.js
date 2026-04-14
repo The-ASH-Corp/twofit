@@ -104,3 +104,31 @@ export const getFounderAllAdmins = createAsyncThunk(
     }
   },
 );
+
+export const deleteAdmin = createAsyncThunk(
+  "admins/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.delete(`/admin/delete-admin/${id}`);
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to delete admin"
+      );
+    }
+  }
+);
+
+export const editAdmin = createAsyncThunk(
+  "admins/edit",
+  async ({ id, adminData }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.put(`/admin/edit-admin/${id}`, adminData);
+      return data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to edit admin"
+      );
+    }
+  }
+);

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 import { generatePassword, hashPassword } from "../../utils/password.js";
 import allProgramaModel from "../allPrograms/allPrograma.model.js";
@@ -137,7 +138,13 @@ export const addNewAdmin = async (adminData) => {
 };
 
 export const getAdminById = async (id) => {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new Error("Invalid Admin ID");
+  }
   const admin = await AdminModel.findById(id).select("-password").populate("program")
+  if (!admin) {
+    throw new Error("Admin not found");
+  }
   return admin;
 };
 
@@ -431,17 +438,64 @@ export const getDashboardData = async (adminId, duration = "12m") => {
 
 export const getAdminByHead = async ({ headId, page, limit }) => {
   try {
-    const skip = (page - 1) * limit;
+    const skip = (Number(page) - 1) * Number(limit);
     const totalCount = await AdminModel.countDocuments({ headId });
-    const admin = await AdminModel.find({ headId })
-      .select("-password")
-      .skip(skip)
-      .limit(limit);
+    
+    const admin = await AdminModel.aggregate([
+      { $match: { headId: new mongoose.Types.ObjectId(headId) } },
+      { $skip: skip },
+      { $limit: Number(limit) },
+      // Get existing coaches
+      {
+        $lookup: {
+          from: "coaches",
+          localField: "_id",
+          foreignField: "adminId",
+          as: "coaches"
+        }
+      },
+      // Get users assigned to these coaches
+      {
+        $lookup: {
+          from: "users",
+          let: { coachIds: "$coaches._id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $or: [
+                    { $in: ["$trainer", "$$coachIds"] },
+                    { $in: ["$therapist", "$$coachIds"] },
+                    { $in: ["$dietition", "$$coachIds"] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "users",
+        },
+      },
+      {
+        $addFields: {
+          experts: "$coaches",
+          clients: "$users"
+        }
+      },
+      { 
+        $project: { 
+          password: 0, 
+          coaches: 0,
+          users: 0
+        } 
+      }
+    ]);
+
     return {
       admin,
       totalCount,
     };
   } catch (error) {
+    console.error("Error in getAdminByHead:", error);
     throw new Error("Failed to fetch admin");
   }
 };
@@ -552,5 +606,50 @@ export const founderAdminList = async (page, limit) => {
   } catch (error) {
     throw error;
   }
+};
+
+export const deleteAdmin = async (adminId) => {
+  const admin = await AdminModel.findById(adminId);
+  if (!admin) {
+    throw new Error("Admin not found");
+  }
+  if (admin.experts && admin.experts.length > 0) {
+    throw new Error("Remove the experts and clients for delete admin");
+  }
+  await AdminModel.findByIdAndDelete(adminId);
+  return true;
+};
+
+export const editAdmin = async (adminId, adminData) => {
+  const admin = await AdminModel.findById(adminId);
+  if (!admin) {
+    throw new Error("Admin not found");
+  }
+
+  if (adminData.password) {
+    adminData.password = await hashPassword(adminData.password);
+  } else {
+    delete adminData.password;
+  }
+
+  if (adminData.fullname) {
+    adminData.name = capitalizeFirst(adminData.fullname);
+  }
+
+  if (adminData.chooseProgram) {
+    adminData.program = adminData.chooseProgram;
+  }
+
+  if (adminData.baseSalary) {
+     adminData.salary = adminData.baseSalary;
+  }
+
+  const updatedAdmin = await AdminModel.findByIdAndUpdate(
+    adminId,
+    { $set: adminData },
+    { new: true }
+  );
+
+  return updatedAdmin;
 };
 

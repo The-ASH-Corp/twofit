@@ -9,12 +9,13 @@ import {
 } from "@/redux/features/admins/admins.selecters";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
 
 const AdminProfile = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const admin = useSelector(getSelectedAdmin);
   const status = useSelector(getAdminStatus);
@@ -43,9 +44,12 @@ const AdminProfile = () => {
   return (
     <div className="flex flex-col gap-6 w-full h-[calc(100vh-120px)] overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <h1 className="text-xl font-bold text-[#0A4F48]">Profile Details</h1>
-        <button className="px-5 py-2 bg-[#0A4F48] text-white rounded-lg text-sm font-bold shadow-sm hover:bg-[#073a35] transition-colors">
+        <button 
+          className="w-full sm:w-auto px-6 py-2.5 bg-[#0A4F48] text-white rounded-xl text-sm font-bold shadow-lg shadow-[#0A4F48]/20 hover:bg-[#073a35] hover:shadow-xl hover:shadow-[#0A4F48]/30 transition-all active:scale-95" 
+          onClick={() => navigate(`/head/admins/edit/${id}`)}
+        >
           Edit Profile
         </button>
       </div>

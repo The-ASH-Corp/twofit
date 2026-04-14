@@ -9,6 +9,7 @@ import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 import { sendEmail } from "../../utils/email.js";
 import { createNotification } from "../notification/notification.service.js";
 import { assertEmailUnique } from "../../utils/checkEmailUnique.js";
+import { SOP } from "../sop/sop.model.js";
 
 export const createCoach = async (coach) => {
  try {
@@ -283,6 +284,27 @@ export const updateCoachById = async (coachId, updatedData) => {
 };
 
 export const deleteCoachById = async (coachId) => {
+  const coach = await CoachModel.findById(coachId);
+  if (!coach) {
+    throw new Error("Expert not found");
+  }
+
+  // Check if there are assigned users
+  if (coach.assignedUsers && coach.assignedUsers.length > 0) {
+    throw new Error("Remove the assigned clients before deleting the expert");
+  }
+
+  // Remove reference from Admin
+  if (coach.adminId) {
+    await AdminModel.findByIdAndUpdate(
+      coach.adminId,
+      { $pull: { experts: coachId } }
+    );
+  }
+
+  // Clean up associated SOPs
+  await SOP.deleteMany({ coachId });
+
   return await CoachModel.findByIdAndDelete(coachId);
 };
 
