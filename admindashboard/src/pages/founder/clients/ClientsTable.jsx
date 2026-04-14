@@ -63,7 +63,7 @@ export default function ClientsTable() {
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="h-[calc(100vh-156px)] pb-4 overflow-auto no-scrollbar">
+    <div className="pb-4 overflow-auto no-scrollbar">
       <BaseTable
         columns={ClientColumns}
         data={clients}
