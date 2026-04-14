@@ -22,7 +22,7 @@ export default function ClientLayout() {
           <TopBar onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
         </div>
 
-        <div className="no-scrollbar mt-2 flex-1 overflow-auto md:mt-1">
+        <div className="no-scrollbar mt-4 flex-1 overflow-auto md:mt-1">
           <Outlet />
         </div>
       </div>

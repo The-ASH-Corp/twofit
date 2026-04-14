@@ -171,10 +171,16 @@ export const getClientsBasedOnCoach = async (req, res) => {
 
 export const updateWeight = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const { currentWeight } = req.body;
+    if (req.files?.frontPhoto?.[0]) {
+      req.body.frontPhoto = "/uploads/" + req.files.frontPhoto[0].filename;
+    }
 
-    const user = await service.updateWeightService(userId, currentWeight);
+    if (req.files?.sidePhoto?.[0]) {
+      req.body.sidePhoto = "/uploads/" + req.files.sidePhoto[0].filename;
+    }
+    const { userId } = req.params;
+
+    const user = await service.updateWeightService(userId, req.body);
 
     res.status(200).json({
       message: "Weight updated successfully",

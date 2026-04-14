@@ -38,7 +38,15 @@ router.delete("/delete-client/:id", authMiddleware, deleteClient)
 
 router.post("/get-all-users-based-on-coach-for-admin", authMiddleware, getClientsBasedOnCoach)
 
-router.put("/:userId/weight", authMiddleware, updateWeight);
+router.put(
+  "/:userId/weight",
+  authMiddleware,
+  uploader.fields([
+    { name: "frontPhoto", maxCount: 1 },
+    { name: "sidePhoto", maxCount: 1 },
+  ]),
+  updateWeight,
+);
 router.put("/:userId/measurements", authMiddleware, updateMeasurements);
 router.get("/get-all-feedbacks/:userId", authMiddleware, getAllFeedbacks)
 router.get("/weight-history",authMiddleware, getWeightHistoryOnly);
