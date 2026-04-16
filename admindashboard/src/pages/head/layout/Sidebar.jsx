@@ -13,6 +13,7 @@ const menuItems = [
   { label: "Experts", icon: assets.experts, path: "/head/experts" },
   { label: "Clients", icon: assets.clients, path: "/head/clients" },
   { label: "Finance", icon: assets.finance, path: "/head/finance" },
+  { label: "Growth Support", icon: assets.therapy, path: "/head/growth-support" },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
