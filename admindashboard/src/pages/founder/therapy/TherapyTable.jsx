@@ -54,7 +54,7 @@ if (status === "loading")
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="h-[calc(100vh-130px)] pb-4 overflow-auto no-scrollbar">
+    <div className=" pb-4 overflow-auto no-scrollbar">
       <BaseTable
         data={plans}
         columns={therapyColumns}
@@ -75,3 +75,4 @@ if (status === "loading")
 };
 
 export default TherapyTable;
+

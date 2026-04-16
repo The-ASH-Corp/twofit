@@ -92,16 +92,20 @@ export const getAllFeedbacks = createAsyncThunk(
 
 
 
-export const updateWeightOfClient = createAsyncThunk("client/updateWeight", async ({ id, currentWeight }, { rejectWithValue }) => {
-  try {
-    const data = await axiosInstance.put(`clients/${id}/weight`, { currentWeight })
-    return data.data
+export const updateWeightOfClient = createAsyncThunk(
+  "client/updateWeight",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.put(`clients/${id}/weight`, data);
 
-  }
-  catch (error) {
-    return rejectWithValue(error.response?.data?.message || "Failed to update weight")
-  }
-})
+      return res.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update weight",
+      );
+    }
+  },
+);
 
 
 export const updateClientStatus = createAsyncThunk(

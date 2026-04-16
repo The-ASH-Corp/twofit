@@ -167,11 +167,19 @@ export default function Topbar({ onToggleSidebar }) {
               </p>
             </div>
             <div className="relative">
-              <img
-                src={assets.profileVector}
-                className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-white shadow-md object-cover group-hover:scale-105 transition-transform duration-300 ring-2 ring-transparent group-hover:ring-[#EBF3F2]"
-                alt="Profile"
-              />
+              {!user.profilePhot ? (
+                <img
+                  src={`${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}${user?.profilePhoto}`}
+                  className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-white shadow-md object-cover group-hover:scale-105 transition-transform duration-300 ring-2 ring-transparent group-hover:ring-[#EBF3F2]"
+                  alt="Profile"
+                />
+              ) : (
+                <img
+                  src={assets.profileVector}
+                  className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-white shadow-md object-cover group-hover:scale-105 transition-transform duration-300 ring-2 ring-transparent group-hover:ring-[#EBF3F2]"
+                  alt="Profile"
+                />
+              )}
               <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
             </div>
           </div>
