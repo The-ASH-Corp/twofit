@@ -240,14 +240,14 @@ export default function HabitTracker() {
                       className="flex items-center justify-between gap-3 rounded-[26px] border border-[#E0E8E4] bg-white px-3.5 py-3.5 sm:px-4 sm:py-4 cursor-pointer transition-all hover:shadow-[0_8px_24px_rgba(15,41,29,0.08)]"
                       style={dualEdgeDepthShadow}
                     >
-                      <div className="flex min-w-0 items-center gap-3">
+                      <div className=" flex min-w-0 items-center gap-3">
                         <div
-                          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#D8E4DE] bg-[#ECF2EE] text-[#0A7B4E]"
+                          className="bg-[#0A7B4E] text-white flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#D8E4DE]  "
                           style={protocolIconDepthShadow}
                         >
-                          <Icon size={20} />
+                          <Icon size={20}/>
                         </div>
-                        <div className="min-w-0">
+                        <div className="min-w-0 ">
                           <p className="truncate text-[14px] sm:text-[16px] leading-none font-black text-[#1F2D26]">
                             {habit.name}
                           </p>
@@ -312,7 +312,7 @@ export default function HabitTracker() {
                 <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#E3F0E8] text-[#0A7B4E]">
                   <PencilLine size={20} />
                 </div>
-                <h2 className="text-[24px] sm:text-[28px] leading-none font-black text-[#22322B]">
+                <h2 className="text-[24px] sm:text-[22px] leading-none font-black text-[#22322B]">
                   Daily Reflection
                 </h2>
               </div>
@@ -336,7 +336,7 @@ export default function HabitTracker() {
                 type="button"
                 onClick={handleSaveReflection}
                 disabled={reflectionSaving}
-                className="mt-3 w-full rounded-full bg-[#D7DEDB] py-3.5 text-[16px] sm:text-[24px] font-black text-[#0A7B4E] transition-all hover:bg-[#CCD6D2] disabled:opacity-60"
+                className="mt-3 w-full rounded-full bg-[#D7DEDB]  py-3.5 text-[16px] sm:text-[22px] font-black text-[#0A7B4E] transition-all hover:bg-[#0A7B4E] hover:text-white disabled:opacity-60"
               >
                 {reflectionSaving ? "Saving..." : "Log Entry"}
               </button>
@@ -344,10 +344,10 @@ export default function HabitTracker() {
 
             <section className="rounded-[30px] border border-[#DCE7E1] bg-white p-5 sm:p-6 shadow-[0_10px_30px_rgba(15,41,29,0.04)]" style={dualEdgeDepthShadow}>
               <div className="flex items-center justify-between">
-                <h3 className="text-[24px] sm:text-[30px] leading-none font-black text-[#22322B]">
+                <h3 className="text-[20px] sm:text-[22px] leading-none font-black text-[#22322B]">
                   Weekly Streak
                 </h3>
-                <p className="text-[18px] font-black text-[#0A7B4E]">
+                <p className="text-[16px] font-black text-[#0A7B4E]">
                   {weeklyStatus.average}% Avg.
                 </p>
               </div>
