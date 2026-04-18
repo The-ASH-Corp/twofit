@@ -46,7 +46,9 @@ import axios from "axios";
 
 // dotenv.config();
 
-export async function sendEmail({ email, password, fullName}) {
+export async function sendEmail({ email, password, fullName
+  
+}) {
   try {
     console.log(email, password, fullName);
 
