@@ -20,6 +20,7 @@ import broadcastReducer from "../features/broadcast/broadcast.slice";
 import sopReducer from "../features/sop/sop.slice"
 import recipeReducer from "../features/recipe/recipe.slice"
 import reminderReducer from "../features/autoReminder/reminder.slice";
+import growthSupportReducer from "../features/growthSupport/growthSupport.slice";
 
 export default combineReducers({
   auth: authReducer,
@@ -41,4 +42,5 @@ export default combineReducers({
   sop: sopReducer,
   recipe: recipeReducer,
   reminder: reminderReducer,
+  growthSupport: growthSupportReducer,
 });

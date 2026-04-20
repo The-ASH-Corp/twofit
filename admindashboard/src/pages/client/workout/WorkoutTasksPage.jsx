@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
+import { GiWeightLiftingUp } from "react-icons/gi";
 import {
   CalendarDays,
   Check,
@@ -28,6 +29,8 @@ import {
 } from "@/redux/features/tasks/task.thunk";
 import MobileBottomNav from "../components/MobileBottomNav";
 import { cn } from "@/lib/utils";
+import bgImage from "/src/assets/workout-bg.jpg";
+import { CgGym } from "react-icons/cg";
 
 const rpeScale = [
   {
@@ -364,8 +367,6 @@ export default function WorkoutTasksPage() {
     );
   }
 
-
-
   const completionProgress = workoutTasks.length
     ? Math.round((watchedVideos.size / workoutTasks.length) * 100)
     : 0;
@@ -373,7 +374,6 @@ export default function WorkoutTasksPage() {
     workoutTasks.length - watchedVideos.size,
     0,
   );
-
 
   return (
     <div className="client-page-container p-5 sm:p-6 lg:p-7">
@@ -401,17 +401,25 @@ export default function WorkoutTasksPage() {
                     </video>
 
                     {!isStarted && (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-black/20 backdrop-blur-[2px]">
+                      // <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-black/20 backdrop-blur-[2px] ">
+                      <div
+                        className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-black/20 backdrop-blur-[2px]"
+                        style={{
+                          backgroundImage: `url(${bgImage})`,
+                          backgroundSize: "cover",
+                          backgroundPosition: "center",
+                        }}
+                      >
                         <h3 className="mt-8 text-[32px] font-black text-white uppercase tracking-tight text-center drop-shadow-2xl">
                           Ready for your session?
                         </h3>
-                        <p className="mt-2 text-[14px] font-bold text-emerald-100/70 uppercase tracking-[0.2em] text-center">
+                        {/* <p className="mt-2 text-[14px] font-bold text-emerald-100/70 uppercase tracking-[0.2em] text-center">
                           Day {currentGlobalDay} • {workoutTasks.length}{" "}
                           Handpicked Drills
-                        </p>
+                        </p> */}
                         <button
                           onClick={() => setIsStarted(true)}
-                          className="mt-8 px-10 py-4 bg-white text-[#0A7B4E] text-[15px] font-black uppercase tracking-widest rounded-full shadow-2xl hover:bg-emerald-50 transition-colors shadow-emerald-900/40"
+                          className="mt-8 px-10 py-4 bg-white text-[#0A7B4E] text-[15px] font-black uppercase tracking-widest rounded-full shadow-2xl hover:bg-[#0A7B4E] hover:text-white transition-colors shadow-emerald-900/40"
                         >
                           Start My Workout
                         </button>
@@ -459,11 +467,16 @@ export default function WorkoutTasksPage() {
 
             {/* Active Focal Module Detail */}
             <div className="client-card rounded-[24px] border border-[#E8EEEB] bg-[#FCFDFC] p-6 sm:p-7 shadow-[0_6px_24px_rgba(30,44,38,0.02)]">
-              <div className="inline-flex items-center rounded-full border border-[#D1E0D7] bg-[#F5F9F7] px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.13em] text-[#0A7B4E]">
-                Active Focal Module
+             
+              <div className="inline-flex gap-2 items-center rounded-full border border-[#D1E0D7] bg-[#F5F9F7] px-3 py-1.5 text-[12px] font-black uppercase tracking-[0.13em] text-[#0A7B4E]">
+              <CgGym size={25}  />  Active Focal Module
               </div>
+              
               <h2 className="mt-4 text-[22px] leading-tight font-black text-[#1A2621] sm:text-[26px] lg:text-[30px] flex items-center gap-2">
-                {selectedTask?.name || "Exercise Overview"} <span className="text-[15.5px] leading-relaxed font-medium text-[#5A6D63]">:- {selectedTask?.notes}</span>
+                {selectedTask?.name || "Exercise Overview"}{" "}
+                <span className="text-[15.5px] leading-relaxed font-medium text-[#5A6D63]">
+                  :- {selectedTask?.notes}
+                </span>
               </h2>
               <p className="mt-3 text-[15.5px] leading-relaxed font-medium text-[#5A6D63]">
                 {selectedTask?.description ||
@@ -556,7 +569,7 @@ export default function WorkoutTasksPage() {
           <div className="space-y-6">
             <section className="client-card rounded-[30px] p-5 sm:p-6">
               <h3 className="inline-flex items-center gap-3 text-[20px] leading-none font-black text-[#25352E] sm:text-[24px] lg:text-[28px]">
-                <ListChecks size={22} className="text-[#087B44]" />
+                <GiWeightLiftingUp size={22} className="text-[#087B44]" />
                 Workout Tasks
               </h3>
 
@@ -597,7 +610,7 @@ export default function WorkoutTasksPage() {
                           />
                         ) : (
                           <div className="h-full w-full flex items-center justify-center opacity-20">
-                            <Zap size={16} /> 
+                            <Zap size={16} />
                           </div>
                         )}
 

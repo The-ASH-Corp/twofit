@@ -22,6 +22,7 @@ const persistConfig = {
     "broadcast",
     "sop",
     "reminder",
+    "growthSupport",
   ],
 };
 

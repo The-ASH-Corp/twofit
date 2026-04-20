@@ -216,8 +216,47 @@ export const updateOneClient = async (userData, id) => {
 };
 
 export const deleteOneClient = async (id) => {
+  const client = await User.findById(id);
+  if (!client) {
+    throw new Error("Client not found");
+  }
+
+  const coachIds = [
+    client.trainer,
+    client.dietition,
+    client.therapist,
+  ].filter(Boolean);
+
+  // 1. Remove client from Expert's assignedUsers list
+  if (coachIds.length > 0) {
+    await CoachModel.updateMany(
+      { _id: { $in: coachIds } },
+      { $pull: { assignedUsers: id } },
+    );
+  }
+
+  // 2. Delete habits and task submissions
+  await Promise.all([
+    HabitModel.deleteMany({ clientId: id }),
+    TaskSubmission.deleteMany({ userId: id }),
+  ]);
+
+  // 3. Recalculate Expert incentives
+  for (const coachId of coachIds) {
+    try {
+      await calculateExtraClientIncentive(coachId);
+    } catch (error) {
+      console.error(
+        `Failed to recal incentive for coach ${coachId}:`,
+        error.message,
+      );
+    }
+  }
+
+  // 4. Delete the client
   return await User.findByIdAndDelete(id);
 };
+
 
 export const getClientsBasedOnCoach = async (coachIds, page, limit) => {
   const skip = (page - 1) * limit;
