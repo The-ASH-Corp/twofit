@@ -1,7 +1,9 @@
 import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
+import { randomUUID } from "crypto";
 import { broadcastModel } from "./broadcast.model.js";
 import { sendTemplateMessage } from "../../utils/whatsapp.js";
 import User from "../auth/auth.model.js";
+import { trackSendFailure, trackSendSuccess } from "../whatsapp/whatsapp.service.js";
 
 export const createBroadcast = async (data) => {
   try {
@@ -135,17 +137,79 @@ export const sentWhatsAppMessage = async (payload) => {
       };
     }
 
-    const sendResults = await Promise.allSettled(
-      users.map((user) =>
-        sendTemplateMessage({
-          to: user.phone,
-          templateName,
-          variables,
-        }),
-      ),
+    const sendResults = await Promise.all(
+      users.map(async (user) => {
+        const trackingId = randomUUID();
+
+        try {
+          const sendApiResponse = await sendTemplateMessage({
+            to: user.phone,
+            templateName,
+            variables,
+            callbackData: trackingId,
+          });
+
+          let trackingDoc = null;
+          try {
+            trackingDoc = await trackSendSuccess({
+              trackingId,
+              recipientUserId: user._id,
+              recipientPhone: user.phone,
+              templateName,
+              variables,
+              audienceType,
+              broadcastId,
+              sendApiResponse,
+            });
+          } catch (trackingError) {
+            console.error("WhatsApp tracking save failed (success case):", trackingError.message);
+          }
+
+          return {
+            success: true,
+            user: {
+              _id: user._id,
+              name: user.name,
+              phone: user.phone,
+            },
+            waMessageId: trackingDoc?.waMessageId || sendApiResponse?.messages?.[0]?.id || null,
+            trackingId: trackingDoc?.trackingId || trackingId,
+            status: trackingDoc?.status || "accepted",
+          };
+        } catch (error) {
+          let trackingDoc = null;
+
+          try {
+            trackingDoc = await trackSendFailure({
+              trackingId,
+              recipientUserId: user._id,
+              recipientPhone: user.phone,
+              templateName,
+              variables,
+              audienceType,
+              broadcastId,
+              error,
+            });
+          } catch (trackingError) {
+            console.error("WhatsApp tracking save failed (failure case):", trackingError.message);
+          }
+
+          return {
+            success: false,
+            user: {
+              _id: user._id,
+              name: user.name,
+              phone: user.phone,
+            },
+            error: error.message,
+            trackingId: trackingDoc?.trackingId || trackingId,
+            status: "failed",
+          };
+        }
+      }),
     );
 
-    const sentCount = sendResults.filter((result) => result.status === "fulfilled").length;
+    const sentCount = sendResults.filter((result) => result.success).length;
     const failedCount = sendResults.length - sentCount;
 
     return {
@@ -156,13 +220,22 @@ export const sentWhatsAppMessage = async (payload) => {
       sentCount,
       failedCount,
       broadcastId,
+      tracking: {
+        acceptedCount: sendResults.filter((result) => result.success && result.status === "accepted").length,
+        failedCount: sendResults.filter((result) => !result.success).length,
+        trackedCount: sendResults.filter((result) => Boolean(result.trackingId)).length,
+        waMessageIdCount: sendResults.filter((result) => Boolean(result.waMessageId)).length,
+      },
       ...(isAllUsers
         ? {}
         : {
-            userDetails: users.map((user) => ({
-              _id: user._id,
-              name: user.name,
-              phone: user.phone,
+            userDetails: sendResults.map((result) => ({
+              ...result.user,
+              status: result.status,
+              success: result.success,
+              trackingId: result.trackingId || null,
+              waMessageId: result.waMessageId || null,
+              error: result.error || null,
             })),
           }),
     };
@@ -207,4 +280,3 @@ export const getBroadcastAudience = async (page = 1, limit = 20, search = "") =>
     throw error;
   }
 };
-
