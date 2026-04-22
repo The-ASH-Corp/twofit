@@ -23,7 +23,6 @@ const HeadProfile = () => {
   const performance = useSelector(selectHeadPerformance);
   const status = useSelector(selectHeadStatus);
   const error = useSelector(selectHeadError);
-  console.log(id)
 
   useEffect(() => {
     if (id) {

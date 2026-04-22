@@ -156,13 +156,13 @@ export default function BaseTable({
               <div className="relative flex-1 sm:flex-none">
                 <button
                   onClick={() => setOpenStatus(!openStatus)}
-                  className="w-full h-[46px] px-4 bg-[#F8FAFC] hover:bg-[#F1F5F9] text-slate-600 rounded-2xl text-sm font-bold flex items-center justify-between gap-2 transition-all active:scale-95 border-2 border-transparent focus:border-[#0A4F48]/10"
+                  className="w-full h-[46px] px-4 bg-white hover:bg-slate-50 text-slate-600 rounded-2xl text-sm font-bold flex items-center justify-between gap-2 transition-all active:scale-95 border-2 border-slate-100 focus:border-[#0A4F48]/10 shadow-sm"
                 >
-                  <span className="truncate max-w-[80px] sm:max-w-[100px]">{statusFilter}</span>
+                  <span className="truncate max-w-[110px] sm:max-w-[140px]">{statusFilter}</span>
                   <MdOutlineKeyboardArrowDown className="w-5 h-5 text-slate-400" />
                 </button>
                 {openStatus && (
-                  <div className="absolute top-full right-0 mt-2 w-56 bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 z-50 p-2 animate-in fade-in zoom-in-95 duration-200 origin-top-right">
+                  <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 z-[100] p-2 animate-in fade-in zoom-in-95 duration-200 origin-top-left">
                     <button
                       onClick={() => {
                         setStatusFilter("All Status");
@@ -229,7 +229,7 @@ export default function BaseTable({
               {table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="group transition-all duration-300 cursor-pointer flex flex-col md:table-row relative bg-[#F8FAFC] hover:bg-white hover:shadow-xl hover:shadow-slate-200/40 hover:-translate-y-1 rounded-2xl z-0 hover:z-50 has-[div[role='menu']]:z-60 border border-slate-100 md:border-none"
+                  className="group transition-all duration-300 cursor-pointer flex flex-col md:table-row relative bg-[#F8FAFC] hover:bg-white hover:shadow-xl hover:shadow-slate-200/40 hover:-translate-y-1 rounded-2xl z-0 hover:z-50 has-[div[role='menu']]:z-60 border border-slate-100 md:border-none mb-6 md:mb-0"
                   onClick={() => {
                     if (profilePath) {
                       profilePath(row.original?._id);
