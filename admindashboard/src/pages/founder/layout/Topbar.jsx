@@ -167,7 +167,7 @@ export default function Topbar({ onToggleSidebar }) {
               </p>
             </div>
             <div className="relative">
-              {!user.profilePhot ? (
+              {user?.profilePhot ? (
                 <img
                   src={`${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}${user?.profilePhoto}`}
                   className="w-9 h-9 md:w-10 md:h-10 rounded-full border-2 border-white shadow-md object-cover group-hover:scale-105 transition-transform duration-300 ring-2 ring-transparent group-hover:ring-[#EBF3F2]"
