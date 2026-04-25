@@ -1,7 +1,7 @@
 import BaseForm from "@/components/form/BaseForm";
 import { createAdmin } from "@/redux/features/admins/admin.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { getAllProgramsByCategory } from "@/redux/features/program/program.thunk";
+import { getAllPrograms } from "@/redux/features/program/program.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -18,10 +18,10 @@ export default function AdminForm() {
 
   const fetchPrograms = useCallback(async () => {
     const response = await dispatch(
-      getAllProgramsByCategory({category: user.programCategory, page: 1, limit: 1000})
+      getAllPrograms({page: 1, limit: 10000})
     ).unwrap();
     setPrograms(response.data);
-  }, [dispatch, user.programCategory]);
+  }, [dispatch]);
   
   useEffect(() => {
     fetchPrograms();

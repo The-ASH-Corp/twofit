@@ -3,7 +3,7 @@ import BaseForm from "../../../components/form/BaseForm";
 import { createClient } from "../../../redux/features/auth/auth.thunk";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { getAllProgramsByAdmin } from "@/redux/features/program/program.thunk";
+import { getAllPrograms } from "@/redux/features/program/program.thunk";
 import { useEffect, useState } from "react";
 import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
 import { toast } from "react-toastify";
@@ -121,7 +121,7 @@ export default function ClientForm() {
   useEffect(() => {
     const timer = setTimeout(async () => {
       const programRes = await dispatch(
-        getAllProgramsByAdmin({ adminId: user?._id, page: 1, limit: 120 }),
+        getAllPrograms({ page: 1, limit: 10000 }),
       );
       setProgram(programRes?.payload?.data || []);
 

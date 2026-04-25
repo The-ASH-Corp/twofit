@@ -3,7 +3,7 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { createCoach } from "@/redux/features/coach/coach.thunk";
 import { refreshProfile } from "@/redux/features/auth/auth.thunk";
 import {
-  getAllProgramsByAdmin,
+  getAllPrograms,
 } from "@/redux/features/program/program.thunk";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,17 +19,15 @@ export default function ExpertForm() {
   const [program, setProgram] = useState(null);
   const [therapy, setTherapy] = useState(null);
   const [selectedRole, setSelectedRole] = useState("");
-
-  
   const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(
-      getAllProgramsByAdmin({ adminId: user?._id, page: 1, limit: 120 }),
+      getAllPrograms({ page: 1, limit: 10000 }),
     ).then((res) => {
       setProgram(res.payload.data);
     });
-    dispatch(fetchTherapyPlans({ page: 1, limit: 120 })).then((res) => {
+    dispatch(fetchTherapyPlans({ page: 1, limit: 10000 })).then((res) => {
       setTherapy(res.payload.data.therapy);
     });
   }, [dispatch, user?._id]);
