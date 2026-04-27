@@ -211,8 +211,8 @@ export default function HabitTracker() {
                   <h2 className="text-[24px] sm:text-[28px] leading-none font-black text-[#1F2D26]">
                     Today&apos;s Protocol
                   </h2>
-                  <p className="mt-2 text-[15px] font-semibold text-[#7B8C83]">
-                    Mandatory habits for peak performance
+                  <p className="mt-2 text-[15px] font-semibold text-red-600">
+                   *Discipline check - complete the habit and post proof in chat
                   </p>
                 </div>
                 
