@@ -668,3 +668,33 @@ export const editAdmin = async (adminId, adminData) => {
   return updatedAdmin;
 };
 
+
+export const getAdminByProgram = async ({ programId, page, limit }) => {
+
+  
+  try {
+    page = Number(page);
+    limit = Number(limit);
+    const skip = (page - 1) * limit;
+
+    const objectIds = programId.split(',').map(id => new mongoose.Types.ObjectId(id));
+
+    const data = await AdminModel.aggregate([
+      {
+        $match: {
+          program: { $in: objectIds }
+        }
+      },
+      { $skip: skip },
+      { $limit: limit }
+    ]);
+
+    const totalCount = await AdminModel.countDocuments({
+      program: { $in: objectIds }
+    });
+
+    return { data, totalCount };
+  } catch (error) {
+    throw error;
+  }
+};

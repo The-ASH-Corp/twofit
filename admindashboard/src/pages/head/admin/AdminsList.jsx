@@ -1,21 +1,22 @@
-import React, { useEffect, useState } from 'react'
-import BaseTable from '../../../components/table/BaseTable'
-import { AdminColumns } from './AdminColumns'
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { getAdminsByHeadId } from '@/redux/features/admins/admin.thunk';
-import { useAppSelector } from '@/redux/store/hooks';
-import { selectUser } from '@/redux/features/auth/auth.selectores';
-import { SyncLoader } from 'react-spinners';
-import { getAdminError, getAdminStatus } from '@/redux/features/admins/admins.selecters';
-import { deleteAdmin } from '@/redux/features/admins/admin.thunk';
-import { toast } from 'react-toastify';
+import React, { useEffect, useState } from "react";
+import BaseTable from "../../../components/table/BaseTable";
+import { AdminColumns } from "./AdminColumns";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {
+  getAdminByProgramId,
+} from "@/redux/features/admins/admin.thunk";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { SyncLoader } from "react-spinners";
+import { deleteAdmin } from "@/redux/features/admins/admin.thunk";
+import { toast } from "react-toastify";
+import { getAllProgramsByCategory } from "@/redux/features/program/program.thunk";
 
 export default function AdminsList() {
-
-  const user =useAppSelector(selectUser)
-  const [admins,setAdmins]=useState([])
-  const [totalCount,setTotalCount]=useState(0)
+  const user = useAppSelector(selectUser);
+  const [admins, setAdmins] = useState([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [loading, setLoading] = useState(false);
@@ -23,19 +24,30 @@ export default function AdminsList() {
   const [adminToDelete, setAdminToDelete] = useState(null);
 
   const dispatch = useDispatch();
-  const fetchAdminData=async()=>{
+  const fetchAdminData = async () => {
     setLoading(true);
     try {
-      const admin =await dispatch(getAdminsByHeadId({page,limit,headId:user?._id})).unwrap()
-      setAdmins(admin.data)
-      setTotalCount(admin.total)
+      const prgms = await dispatch(
+        getAllProgramsByCategory({
+          category: user?.programCategory,
+          page,
+          limit,
+        }),
+      ).unwrap();
+      const programIds = prgms.data.map((program) => program._id);
+
+      const admin = await dispatch(
+        getAdminByProgramId({ programId: programIds, page, limit })).unwrap();
+
+      setAdmins(admin.data);
+      setTotalCount(admin.total);
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
     }
-  }
- const handlePageChange = (newPage) => {
+  };
+  const handlePageChange = (newPage) => {
     setPage(newPage);
   };
 
@@ -51,12 +63,10 @@ export default function AdminsList() {
   const searchInputHandler = (e) => {
     const value = e.target.value.toLowerCase();
     const filteredAdmins = admins.filter((admin) => {
-      return (
-        admin.name.toLowerCase().includes(value)
-      )
-    })
-    setAdmins(filteredAdmins)
-    if (value == '') {
+      return admin.name.toLowerCase().includes(value);
+    });
+    setAdmins(filteredAdmins);
+    if (value == "") {
       fetchAdminData();
     }
   };
@@ -71,8 +81,9 @@ export default function AdminsList() {
       setDeleteModalOpen(true);
     };
 
-    window.addEventListener('open-delete-admin', handleOpenDelete);
-    return () => window.removeEventListener('open-delete-admin', handleOpenDelete);
+    window.addEventListener("open-delete-admin", handleOpenDelete);
+    return () =>
+      window.removeEventListener("open-delete-admin", handleOpenDelete);
   }, []);
 
   const confirmDeleteAdmin = async () => {
@@ -83,12 +94,13 @@ export default function AdminsList() {
       setDeleteModalOpen(false);
       setAdminToDelete(null);
       fetchAdminData();
-    } catch(err) {
+    } catch (err) {
       toast.error(err || "Failed to delete admin");
     }
   };
 
-  if (loading) return (
+  if (loading)
+    return (
       <div className="flex justify-center items-center h-[calc(100vh-120px)]">
         <SyncLoader color="#0A4F48" loading margin={2} size={20} />
       </div>
@@ -122,7 +134,8 @@ export default function AdminsList() {
             <h3 className="text-lg font-semibold mb-2">Delete Admin?</h3>
 
             <p className="text-sm text-gray-600 mb-4">
-              Are you sure you want to delete {adminToDelete?.name}? This action cannot be undone.
+              Are you sure you want to delete {adminToDelete?.name}? This action
+              cannot be undone.
             </p>
 
             <div className="flex justify-end gap-2">
