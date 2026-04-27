@@ -40,22 +40,22 @@ const ExpertCenterSide = ({ expert }) => {
   const [showRatingMenu, setShowRatingMenu] = useState(false);
   const [hoveredBarIndex, setHoveredBarIndex] = useState(null);
 
+
   // Mock programs logic if not available in expert object
   const expertPrograms = useMemo(() => {
     // If expert has programs array, use it. Otherwise, extract from assigned users or show mock.
-    if (expert?.specialization && expert.specialization.length > 0) {
-      return expert.specialization.map(s => ({
-         title: s,
-         count: expert.assignedUsers?.filter(u => u.programType?.title === s).length || 0
+    if (expert?.assignedPrograms && expert.assignedPrograms.length > 0) {
+      return expert.assignedPrograms.map(s => ({
+         title: s?.title,
+         count: expert.assignedUsers?.filter(u => u.programType?._id === s?._id).length || 0
       }));
     }
-    return [
-      { title: "Weight Loss", count: 12 },
-      { title: "PCOD", count: 5 },
-      { title: "Thyroid", count: 3 },
-    ];
-  }, [expert]);
+    return expert.assignedTherapy?.map(s => ({
+      title: s?.name,
+      count: expert.assignedUsers?.filter(u => u.programType?._id === s?._id).length || 0
+    }))
 
+  }, [expert]);  
   const assignedClientsList = useMemo(() => {
      return expert?.assignedUsers || [];
   }, [expert]);
@@ -226,9 +226,6 @@ const ExpertCenterSide = ({ expert }) => {
             </div>
             <h3 className="font-bold text-[#1E293B] text-lg">Programs</h3>
           </div>
-          {/* <button className="p-1.5 rounded-lg text-slate-400 hover:text-[#0A4F48] hover:bg-slate-50 transition-colors">
-            <MoreHorizontal size={18} />
-          </button> */}
         </div>
         <div className="flex flex-wrap gap-3">
           {expertPrograms.map((prog, i) => {

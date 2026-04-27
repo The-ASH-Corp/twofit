@@ -310,3 +310,16 @@ export const getCoachRatingGraph = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const getAllCoachesByProgramId = async (req, res) => {
+  try {
+    const { programId, page, limit } = req.params;
+    const coaches = await coachService.getAllCoachesByProgramId(programId, page, limit);
+    res.status(200).json({
+      success: true,
+      data: coaches,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};

@@ -216,6 +216,7 @@ export const getCoachById = async (coachId) => {
       ],
     })
     .populate("assignedPrograms")
+    .populate("assignedTherapy")
     .populate({
       path: "feedback.userId",
       select: "name",
@@ -709,4 +710,37 @@ export const getMonthWiseAverageRating = async (coachId, duration) => {
     duration,
     ratingData: result
   };
+};
+
+
+export const getAllCoachesByProgramId = async (programId, page, limit) => {
+  try {
+    page = Number(page);
+    limit = Number(limit);
+
+    const skip = (page - 1) * limit;
+    const prgmIds = programId.split(",").map(id => new mongoose.Types.ObjectId(id));
+
+    const totalCount = await CoachModel.countDocuments({ assignedPrograms: { $in: prgmIds } });
+
+
+    const data = await CoachModel.aggregate([
+      // ===== Pagination =====
+      { $skip: skip },
+      { $limit: limit },
+      // match programs
+      {
+        $match: {
+          assignedPrograms: { $in: prgmIds },
+        },
+      },
+    ]);
+
+    return {
+      data,
+      totalCount,
+    };
+  } catch (error) {
+    throw error;
+  }
 };
