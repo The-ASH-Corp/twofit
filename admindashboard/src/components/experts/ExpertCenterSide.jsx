@@ -50,7 +50,7 @@ const ExpertCenterSide = ({ expert }) => {
          count: expert.assignedUsers?.filter(u => u.programType?._id === s?._id).length || 0
       }));
     }
-    return expert.assignedTherapy?.map(s => ({
+    return expert?.assignedTherapy?.map(s => ({
       title: s?.name,
       count: expert.assignedUsers?.filter(u => u.programType?._id === s?._id).length || 0
     }))
@@ -228,7 +228,7 @@ const ExpertCenterSide = ({ expert }) => {
           </div>
         </div>
         <div className="flex flex-wrap gap-3">
-          {expertPrograms.map((prog, i) => {
+          {expertPrograms?.map((prog, i) => {
             const title =
               typeof prog === "string" ? prog : prog.title || "Program";
             const count =

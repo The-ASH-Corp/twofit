@@ -91,7 +91,7 @@ export default function ExpertForm() {
           })),
           allowCustom: true,
         },
-        { name: "experience", label: "Experience", type: "text" },
+        { name: "experience", label: "Experience", type: "number" },
         { name: "qualification", label: "Qualification", type: "text" },
         {
           name: "languages",
@@ -272,7 +272,11 @@ export default function ExpertForm() {
       .min(1, "Select at least one specialization")
       .required("Specialization is required"),
 
-    experience: Yup.string().trim().required("Experience is required"),
+    experience: Yup.number()
+      .required("Experience is required")
+      .min(0, "Experience must be at least 0")
+      .max(100, "Experience must be less than 100"),
+
     qualification: Yup.string().trim().required("Qualification is required"),
 
     languages: Yup.array()
@@ -368,16 +372,13 @@ export default function ExpertForm() {
       const coach = await dispatch(createCoach(formData));
 
       if (coach.meta.requestStatus === "fulfilled") {
-        console.log(coach, "if")
         await dispatch(refreshProfile({ id: user?._id, role: user.role }));
         toast("Coach created successfully", { type: "success" });
         navigate(-1);
       } else {
-        console.log(coach, "else");
         toast(coach.message || "Failed to create coach 1", { type: "error" });
       }
     } catch (err) {
-      console.log(err, "catch");
       toast(err?.message || "Failed to create coach 1", { type: "error" });
     } finally {
       setIsLoading(false);
