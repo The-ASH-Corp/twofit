@@ -74,7 +74,7 @@ export default function AdminForm() {
             ],
             allowCustom: true,
         },
-        { name: "experience", label: "Experience", type: "text" },
+        { name: "experience", label: "Experience", type: "number" },
         { name: "qualification", label: "Qualification", type: "text" },
       ],
     },
@@ -123,7 +123,12 @@ export default function AdminForm() {
         },
       ],
     },
-  ];
+  ].filter(section => {
+    if (section.section === "Program Assignment" && user?.role === 'founder') {
+      return false;
+    }
+    return true;
+  });
 
   const initialValues = {
     fullname: "",
@@ -134,7 +139,7 @@ export default function AdminForm() {
     address: "",
     password: "",
     specialization: [],
-    experience: "",
+    experience: 0,
     qualification: "",
     chooseProgram: [],
     baseSalary: "",
@@ -180,14 +185,20 @@ export default function AdminForm() {
       .min(1, "Select at least one specialization")
       .required("Specialization is required"),
 
-    experience: Yup.string().trim().required("Experience is required"),
+    experience: Yup.number()
+    .typeError("Experience must be a number")
+    .required("Experience is required")
+    .positive("Experience must be greater than 0"),
 
     qualification: Yup.string().trim().required("Qualification is required"),
 
-    chooseProgram: Yup.array()
-      .of(Yup.string())
-      .min(1, "Choose at least one program")
-      .required("Choose Program is required"),
+    chooseProgram:
+      user?.role === "founder"
+        ? Yup.array().of(Yup.string())
+        : Yup.array()
+            .of(Yup.string())
+            .min(1, "Choose at least one program")
+            .required("Choose Program is required"),
 
     baseSalary: Yup.number()
       .typeError("Base Salary must be a number")

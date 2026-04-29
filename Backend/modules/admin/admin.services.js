@@ -53,7 +53,7 @@ export const addNewAdmin = async (adminData) => {
     dob: adminData.dob,
     gender: adminData.gender,
     specialization: adminData.specialization,
-    program: adminData.chooseProgram,
+    program: adminData.chooseProgram ? adminData.chooseProgram : [],
     salary: adminData.baseSalary,
     autoSendWelcome: adminData.autoSendWelcome,
     autoSendGuide: adminData.autoSendGuide,
