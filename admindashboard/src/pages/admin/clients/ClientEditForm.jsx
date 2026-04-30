@@ -52,6 +52,7 @@ export default function ClientEditForm() {
 
   const [program, setProgram] = useState(null);
   const [coachesOfAdmin, setCoachesOfAdmin] = useState([]);
+  const [allTherapists, setAllTherapists] = useState([]);
   const [selectedTherapyType, setSelectedTherapyType] = useState("");
   const [therapy, setTherapy] = useState([]);
   const [initialValues, setInitialValues] = useState(null);
@@ -71,6 +72,8 @@ export default function ClientEditForm() {
     if (res.payload?.data) {
       setTherapy(res.payload.data.therapy);
     }
+    const allTherapistsRes = await dispatch(getAllTherapists());
+    setAllTherapists(allTherapistsRes?.payload || []);
   };
 
   useEffect(() => {
@@ -220,34 +223,35 @@ export default function ClientEditForm() {
                   : [],
                 onChange: (e) => setSelectedTherapyType(e.target.value),
               },
+              ...(selectedTherapyType && !initialValues?.therapist
+                ? [
+                    {
+                      name: "therapist",
+                      label: "Therapist",
+                      type: "select",
+                      options: allTherapists
+                        ? allTherapists
+                            ?.filter((coach) => {
+                              if (coach?.role !== "Therapist") return false;
+                              if (selectedTherapyType) {
+                                return coach.assignedTherapy?.some(
+                                  (t) => (t?._id || t) === selectedTherapyType,
+                                );
+                              }
+                              return true;
+                            })
+                            ?.map((coach) => ({
+                              label: coach.name,
+                              value: coach?._id,
+                            }))
+                        : [],
+                    },
+                  ]
+                : []),
             ],
           },
         ]
       : []),
-    ...(selectedTherapyType && !initialValues?.therapist
-      ? [
-          {
-            section: "Expert Assignment",
-            position: "right",
-            fields: [
-              {
-                name: "therapist",
-                label: "Therapist",
-                type: "select",
-                options: coachesOfAdmin
-                  ? coachesOfAdmin
-                      ?.filter((coach) => coach?.role === "Therapist")
-                      ?.map((coach) => ({
-                        label: coach.name,
-                        value: coach?._id,
-                      }))
-                  : [],
-              },
-            ],
-          },
-        ]
-      : []),
-   
   ];
 
   const handleUpdate = async (values) => {    

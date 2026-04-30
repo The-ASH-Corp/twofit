@@ -4,6 +4,8 @@ import { useDispatch } from "react-redux";
 import { logout } from "@/redux/features/auth/auth.thunk";
 import { useState, useEffect } from "react";
 import { X, ChevronDown, LogOut } from "lucide-react";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 const menuItems = [
   { label: "Dashboard", icon: assets.dashboard, path: "/admin" },
@@ -22,6 +24,17 @@ export default function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
 
   const [openMenu, setOpenMenu] = useState(null);
+  const user = useAppSelector(selectUser);
+
+  const filteredMenuItems = menuItems.filter((item) => {
+    if (
+      item.label === "Programs" &&
+      (!user?.program || user.program.length === 0)
+    ) {
+      return false;
+    }
+    return true;
+  });
 
   useEffect(() => {
     const activeParent = menuItems.find(item => 
@@ -89,7 +102,7 @@ export default function Sidebar({ isOpen, onClose }) {
           </div>
 
           <nav className="space-y-1.5">
-            {menuItems.map((item) => {
+            {filteredMenuItems.map((item) => {
               const isMenuOpen = openMenu === item.label;
              
               const hasChildren = !!item.children;

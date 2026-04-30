@@ -755,3 +755,12 @@ export const getAllCoachesByProgramId = async (programId, page, limit) => {
     throw error;
   }
 };
+
+export const getAllTherapists = async () => {
+  try {
+    const therapists = await CoachModel.find({ role: "Therapist" }).select("-password");
+    return therapists;
+  } catch (error) {
+    throw error;
+  }
+};

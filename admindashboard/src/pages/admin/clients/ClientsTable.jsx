@@ -84,8 +84,8 @@ export default function ClientsTable() {
       <BaseTable
         columns={columns}
         data={filteredClients}
-        actionLabel="Add Client"
-        actionPath="/admin/clients/addclient"
+        actionLabel={user?.program?.length > 0 ? "Add Client" : null}
+        actionPath={user?.program?.length > 0 ? "/admin/clients/addclient" : null}
         profilePath={profilePath}
         pageLabel={"Clients"}
         handlePageChange={handlePageChange}

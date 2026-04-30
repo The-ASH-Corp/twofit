@@ -209,3 +209,18 @@ export const getAllCoachesByProgramId = createAsyncThunk(
   },
 );
 
+export const getAllTherapists = createAsyncThunk(
+  "coach/getAllTherapists",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/coach/get-all-therapists`,
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get therapists",
+      );
+    }
+  },
+);
