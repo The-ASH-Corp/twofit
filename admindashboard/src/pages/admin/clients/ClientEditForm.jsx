@@ -1,6 +1,9 @@
 import * as Yup from "yup";
 import BaseForm from "../../../components/form/BaseForm";
-import { updateClient, getClient } from "../../../redux/features/client/client.thunk";
+import {
+  updateClient,
+  getClient,
+} from "../../../redux/features/client/client.thunk";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { getAllProgramsByAdmin } from "@/redux/features/program/program.thunk";
@@ -68,7 +71,7 @@ export default function ClientEditForm() {
   };
 
   const fetchTherapy = async () => {
-    const res = await dispatch(fetchTherapyPlans({page:1, limit:100}));
+    const res = await dispatch(fetchTherapyPlans({ page: 1, limit: 100 }));
     if (res.payload?.data) {
       setTherapy(res.payload.data.therapy);
     }
@@ -83,33 +86,38 @@ export default function ClientEditForm() {
 
   useEffect(() => {
     if (id) {
-       dispatch(getClient({ id })).unwrap().then((data) => {
-           const formattedValues = {
-               ...initialFormValues,
-               ...data,
-               dob: data.dob ? new Date(data.dob).toISOString().split('T')[0] : "",
-               startDate: data.programStartDate ? new Date(data.programStartDate).toISOString().split('T')[0] : "",
-               endDate: data.programEndDate ? new Date(data.programEndDate).toISOString().split('T')[0] : "",
-               programType: data.programType?._id || data.programType, 
-               therapyType: data.therapyType?._id || data.therapyType,
-               dietician: data.dietician?._id || data.dietician,
-               trainer: data.trainer?._id || data.trainer,
-               therapist: data.therapist?._id || data.therapist,
-           };
-           
-           if (formattedValues.therapyType) {
-               setSelectedTherapyType(formattedValues.therapyType);
-           }
+      dispatch(getClient({ id }))
+        .unwrap()
+        .then((data) => {
+          const formattedValues = {
+            ...initialFormValues,
+            ...data,
+            dob: data.dob ? new Date(data.dob).toISOString().split("T")[0] : "",
+            startDate: data.programStartDate
+              ? new Date(data.programStartDate).toISOString().split("T")[0]
+              : "",
+            endDate: data.programEndDate
+              ? new Date(data.programEndDate).toISOString().split("T")[0]
+              : "",
+            programType: data.programType?._id || data.programType,
+            therapyType: data.therapyType?._id || data.therapyType,
+            dietician: data.dietician?._id || data.dietician,
+            trainer: data.trainer?._id || data.trainer,
+            therapist: data.therapist?._id || data.therapist,
+          };
 
-           setInitialValues(formattedValues);
-       }).catch(err => {
-           toast.error("Failed to fetch client details");
-           navigate(-1);
-       });
+          if (formattedValues.therapyType) {
+            setSelectedTherapyType(formattedValues.therapyType);
+          }
+
+          setInitialValues(formattedValues);
+        })
+        .catch((err) => {
+          toast.error("Failed to fetch client details");
+          navigate(-1);
+        });
     }
   }, [id, dispatch, navigate]);
-  
-  
 
   const fields = [
     {
@@ -204,8 +212,7 @@ export default function ClientEditForm() {
       ],
     },
 
-   
-    ...((!initialValues?.therapyType || !initialValues.therapist)
+    ...(!initialValues?.therapyType || !initialValues.therapist
       ? [
           {
             section: "Therapy Assignment",
@@ -254,9 +261,9 @@ export default function ClientEditForm() {
       : []),
   ];
 
-  const handleUpdate = async (values) => {    
+  const handleUpdate = async (values) => {
     const client = await dispatch(updateClient({ id, values }));
-    if (client.payload.success) { 
+    if (client.payload.success) {
       toast.success("Client updated successfully");
       navigate(-1);
     } else {
@@ -265,7 +272,7 @@ export default function ClientEditForm() {
   };
 
   if (!initialValues) {
-      return <div>Loading...</div>;
+    return <div>Loading...</div>;
   }
 
   return (
@@ -275,7 +282,6 @@ export default function ClientEditForm() {
       validationSchema={schema}
       submitLabel="Update Client"
       onSubmit={(values) => handleUpdate(values)}
-
     />
   );
 }

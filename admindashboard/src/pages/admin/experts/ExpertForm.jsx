@@ -2,9 +2,7 @@ import BaseForm from "@/components/form/BaseForm";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { createCoach } from "@/redux/features/coach/coach.thunk";
 import { refreshProfile } from "@/redux/features/auth/auth.thunk";
-import {
-  getAllPrograms,
-} from "@/redux/features/program/program.thunk";
+import { getAllPrograms } from "@/redux/features/program/program.thunk";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -22,9 +20,7 @@ export default function ExpertForm() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(
-      getAllPrograms({ page: 1, limit: 10000 }),
-    ).then((res) => {
+    dispatch(getAllPrograms({ page: 1, limit: 10000 })).then((res) => {
       setProgram(res.payload.data);
     });
     dispatch(fetchTherapyPlans({ page: 1, limit: 10000 })).then((res) => {
@@ -70,11 +66,15 @@ export default function ExpertForm() {
           name: "role",
           label: "Choose Role",
           type: "select",
-          options: [
-            { label: "Trainer", value: "Trainer" },
-            { label: "Dietician", value: "Dietician" },
-            { label: "Therapist", value: "Therapist" },
-          ],
+          options:
+            user?.role === "admin" &&
+            (!user?.program || user.program.length === 0)
+              ? [{ label: "Therapist", value: "Therapist" }]
+              : [
+                  { label: "Trainer", value: "Trainer" },
+                  { label: "Dietician", value: "Dietician" },
+                  { label: "Therapist", value: "Therapist" },
+                ],
           onChange: (e, form) => {
             setSelectedRole(e.target.value);
             form.setFieldValue("chooseProgram", []);
@@ -316,15 +316,12 @@ export default function ExpertForm() {
 
     workingHours: Yup.object({
       startTime: Yup.string().required("Working start time is required"),
-      endTime: Yup.string()
-        .required("Working end time is required")
-        
+      endTime: Yup.string().required("Working end time is required"),
     }),
 
     breakSlots: Yup.object({
       startTime: Yup.string().required("Break start time is required"),
-      endTime: Yup.string()
-        .required("Break end time is required")
+      endTime: Yup.string().required("Break end time is required"),
     }),
 
     dailyConsults: Yup.number()
@@ -391,7 +388,7 @@ export default function ExpertForm() {
     <BaseForm
       fields={fields}
       initialValues={initialValues}
-       validationSchema={validationSchema}
+      validationSchema={validationSchema}
       onSubmit={(values) => handleCoachCreation(values)}
       heading="Expert"
       submitButton="Create Expert"
