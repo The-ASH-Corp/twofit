@@ -2,9 +2,7 @@ import BaseForm from "@/components/form/BaseForm";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { createCoach } from "@/redux/features/coach/coach.thunk";
 import { refreshProfile } from "@/redux/features/auth/auth.thunk";
-import {
-  getAllProgramsByAdmin,
-} from "@/redux/features/program/program.thunk";
+import { getAllPrograms } from "@/redux/features/program/program.thunk";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -19,17 +17,13 @@ export default function ExpertForm() {
   const [program, setProgram] = useState(null);
   const [therapy, setTherapy] = useState(null);
   const [selectedRole, setSelectedRole] = useState("");
-
-  
   const navigate = useNavigate();
 
   useEffect(() => {
-    dispatch(
-      getAllProgramsByAdmin({ adminId: user?._id, page: 1, limit: 120 }),
-    ).then((res) => {
+    dispatch(getAllPrograms({ page: 1, limit: 10000 })).then((res) => {
       setProgram(res.payload.data);
     });
-    dispatch(fetchTherapyPlans({ page: 1, limit: 120 })).then((res) => {
+    dispatch(fetchTherapyPlans({ page: 1, limit: 10000 })).then((res) => {
       setTherapy(res.payload.data.therapy);
     });
   }, [dispatch, user?._id]);
@@ -72,11 +66,19 @@ export default function ExpertForm() {
           name: "role",
           label: "Choose Role",
           type: "select",
-          options: [
-            { label: "Trainer", value: "Trainer" },
-            { label: "Dietician", value: "Dietician" },
-            { label: "Therapist", value: "Therapist" },
-          ],
+          options:
+            user?.role === "admin"
+              ? !user?.program || user.program.length === 0
+                ? [{ label: "Therapist", value: "Therapist" }]
+                : [
+                    { label: "Trainer", value: "Trainer" },
+                    { label: "Dietician", value: "Dietician" },
+                  ]
+              : [
+                  { label: "Trainer", value: "Trainer" },
+                  { label: "Dietician", value: "Dietician" },
+                  { label: "Therapist", value: "Therapist" },
+                ],
           onChange: (e, form) => {
             setSelectedRole(e.target.value);
             form.setFieldValue("chooseProgram", []);
@@ -93,7 +95,7 @@ export default function ExpertForm() {
           })),
           allowCustom: true,
         },
-        { name: "experience", label: "Experience", type: "text" },
+        { name: "experience", label: "Experience", type: "number" },
         { name: "qualification", label: "Qualification", type: "text" },
         {
           name: "languages",
@@ -274,7 +276,11 @@ export default function ExpertForm() {
       .min(1, "Select at least one specialization")
       .required("Specialization is required"),
 
-    experience: Yup.string().trim().required("Experience is required"),
+    experience: Yup.number()
+      .required("Experience is required")
+      .min(0, "Experience must be at least 0")
+      .max(100, "Experience must be less than 100"),
+
     qualification: Yup.string().trim().required("Qualification is required"),
 
     languages: Yup.array()
@@ -314,15 +320,12 @@ export default function ExpertForm() {
 
     workingHours: Yup.object({
       startTime: Yup.string().required("Working start time is required"),
-      endTime: Yup.string()
-        .required("Working end time is required")
-        
+      endTime: Yup.string().required("Working end time is required"),
     }),
 
     breakSlots: Yup.object({
       startTime: Yup.string().required("Break start time is required"),
-      endTime: Yup.string()
-        .required("Break end time is required")
+      endTime: Yup.string().required("Break end time is required"),
     }),
 
     dailyConsults: Yup.number()
@@ -370,16 +373,15 @@ export default function ExpertForm() {
       const coach = await dispatch(createCoach(formData));
 
       if (coach.meta.requestStatus === "fulfilled") {
-        console.log(coach, "if")
-        await dispatch(refreshProfile({ id: user?._id, role: user.role }));
+        await dispatch(
+          refreshProfile({ id: user?._id, role: user.role }),
+        ).unwrap();
         toast("Coach created successfully", { type: "success" });
         navigate(-1);
       } else {
-        console.log(coach, "else");
         toast(coach.message || "Failed to create coach 1", { type: "error" });
       }
     } catch (err) {
-      console.log(err, "catch");
       toast(err?.message || "Failed to create coach 1", { type: "error" });
     } finally {
       setIsLoading(false);
@@ -390,7 +392,7 @@ export default function ExpertForm() {
     <BaseForm
       fields={fields}
       initialValues={initialValues}
-       validationSchema={validationSchema}
+      validationSchema={validationSchema}
       onSubmit={(values) => handleCoachCreation(values)}
       heading="Expert"
       submitButton="Create Expert"

@@ -3,9 +3,9 @@ import BaseForm from "../../../components/form/BaseForm";
 import { createClient } from "../../../redux/features/auth/auth.thunk";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { getAllProgramsByAdmin } from "@/redux/features/program/program.thunk";
+import { getAllPrograms } from "@/redux/features/program/program.thunk";
 import { useEffect, useState } from "react";
-import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
+import { getAllCoachesByAdmin, getAllTherapists } from "@/redux/features/coach/coach.thunk";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { fetchTherapyPlans } from "@/redux/features/therapy/therapy.thunk";
@@ -110,25 +110,26 @@ export default function ClientForm() {
   const navigate = useNavigate();
   const [program, setProgram] = useState(null);
   const [coachesOfAdmin, setCoachesOfAdmin] = useState([]);
+  const [allTherapists, setAllTherapists] = useState([]);
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [selectedTherapyType, setSelectedTherapyType] = useState("");
   const [therapy, setTherapy] = useState([]);
   const dispatch = useDispatch();
 
   const user = useSelector(selectUser);
-  console.log(user)
 
   useEffect(() => {
     const timer = setTimeout(async () => {
       const programRes = await dispatch(
-        getAllProgramsByAdmin({ adminId: user?._id, page: 1, limit: 120 }),
+        getAllPrograms({ page: 1, limit: 10000 }),
       );
       setProgram(programRes?.payload?.data || []);
 
-      const coachessOfAdmin = await dispatch(
-        getAllCoachesByAdmin(user?.experts),
-      );
+      const coachessOfAdmin = await dispatch(getAllCoachesByAdmin(user?.experts));
       setCoachesOfAdmin(coachessOfAdmin?.payload || []);
+
+      const allTherapistsRes = await dispatch(getAllTherapists());
+      setAllTherapists(allTherapistsRes?.payload || []);
 
       const therapyRes = await dispatch(
         fetchTherapyPlans({ page: 1, limit: 100 }),
@@ -331,6 +332,31 @@ export default function ClientForm() {
             : [],
           onChange: (e) => setSelectedTherapyType(e.target.value),
         },
+        ...(selectedTherapyType
+          ? [
+              {
+                name: "therapist",
+                label: "Therapist",
+                type: "select",
+                options: allTherapists
+                  ? allTherapists
+                      ?.filter((coach) => {
+                        if (coach?.role !== "Therapist") return false;
+                        if (selectedTherapyType) {
+                          return coach.assignedTherapy?.some(
+                            (t) => (t?._id || t) === selectedTherapyType,
+                          );
+                        }
+                        return true;
+                      })
+                      ?.map((coach) => ({
+                        label: coach.name,
+                        value: coach?._id,
+                      }))
+                  : [],
+              },
+            ]
+          : []),
       ],
     },
     {
@@ -375,23 +401,6 @@ export default function ClientForm() {
                 ?.map((coach) => ({ label: coach.name, value: coach?._id }))
             : [],
         },
-        ...(selectedTherapyType
-          ? [
-              {
-                name: "therapist",
-                label: "Therapist",
-                type: "select",
-                options: coachesOfAdmin
-                  ? coachesOfAdmin
-                      ?.filter((coach) => coach?.role === "Therapist")
-                      ?.map((coach) => ({
-                        label: coach.name,
-                        value: coach?._id,
-                      }))
-                  : [],
-              },
-            ]
-          : []),
       ],
     },
     {
@@ -416,10 +425,6 @@ export default function ClientForm() {
       ],
     },
   ];
-
-  console.log(
-    coachesOfAdmin
-   );
 
   const handleUserCreation = async (values) => {
     setIsLoading(true);

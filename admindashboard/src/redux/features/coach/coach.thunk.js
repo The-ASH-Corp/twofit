@@ -191,3 +191,36 @@ export const updateCoach = createAsyncThunk(
     }
   }
 );
+
+
+export const getAllCoachesByProgramId = createAsyncThunk(
+  "coach/getAllCoachesByProgramId",
+  async ({ programId, page, limit }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/coach/get-all-coaches-by-program-id/${programId}/${page}/${limit}`,
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get coaches by program id",
+      );
+    }
+  },
+);
+
+export const getAllTherapists = createAsyncThunk(
+  "coach/getAllTherapists",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/coach/get-all-therapists`,
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get therapists",
+      );
+    }
+  },
+);

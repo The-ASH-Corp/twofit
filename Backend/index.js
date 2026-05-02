@@ -65,7 +65,13 @@ app.use(
 );
 
 // BODY PARSER MUST COME AFTER CORS
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, _res, buf) => {
+      req.rawBody = buf;
+    },
+  }),
+);
 app.use(cookieParser())
 
 app.use("/uploads", express.static("uploads"));
