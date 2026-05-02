@@ -1,6 +1,6 @@
 import { generatePassword, hashPassword } from "../../utils/password.js";
 import { AdminModel } from "../admin/admin.model.js";
-import { calculateExtraClientIncentive, calculateRatingIncentive } from "../incentive/incentive.service.js";
+import { calculateCoachIncentives } from "../incentive/incentive.service.js";
 import { CoachModel } from "./coach.model.js";
 import User from "../auth/auth.model.js";
 import mongoose from "mongoose";
@@ -302,12 +302,12 @@ export const updateCoachById = async (coachId, updatedData) => {
     delete updatedData.chooseTherapy;
   }
 
-  calculateExtraClientIncentive(coachId)
+  calculateCoachIncentives(coachId);
 
   const updated = await CoachModel.updateOne({ _id: coachId }, { $set: updatedData });
 
-  calculateExtraClientIncentive(coachId);
-
+  calculateCoachIncentives(coachId);
+  
   return updated;
 };
 
@@ -413,7 +413,7 @@ export const createFeedback = async (expertId, userId, rating, feedback) => {
     { new: true },
   );
 
-  await calculateRatingIncentive(expertId);
+  await calculateCoachIncentives(expertId);
 
   return avgrating;
 };
