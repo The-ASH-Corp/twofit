@@ -67,9 +67,13 @@ export default function ExpertForm() {
           label: "Choose Role",
           type: "select",
           options:
-            user?.role === "admin" &&
-            (!user?.program || user.program.length === 0)
-              ? [{ label: "Therapist", value: "Therapist" }]
+            user?.role === "admin"
+              ? !user?.program || user.program.length === 0
+                ? [{ label: "Therapist", value: "Therapist" }]
+                : [
+                    { label: "Trainer", value: "Trainer" },
+                    { label: "Dietician", value: "Dietician" },
+                  ]
               : [
                   { label: "Trainer", value: "Trainer" },
                   { label: "Dietician", value: "Dietician" },

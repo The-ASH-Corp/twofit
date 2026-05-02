@@ -164,11 +164,11 @@ export default function HabitTracker() {
 
   if (!habits || !habits.habits?.length) {
     return (
-      <div className="flex flex-col items-center justify-center w-full h-[60vh] text-center p-8 bg-white rounded-[32px] shadow-sm">
+      <div className="flex flex-col items-center justify-center w-50% h-[60vh] text-center p-8 bg-white rounded-[32px] shadow-sm m-5">
         <Target size={48} className="text-gray-200 mb-4" />
         <h3 className="text-lg font-bold text-gray-800">No habits assigned yet</h3>
         <p className="text-sm text-gray-500 max-w-xs mt-1">
-          Visit the admin panel to set up your daily rituals.
+          Your coach hasn't set up any habits for you yet. Check back soon!
         </p>
       </div>
     );
