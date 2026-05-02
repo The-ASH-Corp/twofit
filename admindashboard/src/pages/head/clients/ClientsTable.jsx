@@ -7,15 +7,18 @@ import {
   selectClientError,
   selectClientStatus,
 } from "@/redux/features/client/client.selectors";
+import { getClientsBasedOnCoach } from "@/redux/features/client/client.thunk";
 import { useNavigate } from "react-router-dom";
 import { SyncLoader } from "react-spinners";
-import { getAllUsersByHead } from "@/redux/features/head/head.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { getAllProgramsByCategory } from "@/redux/features/program/program.thunk";
+import { getAllCoachesByProgramId, getAllTherapists } from "@/redux/features/coach/coach.thunk";
 
 export default function ClientsTable() {
-  const user =useAppSelector(selectUser)
-    const status = useSelector(selectClientStatus);
+  const user = useAppSelector(selectUser);
+  const status = useSelector(selectClientStatus);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const error = useAppSelector(selectClientError);
   const [clients, setClients] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -26,7 +29,40 @@ export default function ClientsTable() {
   const fetchClientData = async () => {
     setLoading(true);
     try {
-      const client = await dispatch(getAllUsersByHead({ headId:user?._id,page, limit })).unwrap();
+      // Get programs under the head's category
+      const prgms = await dispatch(
+        getAllProgramsByCategory({
+          category: user?.programCategory,
+          page: 1,
+          limit: 10000,
+        })
+      ).unwrap();
+      const programIds = prgms.data.map((program) => program._id);
+
+      // Fetch Trainers/Dieticians by program match
+      const programCoaches = await dispatch(
+        getAllCoachesByProgramId({ programId: programIds, page: 1, limit: 10000 })
+      ).unwrap();
+
+      // Fetch all Therapists (therapists don't have programs)
+      const therapists = await dispatch(getAllTherapists()).unwrap();
+
+      // Merge, deduplicate, and extract IDs
+      const allCoaches = [...(programCoaches.data || []), ...(therapists || [])];
+      const coachIds = [
+        ...new Set(allCoaches.map((c) => c._id)),
+      ];
+
+      if (coachIds.length === 0) {
+        setClients([]);
+        setTotalCount(0);
+        return;
+      }
+
+      // Fetch clients assigned to these coaches
+      const client = await dispatch(
+        getClientsBasedOnCoach({ coachIds, page, limit })
+      ).unwrap();
       setClients(client.data);
       setTotalCount(client.total);
     } catch (error) {
@@ -35,7 +71,6 @@ export default function ClientsTable() {
       setLoading(false);
     }
   };
-
 
   const handlePageChange = (newPage) => {
     setPage(newPage);
@@ -47,10 +82,10 @@ export default function ClientsTable() {
 
   const searchInpiutHandler = (e) => {
     const value = e.target.value.toLowerCase();
-    const filteredAdmins = clients.filter((admin) => {
-      return admin.name.toLowerCase().includes(value);
+    const filteredClients = clients.filter((client) => {
+      return client.name?.toLowerCase().includes(value);
     });
-    setClients(filteredAdmins);
+    setClients(filteredClients);
     if (value == "") {
       fetchClientData();
     }
@@ -60,17 +95,15 @@ export default function ClientsTable() {
     navigate(`/head/clients/profile/${id}`);
   };
 
-  const dispatch = useDispatch();
-
   useEffect(() => {
     fetchClientData();
   }, [page, limit, dispatch]);
 
   if (loading) return (
-        <div className="flex justify-center items-center h-[calc(100vh-120px)]">
-          <SyncLoader color="#0A4F48" loading margin={2} size={20} />
-        </div>
-      );
+    <div className="flex justify-center items-center h-[calc(100vh-120px)]">
+      <SyncLoader color="#0A4F48" loading margin={2} size={20} />
+    </div>
+  );
   if (error) return <p>{error}</p>;
 
   return (

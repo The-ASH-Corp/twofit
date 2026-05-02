@@ -10,7 +10,6 @@ import {
 } from "@/redux/features/client/client.selectors";
 import { getClientsBasedOnCoach } from "@/redux/features/client/client.thunk";
 import { useNavigate } from "react-router-dom";
-import { selectAllCoaches } from "@/redux/features/coach/coach.selector";
 import { getAllCoachesByAdminId } from "@/redux/features/admins/admin.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { SyncLoader } from "react-spinners";
@@ -18,7 +17,6 @@ import { SyncLoader } from "react-spinners";
 export default function ClientsTable() {
   const dispatch = useDispatch();
 
-  const coachIds = useAppSelector(selectAllCoaches);
   const user = useAppSelector(selectUser);
   const status = useAppSelector(selectClientStatus);
   const error = useAppSelector(selectClientError);
@@ -29,11 +27,21 @@ export default function ClientsTable() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
-  if (coachIds.length === 0) {
-    dispatch(getAllCoachesByAdminId(user?._id, page, limit));
-  }
-
   const fetchClientData = async () => {
+    // First fetch coaches using the program-based API (same as ExpertTable)
+    const coaches = await dispatch(
+      getAllCoachesByAdminId({ adminId: user?._id, page: 1, limit: 10000 })
+    ).unwrap();
+
+    // Extract coach IDs from the program-based results
+    const coachIds = coaches?.map((coach) => coach._id) || [];
+
+    if (coachIds.length === 0) {
+      setClients([]);
+      setClientsLength(0);
+      return;
+    }
+
     const client = await dispatch(
       getClientsBasedOnCoach({ coachIds, page, limit })
     ).unwrap();

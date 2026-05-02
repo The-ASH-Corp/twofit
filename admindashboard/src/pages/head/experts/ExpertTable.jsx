@@ -3,12 +3,11 @@ import BaseTable from "../../../components/table/BaseTable";
 import { ExpertColumns } from "./ExpertColumns";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getAllCoachesByHead } from "@/redux/features/head/head.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { SyncLoader } from "react-spinners";
 import { getAllProgramsByCategory } from "@/redux/features/program/program.thunk";
-import { getAllCoachesByProgramId } from "@/redux/features/coach/coach.thunk";
+import { getAllCoachesByProgramId, getAllTherapists } from "@/redux/features/coach/coach.thunk";
 
 export default function ExpertTable() {
   const user = useAppSelector(selectUser);
@@ -22,21 +21,32 @@ export default function ExpertTable() {
   const fetchCoachData = async () => {
     setLoading(true);
     try {
+      // Get programs under the head's category
       const prgms = await dispatch(
         getAllProgramsByCategory({
           category: user?.programCategory,
-          page,
-          limit,
+          page: 1,
+          limit: 10000,
         }),
       ).unwrap();
       const programIds = prgms.data.map((program) => program._id);
 
-      const coache = await dispatch(
-        getAllCoachesByHead({ page, limit, headId: user?._id }),
+      // Fetch Trainers/Dieticians by program match
+      const programCoaches = await dispatch(
+        getAllCoachesByProgramId({ programId: programIds, page, limit })
       ).unwrap();
-      const newdata = await dispatch(getAllCoachesByProgramId({ programId: programIds, page, limit })).unwrap();
-      setCoaches([...coache.data, ...newdata.data]);
-      setLength(coache.data.length + newdata.data.length);
+
+      // Fetch all Therapists (therapists don't have programs, they have therapyType)
+      const therapists = await dispatch(getAllTherapists()).unwrap();
+
+      // Merge and deduplicate
+      const allCoaches = [...(programCoaches.data || []), ...(therapists || [])];
+      const uniqueCoaches = Array.from(
+        new Map(allCoaches.map((c) => [c._id, c])).values()
+      );
+
+      setCoaches(uniqueCoaches);
+      setLength(uniqueCoaches.length);
     } catch (error) {
       console.error(error);
     } finally {

@@ -166,20 +166,24 @@ export const getAdminById = async (id) => {
 
 export const getAllCoachesByAdmin = async ({ adminId, page, limit }) => {
   const skip = (page - 1) * limit;
-  const admin = await AdminModel.findById(adminId).select("experts");
-  const totalCount = admin?.experts?.length || 0;
+  const admin = await AdminModel.findById(adminId).select("program");
 
-  const populatedAdmin = await AdminModel.findById(adminId).populate({
-    path: "experts",
-    options: {
-      skip: skip,
-      limit: limit,
-    },
-  });
+  let query;
+  if (admin?.program && admin.program.length > 0) {
+    query = { assignedPrograms: { $in: admin.program } };
+  } else {
+    query = { role: "Therapist" };
+  }
+
+  const totalCount = await CoachModel.countDocuments(query);
+  const coaches = await CoachModel.find(query)
+    .skip(skip)
+    .limit(limit)
+    .select("-password");
 
   return {
-    coaches: populatedAdmin?.experts || [],
-    totalCount: totalCount,
+    coaches,
+    totalCount,
   };
 };
 
