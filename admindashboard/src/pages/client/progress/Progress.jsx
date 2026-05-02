@@ -94,7 +94,7 @@ export default function Progress() {
     if (!lastWeightUpdateDate) return true;
     const daysSinceLastUpdate =
       (new Date() - new Date(lastWeightUpdateDate)) / (1000 * 60 * 60 * 24);
-    return daysSinceLastUpdate >= 7;
+    return daysSinceLastUpdate >= 10;
   };
 
   const shouldShowMeasurementUpdateButton = () => {
@@ -102,7 +102,7 @@ export default function Progress() {
     const daysSinceLastUpdate =
       (new Date() - new Date(lastMeasurementUpdateDate)) /
       (1000 * 60 * 60 * 24);
-    return daysSinceLastUpdate >= 7;
+    return daysSinceLastUpdate >= 10;
   };
 
   const startWeight = Number(sortedWeightHistory[0]?.weight) || 0;
