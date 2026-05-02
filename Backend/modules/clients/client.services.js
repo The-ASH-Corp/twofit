@@ -3,7 +3,7 @@ import { CoachModel } from "../coach/coach.model.js";
 import mongoose from "mongoose";
 import HabitModel from "../habit/habit.model.js";
 import TaskSubmission from "../taskSubmission/taskSubmission.model.js";
-import { calculateExtraClientIncentive } from "../incentive/incentive.service.js";
+import { calculateCoachIncentives } from "../incentive/incentive.service.js";
 
 const ACCEPTED_SUBMISSION_STATUSES = new Set(["pending", "verified"]);
 
@@ -206,11 +206,11 @@ export const updateOneClient = async (userData, id) => {
     { $set: userData },
     { new: true },
   ).select("-password");
-  const coaches = [client.dietition, client.trainer, client.therapist].filter(
+  const coaches = [client.Dietician, client.trainer, client.therapist].filter(
     Boolean,
   );
   for (const coachId of coaches) {
-    await calculateExtraClientIncentive(coachId);
+    await calculateCoachIncentives(coachId);
   }
   return client;
 };
@@ -221,11 +221,9 @@ export const deleteOneClient = async (id) => {
     throw new Error("Client not found");
   }
 
-  const coachIds = [
-    client.trainer,
-    client.dietition,
-    client.therapist,
-  ].filter(Boolean);
+  const coachIds = [client.trainer, client.Dietician, client.therapist].filter(
+    Boolean,
+  );
 
   // 1. Remove client from Expert's assignedUsers list
   if (coachIds.length > 0) {
@@ -244,7 +242,7 @@ export const deleteOneClient = async (id) => {
   // 3. Recalculate Expert incentives
   for (const coachId of coachIds) {
     try {
-      await calculateExtraClientIncentive(coachId);
+      await calculateCoachIncentives(coachId);
     } catch (error) {
       console.error(
         `Failed to recal incentive for coach ${coachId}:`,

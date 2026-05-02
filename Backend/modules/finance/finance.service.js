@@ -1,7 +1,7 @@
 import { AdminModel } from "../admin/admin.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import { HeadsModel } from "../Heads/heads.modal.js";
-import { calculateExtraClientIncentive, calculateRatingIncentive } from "../incentive/incentive.service.js";
+import { calculateCoachIncentives } from "../incentive/incentive.service.js";
 import { PayrollModel } from "./finance.model.js";
 
 export const allEmployees = async (page, limit) => {
@@ -93,8 +93,7 @@ export const generateMonthlyPayroll = async () => {
       let updatedEmp = emp;
 
       if (emp.type === "Coach") {
-        await calculateRatingIncentive(emp._id);
-        await calculateExtraClientIncentive(emp._id);
+        await calculateCoachIncentives(emp._id);
         const freshCoach = await CoachModel.findById(emp._id).lean();
         updatedEmp = { ...freshCoach, type: "Coach" };
       }
