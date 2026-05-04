@@ -54,7 +54,7 @@ export default function AssignDietPlanDrawer({ isOpen, onClose, clientId }) {
       <div className="relative w-full lg:w-[340px] lg:h-full max-h-[85vh] lg:max-h-none bg-white shadow-2xl flex flex-col rounded-t-3xl lg:rounded-none animate-in slide-in-from-bottom lg:slide-in-from-right duration-300 pb-24 lg:pb-0">
         {/* Header */}
         <div className="flex justify-between items-center p-5 lg:p-6 pb-4 border-b border-gray-100">
-           {/* Mobile handle bar */}
+          {/* Mobile handle bar */}
           <div className="lg:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-gray-300 rounded-full"></div>
 
           <h2 className="text-[16px] lg:text-xl font-bold text-[#0A4F48]">
@@ -75,15 +75,21 @@ export default function AssignDietPlanDrawer({ isOpen, onClose, clientId }) {
             <h3 className="text-sm font-semibold text-gray-700 mb-4">
               Meal Count
             </h3>
-            <div className="grid py-5  rounded-xl">
-              <input
-                type="number"
-                min="1"
-                max="10"
-                value={mealCount}
-                onChange={(e) => setMealCount(e.target.value)}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0A4F48]/50"
-              />
+            <div className="grid grid-cols-3 gap-3">
+              {[4, 5, 6].map((count) => (
+                <button
+                  key={count}
+                  onClick={() => setMealCount(count)}
+                  className={`py-2 rounded-lg border text-sm font-medium transition 
+          ${
+            mealCount === count
+              ? "bg-[#0A4F48] text-white border-[#0A4F48]"
+              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+          }`}
+                >
+                  {count} Meals
+                </button>
+              ))}
             </div>
           </div>
 
@@ -93,13 +99,18 @@ export default function AssignDietPlanDrawer({ isOpen, onClose, clientId }) {
               Attachment
             </h3>
             <div className="flex border border-gray-200 rounded-lg bg-white overflow-hidden">
-                <label className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-4 py-3 cursor-pointer transition-colors border-r border-gray-200">
-                    Upload File
-                    <input type="file" className="hidden" accept="application/pdf" onChange={handleFileChange} />
-                </label>
-                <div className="flex-1 px-4 py-3 text-sm text-gray-500 truncate flex items-center">
-                    {file ? file.name : "Upload PDF"}
-                </div>
+              <label className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-4 py-3 cursor-pointer transition-colors border-r border-gray-200">
+                Upload File
+                <input
+                  type="file"
+                  className="hidden"
+                  accept="application/pdf"
+                  onChange={handleFileChange}
+                />
+              </label>
+              <div className="flex-1 px-4 py-3 text-sm text-gray-500 truncate flex items-center">
+                {file ? file.name : "Upload PDF"}
+              </div>
             </div>
           </div>
         </div>

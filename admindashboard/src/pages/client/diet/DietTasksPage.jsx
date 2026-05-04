@@ -54,12 +54,12 @@ const getMealConfig = (index, totalCount, Apple, Utensils, Moon) => {
   }
   if (totalCount === 6) {
     const configs = [
-      { label: "BREAKFAST", time: "07:30 AM", icon: Apple },
-      { label: "MID-MORNING", time: "10:30 AM", icon: Apple },
-      { label: "LUNCH", time: "01:00 PM", icon: Utensils },
-      { label: "AFTERNOON", time: "04:00 PM", icon: Apple },
-      { label: "EVENING", time: "07:00 PM", icon: Apple },
-      { label: "DINNER", time: "09:30 PM", icon: Moon },
+      { label: "DETOX", time: "Empty Stomach", icon: Apple },
+      { label: "BREAKFAST", time: "08:00 AM", icon: Apple },
+      { label: "MID SNACKS", time: "11:00 AM", icon: Utensils },
+      { label: "LUNCH", time: "01:00 PM", icon: Apple },
+      { label: "EVENING SNACKS", time: "04:00 PM", icon: Apple },
+      { label: "DINNER", time: "07:00 PM", icon: Moon },
     ];
     return configs[index] || { label: `MEAL ${index + 1}`, time: "--:--", icon: Utensils };
   }
@@ -141,6 +141,7 @@ export default function DietTasksPage() {
 
       return {
         name: config.label,
+        time:config.time,
         notes: "Upload a clear image of your meal for expert review.",
         index,
         exerciseIndex: mealIndex,
@@ -515,7 +516,7 @@ export default function DietTasksPage() {
 
           <div className="relative mt-6 pb-1">
             <div className="absolute left-[24px] right-[24px] top-[20px] h-[5px] rounded-full bg-[#DDE5E1]" />
-            <div
+            <div 
               className="absolute left-[24px] top-[20px] h-[5px] rounded-full bg-[#0A7B4E] transition-all duration-700"
               style={{ width: `${progressBarWidth}%` }}
             />
@@ -574,7 +575,12 @@ export default function DietTasksPage() {
                       {item.name
                         .toLowerCase()
                         .replace(/\b\w/g, (match) => match.toUpperCase())}
+                        
                     </button>
+                    <p className={cn(
+                        "truncate text-center text-[11px] font-bold leading-tight text-[#5D6D65]",
+                        isActive && "text-[#0A7B4E]",
+                      )}>{item.time}</p>
                   </div>
                 );
               })}
