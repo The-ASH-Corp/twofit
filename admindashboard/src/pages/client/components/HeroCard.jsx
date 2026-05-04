@@ -60,7 +60,7 @@ export default function HeroCard({ program, currentGlobalDay }) {
 
   {/* ✅ Background Image Layer */}
   <div
-    className="absolute inset-0 bg-no-repeat bg-contain bg-right-bottom opacity-100"
+    className="absolute inset-0 bg-no-repeat bg-cover bg-right-bottom opacity-100"
     style={{
       backgroundImage: program?.image
         ? `url(http://localhost:5000${program.image})`
@@ -69,15 +69,15 @@ export default function HeroCard({ program, currentGlobalDay }) {
   />
 
   {/* ✅ Optional gradient overlay (for readability) */}
-  <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/70 to-transparent" />
+  <div className="absolute inset-0 bg-gradient-to-r from-white/60 via-white/30 to-transparent" />
 
   {/* Your shape */}
   <div className="absolute bottom-0 right-4 h-[148px] w-[204px] rounded-t-[120px] rounded-b-[18px] bg-[rgba(10,79,72,0.06)]" />
 
   {/* ✅ Content */}
   <div className="relative z-10 flex h-full items-center">
-    <div className="flex flex-1 flex-col pr-[120px] sm:pr-[200px] lg:pr-60">
-      <h2 className="client-title text-[28px] sm:text-[34px] lg:text-[40px]">
+    <div className="flex flex-1 flex-col pr-[120px] sm:pr-[200px] lg:pr-60  ">
+      <h2 className="client-title text-[25px] sm:text-[29px] lg:text-[35px] ">
         {titleBase}
       </h2>
 
