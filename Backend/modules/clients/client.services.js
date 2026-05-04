@@ -229,14 +229,14 @@ export const deleteOneClient = async (id) => {
   if (coachIds.length > 0) {
     await CoachModel.updateMany(
       { _id: { $in: coachIds } },
-      { $pull: { assignedUsers: id } },
+      { $pull: { assignedUsers: new mongoose.Types.ObjectId(id) } },
     );
   }
 
   // 2. Delete habits and task submissions
   await Promise.all([
-    HabitModel.deleteMany({ clientId: id }),
-    TaskSubmission.deleteMany({ userId: id }),
+    HabitModel.deleteMany({ clientId: new mongoose.Types.ObjectId(id) }),
+    TaskSubmission.deleteMany({ userId: new mongoose.Types.ObjectId(id) }),
   ]);
 
   // 3. Recalculate Expert incentives

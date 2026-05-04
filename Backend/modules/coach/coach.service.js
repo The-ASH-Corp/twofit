@@ -326,12 +326,12 @@ export const deleteCoachById = async (coachId) => {
   if (coach.adminId) {
     await AdminModel.findByIdAndUpdate(
       coach.adminId,
-      { $pull: { experts: coachId } }
+      { $pull: { experts: new mongoose.Types.ObjectId(coachId) } }
     );
   }
 
   // Clean up associated SOPs
-  await SOP.deleteMany({ coachId });
+  await SOP.deleteMany({ coachId: new mongoose.Types.ObjectId(coachId) });
 
   return await CoachModel.findByIdAndDelete(coachId);
 };
