@@ -1,6 +1,6 @@
 import { generatePassword, hashPassword } from "../../utils/password.js";
 import { AdminModel } from "../admin/admin.model.js";
-import { calculateExtraClientIncentive, calculateRatingIncentive } from "../incentive/incentive.service.js";
+import { calculateCoachIncentives } from "../incentive/incentive.service.js";
 import { CoachModel } from "./coach.model.js";
 import User from "../auth/auth.model.js";
 import mongoose from "mongoose";
@@ -12,185 +12,185 @@ import { assertEmailUnique } from "../../utils/checkEmailUnique.js";
 import { SOP } from "../sop/sop.model.js";
 
 export const createCoach = async (coach) => {
- try {
-   await assertEmailUnique(coach.email);
-   // Parse JSON stringified fields from FormData
-   const fieldsToParseAsJSON = [
-     "workingHours",
-     "breakSlots",
-     "workingdays",
-     "specialization",
-     "chooseProgram",
-     "chooseTherapy",
-     "languages",
-   ];
-   const booleanFields = [
-     // "ratingIncentive",
-     // "responseTimeIncentive",
-     // "complianceIncentive",
-     "autoSendWelcome",
-     "autoSendGuide",
-     "automatedReminder",
-   ];
-
-   // Parse JSON strings
-   fieldsToParseAsJSON.forEach((field) => {
-     if (coach[field] && typeof coach[field] === "string") {
-       try {
-         coach[field] = JSON.parse(coach[field]);
-       } catch (e) {
-         console.error(`Failed to parse ${field}:`, e);
-       }
-     }
-   });
-
-   // Convert boolean strings to actual booleans
-   booleanFields.forEach((field) => {
-     if (coach[field] !== undefined) {
-       coach[field] = coach[field] === "true" || coach[field] === true;
-     }
-   });
-
-   let plainPassword;
-   if (coach.password) {
-     plainPassword = coach.password;
-   } else {
-     plainPassword = generatePassword();
-     console.log("Generated Password for Coach:", plainPassword);
-   }
-
-   const hashedPassword = await hashPassword(plainPassword);
-
-   const coachCreated = await CoachModel.create({
-     name: capitalizeFirst(coach.fullname),
-     dob: coach.dob,
-     gender: coach.gender,
-     password: hashedPassword,
-     // ratingIncentive: coach.ratingIncentive,
-     // responseTimeIncentive: coach.responseTimeIncentive,
-     // complianceIncentive: coach.complianceIncentive,
-     autoSendWelcome: coach.autoSendWelcome,
-     autoSendGuide: coach.autoSendGuide,
-     automatedReminder: coach.automatedReminder,
-     email: coach.email,
-     phone: coach.phone,
-     address: coach.address,
-     role: coach.role,
-     adminId: coach.adminId,
-     specialization: coach.specialization,
-     experience: coach.experience,
-     qualification: coach.qualification,
-     languages: coach.languages,
-     assignedPrograms: coach.chooseProgram ?? null,
-     assignedTherapy: coach.chooseTherapy ?? null,
-     maxClient: coach.clientLimit,
-     workingDays: coach.workingdays,
-     workingHours: coach.workingHours,
-     breakSlots: coach.breakSlots,
-     maxDailyConsults: coach.dailyConsults,
-     responseTime: coach.responseTime,
-     salary: coach.baseSalary,
-     status: "Active",
-   });
-
-   await AdminModel.findByIdAndUpdate(
-     coach.adminId,
-     { $addToSet: { experts: coachCreated._id } },
-     { new: true },
-   );
-
-   // Notify Admin
-   await createNotification({
-     type: "new_coach",
-     title: "New Team Member",
-     message: `${coachCreated.name} has been employed as a ${coachCreated.role} under your supervision.`,
-     recipientRole: "admin",
-     recipientId: coach.adminId,
-     category: "admin",
-     priority: "high",
-     metadata: { expertId: coachCreated._id },
-   });
-
-   // Notify Coach
-   await createNotification({
-     type: "welcome_message",
-     title: "Welcome to the Team",
-     message: "Your expert account has been created successfully.",
-     recipientRole: "coach",
-     recipientId: coachCreated._id,
-     category: "system",
-     metadata: { expertId: coachCreated._id },
-   });
-
-  //  void sendEmail({
-  //    to: coach.email,
-  //    subject: "Welcome to TwoFit - Your Login Credentials",
-  //    html: `
-  //     <!DOCTYPE html>
-  //     <html>
-  //     <head>
-  //       <style>
-  //         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-  //         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-  //         .header { background-color: #0A4F48; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
-  //         .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-  //         .credentials-box { background-color: white; border-left: 5px solid #0A4F48; padding: 20px; margin: 20px 0; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-  //         .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
-  //       </style>
-  //     </head>
-  //     <body>
-  //       <div class="container">
-  //         <div class="header">
-  //           <h1>Welcome to TwoFit!</h1>
-  //         </div>
-  //         <div class="content">
-  //           <p>Hello <strong>${coach.fullname}</strong>,</p>
-  //           <p>Your Expert account has been successfully created. Here are your login credentials:</p>
-            
-  //           <div class="credentials-box">
-  //             <p style="margin: 5px 0;"><strong>Email:</strong> ${coach.email}</p>
-  //             <p style="margin: 5px 0;"><strong>Password:</strong> ${plainPassword}</p>
-  //           </div>
-            
-  //           <p>Please log in and change your password immediately for security purposes.</p>
-            
-  //           <div style="text-align: center; margin-top: 30px;">
-  //             <a href="https://app.twofit.co/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
-  //           </div>
-  //         </div>
-  //         <div class="footer">
-  //           <p>&copy; ${new Date().getFullYear()} TwoFit. All rights reserved.</p>
-  //           <p>This email was sent to ${coach.email}</p>
-  //         </div>
-  //       </div>
-  //     </body>
-  //     </html>
-  //   `,
-  //  }).catch((err) =>
-  //    console.error("Failed to send coach credentials email:", err.message),
-  //  );
-
   try {
-  await sendEmail({
-    email: coach.email,
-    fullName: coach.fullname,
-    password: plainPassword,
-  });
+    await assertEmailUnique(coach.email);
+    // Parse JSON stringified fields from FormData
+    const fieldsToParseAsJSON = [
+      "workingHours",
+      "breakSlots",
+      "workingdays",
+      "specialization",
+      "chooseProgram",
+      "chooseTherapy",
+      "languages",
+    ];
+    const booleanFields = [
+      // "ratingIncentive",
+      // "responseTimeIncentive",
+      // "complianceIncentive",
+      "autoSendWelcome",
+      "autoSendGuide",
+      "automatedReminder",
+    ];
 
-console.log("EMAIL DEBUG:", {
-  email: coach.email,
-  fullName: coach.fullname,
-  password: plainPassword,
-});
-} catch (err) {
-  console.error("Failed to send coach credentials email:", err.message);
-}
+    // Parse JSON strings
+    fieldsToParseAsJSON.forEach((field) => {
+      if (coach[field] && typeof coach[field] === "string") {
+        try {
+          coach[field] = JSON.parse(coach[field]);
+        } catch (e) {
+          console.error(`Failed to parse ${field}:`, e);
+        }
+      }
+    });
 
-   return coachCreated;
- } catch (error) {
-  console.log(error)
-  throw error;
- }
+    // Convert boolean strings to actual booleans
+    booleanFields.forEach((field) => {
+      if (coach[field] !== undefined) {
+        coach[field] = coach[field] === "true" || coach[field] === true;
+      }
+    });
+
+    let plainPassword;
+    if (coach.password) {
+      plainPassword = coach.password;
+    } else {
+      plainPassword = generatePassword();
+      console.log("Generated Password for Coach:", plainPassword);
+    }
+
+    const hashedPassword = await hashPassword(plainPassword);
+
+    const coachCreated = await CoachModel.create({
+      name: capitalizeFirst(coach.fullname),
+      dob: coach.dob,
+      gender: coach.gender,
+      password: hashedPassword,
+      // ratingIncentive: coach.ratingIncentive,
+      // responseTimeIncentive: coach.responseTimeIncentive,
+      // complianceIncentive: coach.complianceIncentive,
+      autoSendWelcome: coach.autoSendWelcome,
+      autoSendGuide: coach.autoSendGuide,
+      automatedReminder: coach.automatedReminder,
+      email: coach.email,
+      phone: coach.phone,
+      address: coach.address,
+      role: coach.role,
+      adminId: coach.adminId,
+      specialization: coach.specialization,
+      experience: coach.experience,
+      qualification: coach.qualification,
+      languages: coach.languages,
+      assignedPrograms: coach.chooseProgram ?? null,
+      assignedTherapy: coach.chooseTherapy ?? null,
+      maxClient: coach.clientLimit,
+      workingDays: coach.workingdays,
+      workingHours: coach.workingHours,
+      breakSlots: coach.breakSlots,
+      maxDailyConsults: coach.dailyConsults,
+      responseTime: coach.responseTime,
+      salary: coach.baseSalary,
+      status: "Active",
+    });
+
+    await AdminModel.findByIdAndUpdate(
+      coach.adminId,
+      { $addToSet: { experts: coachCreated._id } },
+      { new: true },
+    );
+
+    // Notify Admin
+    await createNotification({
+      type: "new_coach",
+      title: "New Team Member",
+      message: `${coachCreated.name} has been employed as a ${coachCreated.role} under your supervision.`,
+      recipientRole: "admin",
+      recipientId: coach.adminId,
+      category: "admin",
+      priority: "high",
+      metadata: { expertId: coachCreated._id },
+    });
+
+    // Notify Coach
+    await createNotification({
+      type: "welcome_message",
+      title: "Welcome to the Team",
+      message: "Your expert account has been created successfully.",
+      recipientRole: "coach",
+      recipientId: coachCreated._id,
+      category: "system",
+      metadata: { expertId: coachCreated._id },
+    });
+
+    //  void sendEmail({
+    //    to: coach.email,
+    //    subject: "Welcome to TwoFit - Your Login Credentials",
+    //    html: `
+    //     <!DOCTYPE html>
+    //     <html>
+    //     <head>
+    //       <style>
+    //         body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    //         .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    //         .header { background-color: #0A4F48; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+    //         .content { background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+    //         .credentials-box { background-color: white; border-left: 5px solid #0A4F48; padding: 20px; margin: 20px 0; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    //         .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+    //       </style>
+    //     </head>
+    //     <body>
+    //       <div class="container">
+    //         <div class="header">
+    //           <h1>Welcome to TwoFit!</h1>
+    //         </div>
+    //         <div class="content">
+    //           <p>Hello <strong>${coach.fullname}</strong>,</p>
+    //           <p>Your Expert account has been successfully created. Here are your login credentials:</p>
+
+    //           <div class="credentials-box">
+    //             <p style="margin: 5px 0;"><strong>Email:</strong> ${coach.email}</p>
+    //             <p style="margin: 5px 0;"><strong>Password:</strong> ${plainPassword}</p>
+    //           </div>
+
+    //           <p>Please log in and change your password immediately for security purposes.</p>
+
+    //           <div style="text-align: center; margin-top: 30px;">
+    //             <a href="https://app.twofit.co/login" style="background-color: #0A4F48; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login Now</a>
+    //           </div>
+    //         </div>
+    //         <div class="footer">
+    //           <p>&copy; ${new Date().getFullYear()} TwoFit. All rights reserved.</p>
+    //           <p>This email was sent to ${coach.email}</p>
+    //         </div>
+    //       </div>
+    //     </body>
+    //     </html>
+    //   `,
+    //  }).catch((err) =>
+    //    console.error("Failed to send coach credentials email:", err.message),
+    //  );
+
+    try {
+      await sendEmail({
+        email: coach.email,
+        fullName: coach.fullname,
+        password: plainPassword,
+      });
+
+      console.log("EMAIL DEBUG:", {
+        email: coach.email,
+        fullName: coach.fullname,
+        password: plainPassword,
+      });
+    } catch (err) {
+      console.error("Failed to send coach credentials email:", err.message);
+    }
+
+    return coachCreated;
+  } catch (error) {
+    console.log(error)
+    throw error;
+  }
 };
 
 export const getAllCoach = async (page, limit) => {
@@ -216,6 +216,7 @@ export const getCoachById = async (coachId) => {
       ],
     })
     .populate("assignedPrograms")
+    .populate("assignedTherapy")
     .populate({
       path: "feedback.userId",
       select: "name",
@@ -224,7 +225,18 @@ export const getCoachById = async (coachId) => {
   if (!coach) return coach;
 
   const coachObj = coach.toObject();
-  const assignedUsers = coachObj.assignedUsers || [];
+
+  // create a set of assigned program IDs
+  const programSet = new Set(
+    (coachObj.assignedPrograms || []).map(p => p._id.toString())
+  );
+
+  // filter users whose programType matches
+  const assignedUsers = (coachObj.assignedUsers || []).filter(user => {
+    const userProgramId = user?.programType?._id?.toString();
+    return programSet.has(userProgramId);
+  });
+
 
   const usersWithCompliance = await Promise.all(
     assignedUsers.map(async (user) => {
@@ -249,7 +261,7 @@ export const updateCoachById = async (coachId, updatedData) => {
   const fieldsToParseAsJSON = [
     "workingHours",
     "breakSlots",
-    "workingDays", 
+    "workingDays",
     "specialization",
     "chooseProgram",
     "chooseTherapy",
@@ -279,7 +291,7 @@ export const updateCoachById = async (coachId, updatedData) => {
       updatedData[field] = updatedData[field] === "true" || updatedData[field] === true;
     }
   });
-  
+
   // Transform fields to match schema
   if (updatedData.chooseProgram) {
     updatedData.assignedPrograms = updatedData.chooseProgram;
@@ -290,11 +302,11 @@ export const updateCoachById = async (coachId, updatedData) => {
     delete updatedData.chooseTherapy;
   }
 
-  calculateExtraClientIncentive(coachId)
+  calculateCoachIncentives(coachId);
 
   const updated = await CoachModel.updateOne({ _id: coachId }, { $set: updatedData });
 
-  calculateExtraClientIncentive(coachId);
+  calculateCoachIncentives(coachId);
   
   return updated;
 };
@@ -401,7 +413,7 @@ export const createFeedback = async (expertId, userId, rating, feedback) => {
     { new: true },
   );
 
-  await calculateRatingIncentive(expertId);
+  await calculateCoachIncentives(expertId);
 
   return avgrating;
 };
@@ -709,4 +721,46 @@ export const getMonthWiseAverageRating = async (coachId, duration) => {
     duration,
     ratingData: result
   };
+};
+
+
+export const getAllCoachesByProgramId = async (programId, page, limit) => {
+  try {
+    page = Number(page);
+    limit = Number(limit);
+
+    const skip = (page - 1) * limit;
+    const prgmIds = programId.split(",").map(id => new mongoose.Types.ObjectId(id));
+
+    const totalCount = await CoachModel.countDocuments({ assignedPrograms: { $in: prgmIds } });
+
+
+    const data = await CoachModel.aggregate([
+      // ===== Pagination =====
+      { $skip: skip },
+      { $limit: limit },
+      // match programs
+      {
+        $match: {
+          assignedPrograms: { $in: prgmIds },
+        },
+      },
+    ]);
+
+    return {
+      data,
+      totalCount,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getAllTherapists = async () => {
+  try {
+    const therapists = await CoachModel.find({ role: "Therapist" }).select("-password");
+    return therapists;
+  } catch (error) {
+    throw error;
+  }
 };

@@ -7,7 +7,7 @@ import { AdminModel } from "../../modules/admin/admin.model.js";
 import { HeadsModel } from "../Heads/heads.modal.js";
 import { CoachModel } from "../coach/coach.model.js";
 import { FounderModel } from "../../seeds/createAdmin.js";
-import { calculateExtraClientIncentive } from "../incentive/incentive.service.js";
+import { calculateCoachIncentives } from "../incentive/incentive.service.js";
 import { sendEmail, sendOTPEmail } from "../../utils/email.js";
 import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 import {
@@ -78,7 +78,7 @@ export const adminCreateUser = async (userData) => {
       );
 
       // Recalculate extra client incentive
-      await calculateExtraClientIncentive(coachId);
+      await calculateCoachIncentives(coachId);
 
       // Notify Coach
       await createNotification({

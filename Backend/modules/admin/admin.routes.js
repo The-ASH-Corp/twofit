@@ -16,4 +16,6 @@ router.get("/dashboard-data/:adminId", authMiddleware, adminController.getDashbo
 router.get("/get-admin-by-head/:headId/:page/:limit", authMiddleware, adminController.getAdminByHead)
 router.delete("/delete-admin/:id", authMiddleware, adminController.deleteAdmin)
 router.put("/edit-admin/:id", authMiddleware, adminController.editAdmin)
+
+router.get("/get-admin-by-program/:programId/:page/:limit", authMiddleware, adminController.getAdminByProgram)
 export default router;

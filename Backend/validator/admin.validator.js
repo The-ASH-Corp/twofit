@@ -35,16 +35,15 @@ export const adminValidationSchema = z.object({
     invalid_type_error: "Specialisation must be string",
   }),
   chooseProgram:z.array(z.string(), {
-    required_error: "Program is Required",
     invalid_type_error: "Program must be string",
-  }),
+  }).optional(),
   baseSalary: z.number({
     required_error: "Base Salary is Required",
     invalid_type_error: "Base Salary must be number",
   }),
-  experience: z.string({
+  experience: z.number({
     required_error: "Experience is Required",
-    invalid_type_error: "Experience must be string",
+    invalid_type_error: "Experience must be number",
   }),
   qualification: z.string({
     required_error: "Qualification is Required",

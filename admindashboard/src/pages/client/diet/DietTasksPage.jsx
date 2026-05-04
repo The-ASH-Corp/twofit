@@ -474,6 +474,31 @@ export default function DietTasksPage() {
     );
   }
 
+  if (!dietPlanPdf) {
+    return (
+      <div className="client-page-container p-5 sm:p-6 min-h-[80vh] flex flex-col justify-center">
+        <div className="client-page-shell max-w-2xl mx-auto w-full">
+          <div className="bg-white rounded-[32px] p-8 sm:p-12 text-center shadow-2xl border border-[#0A4F48]/10 flex flex-col items-center">
+            <div className="w-24 h-24 bg-[#F0F7F4] rounded-[24px] flex items-center justify-center mb-8 rotate-3 transition-transform hover:rotate-6">
+              <Utensils size={44} className="text-[#0A4F48]" />
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-[#1F2F27] tracking-tight">Diet Plan Pending</h2>
+            <p className="text-[#5F7269] mt-6 text-lg font-medium leading-relaxed">
+              Your dietitian is currently crafting your personalized diet plan. Once it's ready, you'll see your daily meals and tracking tools here.
+            </p>
+            <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
+              <div className="px-6 py-3 bg-[#E8F3EC] rounded-full text-[#0A4F48] font-bold text-sm flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#0A7B4E] animate-pulse"></span>
+                Expert review in progress
+              </div>
+            </div>
+          </div>
+        </div>
+        <MobileBottomNav />
+      </div>
+    );
+  }
+
   return (
     <div className="client-page-container p-5 sm:p-6">
       <div className="client-page-shell">
@@ -641,10 +666,10 @@ export default function DietTasksPage() {
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <p className="text-[38px] leading-none font-black text-[#1F2F27]">
+                    <p className="text-[28px] leading-none font-black text-[#1F2F27]">
                       {dietCompliancePercent}%
                     </p>
-                    <p className="mt-1 text-[10px] font-black uppercase tracking-[0.14em] text-[#63756C]">
+                    <p className="mt-1 text-[8px] font-black uppercase tracking-[0.14em] text-[#63756C]">
                       Compliance
                     </p>
                   </div>

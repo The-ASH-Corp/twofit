@@ -18,7 +18,6 @@ const adminSchema = new mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "ProgramsList",
-        required: true,
       },
     ],
     salary: { type: Number, default: 0 },

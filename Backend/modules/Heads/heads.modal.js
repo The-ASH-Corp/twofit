@@ -11,15 +11,21 @@ const headsSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, trim: true },
   phone: { type: String, required: true, unique: true },
   address: { type: String, required: true },
-  profilePhoto: {type: String, default:""},
+  profilePhoto: { type: String, default: "" },
   specialization: { type: Array, required: true },
   experience: { type: String, required: true },
   qualification: { type: String, required: true },
-  programCategory: { type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true },
+  programCategory: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+    required: true,
+  },
   salary: { type: Number, required: true },
+  addOnIncentive: { type: Number , default: 0},
+  deduction: {type: Number, default: 0},
   password: { type: String, required: true },
-  role:{type:String,enum:["head"],default:"head"},
-  status:{type:String,enum:["Active","Inactive"],default:"Active"}
+  role: { type: String, enum: ["head"], default: "head" },
+  status: { type: String, enum: ["Active", "Inactive"], default: "Active" },
 });
 
 headsSchema.pre("save", function (next) {

@@ -33,4 +33,10 @@ router.get(
 
 router.get("/rating-graph/:id", authMiddleware, coachController.getCoachRatingGraph);
 
+
+// get all coaches by program id
+router.get("/get-all-coaches-by-program-id/:programId/:page/:limit", authMiddleware, coachController.getAllCoachesByProgramId)
+
+// get all therapists 
+router.get("/get-all-therapists", authMiddleware, coachController.getAllTherapists)
 export default router
