@@ -91,6 +91,7 @@ export async function sendEmail({ email, password, fullName
 
 export async function sendOTPEmail({ fullName, otp,email }) {
   try {
+    console.log(process.env.MSG91_API_KEY)
     const response = await axios.post(
       "https://control.msg91.com/api/v5/email/send",
       {
@@ -120,6 +121,6 @@ export async function sendOTPEmail({ fullName, otp,email }) {
 
     console.log("✅ OTP Email sent:", response.data);
   } catch (error) {
-    console.log("❌ FULL ERROR:", error.response?.data);
+    console.log("FULL ERROR:", error.response?.data);
   }
 }
