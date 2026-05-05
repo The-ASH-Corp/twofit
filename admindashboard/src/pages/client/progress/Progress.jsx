@@ -28,8 +28,10 @@ import {
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { SyncLoader } from "react-spinners";
 import { dualEdgeDepthShadow } from "../habit/HabitTracker";
+import { useLocation } from "react-router-dom";
 
 export default function Progress() {
+  const location = useLocation();
   const [program, setProgram] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [panelType, setPanelType] = useState(null);
@@ -40,6 +42,13 @@ export default function Progress() {
   const selectedClient = useAppSelector(selectSelectedClient);
   const dispatch = useDispatch();
   const clientData = selectedClient || user;
+
+  useEffect(() => {
+    if (location.state?.openWeightUpdate) {
+      setIsOpen(true);
+      setPanelType("weight");
+    }
+  }, [location.state]);
 
   const clampPercent = (value) => {
     const num = Number(value);
@@ -91,6 +100,7 @@ export default function Progress() {
     sortedMeasurementHistory[sortedMeasurementHistory.length - 1]?.date || "";
 
   const shouldShowWeightUpdateButton = () => {
+    if (sortedWeightHistory.length === 0) return true;
     if (!lastWeightUpdateDate) return true;
     const daysSinceLastUpdate =
       (new Date() - new Date(lastWeightUpdateDate)) / (1000 * 60 * 60 * 24);
