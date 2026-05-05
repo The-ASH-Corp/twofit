@@ -206,7 +206,7 @@ export const updateOneClient = async (userData, id) => {
     { $set: userData },
     { new: true },
   ).select("-password");
-  const coaches = [client.Dietician, client.trainer, client.therapist].filter(
+  const coaches = [client.dietition, client.trainer, client.therapist].filter(
     Boolean,
   );
   for (const coachId of coaches) {
@@ -221,7 +221,7 @@ export const deleteOneClient = async (id) => {
     throw new Error("Client not found");
   }
 
-  const coachIds = [client.trainer, client.Dietician, client.therapist].filter(
+  const coachIds = [client.trainer, client.dietition, client.therapist].filter(
     Boolean,
   );
 
@@ -229,14 +229,14 @@ export const deleteOneClient = async (id) => {
   if (coachIds.length > 0) {
     await CoachModel.updateMany(
       { _id: { $in: coachIds } },
-      { $pull: { assignedUsers: id } },
+      { $pull: { assignedUsers: new mongoose.Types.ObjectId(id) } },
     );
   }
 
   // 2. Delete habits and task submissions
   await Promise.all([
-    HabitModel.deleteMany({ clientId: id }),
-    TaskSubmission.deleteMany({ userId: id }),
+    HabitModel.deleteMany({ clientId: new mongoose.Types.ObjectId(id) }),
+    TaskSubmission.deleteMany({ userId: new mongoose.Types.ObjectId(id) }),
   ]);
 
   // 3. Recalculate Expert incentives

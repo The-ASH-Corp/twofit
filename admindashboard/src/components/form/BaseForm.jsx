@@ -4,6 +4,7 @@ import FormRadio from "./FormRadio";
 import FormToggle from "./ToggleForm";
 import FormSelect from "./FormSelect";
 import MultipleSelectForm from "./MultipleSelectForm";
+import SingleSelectForm from "./SingleSelectForm";
 import FormCheckboxGroup from "./FormCheckboxGroup";
 import FormTimeRange from "./FormTimeRange";
 import FormFileInput from "./FormFileInput";
@@ -38,11 +39,15 @@ export default function BaseForm({
       case "select":
         return (
            <div className="w-full">
-            <FormSelect
+              <FormSelect
                 label={field.label ?? "Select Option"}
                 name={field.name}
                 options={field.options}
                 onChange={field.onChange}
+                allowCustom={field.allowCustom || false}
+                customOptionLabel={field.customOptionLabel}
+                customPlaceholder={field.customPlaceholder}
+                customInputWithoutOption={field.customInputWithoutOption || false}
             />
            </div>
         );
@@ -54,7 +59,19 @@ export default function BaseForm({
                 name={field.name}
                 options={field.options}
                 allowCustom={field.allowCustom || false}
-              />
+            />
+           </div>
+        );
+      case "single-select-custom":
+        return (
+          <div className="w-full">
+            <SingleSelectForm
+              label={field.label ?? "Select Option"}
+              name={field.name}
+              options={field.options}
+              allowCustom={field.allowCustom || false}
+              customPlaceholder={field.customPlaceholder}
+            />
           </div>
         );
       case "file":

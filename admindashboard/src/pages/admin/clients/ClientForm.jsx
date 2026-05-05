@@ -247,12 +247,13 @@ export default function ClientForm() {
         {
           name: "fitnessGoal",
           label: "Fitness Goal",
-          type: "select",
+          type: "single-select-custom",
           options: [
             { label: "Weight Loss", value: "weight_loss" },
             { label: "Muscle Gain", value: "muscle_gain" },
           ],
           allowCustom: true,
+          customPlaceholder: "Add other...",
         },
         { name: "height", label: "Height", type: "text" },
         { name: "currentWeight", label: "Current Weight", type: "text" },

@@ -35,7 +35,7 @@ export default function AdminEditForm() {
         baseSalary: admin.salary || "",
       });
 
-    } catch (err) {
+    } catch {
       toast.error("Failed to load data");
     } finally {
       setFetching(false);
@@ -106,19 +106,6 @@ export default function AdminEditForm() {
     },
   ];
 
-  const initialValues = {
-    fullname: "",
-    dob: "",
-    gender: "",
-    email: "",
-    phone: "",
-    address: "",
-    specialization: [],
-    experience: "",
-    qualification: "",
-    baseSalary: "",
-  };
-
   const validationSchema = Yup.object({
     fullname: Yup.string()
       .trim()
@@ -171,7 +158,7 @@ export default function AdminEditForm() {
         })
       ).unwrap();
       toast("Admin updated successfully", { type: "success" });
-      navigate("/head/admins");
+      navigate(user?.role === "founder" ? "/founder/admins" : "/head/admins");
     } catch (error) {
       console.log(error)
       toast(error?.message || "Failed to update admin", { type: "error" });

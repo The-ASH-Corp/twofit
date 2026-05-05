@@ -165,6 +165,7 @@ function App() {
           <Route path="heads/add-head" element={<FounderHeadForm />} />
           <Route path="admins" element={<FounderAdminList />} />
           <Route path="admins/profile/:id" element={<FounderAdminProfile />} />
+          <Route path="admins/edit/:id" element={<HeadEditAdmin />} />
           <Route path="experts" element={<FounderExpertList />} />
           <Route
             path="experts/profile/:id"
