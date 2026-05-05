@@ -4,8 +4,20 @@ import { useDispatch } from "react-redux";
 import { logout } from "@/redux/features/auth/auth.thunk";
 import { useState, useEffect } from "react";
 import { X, ChevronDown, LogOut, LayoutDashboard, Calendar, RefreshCcw, Dumbbell, Activity, Utensils, BookOpen, TrendingUp, MessageSquare, FileText } from "lucide-react";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
+import { useAppSelector } from "@/redux/store/hooks";
 
-const menuItems = [
+
+
+export default function Sidebar({ isOpen, onClose }) {
+  const user = useAppSelector(selectUser);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const location = useLocation();
+
+  const [openMenu, setOpenMenu] = useState(null);
+
+  const menuItems = [
   {
     label: "Dashboard",
     icon: LayoutDashboard,
@@ -18,21 +30,17 @@ const menuItems = [
     path: "/client/habit-tracker",
   },
   { label: "Workout", icon: Dumbbell, path: "/client/workout" },
-  { label: "Therapy", icon: Activity, path: "/client/therapy" },
+   ...(user?.therapyType ? [{
+    label: "Therapy",
+    icon: Activity,
+    path: "/client/therapy",
+  }] : []),
   { label: "Diet", icon: Utensils, path: "/client/diet" },
   { label: "Recipe Library", icon: BookOpen, path: "/client/recipe" },
   { label: "Progress", icon: TrendingUp, path: "/client/progress" },
   { label: "Messages", icon: MessageSquare, path: "/client/chats" },
   { label: "Feedback", icon: FileText, path: "/client/feedback" },
 ];
-
-export default function Sidebar({ isOpen, onClose }) {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const location = useLocation();
-
-  const [openMenu, setOpenMenu] = useState(null);
-
   useEffect(() => {
     const activeParent = menuItems.find((item) =>
       item.children?.some((child) => location.pathname.startsWith(child.path)),
@@ -46,10 +54,6 @@ export default function Sidebar({ isOpen, onClose }) {
     await dispatch(logout());
     localStorage.clear();
     navigate("/login");
-  };
-
-  const handleToggleMenu = (label) => {
-    setOpenMenu(openMenu === label ? null : label);
   };
 
   return (

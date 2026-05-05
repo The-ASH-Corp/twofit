@@ -274,12 +274,6 @@ export default function TherapyTasksPage() {
     }
   };
 
-  const openNextVideo = () => {
-    const nextIndex = selectedIndex + 1;
-    if (nextIndex < therapyTasks.length && isUnlocked(nextIndex)) {
-      setSelectedIndex(nextIndex);
-    }
-  };
 
   const clientStatus = clientUser?.status || user?.status;
 
