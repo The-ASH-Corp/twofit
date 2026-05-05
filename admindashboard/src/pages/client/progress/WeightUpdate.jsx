@@ -2,7 +2,7 @@ import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { refreshProfile } from "@/redux/features/auth/auth.thunk";
 import { updateWeightOfClient } from "@/redux/features/client/client.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
-import {  useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 
@@ -14,6 +14,14 @@ export default function WeightUpdate({ onClose }) {
   const [sidePhoto, setSidePhoto] = useState(null);
   const [frontPreview, setFrontPreview] = useState(null);
   const [sidePreview, setSidePreview] = useState(null);
+
+  const isFirstTime = !user?.weightHistory || user.weightHistory.every(h => !h.frontPhoto && !h.sidePhoto);
+
+  useEffect(() => {
+    if (user?.currentWeight) {
+      setWeight(user.currentWeight.toString());
+    }
+  }, [user?.currentWeight]);
 
   const handleFrontChange = (e) => {
     const file = e.target.files[0];
@@ -35,8 +43,13 @@ export default function WeightUpdate({ onClose }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!weight) {
+    if (!weight && !isFirstTime) {
       toast.info("Please enter weight");
+      return;
+    }
+
+    if (!frontPhoto && !sidePhoto) {
+      toast.info("Please add at least one photo");
       return;
     }
 
@@ -46,7 +59,7 @@ export default function WeightUpdate({ onClose }) {
     }
 
     const formData = new FormData();
-    formData.append("currentWeight", Number(weight));
+    if (weight) formData.append("currentWeight", Number(weight));
 
     if (frontPhoto) formData.append("frontPhoto", frontPhoto);
     if (sidePhoto) formData.append("sidePhoto", sidePhoto);
@@ -63,24 +76,22 @@ export default function WeightUpdate({ onClose }) {
         refreshProfile({ id: user._id, role: user.role }),
       ).unwrap();
 
-      console.log("hello")
-
-      toast.success("Weight updated successfully");
+      toast.success("Progress updated successfully");
       if (onClose) onClose();
     } catch (err) {
-      toast.error(`Failed to update weight ${err}`);
+      toast.error(`Failed to update progress: ${err}`);
     }
   };
 
   return (
     <div className="space-y-4 flex flex-col h-full">
-      <form onSubmit={handleSubmit}>
-        <div className="flex gap-4 items-center">
-          <div className="mb-3 flex flex-col items-center gap-1">
-            <label className="block text-[12px] font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="flex gap-4 items-center justify-center">
+          <div className="flex flex-col items-center gap-1">
+            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
               FRONT PHOTO
             </label>
-            <label className="cursor-pointer">
+            <label className="cursor-pointer relative group">
               <input
                 type="file"
                 name="frontPhoto"
@@ -88,20 +99,27 @@ export default function WeightUpdate({ onClose }) {
                 onChange={handleFrontChange}
                 className="hidden"
               />
-
-              <img
-                src={frontPreview}
-                className="w-24 h-24 object-fill rounded-xl border hover:opacity-80"
-              />
+              <div className="w-28 h-28 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden bg-gray-50 group-hover:border-[#0A4F48] transition-colors">
+                {frontPreview ? (
+                  <img
+                    src={frontPreview}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-gray-300 flex flex-col items-center gap-1">
+                    <span className="text-2xl">+</span>
+                    <span className="text-[10px] font-bold">FRONT</span>
+                  </div>
+                )}
+              </div>
             </label>
-
-            <p className="text-xs text-gray-500">Click to add photo</p>
           </div>
-          <div className="mb-3 flex flex-col items-center gap-1">
-            <label className="block text-[12px] font-bold text-gray-500 uppercase tracking-widest mb-2 ml-1">
+          
+          <div className="flex flex-col items-center gap-1">
+            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">
               SIDE PHOTO
             </label>
-            <label className="cursor-pointer">
+            <label className="cursor-pointer relative group">
               <input
                 type="file"
                 name="sidePhoto"
@@ -109,35 +127,49 @@ export default function WeightUpdate({ onClose }) {
                 onChange={handleSideChange}
                 className="hidden"
               />
-
-              <img
-                src={sidePreview}
-                className="w-24 h-24 object-fill rounded-xl border hover:opacity-80"
-              />
+              <div className="w-28 h-28 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden bg-gray-50 group-hover:border-[#0A4F48] transition-colors">
+                {sidePreview ? (
+                  <img
+                    src={sidePreview}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-gray-300 flex flex-col items-center gap-1">
+                    <span className="text-2xl">+</span>
+                    <span className="text-[10px] font-bold">SIDE</span>
+                  </div>
+                )}
+              </div>
             </label>
-
-            <p className="text-xs text-gray-500">Click to add photo</p>
           </div>
         </div>
-        <div className="space-y-2">
-          <label className="text-[14px] font-medium text-gray-700">
-            Current Weight
-          </label>
-          <input
-            value={weight}
-            onChange={(e) => setWeight(e.target.value)}
-            type="number"
-            placeholder="Add weight (kg)"
-            className="w-full border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0A4F48]/20 p-3"
-          />
-        </div>
+
+        {!isFirstTime && (
+          <div className="space-y-2">
+            <label className="text-[12px] font-black text-gray-500 uppercase tracking-widest">
+              Update Weight (KG)
+            </label>
+            <div className="relative">
+              <input
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                type="number"
+                placeholder="e.g. 75"
+                className="w-full border-2 border-gray-100 rounded-2xl focus:border-[#0A4F48] focus:outline-none p-4 font-bold text-lg transition-all"
+              />
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 font-black text-gray-400">
+                KG
+              </span>
+            </div>
+          </div>
+        )}
       </form>
 
-      <div className="space-y-3 mt-auto">
+      <div className="flex gap-3 mt-auto">
         {onClose && (
           <button
             onClick={onClose}
-            className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+            className="flex-1 bg-gray-50 text-gray-500 py-4 rounded-2xl font-black uppercase tracking-widest text-[12px] hover:bg-gray-100 transition-colors"
           >
             Cancel
           </button>
@@ -145,9 +177,9 @@ export default function WeightUpdate({ onClose }) {
         <button
           type="submit"
           onClick={handleSubmit}
-          className="w-full bg-[#0A4F48] text-white py-3 rounded-xl font-medium hover:bg-[#083d38] transition-colors"
+          className="flex-[2] bg-[#0A4F48] text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[12px] hover:bg-[#083d38] transition-all shadow-lg shadow-[#0A4F48]/20"
         >
-          Save & Update
+          {isFirstTime ? "Save Initial Progress" : "Update Progress"}
         </button>
       </div>
     </div>

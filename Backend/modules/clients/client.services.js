@@ -284,41 +284,44 @@ export const getClientsBasedOnCoach = async (coachIds, page, limit) => {
 };
 
 export const updateWeightService = async (userId, data) => {
-  if (!data.currentWeight) {
-    throw new Error("Current weight is required");
-  }
-
-   if (!data.sidePhoto && !data.frontPhoto) {
-     throw new Error("photo is required");
-   }
-
   const user = await User.findById(userId);
 
   if (!user) {
     throw new Error("User not found");
   }
 
-  if (!user.weightHistory || user.weightHistory.length === 0) {
-    user.weightHistory = [
-      {
-        weight: data.currentWeight,
-        frontPhoto: data.frontPhoto,
-        sidePhoto: data.sidePhoto,
-        date: new Date(),
-        isInitial: true,
-      },
-    ];
-  } else {
-    user.weightHistory.push({
-      weight: data.currentWeight,
-      frontPhoto: data.frontPhoto,
-      sidePhoto: data.sidePhoto,
-      date: new Date(),
-      isInitial: false,
-    });
+  // A user is in "first time" state if they have no photos in their weight history yet
+  const hasPhotos = user.weightHistory.some(
+    (h) => h.frontPhoto || h.sidePhoto,
+  );
+  const isFirstTime = !hasPhotos;
+
+  const weight = data.currentWeight || user.currentWeight;
+
+  if (!weight) {
+    throw new Error("Current weight is required");
   }
 
-  user.currentWeight = data.currentWeight;
+  if (!data.sidePhoto && !data.frontPhoto) {
+    throw new Error("At least one photo is required");
+  }
+
+  const historyEntry = {
+    weight: weight,
+    frontPhoto: data.frontPhoto || "",
+    sidePhoto: data.sidePhoto || "",
+    date: new Date(),
+    isInitial: isFirstTime,
+  };
+
+  if (isFirstTime && user.weightHistory.length > 0 && !user.weightHistory[0].frontPhoto && !user.weightHistory[0].sidePhoto) {
+    // Update the existing initial entry if it has no photos
+    user.weightHistory[0] = { ...user.weightHistory[0].toObject(), ...historyEntry };
+  } else {
+    user.weightHistory.push(historyEntry);
+  }
+
+  user.currentWeight = weight;
 
   await user.save();
 

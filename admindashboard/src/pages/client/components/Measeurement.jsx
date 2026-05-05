@@ -66,12 +66,13 @@ export default function Measeurement() {
       <div className="space-y-3.5">
         {stats.map((stat, index) => (
           <div key={index} className="space-y-1.5">
-            <div className="flex items-center justify-between gap-3.5">
-              <p className="client-title w-14 shrink-0 text-[12px]">{stat.label}</p>
-              <p className="text-[10px] font-semibold text-[#6c7f73]">
-                {formatMeasurement(stat.current)} cm
-                <span className="text-[#9bad9f]"> VS {formatMeasurement(stat.start)} cm</span>
-              </p>
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <p className="client-title text-[13px] font-medium text-[#2d3748]">{stat.label}</p>
+              <div className="flex items-center gap-1.5 text-[11px] font-medium whitespace-nowrap bg-white px-2.5 py-0.5 rounded-full shadow-sm border border-[#e2e8f0]">
+                <span className="text-[#0A4F48] font-bold">{formatMeasurement(stat.current)} cm</span>
+                <span className="text-[#a0aec0] text-[9px] uppercase tracking-wider">vs</span>
+                <span className="text-[#718096]">{formatMeasurement(stat.start)} cm</span>
+              </div>
             </div>
             <div className="flex items-center gap-3.5">
               <div className="relative h-2.5 flex-1 overflow-visible rounded-full border border-[#e5ece5] bg-[#f8fbf8]">

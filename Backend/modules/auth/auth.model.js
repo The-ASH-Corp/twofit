@@ -44,6 +44,7 @@ const userSchema = new mongoose.Schema(
         frontPhoto: { type: String, default: "" },
         sidePhoto: { type: String, default: "" },
         date: { type: Date, default: Date.now },
+        isInitial: { type: Boolean, default: false },
       },
     ],
     measurements: {
