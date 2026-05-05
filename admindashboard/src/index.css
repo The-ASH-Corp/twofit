@@ -264,11 +264,14 @@
 
 .client-title {
   color: var(--client-text-heading);
-  font-weight: 600;
+  font-weight: 700;
+
+  width: 300px;
 }
 
 .client-subtitle {
-  color: var(--client-text-body);
+  color: var(--primary-accent);
+  color: invert;
   font-weight: 500;
 }
 

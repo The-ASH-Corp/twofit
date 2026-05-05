@@ -57,7 +57,8 @@ const DailyTasks = () => {
 
   return (
     <div className="p-4 md:p-6 bg-white rounded-2xl mx-auto">
-      <h1 className="text-2xl md:text-3xl font-bold mb-2">Daily Duties</h1>
+      <h1 className="text-2xl md:text-3xl font-bold ">Daily Duties</h1>
+      <p className="text-red-600 mb-2 font-semibold">*Get it done - complete the review and share proof in chat</p>
 
       <p className="text-gray-600 mb-6">
         Date: <strong>{date}</strong>
