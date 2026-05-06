@@ -69,7 +69,7 @@ const TaskEditForm = () => {
       toast.success("task updated successfully");
       navigate(-1);
     } catch (error) {
-      toast.error("Failed to update task:", error);
+      toast.error(error || "Failed to update task");
     }
   };
 

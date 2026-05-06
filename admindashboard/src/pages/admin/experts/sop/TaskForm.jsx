@@ -61,11 +61,11 @@ const TaskForm = () => {
               adminId: user._id, // from auth state
             };
 
-             const task = await dispatch(createSop(payload)).unwrap();
+             await dispatch(createSop(payload)).unwrap();
               toast.success("task created successfully");
               navigate(`/admin/experts/tasks/${id}`);
             } catch (error) {
-              console.error("Failed to create task:", error);
+              toast.error(error || "Failed to create task");
             }
     };
 

@@ -264,11 +264,11 @@ export default function ClientEditForm() {
   const handleUpdate = async (values) => {
     const client = await dispatch(updateClient({ id, values }));
     if (client.payload.success) {
-      toast.success("Client updated successfully");
-      navigate(-1);
-    } else {
-      toast.error("Failed to update client");
-    }
+        toast.success("Client updated successfully");
+        navigate(-1);
+      } else {
+        toast.error("Failed to update client");
+      }
   };
 
   if (!initialValues) {

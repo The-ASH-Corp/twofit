@@ -198,7 +198,7 @@ export default function ExpertEditForm() {
         toast("Failed to update expert", { type: "error" });
       }
     } catch (err) {
-      toast("Failed to update expert", { type: "error" });
+      toast.error(err || "Failed to update expert");
     }
   };
 
