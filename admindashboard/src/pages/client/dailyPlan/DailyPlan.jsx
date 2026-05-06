@@ -23,6 +23,40 @@ import { dualEdgeDepthShadow } from "../habit/HabitTracker";
 
 const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
+
+export const motivationQuotes = [
+"Don’t wait for perfect conditions. Keep moving and let the process shape you.",
+"Progress is built by the people who continue when others stop.",
+"The process may be slow, but stopping guarantees failure.",
+"You don’t need instant results. You need consistency.",
+"Every small step forward is proof that you refused to quit.",
+"Growth happens quietly while you keep showing up.",
+"Success belongs to the people who stay in the process long enough.",
+"Keep going, even when the progress is invisible.",
+"Discipline is choosing the process over temporary comfort.",
+"The strongest people are not the fastest; they are the most consistent.",
+"You are closer than you think. Don’t stop now.",
+"The process is painful sometimes, but regret hurts longer.",
+"Keep building, even on the days you doubt yourself.",
+"Momentum is created by continuing, not by waiting.",
+"One more step today can change your entire future.",
+"Trust the process, especially when the results take time.",
+"Winners are ordinary people with extraordinary persistence.",
+"Keep moving forward, even if it’s only one inch at a time.",
+"Your future is being shaped by what you consistently do today.",
+"The journey rewards the people who refuse to stop.",
+"Don’t chase motivation every day. Build habits that keep you going.",
+"Every repetition, every effort, every struggle is part of your transformation.",
+"Some days will test you. Keep going anyway.",
+"You don’t fail when it gets hard. You fail when you stop.",
+"The process is turning you into someone stronger than yesterday.",
+"Great things take time. Stay patient and keep working.",
+"Your consistency will take you places motivation never can.",
+"Small progress repeated daily becomes massive success.",
+"Keep showing up for yourself, no matter how difficult it feels.",
+"Never stop the process. Just keep going, one step at a time.",
+];
+
 export default function DailyPlan() {
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
@@ -506,12 +540,9 @@ export default function DailyPlan() {
                />
                <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
                <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                  <p className="text-white text-lg font-bold leading-tight mb-2">"Precision is the foundation of excellence."</p>
-                  <p className="text-white/60 text-[10px] font-black uppercase tracking-[2px]">Clinical Directive 2026</p>
+                  <p className="text-white text-lg font-bold leading-tight mb-2">"{motivationQuotes[Math.floor(Math.random() * motivationQuotes.length)]}"</p>
+                  <p className="text-white text-sm font-medium leading-tight mb-2">- Twofit Team</p>
                </div>
-               <button className="absolute top-6 right-6 w-12 h-12 rounded-full bg-[#0A4F48] text-white flex items-center justify-center shadow-lg transition-transform hover:rotate-90">
-                  <Play className="w-5 h-5 fill-current" />
-               </button>
             </div>
           </div>
         </div>

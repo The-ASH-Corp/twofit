@@ -23,6 +23,7 @@ import {
 import { SyncLoader } from "react-spinners";
 import { addDays, format, startOfWeek } from "date-fns";
 import MobileBottomNav from "../components/MobileBottomNav";
+import { motivationQuotes } from "../dailyPlan/DailyPlan";
 
 export const dualEdgeDepthShadow = {
   boxShadow:
@@ -297,9 +298,9 @@ export default function HabitTracker() {
                     DAILY INSIGHT
                   </span>
                   <h3 className="mt-3 text-[24px] sm:text-[30px] leading-[1.1] font-black text-[#24342C]">
-                    Consistency is the bridge between goals and accomplishment.
+                    {motivationQuotes[Math.floor(Math.random() * motivationQuotes.length)]}
                   </h3>
-                  <p className="mt-2 text-[18px] sm:text-[20px] font-bold text-[#5D6D65]">- Jim Rohn</p>
+                  <p className="mt-2 text-[18px] sm:text-[20px] font-bold text-[#5D6D65]">- Twofit Team</p>
                 </div>
                 
               </div>
