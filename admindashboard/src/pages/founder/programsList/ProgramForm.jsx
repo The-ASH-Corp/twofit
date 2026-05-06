@@ -123,7 +123,7 @@ export default function ProgramForm() {
         toast.error("Failed to create program");
       }
     } catch (error) {
-      toast.error("Program creation failed:", error);
+      toast.error(error);
     }
   };
   return (

@@ -7,6 +7,13 @@ import User from "../auth/auth.model.js";
 import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 
 export const createProgram = async (data) => {
+  const isExist = await programModel.findOne({
+    title: data.title.trim(),
+  });
+  if(isExist){
+    throw new Error("Program already exists");
+  }
+
   return await programModel.create(data);
 };
 
