@@ -32,6 +32,41 @@ import { cn } from "@/lib/utils";
 import bgImage from "/src/assets/workout-bg.jpg";
 import { CgGym } from "react-icons/cg";
 
+
+const workoutQuotes =[
+  "Your body can handle more than your mind thinks.",
+"Every workout is a step closer to your strongest self.",
+"Push yourself today so your future self can thank you.",
+"Sweat is proof that you showed up for yourself.",
+"Results come from consistency, not excuses.",
+"Train with purpose, not with comfort.",
+"Strong habits create strong bodies.",
+"The pain you feel today becomes the strength you feel tomorrow.",
+"Don’t stop when it gets hard. Stop when you’re done.",
+"Fitness is built one workout at a time.",
+"Your only competition is who you were yesterday.",
+"Discipline in the gym creates confidence outside it.",
+"A small workout is still better than no workout.",
+"The hardest part is starting. After that, keep moving.",
+"Your body changes when your excuses end.",
+"Every rep is an investment in yourself.",
+"Strength grows through struggle.",
+"You won’t always feel motivated. Train anyway.",
+"Consistency beats intensity when intensity doesn’t last.",
+"Wake up with determination. Sleep with satisfaction.",
+"One hour of effort can change your entire mindset.",
+"Fitness is not punishment. It’s self-respect.",
+"Push through the weakness to discover your power.",
+"Your goals don’t work unless you do.",
+"The gym is where excuses lose and discipline wins.",
+"Every drop of sweat carries you closer to your goal.",
+"Train your mind and your body will follow.",
+"You are stronger than your comfort zone.",
+"Keep lifting, keep running, keep growing.",
+"No shortcuts. No excuses. Just effort and progress.",
+]
+
+
 const rpeScale = [
   {
     value: 1,
@@ -695,8 +730,7 @@ export default function WorkoutTasksPage() {
                 Coach Insight
               </div>
               <p className="mt-4 text-[17px] font-semibold leading-relaxed text-[#4D6158]">
-                Keep your core tight during every pressing movement and drive
-                from your feet to maintain stable force output through the set.
+                {workoutQuotes[Math.floor(Math.random() * workoutQuotes.length)]}
               </p>
             </section>
           </div>

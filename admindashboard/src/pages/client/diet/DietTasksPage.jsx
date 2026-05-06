@@ -1,17 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { 
-  CalendarDays,
   CheckCircle2, 
   TrendingUp, 
-  Droplets, 
   Apple, 
   Moon, 
   Camera, 
   Check, 
   Utensils,
   Info,
-  X
+  X,
+  Lightbulb
 } from "lucide-react";
 import { SyncLoader } from "react-spinners";
 import { toast } from "react-toastify";
@@ -31,6 +30,40 @@ import {
 } from "@/redux/features/tasks/task.thunk";
 import MobileBottomNav from "../components/MobileBottomNav";
 import { cn } from "@/lib/utils";
+
+const dieteMotivationalQuotes = [
+"Your diet is an investment in your future self.",
+"Eat with purpose, not just for comfort.",
+"Small healthy choices create big transformations.",
+"Fuel your body like it matters, because it does.",
+"Discipline in the kitchen creates results in the mirror.",
+"Healthy eating is self-respect in action.",
+"You don’t need a perfect diet, just consistent habits.",
+"Every healthy meal is progress.",
+"Your body reflects what you feed it.",
+"Eat to nourish your goals, not your excuses.",
+"Consistency with food beats crash diets every time.",
+"A healthy body starts with healthy choices.",
+"Food is fuel. Choose wisely.",
+"Good nutrition is part of the process, not a punishment.",
+"The strongest transformations begin in the kitchen.",
+"Control your food, or your food will control you.",
+"Healthy eating is a daily act of discipline.",
+"Your future health depends on today’s decisions.",
+"Eat clean enough to feel proud of yourself.",
+"Every meal is a chance to improve.",
+"Progress happens when healthy choices become habits.",
+"Don’t eat less. Eat better.",
+"Your goals deserve better nutrition.",
+"A balanced diet builds a balanced life.",
+"The way you eat today shapes how you feel tomorrow.",
+"Strong bodies are built with smart nutrition.",
+"Healthy eating is not temporary. It’s a lifestyle.",
+"Feed your body energy, not regret.",
+"Better food choices lead to better results.",
+"Stay consistent with your diet and your body will respond."
+]
+
 
 const getMealConfig = (index, totalCount, Apple, Utensils, Moon) => {
   if (totalCount === 4) {
@@ -624,16 +657,14 @@ export default function DietTasksPage() {
             <section className="client-card rounded-[24px] border-l-[4px] border-l-[#0A7B4E] p-5 sm:p-6">
               <div className="flex items-start gap-4">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#E8F3EC] text-[#0A7B4E]">
-                  <Droplets size={20} />
+                  <Lightbulb size={20} />
                 </div>
                 <div>
                   <h4 className="text-[26px] leading-none font-black text-[#1F2F27]">
-                    Hydration Tip
+                    Diet Tip
                   </h4>
                   <p className="mt-2 text-[14px] font-medium leading-relaxed text-[#5F7269]">
-                    Boost your metabolism and aid digestion by drinking exactly{" "}
-                    <span className="font-black text-[#1F2F27]">250ml of water</span>{" "}
-                    before your breakfast meal.
+                   {dieteMotivationalQuotes[Math.floor(Math.random() * dieteMotivationalQuotes.length)]}
                   </p>
                 </div>
               </div>
