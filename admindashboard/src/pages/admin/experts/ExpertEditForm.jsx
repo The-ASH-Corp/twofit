@@ -149,7 +149,6 @@ export default function ExpertEditForm() {
 
   const handleCoachUpdate = async (values) => {
     try {
-      console.log(values);
       const formData = new FormData();
 
       const isObjectChanged = (obj1, obj2) => {
@@ -199,7 +198,7 @@ export default function ExpertEditForm() {
         toast("Failed to update expert", { type: "error" });
       }
     } catch (err) {
-      toast("Failed to update expert", { type: "error" });
+      toast.error(err || "Failed to update expert");
     }
   };
 

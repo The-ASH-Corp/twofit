@@ -48,7 +48,7 @@ export default function CategoryForm() {
 
   const handelSubmit = async (value) => {
     try {
-      const category = await dispatch(createCategory(value)).unwrap();
+      const category = await dispatch(createCategory(value)).unwrap();      
       if (category.success) {
         toast.success("Category created successfully");
         navigate("/founder/categories");
@@ -56,7 +56,7 @@ export default function CategoryForm() {
         toast.error("Failed to create category");
       }
     } catch (error) {
-      console.error("Category creation failed:", error);
+      toast.error(error);
     }
   };
 

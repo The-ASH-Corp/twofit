@@ -160,7 +160,6 @@ export default function AdminEditForm() {
       toast("Admin updated successfully", { type: "success" });
       navigate(user?.role === "founder" ? "/founder/admins" : "/head/admins");
     } catch (error) {
-      console.log(error)
       toast(error?.message || "Failed to update admin", { type: "error" });
     } finally {
       setIsLoading(false);

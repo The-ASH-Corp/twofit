@@ -90,8 +90,7 @@ export default function PlanForm() {
             }
           }
         } catch (error) {
-           console.error("Error fetching plan:", error);
-           toast.error("Could not load plan for editing");
+           toast.error(error || "Could not load plan for editing");
         }
       };
       
@@ -292,8 +291,7 @@ export default function PlanForm() {
           }
       }
     } catch (error) {
-      console.error(error);
-      toast.error(error.message || "Failed to save plan");
+      toast.error(error || "Failed to save plan");
     }
   };
   return (
@@ -568,8 +566,7 @@ const PlanSection = ({
           }
         }
       } catch (error) {
-        console.error("Upload failed", error);
-        toast.error("File upload failed");
+        toast.error(error || "File upload failed");
       } finally {
         setUploading(false);
         if (fileInputRef.current) {

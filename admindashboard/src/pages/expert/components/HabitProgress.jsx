@@ -14,7 +14,6 @@ export default function HabitProgress() {
   }, [dispatch]);
 
   if (loading) return <p>Loading summary...</p>;
-console.log(dailySummary)
   if (!dailySummary || dailySummary.length === 0) {
   return (
     <div className="bg-white rounded-2xl shadow-md p-6 text-center">

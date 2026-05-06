@@ -5,7 +5,6 @@
 
 // export default function HeroCard({ program, currentGlobalDay }) {
 //   const titleBase = (program?.title || "Weight Loss").replace(/\s+/g, " ").trim();
-//   console.log(program.image)
 //   const navigate = useNavigate();
 
 
@@ -45,13 +44,10 @@
 
 
 import React from "react";
-import { assets } from "@/assets/asset";
-import { Calendar, Clock3, Hourglass, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function HeroCard({ program, currentGlobalDay }) {
   const titleBase = (program?.title || "Weight Loss").replace(/\s+/g, " ").trim();
-  console.log(program.image)
   const navigate = useNavigate();
 
 

@@ -13,7 +13,6 @@ export const createCoach = async (req, res) => {
 
     const coach = await coachService.createCoach(req.body);
 
-    console.log(coach)
 
     res
       .status(201)
@@ -24,7 +23,6 @@ export const createCoach = async (req, res) => {
       });
 
   } catch (err) {
-    console.log(err)
     res.status(400).json({ success: false, message: err.message });
   }
 };

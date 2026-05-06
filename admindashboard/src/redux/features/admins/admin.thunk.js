@@ -140,7 +140,6 @@ export const getAdminByProgramId = createAsyncThunk(
       const data = await axiosInstance.get(
         `/admin/get-admin-by-program/${programId}/${page}/${limit}`,
       );
-      console.log(data,"data from getAd")
       return data;
     } catch (error) {
       return rejectWithValue(
