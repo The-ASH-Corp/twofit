@@ -191,7 +191,7 @@ const WaterIntake = ({ currentGlobalDay: propGlobalDay }) => {
               type="button"
               onClick={handleAddWater}
               disabled={isWaterSyncing}
-              className="client-action-pill flex h-[38px] min-w-0 flex-1 items-center justify-center rounded-full px-5 text-[13px] font-bold whitespace-nowrap transition-all active:scale-[0.98] disabled:opacity-60"
+              className="client-action-pill flex h-[38px] min-w-0 flex-1 items-center justify-center rounded-xl px-10 text-[13px] font-bold whitespace-nowrap transition-all active:scale-[0.98] disabled:opacity-60"
             >
               {isWaterSyncing ? (
                 <span className="flex items-center gap-2">

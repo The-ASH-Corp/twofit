@@ -149,7 +149,6 @@ export default function ExpertEditForm() {
 
   const handleCoachUpdate = async (values) => {
     try {
-      console.log(values);
       const formData = new FormData();
 
       const isObjectChanged = (obj1, obj2) => {

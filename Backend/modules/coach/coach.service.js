@@ -188,7 +188,6 @@ export const createCoach = async (coach) => {
 
     return coachCreated;
   } catch (error) {
-    console.log(error)
     throw error;
   }
 };

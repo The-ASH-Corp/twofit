@@ -219,7 +219,6 @@ const validationSchema = Yup.object({
         toast.success("Head created successfully");
         navigate("/founder/heads");
     } catch (error) {
-      console.log(error, "catch")
       toast.error(error || "Failed to create head");
     } finally {
       setIsLoading(false);

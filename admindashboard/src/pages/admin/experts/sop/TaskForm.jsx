@@ -62,7 +62,6 @@ const TaskForm = () => {
             };
 
              const task = await dispatch(createSop(payload)).unwrap();
-             console.log(task);
               toast.success("task created successfully");
               navigate(`/admin/experts/tasks/${id}`);
             } catch (error) {

@@ -122,7 +122,6 @@ export const sendTestReminder = async (type) => {
       throw new Error("Reminder not found");
     }
 
-    console.log("TEST REMINDER:", reminder.message);
 
     return {
       message: "Test reminder sent successfully",
