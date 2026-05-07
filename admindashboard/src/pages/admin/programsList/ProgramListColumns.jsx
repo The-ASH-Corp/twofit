@@ -1,9 +1,10 @@
+import ProgramActionCell from "./ProgramActionCell";
+
 const statusColors = {
   Active: "bg-[#45C4A2] text-white",
   Inactive: "bg-[#66706D] text-white",
   Suspended: "bg-[#FB5858] text-white",
 };
-import { useNavigate } from "react-router-dom";
 
 export const ProgramListColumns = [
   
@@ -11,9 +12,13 @@ export const ProgramListColumns = [
   { accessorKey: "duration", header: "Duration" },
   {
     header: "category",
-    cell: ({ row }) => (
-      <span className=" capitalize">{row.original.category?.name || "—"}</span>
-    ),
+    cell: ({ row }) => {
+      const category = row.original.category;
+      const categoryName =
+        typeof category === "string" ? category : category?.name;
+
+      return <span className=" capitalize">{categoryName || "—"}</span>;
+    },
   },
 
   {
@@ -33,35 +38,6 @@ export const ProgramListColumns = [
   {
     id: "actions",
     header: "Action",
-    cell: ({ row }) => <ActionCell row={row} />,
+    cell: ({ row }) => <ProgramActionCell row={row} />,
   },
 ];
-
-const ActionCell = ({ row }) => {
-  const navigate = useNavigate();
-  const { _id, title, plans = [] } = row.original;
-  const hasPlans = plans.length > 0;
-
-  const handleNavigation = () => {
-    if (hasPlans) {
-      navigate("/admin/programs/plans", {
-        state: { programId: _id, title },
-      });
-    } else {
-      navigate("/admin/programs/create", {
-        state: { programId: _id, title },
-      });
-    }
-  };
-
-  return (
-    <button
-      onClick={handleNavigation}
-      className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold rounded-lg ${
-        hasPlans ? "bg-[#EBF3F2] text-[#0A4F48]" : "bg-[#0A4F48] text-white"
-      } transition-colors`}
-    >
-      {hasPlans ? "View Plan" : "Add Plan"}
-    </button>
-  );
-};

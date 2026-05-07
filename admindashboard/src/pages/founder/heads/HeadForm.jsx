@@ -96,7 +96,7 @@ const HeadForm = () => {
           {
             name: "experience",
             label: "Experience",
-            type: "text",
+            type: "number",
           },
           {
             name: "qualification",
@@ -175,7 +175,10 @@ const validationSchema = Yup.object({
     .min(1, "Select at least one specialization")
     .required("Specialization is required"),
 
-  experience: Yup.string().required("Experience is required"),
+  experience: Yup.number()
+  .typeError("Experience must be a number")
+  .required("Experience is required")
+  .positive("Experience must be positive"),
 
   qualification: Yup.string().required("Qualification is required"),
 
@@ -212,12 +215,10 @@ const validationSchema = Yup.object({
   const handelSubmit = async (value) => {
     setIsLoading(true);
     try {
-      const result = await dispatch(createHead(value)).unwrap();
-      console.log(result, "try")
+       await dispatch(createHead(value)).unwrap();
         toast.success("Head created successfully");
         navigate("/founder/heads");
     } catch (error) {
-      console.log(error, "catch")
       toast.error(error || "Failed to create head");
     } finally {
       setIsLoading(false);

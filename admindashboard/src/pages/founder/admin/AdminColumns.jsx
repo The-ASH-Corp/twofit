@@ -1,3 +1,5 @@
+import ActionMenu from "@/components/actionMenu/ActionMenu";
+
 // const expertColors = {
 //   Dietitian: "bg-[#FFF5ED] text-black",
 //   Therapist: "bg-[#E7F9F4] text-black",
@@ -65,5 +67,33 @@ export const AdminColumns = [
       );
     },
   },
-  // { id: "actions", header: "Action", cell: () => "⋯" },
+  {
+    id: "actions",
+    header: "Action",
+    cell: ({ row }) => {
+      const programCount = Number(row.original.programCount || 0);
+
+      if (programCount > 0) {
+        return <span className="text-xs font-semibold text-slate-400">-</span>;
+      }
+
+      const handleDelete = () => {
+        const event = new CustomEvent("open-delete-founder-admin", {
+          detail: {
+            id: row.original._id,
+            name: row.original.adminName,
+          },
+        });
+        window.dispatchEvent(event);
+      };
+
+      return (
+        <ActionMenu
+          row={row}
+          editActionPath="/founder/admins/edit/"
+          onDelete={handleDelete}
+        />
+      );
+    },
+  },
 ];

@@ -206,7 +206,7 @@ export const updateOneClient = async (userData, id) => {
     { $set: userData },
     { new: true },
   ).select("-password");
-  const coaches = [client.Dietician, client.trainer, client.therapist].filter(
+  const coaches = [client.dietition, client.trainer, client.therapist].filter(
     Boolean,
   );
   for (const coachId of coaches) {
@@ -221,7 +221,7 @@ export const deleteOneClient = async (id) => {
     throw new Error("Client not found");
   }
 
-  const coachIds = [client.trainer, client.Dietician, client.therapist].filter(
+  const coachIds = [client.trainer, client.dietition, client.therapist].filter(
     Boolean,
   );
 
@@ -229,14 +229,14 @@ export const deleteOneClient = async (id) => {
   if (coachIds.length > 0) {
     await CoachModel.updateMany(
       { _id: { $in: coachIds } },
-      { $pull: { assignedUsers: id } },
+      { $pull: { assignedUsers: new mongoose.Types.ObjectId(id) } },
     );
   }
 
   // 2. Delete habits and task submissions
   await Promise.all([
-    HabitModel.deleteMany({ clientId: id }),
-    TaskSubmission.deleteMany({ userId: id }),
+    HabitModel.deleteMany({ clientId: new mongoose.Types.ObjectId(id) }),
+    TaskSubmission.deleteMany({ userId: new mongoose.Types.ObjectId(id) }),
   ]);
 
   // 3. Recalculate Expert incentives
@@ -284,41 +284,44 @@ export const getClientsBasedOnCoach = async (coachIds, page, limit) => {
 };
 
 export const updateWeightService = async (userId, data) => {
-  if (!data.currentWeight) {
-    throw new Error("Current weight is required");
-  }
-
-   if (!data.sidePhoto && !data.frontPhoto) {
-     throw new Error("photo is required");
-   }
-
   const user = await User.findById(userId);
 
   if (!user) {
     throw new Error("User not found");
   }
 
-  if (!user.weightHistory || user.weightHistory.length === 0) {
-    user.weightHistory = [
-      {
-        weight: data.currentWeight,
-        frontPhoto: data.frontPhoto,
-        sidePhoto: data.sidePhoto,
-        date: new Date(),
-        isInitial: true,
-      },
-    ];
-  } else {
-    user.weightHistory.push({
-      weight: data.currentWeight,
-      frontPhoto: data.frontPhoto,
-      sidePhoto: data.sidePhoto,
-      date: new Date(),
-      isInitial: false,
-    });
+  // A user is in "first time" state if they have no photos in their weight history yet
+  const hasPhotos = user.weightHistory.some(
+    (h) => h.frontPhoto || h.sidePhoto,
+  );
+  const isFirstTime = !hasPhotos;
+
+  const weight = data.currentWeight || user.currentWeight;
+
+  if (!weight) {
+    throw new Error("Current weight is required");
   }
 
-  user.currentWeight = data.currentWeight;
+  if (!data.sidePhoto && !data.frontPhoto) {
+    throw new Error("At least one photo is required");
+  }
+
+  const historyEntry = {
+    weight: weight,
+    frontPhoto: data.frontPhoto || "",
+    sidePhoto: data.sidePhoto || "",
+    date: new Date(),
+    isInitial: isFirstTime,
+  };
+
+  if (isFirstTime && user.weightHistory.length > 0 && !user.weightHistory[0].frontPhoto && !user.weightHistory[0].sidePhoto) {
+    // Update the existing initial entry if it has no photos
+    user.weightHistory[0] = { ...user.weightHistory[0].toObject(), ...historyEntry };
+  } else {
+    user.weightHistory.push(historyEntry);
+  }
+
+  user.currentWeight = weight;
 
   await user.save();
 

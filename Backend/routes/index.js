@@ -21,6 +21,8 @@ import recipeRoutes from "../modules/recipe/recipe.route.js";
 import reminderRoutes from "../modules/autoReminder/reminder.route.js";
 import growthSupportRoutes from "../modules/growthSupport/growthSupport.routes.js";
 import adjustment from "../modules/adjustment/adjustment.routes.js";
+import healthConcernRoutes from "../modules/concern/concern.routes.js"
+import whatsappRoutes from "../modules/whatsapp/whatsapp.routes.js";
 
 const router = express.Router();
 
@@ -45,7 +47,12 @@ router.use("/sop", sopRoutes);
 router.use("/recipes", recipeRoutes);
 router.use("/reminder", reminderRoutes);
 router.use("/growth-support", growthSupportRoutes);
+<<<<<<< HEAD
 router.use("/adjustment", adjustment);
+=======
+router.use("/health-concern",healthConcernRoutes)
+router.use("/whatsapp", whatsappRoutes);
+>>>>>>> origin/master
 
 
 

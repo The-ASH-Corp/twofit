@@ -127,3 +127,17 @@ export const editAdmin = async (req, res) => {
     res.status(400).json({ success: false, message: err.message });
   }
 };
+
+export const getAdminByProgram = async (req, res) => {
+  try {
+    const { programId, page, limit } = req.params;
+    const { data, totalCount } = await service.getAdminByProgram({ programId, page, limit });
+    res.status(200).json({
+      success: true,
+      data: data,
+      total: totalCount,
+    });
+  } catch (error) {
+    res.status(400).json({ success: false, message: error.message })
+  }
+}

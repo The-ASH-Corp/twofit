@@ -1,17 +1,16 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { 
-  CalendarDays,
   CheckCircle2, 
   TrendingUp, 
-  Droplets, 
   Apple, 
   Moon, 
   Camera, 
   Check, 
   Utensils,
   Info,
-  X
+  X,
+  Lightbulb
 } from "lucide-react";
 import { SyncLoader } from "react-spinners";
 import { toast } from "react-toastify";
@@ -31,6 +30,40 @@ import {
 } from "@/redux/features/tasks/task.thunk";
 import MobileBottomNav from "../components/MobileBottomNav";
 import { cn } from "@/lib/utils";
+
+const dieteMotivationalQuotes = [
+"Your diet is an investment in your future self.",
+"Eat with purpose, not just for comfort.",
+"Small healthy choices create big transformations.",
+"Fuel your body like it matters, because it does.",
+"Discipline in the kitchen creates results in the mirror.",
+"Healthy eating is self-respect in action.",
+"You don’t need a perfect diet, just consistent habits.",
+"Every healthy meal is progress.",
+"Your body reflects what you feed it.",
+"Eat to nourish your goals, not your excuses.",
+"Consistency with food beats crash diets every time.",
+"A healthy body starts with healthy choices.",
+"Food is fuel. Choose wisely.",
+"Good nutrition is part of the process, not a punishment.",
+"The strongest transformations begin in the kitchen.",
+"Control your food, or your food will control you.",
+"Healthy eating is a daily act of discipline.",
+"Your future health depends on today’s decisions.",
+"Eat clean enough to feel proud of yourself.",
+"Every meal is a chance to improve.",
+"Progress happens when healthy choices become habits.",
+"Don’t eat less. Eat better.",
+"Your goals deserve better nutrition.",
+"A balanced diet builds a balanced life.",
+"The way you eat today shapes how you feel tomorrow.",
+"Strong bodies are built with smart nutrition.",
+"Healthy eating is not temporary. It’s a lifestyle.",
+"Feed your body energy, not regret.",
+"Better food choices lead to better results.",
+"Stay consistent with your diet and your body will respond."
+]
+
 
 const getMealConfig = (index, totalCount, Apple, Utensils, Moon) => {
   if (totalCount === 4) {
@@ -54,12 +87,12 @@ const getMealConfig = (index, totalCount, Apple, Utensils, Moon) => {
   }
   if (totalCount === 6) {
     const configs = [
-      { label: "BREAKFAST", time: "07:30 AM", icon: Apple },
-      { label: "MID-MORNING", time: "10:30 AM", icon: Apple },
-      { label: "LUNCH", time: "01:00 PM", icon: Utensils },
-      { label: "AFTERNOON", time: "04:00 PM", icon: Apple },
-      { label: "EVENING", time: "07:00 PM", icon: Apple },
-      { label: "DINNER", time: "09:30 PM", icon: Moon },
+      { label: "DETOX", time: "Empty Stomach", icon: Apple },
+      { label: "BREAKFAST", time: "08:00 AM", icon: Apple },
+      { label: "MID SNACKS", time: "11:00 AM", icon: Utensils },
+      { label: "LUNCH", time: "01:00 PM", icon: Apple },
+      { label: "EVENING SNACKS", time: "04:00 PM", icon: Apple },
+      { label: "DINNER", time: "07:00 PM", icon: Moon },
     ];
     return configs[index] || { label: `MEAL ${index + 1}`, time: "--:--", icon: Utensils };
   }
@@ -141,6 +174,7 @@ export default function DietTasksPage() {
 
       return {
         name: config.label,
+        time:config.time,
         notes: "Upload a clear image of your meal for expert review.",
         index,
         exerciseIndex: mealIndex,
@@ -473,6 +507,31 @@ export default function DietTasksPage() {
     );
   }
 
+  if (!dietPlanPdf) {
+    return (
+      <div className="client-page-container p-5 sm:p-6 min-h-[80vh] flex flex-col justify-center">
+        <div className="client-page-shell max-w-2xl mx-auto w-full">
+          <div className="bg-white rounded-[32px] p-8 sm:p-12 text-center shadow-2xl border border-[#0A4F48]/10 flex flex-col items-center">
+            <div className="w-24 h-24 bg-[#F0F7F4] rounded-[24px] flex items-center justify-center mb-8 rotate-3 transition-transform hover:rotate-6">
+              <Utensils size={44} className="text-[#0A4F48]" />
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-black text-[#1F2F27] tracking-tight">Diet Plan Pending</h2>
+            <p className="text-[#5F7269] mt-6 text-lg font-medium leading-relaxed">
+              Your dietitian is currently crafting your personalized diet plan. Once it's ready, you'll see your daily meals and tracking tools here.
+            </p>
+            <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
+              <div className="px-6 py-3 bg-[#E8F3EC] rounded-full text-[#0A4F48] font-bold text-sm flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#0A7B4E] animate-pulse"></span>
+                Expert review in progress
+              </div>
+            </div>
+          </div>
+        </div>
+        <MobileBottomNav />
+      </div>
+    );
+  }
+
   return (
     <div className="client-page-container p-5 sm:p-6">
       <div className="client-page-shell">
@@ -490,7 +549,7 @@ export default function DietTasksPage() {
 
           <div className="relative mt-6 pb-1">
             <div className="absolute left-[24px] right-[24px] top-[20px] h-[5px] rounded-full bg-[#DDE5E1]" />
-            <div
+            <div 
               className="absolute left-[24px] top-[20px] h-[5px] rounded-full bg-[#0A7B4E] transition-all duration-700"
               style={{ width: `${progressBarWidth}%` }}
             />
@@ -549,7 +608,12 @@ export default function DietTasksPage() {
                       {item.name
                         .toLowerCase()
                         .replace(/\b\w/g, (match) => match.toUpperCase())}
+                        
                     </button>
+                    <p className={cn(
+                        "truncate text-center text-[11px] font-bold leading-tight text-[#5D6D65]",
+                        isActive && "text-[#0A7B4E]",
+                      )}>{item.time}</p>
                   </div>
                 );
               })}
@@ -593,16 +657,14 @@ export default function DietTasksPage() {
             <section className="client-card rounded-[24px] border-l-[4px] border-l-[#0A7B4E] p-5 sm:p-6">
               <div className="flex items-start gap-4">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#E8F3EC] text-[#0A7B4E]">
-                  <Droplets size={20} />
+                  <Lightbulb size={20} />
                 </div>
                 <div>
                   <h4 className="text-[26px] leading-none font-black text-[#1F2F27]">
-                    Hydration Tip
+                    Diet Tip
                   </h4>
                   <p className="mt-2 text-[14px] font-medium leading-relaxed text-[#5F7269]">
-                    Boost your metabolism and aid digestion by drinking exactly{" "}
-                    <span className="font-black text-[#1F2F27]">250ml of water</span>{" "}
-                    before your breakfast meal.
+                   {dieteMotivationalQuotes[Math.floor(Math.random() * dieteMotivationalQuotes.length)]}
                   </p>
                 </div>
               </div>
@@ -635,10 +697,10 @@ export default function DietTasksPage() {
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <p className="text-[38px] leading-none font-black text-[#1F2F27]">
+                    <p className="text-[28px] leading-none font-black text-[#1F2F27]">
                       {dietCompliancePercent}%
                     </p>
-                    <p className="mt-1 text-[10px] font-black uppercase tracking-[0.14em] text-[#63756C]">
+                    <p className="mt-1 text-[8px] font-black uppercase tracking-[0.14em] text-[#63756C]">
                       Compliance
                     </p>
                   </div>

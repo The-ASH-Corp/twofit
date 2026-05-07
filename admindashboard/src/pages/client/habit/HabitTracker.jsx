@@ -23,6 +23,7 @@ import {
 import { SyncLoader } from "react-spinners";
 import { addDays, format, startOfWeek } from "date-fns";
 import MobileBottomNav from "../components/MobileBottomNav";
+import { motivationQuotes } from "../dailyPlan/DailyPlan";
 
 export const dualEdgeDepthShadow = {
   boxShadow:
@@ -164,11 +165,11 @@ export default function HabitTracker() {
 
   if (!habits || !habits.habits?.length) {
     return (
-      <div className="flex flex-col items-center justify-center w-full h-[60vh] text-center p-8 bg-white rounded-[32px] shadow-sm">
+      <div className="flex flex-col items-center justify-center w-50% h-[60vh] text-center p-8 bg-white rounded-[32px] shadow-sm m-5">
         <Target size={48} className="text-gray-200 mb-4" />
         <h3 className="text-lg font-bold text-gray-800">No habits assigned yet</h3>
         <p className="text-sm text-gray-500 max-w-xs mt-1">
-          Visit the admin panel to set up your daily rituals.
+          Your coach hasn't set up any habits for you yet. Check back soon!
         </p>
       </div>
     );
@@ -211,8 +212,8 @@ export default function HabitTracker() {
                   <h2 className="text-[24px] sm:text-[28px] leading-none font-black text-[#1F2D26]">
                     Today&apos;s Protocol
                   </h2>
-                  <p className="mt-2 text-[15px] font-semibold text-[#7B8C83]">
-                    Mandatory habits for peak performance
+                  <p className="mt-2 text-[15px] font-semibold text-red-600">
+                   *Discipline check - complete the habit and post proof in chat
                   </p>
                 </div>
                 
@@ -297,9 +298,9 @@ export default function HabitTracker() {
                     DAILY INSIGHT
                   </span>
                   <h3 className="mt-3 text-[24px] sm:text-[30px] leading-[1.1] font-black text-[#24342C]">
-                    Consistency is the bridge between goals and accomplishment.
+                    {motivationQuotes[Math.floor(Math.random() * motivationQuotes.length)]}
                   </h3>
-                  <p className="mt-2 text-[18px] sm:text-[20px] font-bold text-[#5D6D65]">- Jim Rohn</p>
+                  <p className="mt-2 text-[18px] sm:text-[20px] font-bold text-[#5D6D65]">- Twofit Team</p>
                 </div>
                 
               </div>

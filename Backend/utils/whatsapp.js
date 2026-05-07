@@ -48,13 +48,14 @@ const normalizeWhatsAppNumber = (rawNumber) => {
 export const sendTemplateMessage = async ({
   to,
   templateName,
-  variables = []
+  variables = [],
+  callbackData = null,
 }) => {
   try {
     const normalizedTo = normalizeWhatsAppNumber(to);
 
     const response = await fetch(
-      `https://graph.facebook.com/v22.0/${PHONE_NUMBER_ID}/messages`,
+      `https://graph.facebook.com/v25.0/${PHONE_NUMBER_ID}/messages`,
       {
         method: 'post',
         headers: {
@@ -64,6 +65,7 @@ export const sendTemplateMessage = async ({
         body: JSON.stringify({
           messaging_product: "whatsapp",
           to: normalizedTo,
+          ...(callbackData ? { biz_opaque_callback_data: String(callbackData) } : {}),
           type: "template",
           template: {
             name: templateName,

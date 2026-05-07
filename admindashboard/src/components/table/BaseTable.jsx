@@ -199,6 +199,12 @@ export default function BaseTable({
                 <span className="sm:hidden">{actionLabel.split(' ')[0]}</span>
               </button>
             )}
+
+           {actionLabel =="Add Therapy" && <button className="flex-1 sm:flex-none h-[46px] px-4 md:px-6 bg-[#0A4F48] hover:bg-[#084039] text-white rounded-2xl text-sm font-bold flex items-center justify-center gap-2 shadow-lg shadow-[#0A4F48]/25 hover:shadow-xl hover:shadow-[#0A4F48]/30 transition-all active:scale-95 hover:-translate-y-0.5" onClick={()=>navigate("/founder/therapy/create-admin")}>
+              <BiPlus className="w-5 h-5 stroke-2" />
+              <span className="hidden sm:inline">{"Add Therapy Admin"}</span>
+              <span className="sm:hidden">{"Add Admin"}</span>
+            </button>}
           </div>
         </div>
       </div>

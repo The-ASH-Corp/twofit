@@ -73,8 +73,7 @@ export default function TherapyPlan({
         toast.error(resultAction.payload || "File upload failed");
       }
     } catch (error) {
-      console.error("Upload failed:", error);
-      toast.error("File upload failed");
+      toast.error(error || "File upload failed");
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";

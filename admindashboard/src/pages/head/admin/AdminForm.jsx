@@ -1,7 +1,7 @@
 import BaseForm from "@/components/form/BaseForm";
 import { createAdmin } from "@/redux/features/admins/admin.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { getAllProgramsByCategory } from "@/redux/features/program/program.thunk";
+import { getAllPrograms } from "@/redux/features/program/program.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -18,10 +18,10 @@ export default function AdminForm() {
 
   const fetchPrograms = useCallback(async () => {
     const response = await dispatch(
-      getAllProgramsByCategory({category: user.programCategory, page: 1, limit: 1000})
+      getAllPrograms({page: 1, limit: 10000})
     ).unwrap();
     setPrograms(response.data);
-  }, [dispatch, user.programCategory]);
+  }, [dispatch]);
   
   useEffect(() => {
     fetchPrograms();
@@ -74,7 +74,7 @@ export default function AdminForm() {
             ],
             allowCustom: true,
         },
-        { name: "experience", label: "Experience", type: "text" },
+        { name: "experience", label: "Experience", type: "number" },
         { name: "qualification", label: "Qualification", type: "text" },
       ],
     },
@@ -123,7 +123,12 @@ export default function AdminForm() {
         },
       ],
     },
-  ];
+  ].filter(section => {
+    if (section.section === "Program Assignment" && user?.role === 'founder') {
+      return false;
+    }
+    return true;
+  });
 
   const initialValues = {
     fullname: "",
@@ -134,7 +139,7 @@ export default function AdminForm() {
     address: "",
     password: "",
     specialization: [],
-    experience: "",
+    experience: 0,
     qualification: "",
     chooseProgram: [],
     baseSalary: "",
@@ -180,14 +185,20 @@ export default function AdminForm() {
       .min(1, "Select at least one specialization")
       .required("Specialization is required"),
 
-    experience: Yup.string().trim().required("Experience is required"),
+    experience: Yup.number()
+    .typeError("Experience must be a number")
+    .required("Experience is required")
+    .positive("Experience must be greater than 0"),
 
     qualification: Yup.string().trim().required("Qualification is required"),
 
-    chooseProgram: Yup.array()
-      .of(Yup.string())
-      .min(1, "Choose at least one program")
-      .required("Choose Program is required"),
+    chooseProgram:
+      user?.role === "founder"
+        ? Yup.array().of(Yup.string())
+        : Yup.array()
+            .of(Yup.string())
+            .min(1, "Choose at least one program")
+            .required("Choose Program is required"),
 
     baseSalary: Yup.number()
       .typeError("Base Salary must be a number")
@@ -209,9 +220,8 @@ export default function AdminForm() {
         })
       ).unwrap();
       toast("Admin created successfully", { type: "success" });
-      navigate("/head/admins");
+      navigate(-1);
     } catch (error) {
-      console.log(error)
       toast(error?.message || "Failed to create admin", { type: "error" });
     } finally {
       setIsLoading(false);

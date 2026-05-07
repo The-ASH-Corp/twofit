@@ -1,11 +1,15 @@
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from "react";
 import BaseTable from '../../../components/table/BaseTable'
 import { ProgramListColumns } from './ProgramListColumns'
 import { useDispatch } from 'react-redux'
-import {  getAllProgramsByAdmin } from '@/redux/features/program/program.thunk'
+import { getAllPrograms } from '@/redux/features/program/program.thunk'
 import { useAppSelector } from '@/redux/store/hooks'
-import { useEffect } from 'react'
-import { selectProgramError, selectProgramStatus } from '@/redux/features/program/program.selector'
+import {
+  selectAllPrograms,
+  selectProgramError,
+  selectProgramStatus,
+  selectTotalProgramCount,
+} from '@/redux/features/program/program.selector'
 import { selectUser } from '@/redux/features/auth/auth.selectores'
 import { SyncLoader } from 'react-spinners'
 
@@ -15,37 +19,45 @@ export default function ProgramTable() {
   const dispatch = useDispatch();
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [userPrograms, setUserPrograms] = useState([])
-  const [totalPrograms, setTotalPrograms] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const fetchUserPrograms = async () => {
-    const response = await dispatch(
-      getAllProgramsByAdmin({adminId: user._id, page, limit})
-    ).unwrap();
-    setUserPrograms(response.data);
-    setTotalPrograms(response.totalProgram);
-  }
   useEffect(() => {
-    fetchUserPrograms();
-  }, [dispatch, page, limit, user?._id]);
+    dispatch(getAllPrograms({ page, limit }));
+  }, [dispatch, page, limit]);
 
+  const allPrograms = useAppSelector(selectAllPrograms);
+  const totalPrograms = useAppSelector(selectTotalProgramCount);
   const status = useAppSelector(selectProgramStatus);
   const error = useAppSelector(selectProgramError);
 
-    const searchInputHandler = (e) => {
-      const value = e.target.value.toLowerCase();
+  const visiblePrograms = useMemo(() => {
+    const assignedPrograms = Array.isArray(user?.program) ? user.program : [];
+    const assignedProgramIds = new Set(
+      assignedPrograms
+        .map((program) =>
+          typeof program === "string" ? program : program?._id?.toString(),
+        )
+        .filter(Boolean),
+    );
 
-      if (!value) {
-        fetchUserPrograms()
-        return;
-      }
+    const mappedPrograms = (allPrograms || []).map((program) => ({
+      ...program,
+      isAssignedToAdmin: assignedProgramIds.has(program?._id?.toString()),
+    }));
 
-      const filtered = userPrograms.filter((programs) =>
-        programs.title?.toLowerCase().includes(value)
-      );
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    if (!normalizedSearch) {
+      return mappedPrograms;
+    }
 
-      setUserPrograms(filtered);
-    };
+    return mappedPrograms.filter((program) =>
+      program.title?.toLowerCase().includes(normalizedSearch),
+    );
+  }, [allPrograms, searchTerm, user]);
+
+  const searchInputHandler = (e) => {
+    setSearchTerm(e.target.value || "");
+  };
     
   if (status === "loading")
     return (
@@ -58,7 +70,7 @@ export default function ProgramTable() {
     <div className="h-[calc(100vh-120px)] pb-4 overflow-auto no-scrollbar">
       <BaseTable
         columns={ProgramListColumns}
-        data={userPrograms}
+        data={visiblePrograms}
         pageLabel={"Program List"}
         actionLabel="Add Program"
         onSearchInputChange={searchInputHandler}

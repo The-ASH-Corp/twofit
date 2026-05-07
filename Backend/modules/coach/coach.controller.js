@@ -13,7 +13,6 @@ export const createCoach = async (req, res) => {
 
     const coach = await coachService.createCoach(req.body);
 
-    console.log(coach)
 
     res
       .status(201)
@@ -24,7 +23,6 @@ export const createCoach = async (req, res) => {
       });
 
   } catch (err) {
-    console.log(err)
     res.status(400).json({ success: false, message: err.message });
   }
 };
@@ -310,3 +308,28 @@ export const getCoachRatingGraph = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+export const getAllCoachesByProgramId = async (req, res) => {
+  try {
+    const { programId, page, limit } = req.params;
+    const coaches = await coachService.getAllCoachesByProgramId(programId, page, limit);
+    res.status(200).json({
+      success: true,
+      data: coaches,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+export const getAllTherapists = async (req, res) => {
+  try {
+    const therapists = await coachService.getAllTherapists();
+    res.status(200).json({
+      success: true,
+      data: therapists,
+    });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};  

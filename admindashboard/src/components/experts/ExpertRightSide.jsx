@@ -175,7 +175,7 @@ const ExpertRightSide = ({ expert }) => {
        </div>
 
        {/* 2. Documents Section */}
-       <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden shrink-0">
+       {/* <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden shrink-0">
           <div className="px-6 py-5 border-b border-[#F1F5F9] bg-[#FAFCFF] flex items-center justify-between">
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white border border-[#E2E8F0] shadow-sm flex items-center justify-center text-[#0A4F48]">
@@ -220,7 +220,7 @@ const ExpertRightSide = ({ expert }) => {
                  </div>
              )}
           </div>
-       </div>
+       </div> */}
 
     </div>
   );

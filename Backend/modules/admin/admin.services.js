@@ -53,7 +53,7 @@ export const addNewAdmin = async (adminData) => {
     dob: adminData.dob,
     gender: adminData.gender,
     specialization: adminData.specialization,
-    program: adminData.chooseProgram,
+    program: adminData.chooseProgram ? adminData.chooseProgram : [],
     salary: adminData.baseSalary,
     autoSendWelcome: adminData.autoSendWelcome,
     autoSendGuide: adminData.autoSendGuide,
@@ -166,20 +166,24 @@ export const getAdminById = async (id) => {
 
 export const getAllCoachesByAdmin = async ({ adminId, page, limit }) => {
   const skip = (page - 1) * limit;
-  const admin = await AdminModel.findById(adminId).select("experts");
-  const totalCount = admin?.experts?.length || 0;
+  const admin = await AdminModel.findById(adminId).select("program");
 
-  const populatedAdmin = await AdminModel.findById(adminId).populate({
-    path: "experts",
-    options: {
-      skip: skip,
-      limit: limit,
-    },
-  });
+  let query;
+  if (admin?.program && admin.program.length > 0) {
+    query = { assignedPrograms: { $in: admin.program } };
+  } else {
+    query = { role: "Therapist" };
+  }
+
+  const totalCount = await CoachModel.countDocuments(query);
+  const coaches = await CoachModel.find(query)
+    .skip(skip)
+    .limit(limit)
+    .select("-password");
 
   return {
-    coaches: populatedAdmin?.experts || [],
-    totalCount: totalCount,
+    coaches,
+    totalCount,
   };
 };
 
@@ -668,3 +672,33 @@ export const editAdmin = async (adminId, adminData) => {
   return updatedAdmin;
 };
 
+
+export const getAdminByProgram = async ({ programId, page, limit }) => {
+
+  
+  try {
+    page = Number(page);
+    limit = Number(limit);
+    const skip = (page - 1) * limit;
+
+    const objectIds = programId.split(',').map(id => new mongoose.Types.ObjectId(id));
+
+    const data = await AdminModel.aggregate([
+      {
+        $match: {
+          program: { $in: objectIds }
+        }
+      },
+      { $skip: skip },
+      { $limit: limit }
+    ]);
+
+    const totalCount = await AdminModel.countDocuments({
+      program: { $in: objectIds }
+    });
+
+    return { data, totalCount };
+  } catch (error) {
+    throw error;
+  }
+};

@@ -452,7 +452,7 @@ export const getAllCoachesByHead = async (headId, page, limit) => {
   ).reduce((acc, count) => acc + count, 0);
   const coaches = await Promise.all(
     totalAdmins.map((admin) =>
-      CoachModel.find({ adminId: admin._id })
+      CoachModel.find({ adminId: admin._id, role: "Therapist" })
         .skip(skip)
         .limit(limit)
         .populate("assignedUsers"),

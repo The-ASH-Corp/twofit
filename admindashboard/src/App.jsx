@@ -50,6 +50,7 @@ import FounderBroadcastEdit from "./pages/founder/broadcast/broadcastEdit";
 import FounderRecipeList from "./pages/founder/recipe/RecipeList";
 import FounderRecipeForm from "./pages/founder/recipe/Recipeform";
 import FounderGrowthSupport from "./pages/founder/growth/GrowthSupport";
+import FounderTherapyAdminCreateForm from "./pages/head/admin/AdminForm";
 
 
 //Head Pages Imports    
@@ -164,6 +165,7 @@ function App() {
           <Route path="heads/add-head" element={<FounderHeadForm />} />
           <Route path="admins" element={<FounderAdminList />} />
           <Route path="admins/profile/:id" element={<FounderAdminProfile />} />
+          <Route path="admins/edit/:id" element={<HeadEditAdmin />} />
           <Route path="experts" element={<FounderExpertList />} />
           <Route
             path="experts/profile/:id"
@@ -232,6 +234,7 @@ function App() {
           />
           <Route path="profile" element={<Profile />} />
           <Route path="notifications" element={<Notifications />} />
+          <Route path="therapy/create-admin" element={<FounderTherapyAdminCreateForm />} />
         </Route>
 
         {/* HEAD */}

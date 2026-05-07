@@ -28,8 +28,10 @@ import {
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { SyncLoader } from "react-spinners";
 import { dualEdgeDepthShadow } from "../habit/HabitTracker";
+import { useLocation } from "react-router-dom";
 
 export default function Progress() {
+  const location = useLocation();
   const [program, setProgram] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [panelType, setPanelType] = useState(null);
@@ -40,6 +42,13 @@ export default function Progress() {
   const selectedClient = useAppSelector(selectSelectedClient);
   const dispatch = useDispatch();
   const clientData = selectedClient || user;
+
+  useEffect(() => {
+    if (location.state?.openWeightUpdate) {
+      setIsOpen(true);
+      setPanelType("weight");
+    }
+  }, [location.state]);
 
   const clampPercent = (value) => {
     const num = Number(value);
@@ -91,10 +100,11 @@ export default function Progress() {
     sortedMeasurementHistory[sortedMeasurementHistory.length - 1]?.date || "";
 
   const shouldShowWeightUpdateButton = () => {
+    if (sortedWeightHistory.length === 0) return true;
     if (!lastWeightUpdateDate) return true;
     const daysSinceLastUpdate =
       (new Date() - new Date(lastWeightUpdateDate)) / (1000 * 60 * 60 * 24);
-    return daysSinceLastUpdate >= 7;
+    return daysSinceLastUpdate >= 10;
   };
 
   const shouldShowMeasurementUpdateButton = () => {
@@ -102,7 +112,7 @@ export default function Progress() {
     const daysSinceLastUpdate =
       (new Date() - new Date(lastMeasurementUpdateDate)) /
       (1000 * 60 * 60 * 24);
-    return daysSinceLastUpdate >= 7;
+    return daysSinceLastUpdate >= 10;
   };
 
   const startWeight = Number(sortedWeightHistory[0]?.weight) || 0;
@@ -194,6 +204,24 @@ export default function Progress() {
       </div>
     );
   }
+
+const progressQuotes = [
+`Your progress over the last ${Math.min(currentDay, 7)} days shows strong commitment. Stay consistent, and your daily habits will continue building better results.`,
+`The effort you’ve shown in your first ${Math.min(currentDay, 7)} days is creating momentum. Keep following the process and trust your progress.`,
+`Your recent activity reflects growing discipline and consistency. Continue improving your routine, and the results will follow naturally.`,
+`Over the past ${Math.min(currentDay, 7)} days, your commitment has steadily improved. Small consistent actions are leading you toward bigger milestones.`,
+`Your journey is moving in the right direction. Keep focusing on nutrition, workouts, and recovery to unlock even greater progress.`,
+`The progress from your first ${Math.min(currentDay, 7)} days shows positive growth. Consistency and patience will accelerate your transformation.`,
+`Your healthy habits are beginning to create visible momentum. Keep showing up daily, and your results will continue improving.`,
+`Your consistency during the last ${Math.min(currentDay, 7)} days is building a strong foundation. Continue trusting the process and moving forward.`,
+`Your performance trends are improving steadily. Focus on recovery, hydration, and discipline to maximize your next milestone.`,
+`The work you’ve put in over the last few days is paying off. Keep maintaining your routine and let the process shape your progress.`,
+`Your dedication is becoming stronger each day. Continue following your plan, and the improvements will become even more noticeable.`,
+`Your recent progress highlights growing commitment and discipline. Stay focused on daily consistency to reach your goals faster.`,
+`The habits you’re building now are creating long-term results. Keep moving forward with patience and confidence.`,
+`Your progress data shows steady improvement in consistency and effort. Continue pushing forward and trust your daily routine.`,
+`You’ve made meaningful progress during your first ${Math.min(currentDay, 7)} days. Keep building on this momentum with consistent action.`
+]
 
   return (
     <div className="client-page-container p-5 sm:p-6 lg:p-7">
@@ -438,10 +466,7 @@ export default function Progress() {
                 Expert Analysis
               </h3>
               <p className="mt-4 text-[17px] font-medium leading-relaxed text-[#6D7C75]">
-                Our nutrition team has analyzed your first{" "}
-                {Math.min(currentDay, 7)} days. Your consistency is
-                improving, and hydration plus workout completion will push
-                your next milestone faster.
+               {progressQuotes[Math.floor(Math.random() * progressQuotes.length)]}
               </p>
               <button
                 type="button"

@@ -8,12 +8,14 @@ import { getAllCoachesByAdmin } from "@/redux/features/coach/coach.thunk";
 import { AiFillStar } from "react-icons/ai";
 import { ENV } from "@/utils/env";
 import { dualEdgeDepthShadow, protocolIconDepthShadow, reflectionFieldDepthShadow } from "../habit/HabitTracker";
+import { getProgramById } from "@/redux/features/program/program.thunk";
 
 export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedExpert, setSelectedExpert] = useState(null);
   const user = useAppSelector(selectUser);
   const [experts, setExperts] = useState([]);
+  const [duration,setDuration] = useState(null)
 
   const dispatch = useDispatch();
   const fetchExperts = async () => {
@@ -25,6 +27,10 @@ export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
       setExperts(
         coaches.filter((coach) => coach !== null && coach !== undefined),
       );
+
+      await dispatch(getProgramById(user?.programType)).unwrap().then((data) => {
+        setDuration(data?.data?.plan?.duration.split(" ")[0])
+      })
     } catch (error) {
       console.error("Error fetching experts:", error);
     }
@@ -32,7 +38,7 @@ export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
   useEffect(() => {
     fetchExperts();
   }, []);
-
+  
   const getFileUrl = (path) => {
     if (!path) return "";
     if (path.startsWith("http") || path.startsWith("blob:")) return path;
@@ -63,7 +69,30 @@ export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
       </div>
     );
   };
+  const getRatingInfo = () => {
+    if (!user?.programEndDate) return { canRate: false, status: 'none' };
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const endDate = new Date(user.programEndDate);
+    endDate.setHours(0, 0, 0, 0);
+    const daysLeft = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+    
+    if (daysLeft > 7) {
+      return { 
+        canRate: false, 
+        daysUntilWindow: daysLeft - 7, 
+        status: 'upcoming' 
+      };
+    } else {
+      // Once we are within 7 days of the end, or past it, rating is enabled permanently
+      return { 
+        canRate: true, 
+        status: 'active' 
+      };
+    }
+  };
 
+  const ratingInfo = getRatingInfo();
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full mb-8" >
@@ -108,23 +137,35 @@ export default function ExpertCard({ fetchFeedbackData, ratedExpertIds = [] }) {
                 </div>
               </div>
 
-              {/* Action Button */}
-              <button
-                onClick={() => {
-                  if (!isRated) {
-                    setSelectedExpert(expert);
-                    setIsOpen(true);
-                  }
-                }}
-                disabled={isRated}
-                className={`w-full py-3.5 rounded-full font-bold text-sm transition-all border-2 ${
-                  isRated
-                    ? "bg-gray-100 border-transparent text-gray-400 cursor-not-allowed"
-                    : "border-[#0A4F48] text-[#0A4F48] hover:bg-[#0A4F48] hover:text-white"
-                }`} style={isRated? protocolIconDepthShadow : dualEdgeDepthShadow}
-              >
-                {isRated ? "Already Rated" : "Rate Now"}
-              </button>
+              {/* Action Button Area */}
+              <div className="w-full flex flex-col items-center gap-2">
+                {/* Upcoming Window Info */}
+                {ratingInfo.status === 'upcoming' && (
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                    Rating available in {ratingInfo.daysUntilWindow} {ratingInfo.daysUntilWindow === 1 ? 'day' : 'days'}
+                  </p>
+                )}
+
+                {/* The Button */}
+                {ratingInfo.canRate && (
+                  <button
+                    onClick={() => {
+                      if (!isRated) {
+                        setSelectedExpert(expert);
+                        setIsOpen(true);
+                      }
+                    }}
+                    disabled={isRated}
+                    className={`w-full py-3.5 rounded-full font-bold text-sm transition-all border-2 ${
+                      isRated
+                        ? "bg-gray-100 border-transparent text-gray-400 cursor-not-allowed"
+                        : "border-[#0A4F48] text-[#0A4F48] hover:bg-[#0A4F48] hover:text-white"
+                    }`} style={isRated ? protocolIconDepthShadow : dualEdgeDepthShadow}
+                  >
+                    {isRated ? "Already Rated" : "Rate Now"}
+                  </button>
+                )}
+              </div>
             </div>
           );
         })}

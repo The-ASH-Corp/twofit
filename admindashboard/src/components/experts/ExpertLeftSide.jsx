@@ -188,12 +188,12 @@ const ExpertLeftSide = ({ expert }) => {
         <div className="absolute top-4 right-4 flex gap-2">
           <span
             className={`px-2.5 py-0.5 rounded-lg text-[10px] uppercase font-bold tracking-wider backdrop-blur-md border shadow-sm ${
-              expert?.isOnline
+              expert?.status
                 ? "bg-emerald-400/20 text-emerald-50 border-emerald-400/30"
                 : "bg-gray-400/20 text-gray-50 border-gray-400/30"
             }`}
           >
-            {expert?.isOnline ? "Online" : "Offline"}
+            {expert?.status == "Active" ? "Active" : "Inactive"}
           </span>
         </div>
       </div>

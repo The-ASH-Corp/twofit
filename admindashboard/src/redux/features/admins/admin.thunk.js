@@ -132,3 +132,19 @@ export const editAdmin = createAsyncThunk(
     }
   }
 );
+
+export const getAdminByProgramId = createAsyncThunk(
+  "admins/getAdminByProgramId",
+  async ({ programId, page, limit }, { rejectWithValue }) => {
+    try {
+      const data = await axiosInstance.get(
+        `/admin/get-admin-by-program/${programId}/${page}/${limit}`,
+      );
+      return data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to get admins by program id",
+      );
+    }
+  },
+);
