@@ -10,6 +10,8 @@ const initialState = {
   totalSalary: 0,
   totalBaseSalary: 0,
   totalIncentive: 0,
+  totalBonus: 0,
+  totalDeduction: 0,
   error: null,
   status: "idle",
 };
@@ -36,6 +38,8 @@ const employeeSlice = createSlice({
         state.totalSalary = action?.payload?.data?.totalSalary;
         state.totalBaseSalary = action?.payload?.data?.totalBaseSalary;
         state.totalIncentive = action?.payload?.data?.totalIncentive;
+        state.totalBonus = action?.payload?.data?.totalBonus;
+        state.totalDeduction = action?.payload?.data?.totalDeduction;
         state.error = null;
       })
       .addCase(getAllEmployees.rejected, (state, action) => {

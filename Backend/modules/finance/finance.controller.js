@@ -26,3 +26,29 @@ try {
   res.status(400).json({ success: false, message: error.message });
 }
 }
+
+// finance.controller.js
+
+export const allPayrollHistory = async (req, res) => {
+  try {
+    const { page, limit } = req.params;
+    const { month, year } = req.query;
+
+    const history = await financeService.getAllPayrollHistory(
+      page,
+      limit,
+      month,
+      year,
+    );
+
+    res.status(200).json({
+      success: true,
+      data: history,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

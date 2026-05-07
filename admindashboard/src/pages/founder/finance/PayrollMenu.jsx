@@ -56,6 +56,7 @@ const PayrollMenu = ({ EmployeeList, setPayrollOpen, payrollOpen }) => {
         toast.success("Payroll created successfully");
 
         setPayrollOpen(false);
+        window.location.reload();
       } catch (error) {
         toast.error(error || "Failed to create payroll");
       } finally {

@@ -47,12 +47,9 @@ router.use("/sop", sopRoutes);
 router.use("/recipes", recipeRoutes);
 router.use("/reminder", reminderRoutes);
 router.use("/growth-support", growthSupportRoutes);
-<<<<<<< HEAD
 router.use("/adjustment", adjustment);
-=======
 router.use("/health-concern",healthConcernRoutes)
 router.use("/whatsapp", whatsappRoutes);
->>>>>>> origin/master
 
 
 
