@@ -49,10 +49,10 @@ const ExpertCenterSide = ({ expert }) => {
             .length || 0,
       }));
     }
-    return (expert?.assignedTherapy || []).map((s) => ({
+      return (expert?.assignedTherapy || []).map((s) => ({
       title: s?.name,
       count:
-        expert.assignedUsers?.filter((u) => u.programType?._id === s?._id)
+        expert.assignedUsers?.filter((u) => u.therapyType?._id === s?._id)
           .length || 0,
     }));
   }, [expert]);
