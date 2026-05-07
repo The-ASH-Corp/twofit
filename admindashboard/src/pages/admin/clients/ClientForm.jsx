@@ -178,6 +178,12 @@ export default function ClientForm() {
     }
   };
 
+  const selectedPlanDuration =
+    (typeof selectedProgram?.plan === "string"
+      ? selectedProgram?.plan
+      : selectedProgram?.plan?.duration)?.trim() || "";
+  const selectedPlanDaysOnly = selectedPlanDuration.split(/\s+/)[0] || "";
+
   const fields = [
     {
       section: "Personal Information",
@@ -290,10 +296,9 @@ export default function ClientForm() {
           name: "duration",
           label: "Duration",
           type: "select",
-          options: selectedProgram?.duration?.map((d) => ({
-            label: d,
-            value: d,
-          })),
+          options: selectedPlanDuration
+            ? [{ label: selectedPlanDaysOnly, value: selectedPlanDuration }]
+            : [],
           onChange: (e, form) => {
             calculateEndDate(
               form.values.startDate,

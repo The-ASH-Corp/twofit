@@ -21,7 +21,7 @@ export const getAllProgram = async (page, limit) => {
   const totalProgram = await programModel.countDocuments();
   const program = await programModel
     .find()
-    .populate("category", "name -_id")
+    .populate("category").populate("plan")
     .skip((page - 1) * limit)
     .limit(limit)
     .lean();
