@@ -1,3 +1,4 @@
+import { AdjustmentModel } from "../adjustment/adjustment.model.js";
 import { AdminModel } from "../admin/admin.model.js";
 import { CoachModel } from "../coach/coach.model.js";
 import { HeadsModel } from "../Heads/heads.modal.js";
@@ -65,6 +66,7 @@ export const allEmployees = async (page, limit) => {
     employeeCount: unifiedData.length,
     totalSalary,
     employees,
+    allEmployeesList: unifiedData,
     totalIncentive,
     totalBaseSalary,
   };
@@ -83,6 +85,8 @@ export const generateMonthlyPayroll = async () => {
     const admins = await AdminModel.find().lean();
     const coaches = await CoachModel.find().lean();
 
+    const adjustments = await AdjustmentModel.find({ month, year }).lean();
+
     const allEmployees = [
       ...heads.map((h) => ({ ...h, type: "Head" })),
       ...admins.map((a) => ({ ...a, type: "Admin" })),
@@ -90,34 +94,48 @@ export const generateMonthlyPayroll = async () => {
     ];
 
     for (let emp of allEmployees) {
-      let updatedEmp = emp;
+      let incentive = emp.incentives || 0;
 
+      // ✅ Coach incentives (fresh)
       if (emp.type === "Coach") {
-        await calculateCoachIncentives(emp._id);
-        const freshCoach = await CoachModel.findById(emp._id).lean();
-        updatedEmp = { ...freshCoach, type: "Coach" };
+        const result = await calculateCoachIncentives(emp._id);
+        incentive = result?.totalIncentive || 0;
       }
 
-      const baseSalary = updatedEmp.salary || 0;
-      const extraClientIncentive = updatedEmp.extraClientIncentive || 0;
-      const ratingIncentive = updatedEmp.ratingIncentiveAmount || 0;
-      const incentive = updatedEmp.incentives || 0;
-      const netSalary = baseSalary + incentive;
+      // ✅ Get adjustments
+      const individual = adjustments.filter(
+        (a) => a.employeeId?.toString() === emp._id.toString(),
+      );
+
+      const global = adjustments.filter((a) => a.scope === "ALL");
+
+      const allAdj = [...individual, ...global];
+
+      const bonus = allAdj
+        .filter((a) => a.type === "BONUS")
+        .reduce((sum, a) => sum + a.amount, 0);
+
+      const deduction = allAdj
+        .filter((a) => a.type === "DEDUCTION")
+        .reduce((sum, a) => sum + a.amount, 0);
+
+      const baseSalary = emp.salary || 0;
+      const netSalary = baseSalary + incentive + bonus - deduction;
 
       await PayrollModel.create({
-        employeeId: updatedEmp._id,
-        employeeType: updatedEmp.type,
+        employeeId: emp._id,
+        employeeType: emp.type,
         month,
         year,
         baseSalary,
-        ratingIncentive,
-        extraClientIncentive,
         incentive,
+        bonus,
+        deduction,
         netSalary,
       });
     }
+
     return "Payroll generated successfully";
-    
   } catch (error) {
     throw error;
   }

@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../../utils/axiosInstance";
 
-export const createPayroll = createAsyncThunk(
+export const createIncentive = createAsyncThunk(
   "incentive/update",
   async (payrollData, { rejectWithValue }) => {
     try {

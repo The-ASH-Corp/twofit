@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
-const payrollSchema = new mongoose.Schema({
-  id: { type: String, required: true },
+const incentiveSchema = new mongoose.Schema({
   rating1: { type: Number, default: 0 },
   rating2: { type: Number, default: 0 },
   rating3: { type: Number, default: 0 },
@@ -12,5 +11,4 @@ const payrollSchema = new mongoose.Schema({
   targetAchieved: { type: Number, default: 0 },
 });
 
-const incentiveModel = mongoose.model("incentive", payrollSchema);
-export default incentiveModel;
+export const IncentiveModel = mongoose.model("incentive", incentiveSchema);

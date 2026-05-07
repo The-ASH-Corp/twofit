@@ -1,4 +1,5 @@
 export const selectAllEmployees = (state) => state.finance.allEmployees;
+export const selectAllEmployeesList = (state) => state.finance.allEmployeesList;
 export const selectEmployeeCount = (state) => state.finance.allEmployeeCount;
 export const selectTotalSalary = (state) => state.finance.totalSalary;
 export const selectTotalBaseSalary = (state) => state.finance.totalBaseSalary;

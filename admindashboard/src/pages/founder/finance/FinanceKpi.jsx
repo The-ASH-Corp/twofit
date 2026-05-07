@@ -9,6 +9,7 @@ import {
   BanknoteArrowUp,
 } from "lucide-react";
 import {
+  selectAllEmployeesList,
   selectEmployeeCount,
   selectTotalBaseSalary,
   selectTotalIncentive,
@@ -19,10 +20,14 @@ import PayrollMenu from "./PayrollMenu";
 export default function FinanceKpi() {
   const [payrollOpen, setPayrollOpen] = useState(false);
   const [incentiveOpen, setIncentiveOpen] = useState(false);
+  const EmployeeList = useAppSelector(selectAllEmployeesList);
   const count = useAppSelector(selectEmployeeCount);
   const totalPayroll = useAppSelector(selectTotalSalary);
   const totalBaseSalary = useAppSelector(selectTotalBaseSalary);
   const totalIncentive = useAppSelector(selectTotalIncentive);
+
+  // console.log(EmployeeList);
+
 
   return (
     <div className="relative  w-full bg-white p-5 rounded-xl mb-4 h-[calc()]">
@@ -102,6 +107,7 @@ export default function FinanceKpi() {
         )}
         {payrollOpen && (
           <PayrollMenu
+            EmployeeList={EmployeeList}
             setPayrollOpen={setPayrollOpen}
             payrollOpen={payrollOpen}
           />
