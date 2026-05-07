@@ -20,6 +20,8 @@ const payrollSchema = new mongoose.Schema(
     ratingIncentive: { type: Number, default: 0 },
     baseSalary: { type: Number, required: true },
     incentive: { type: Number, default: 0 },
+    bonus: { type: Number, default: 0 },
+    deduction: { type: Number, default: 0 },
     netSalary: { type: Number, required: true },
   },
   { timestamps: true },

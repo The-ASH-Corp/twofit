@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createPayroll, getPayroll } from "./incentive.thunk";
+import { createIncentive, getPayroll } from "./incentive.thunk";
 
 const initialState = {
     Payroll: [],
@@ -18,14 +18,14 @@ const payrollSlice = createSlice({
   },
   extraReducers: (builder)=> {
     builder
-      .addCase(createPayroll.pending, (state) => {
+      .addCase(createIncentive.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(createPayroll.fulfilled, (state, action) => {
+      .addCase(createIncentive.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.createdPayroll = action.payload;
       })
-      .addCase(createPayroll.rejected, (state, action) => {
+      .addCase(createIncentive.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       })

@@ -34,7 +34,7 @@ export const FinanceColumns = [
   //     />
   //   ),
   // },
-  { accessorKey: "name", header: "Employees Name" },
+  { accessorKey: "employeeName", header: "Employees Name" },
   {
     accessorKey: "role",
     header: "Role",
@@ -50,13 +50,23 @@ export const FinanceColumns = [
     },
   },
   {
-    accessorKey: "salary",
+    accessorKey: "baseSalary",
     header: "Base Salary",
-    cell: ({ row }) => formatINR(row.original.salary),
+    // cell: ({ row }) => formatINR(row.original.salary),
   },
   {
-    accessorKey: "incentives",
+    accessorKey: "incentive",
     header: "Incentives",
+  },
+
+  {
+    accessorKey: "bonus",
+    header: "Bonus",
+  },
+
+  {
+    accessorKey: "deduction",
+    header: "Deduction",
   },
 
   {
@@ -68,8 +78,13 @@ export const FinanceColumns = [
   },
 
   {
-    accessorKey: "months",
+    accessorKey: "month",
     header: "Months",
+  },
+
+  {
+    accessorKey: "year",
+    header: "Year",
   },
   // { id: "actions", header: "Action", cell: () => "⋯" },
 ];
