@@ -301,12 +301,13 @@ export const updateCoachById = async (coachId, updatedData) => {
     delete updatedData.chooseTherapy;
   }
 
-  calculateCoachIncentives(coachId);
+  const updated = await CoachModel.updateOne(
+    { _id: coachId },
+    { $set: updatedData },
+  );
 
-  const updated = await CoachModel.updateOne({ _id: coachId }, { $set: updatedData });
+  await calculateCoachIncentives(coachId);
 
-  calculateCoachIncentives(coachId);
-  
   return updated;
 };
 

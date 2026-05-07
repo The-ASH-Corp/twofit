@@ -3,12 +3,15 @@ import { getAllEmployeeHistory, getAllEmployees } from "./finance.thunk";
 
 const initialState = {
   allEmployees: [],
+  allEmployeesList: [],
   employeeHistory: [],
   employeeCount: 0,
   allEmployeeCount: 0,
   totalSalary: 0,
   totalBaseSalary: 0,
   totalIncentive: 0,
+  totalBonus: 0,
+  totalDeduction: 0,
   error: null,
   status: "idle",
 };
@@ -30,10 +33,13 @@ const employeeSlice = createSlice({
       .addCase(getAllEmployees.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.allEmployees = action?.payload?.data?.employees;
+        state.allEmployeesList = action?.payload?.data?.allEmployeesList;
         state.allEmployeeCount = action?.payload?.data?.employeeCount;
         state.totalSalary = action?.payload?.data?.totalSalary;
         state.totalBaseSalary = action?.payload?.data?.totalBaseSalary;
         state.totalIncentive = action?.payload?.data?.totalIncentive;
+        state.totalBonus = action?.payload?.data?.totalBonus;
+        state.totalDeduction = action?.payload?.data?.totalDeduction;
         state.error = null;
       })
       .addCase(getAllEmployees.rejected, (state, action) => {

@@ -1,6 +1,6 @@
 import { selectPayroll } from "@/redux/features/incentive/incentive.selector";
 import {
-  createPayroll,
+  createIncentive,
   getPayroll,
 } from "@/redux/features/incentive/incentive.thunk";
 import { useAppSelector } from "@/redux/store/hooks";
@@ -128,7 +128,7 @@ const IncentiveMenu = ({ setIncentiveOpen, incentiveOpen }) => {
   const handleSubmit = async () => {
    try {
      setLoading(true);
-     const result = await dispatch(createPayroll(payrollData)).unwrap();;
+     const result = await dispatch(createIncentive(payrollData)).unwrap();;
      if (result.success) {
        toast.success("Updated payroll successfully");
        setIncentiveOpen(false);

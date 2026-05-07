@@ -7,10 +7,15 @@ import {
   Banknote,
   BadgePercent,
   BanknoteArrowUp,
+  CirclePlus,
+  BanknoteArrowDown,
 } from "lucide-react";
 import {
+  selectAllEmployeesList,
   selectEmployeeCount,
   selectTotalBaseSalary,
+  selectTotalBonus,
+  selectTotalDeduction,
   selectTotalIncentive,
   selectTotalSalary,
 } from "@/redux/features/finance/finance.selector";
@@ -19,17 +24,21 @@ import PayrollMenu from "./PayrollMenu";
 export default function FinanceKpi() {
   const [payrollOpen, setPayrollOpen] = useState(false);
   const [incentiveOpen, setIncentiveOpen] = useState(false);
+  const EmployeeList = useAppSelector(selectAllEmployeesList);
   const count = useAppSelector(selectEmployeeCount);
   const totalPayroll = useAppSelector(selectTotalSalary);
   const totalBaseSalary = useAppSelector(selectTotalBaseSalary);
   const totalIncentive = useAppSelector(selectTotalIncentive);
+  const totalBonus = useAppSelector(selectTotalBonus);
+  const totalDeduction = useAppSelector(selectTotalDeduction);
+
 
   return (
     <div className="relative  w-full bg-white p-5 rounded-xl mb-4 h-[calc()]">
       <div className="flex flex-col items-center gap-8 md:gap-4">
         <div className="flex flex-col md:flex-row gap-4 md:gap-0 items-start md:items-center md:justify-between w-full">
           <h2 className="text-[#0A4F48] font-bold text-[16px]">
-            Salary & Incentives Overview
+            Salary Overview
           </h2>
           <div className="flex md:justify-end items-center gap-2.5 w-full md:w-fit">
             <button
@@ -46,7 +55,7 @@ export default function FinanceKpi() {
             </button>
           </div>
         </div>
-        <div className="flex flex-col lg:flex-row gap-4 justify-between  w-full">
+        <div className="grid grid-cols-3 gap-4  w-full">
           <KpiCard
             title="Total Employees"
             value={count}
@@ -64,6 +73,27 @@ export default function FinanceKpi() {
             value={`₹ ${totalIncentive?.toLocaleString("en-IN")}`}
             icon={
               <BadgePercent
+                size={20}
+                className="text-[#0A4F48] md:w-6 md:h-6"
+              />
+            }
+            iconClass="bg-[#F4DBC7]"
+            bg="#F4DBC7"
+          />
+          <KpiCard
+            title="Total Bonus"
+            value={`₹ ${totalBonus?.toLocaleString("en-IN")}`}
+            icon={
+              <CirclePlus size={20} className="text-[#0A4F48] md:w-6 md:h-6" />
+            }
+            iconClass="bg-[#F4DBC7]"
+            bg="#F4DBC7"
+          />
+          <KpiCard
+            title="Total Deduction"
+            value={`₹ ${totalDeduction?.toLocaleString("en-IN")}`}
+            icon={
+              <BanknoteArrowDown
                 size={20}
                 className="text-[#0A4F48] md:w-6 md:h-6"
               />
@@ -102,6 +132,7 @@ export default function FinanceKpi() {
         )}
         {payrollOpen && (
           <PayrollMenu
+            EmployeeList={EmployeeList}
             setPayrollOpen={setPayrollOpen}
             payrollOpen={payrollOpen}
           />

@@ -15,6 +15,23 @@ export const getAllEmployees = createAsyncThunk(
   }
 );
 
+export const createPayroll = createAsyncThunk(
+  "payroll/create",
+  async (adjustmentData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        "/adjustment/create",
+        adjustmentData,
+      );
+      return response;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "creating payroll failed",
+      );
+    }
+  },
+);
+
 export const getAllEmployeeHistory = createAsyncThunk(
   "finance/employee/history",
   async ({id, page, limit }, { rejectWithValue }) => {
