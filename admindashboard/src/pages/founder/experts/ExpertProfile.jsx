@@ -7,7 +7,7 @@ import {
   selectCoachStatus,
 } from "@/redux/features/coach/coach.selector";
 import { getSingleCoach } from "@/redux/features/coach/coach.thunk";
-import { ArrowLeft, UserCog } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -37,10 +37,10 @@ const ExpertProfile = () => {
   if (error) return <p className="text-red-500 p-8 text-center">{error}</p>;
 
   return (
-    <div className="flex flex-col gap-6 w-full h-[calc(100vh-156px)] font-sans bg-[#F8FAFC] p-4 sm:p-6 rounded-3xl">
+    <div className="flex w-full min-h-0 flex-col gap-4 rounded-2xl bg-[#F8FAFC] p-3 font-sans sm:gap-6 sm:rounded-3xl sm:p-5 lg:h-[calc(100dvh-156px)] lg:p-6">
       {/* Header with Breadcrumb-like feel */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 shrink-0">
-        <div className="flex items-center gap-4">
+      <div className="flex shrink-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3 sm:gap-4">
           <button
             onClick={() => navigate(-1)}
             className="w-10 h-10 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-500 hover:text-[#0A4F48] hover:border-[#0A4F48] transition-all shadow-sm hover:shadow-md shrink-0"
@@ -48,10 +48,10 @@ const ExpertProfile = () => {
             <ArrowLeft size={20} />
           </button>
           <div className="flex flex-col">
-            <h1 className="text-2xl font-black text-[#0F172A] tracking-tight leading-none">
+            <h1 className="text-xl font-black leading-none tracking-tight text-[#0F172A] sm:text-2xl">
               Expert Profile
             </h1>
-            <p className="text-sm text-[#64748B] font-medium mt-1">
+            <p className="mt-1 text-xs font-medium text-[#64748B] sm:text-sm">
               Manage and view detailed information
             </p>
           </div>
@@ -59,25 +59,24 @@ const ExpertProfile = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 flex-1 min-h-0 overflow-visible lg:overflow-hidden pb-2">
-        {/* Left Column (Profile Card) - 30% */}
-        <div className="lg:col-span-2 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
+      <div className="grid flex-1 min-h-0 grid-cols-1 gap-4 pb-1 sm:gap-6 xl:grid-cols-12 xl:overflow-hidden">
+        {/* Left Column */}
+        <div className="h-auto min-h-0 xl:col-span-3 xl:h-full xl:overflow-y-auto xl:pr-1 xl:[&::-webkit-scrollbar]:hidden xl:[-ms-overflow-style:none] xl:[scrollbar-width:none]">
           <ExpertLeftSide expert={expert} />
         </div>
 
-        {/* Center Column (Details) - 40% */}
-        <div className="lg:col-span-4 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
+        {/* Center Column */}
+        <div className="h-auto min-h-0 xl:col-span-5 xl:h-full xl:overflow-y-auto xl:pr-1 xl:[&::-webkit-scrollbar]:hidden xl:[-ms-overflow-style:none] xl:[scrollbar-width:none]">
           <ExpertCenterSide expert={expert} />
         </div>
 
-        {/* Right Column (Stats) - 30% */}
-        <div className="lg:col-span-4 h-auto lg:h-full lg:overflow-y-auto lg:[&::-webkit-scrollbar]:hidden lg:[-ms-overflow-style:none] lg:[scrollbar-width:none] lg:pr-2">
+        {/* Right Column */}
+        <div className="h-auto min-h-0 xl:col-span-4 xl:h-full xl:overflow-y-auto xl:pr-1 xl:[&::-webkit-scrollbar]:hidden xl:[-ms-overflow-style:none] xl:[scrollbar-width:none]">
           <ExpertRightSide expert={expert} />
         </div>
       </div>
     </div>
   );
 };
-
 
 export default ExpertProfile;

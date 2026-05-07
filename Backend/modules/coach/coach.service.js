@@ -225,15 +225,20 @@ export const getCoachById = async (coachId) => {
 
   const coachObj = coach.toObject();
 
-  // create a set of assigned program IDs
+  // create a set of assigned program and therapy IDs
   const programSet = new Set(
     (coachObj.assignedPrograms || []).map(p => p._id.toString())
   );
+  const therapySet = new Set(
+    (coachObj.assignedTherapy || []).map(t => t._id.toString())
+  );
 
-  // filter users whose programType matches
+  // filter users whose programType OR therapyType matches
   const assignedUsers = (coachObj.assignedUsers || []).filter(user => {
     const userProgramId = user?.programType?._id?.toString();
-    return programSet.has(userProgramId);
+    const userTherapyId = user?.therapyType?._id?.toString();
+    return (userProgramId && programSet.has(userProgramId)) || 
+           (userTherapyId && therapySet.has(userTherapyId));
   });
 
 
@@ -459,7 +464,7 @@ export const getCoachDashboardStats = async (coachId) => {
     totalClients.map((user) => {
       return getUserComplianceStats(
         user._id,
-        user?.programType.plan,
+        user?.programType?.plan,
         user?.therapyType,
         user?.programType?.title,
       );
