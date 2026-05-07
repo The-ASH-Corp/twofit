@@ -543,10 +543,6 @@ export default function Dashboard() {
                 <h3 className="text-[15px] md:text-[17px] font-bold text-[#1E293B] tracking-tight">
                   Experts Overview
                 </h3>
-                <MoreHorizontal
-                  size={20}
-                  className="text-[#94A3B8] group-hover:text-[#0A4F48] transition-colors"
-                />
               </div>
               <div className="flex-1 relative flex items-center justify-center -mt-12">
                 <div className="w-full h-48">
@@ -579,11 +575,6 @@ export default function Dashboard() {
                     label: "Dietitians",
                     count: dashboardData?.totalDietitians || 0,
                     color: "bg-[#EBF3F2]",
-                  },
-                  {
-                    label: "Therapists",
-                    count: dashboardData?.totalTherapists || 0,
-                    color: "bg-[#FAF3E0]",
                   },
                 ].map((item, i) => (
                   <div

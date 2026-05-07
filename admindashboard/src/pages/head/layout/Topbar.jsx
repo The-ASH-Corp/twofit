@@ -136,7 +136,7 @@ export default function Topbar({ onToggleSidebar }) {
             onClick={() => navigate("/head/notifications")}
           >
             <Bell size={20} className="group-hover:animate-swing" />
-            <span className="absolute top-1 right-1 sm:top-2.5 sm:right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white group-hover:scale-105 transition-transform"></span>
+            <span className="absolute top-1 right-1 sm:top-2.5 sm:right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white group-hover:scale-105 transition-transform animate-pulse"></span>
           </button>
 
           <div

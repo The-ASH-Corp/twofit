@@ -1,5 +1,5 @@
 import React from "react";
-import { MoreHorizontal, Bell, MessageSquare, RefreshCw } from "lucide-react";
+import { Bell, MessageSquare, RefreshCw } from "lucide-react";
 import {
   formatNotificationTime,
   getDashboardNotificationStyle,
@@ -23,7 +23,6 @@ export default function RecentNotificationsCard({
     >
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-bold text-[#0A4F48]">Recent Notifications</h3>
-        <MoreHorizontal size={20} className="text-gray-400" />
       </div>
 
       <div className="flex flex-col gap-6 overflow-y-auto pr-2 no-scrollbar">
