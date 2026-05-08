@@ -1,15 +1,12 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  MoreHorizontal,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   Star,
-  Activity,
-  MessageCircle,
   Layers,
-  Users
+  Users,
 } from "lucide-react";
 import {
   Chart as ChartJS,
@@ -45,31 +42,39 @@ const ExpertCenterSide = ({ expert }) => {
   const expertPrograms = useMemo(() => {
     // If expert has programs array, use it. Otherwise, extract from assigned users or show mock.
     if (expert?.assignedPrograms && expert.assignedPrograms.length > 0) {
-      return expert.assignedPrograms.map(s => ({
-         title: s?.title,
-         count: expert.assignedUsers?.filter(u => u.programType?._id === s?._id).length || 0
+      return expert.assignedPrograms.map((s) => ({
+        title: s?.title,
+        count:
+          expert.assignedUsers?.filter((u) => u.programType?._id === s?._id)
+            .length || 0,
       }));
     }
-    return expert?.assignedTherapy?.map(s => ({
+      return (expert?.assignedTherapy || []).map((s) => ({
       title: s?.name,
-      count: expert.assignedUsers?.filter(u => u.programType?._id === s?._id).length || 0
-    }))
+      count:
+        expert.assignedUsers?.filter((u) => u.therapyType?._id === s?._id)
+          .length || 0,
+    }));
+  }, [expert]);
 
-  }, [expert]);  
   const assignedClientsList = useMemo(() => {
-     return expert?.assignedUsers || [];
+    return expert?.assignedUsers || [];
   }, [expert]);
 
   // Pagination for Assigned Clients
   const [clientPage, setClientPage] = useState(1);
   const clientsPerPage = 5;
-  const totalClientPages = Math.ceil((assignedClientsList?.length || 0) / clientsPerPage);
-  
+  const totalClientPages = Math.ceil(
+    (assignedClientsList?.length || 0) / clientsPerPage,
+  );
+  const safeClientPage =
+    totalClientPages > 0 ? Math.min(clientPage, totalClientPages) : 1;
+
   const displayedClients = useMemo(() => {
-      const list = assignedClientsList || [];
-      const start = (clientPage - 1) * clientsPerPage;
-      return list.slice(start, start + clientsPerPage);
-  }, [assignedClientsList, clientPage]);
+    const list = assignedClientsList || [];
+    const start = (safeClientPage - 1) * clientsPerPage;
+    return list.slice(start, start + clientsPerPage);
+  }, [assignedClientsList, safeClientPage]);
 
   const ratingData = useMemo(() => {
     if (!ratingGraphData?.ratingData?.length) {
@@ -135,16 +140,21 @@ const ExpertCenterSide = ({ expert }) => {
         beginAtZero: true,
         max: 5,
         grid: {
-            color: "#F1F5F9",
-            drawBorder: false,
+          color: "#F1F5F9",
+          drawBorder: false,
         },
-        ticks: { stepSize: 1, color: "#94A3B8", font: { size: 10, weight: 'bold' }, padding: 10 },
-        border: { display: false }
+        ticks: {
+          stepSize: 1,
+          color: "#94A3B8",
+          font: { size: 10, weight: "bold" },
+          padding: 10,
+        },
+        border: { display: false },
       },
       x: {
         grid: { display: false },
-        ticks: { color: "#64748B", font: { size: 11, weight: '500' } },
-        border: { display: false }
+        ticks: { color: "#64748B", font: { size: 11, weight: "500" } },
+        border: { display: false },
       },
     },
   };
@@ -158,17 +168,48 @@ const ExpertCenterSide = ({ expert }) => {
     }
   }, [expert?._id, ratingDuration, dispatch]);
 
+  const getComplianceStyles = (compliance = 0) => {
+    if (compliance > 75) {
+      return { text: "text-emerald-600", bar: "bg-emerald-500" };
+    }
+    if (compliance > 40) {
+      return { text: "text-amber-500", bar: "bg-amber-400" };
+    }
+
+    return { text: "text-rose-500", bar: "bg-rose-400" };
+  };
+
+  const isActiveClient = (client) =>
+    client.status?.toLowerCase() === "active" ||
+    client.isActive === true ||
+    !client.status;
+
+  const getStatusStyles = (client) => {
+    if (isActiveClient(client)) {
+      return {
+        badge: "border-emerald-100 bg-emerald-50 text-emerald-700",
+        dot: "bg-emerald-500",
+        label: "Active",
+      };
+    }
+
+    return {
+      badge: "border-slate-100 bg-slate-50 text-slate-500",
+      dot: "bg-slate-400",
+      label: "Inactive",
+    };
+  };
 
   return (
-    <div className="flex flex-col gap-5 h-full min-h-0 pb-6">
+    <div className="flex h-full min-h-0 flex-col gap-4 pb-4 sm:gap-5 sm:pb-6">
       {/* 1. Rating Overview */}
-      <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden shrink-0 min-h-80">
-        <div className="px-6 py-5 border-b border-[#F1F5F9] flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      <div className="flex min-h-[300px] shrink-0 flex-col overflow-hidden rounded-3xl border border-[#EEF2F6] bg-white shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+        <div className="flex flex-col gap-3 border-b border-[#F1F5F9] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
+          <div className="flex min-w-0 items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-[#0A4F48]">
               <Star size={20} className="stroke-2" />
             </div>
-            <div>
+            <div className="min-w-0">
               <h2 className="text-[#1E293B] font-bold text-lg tracking-tight leading-none">
                 Rating Overview
               </h2>
@@ -181,7 +222,7 @@ const ExpertCenterSide = ({ expert }) => {
           <div className="relative">
             <button
               onClick={() => setShowRatingMenu(!showRatingMenu)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-[#E2E8F0] bg-white text-xs font-bold text-[#475569] hover:bg-[#F8FAFC] transition-all"
+              className="flex items-center gap-2 rounded-lg border border-[#E2E8F0] bg-white px-3 py-1.5 text-xs font-bold text-[#475569] transition-all hover:bg-[#F8FAFC]"
             >
               <span>Last {ratingDuration} Months</span>
               <ChevronDown size={14} />
@@ -212,13 +253,13 @@ const ExpertCenterSide = ({ expert }) => {
           </div>
         </div>
 
-        <div className="p-6 flex-1 w-full min-h-[220px]">
+        <div className="min-h-[220px] w-full flex-1 p-4 sm:p-6">
           <Bar data={ratingData} options={ratingOptions} />
         </div>
       </div>
 
       {/* 2. Programs */}
-      <div className="bg-white rounded-3xl p-6 border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+      <div className="rounded-3xl border border-[#EEF2F6] bg-white p-4 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] sm:p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
@@ -228,7 +269,12 @@ const ExpertCenterSide = ({ expert }) => {
           </div>
         </div>
         <div className="flex flex-wrap gap-3">
-          {expertPrograms?.map((prog, i) => {
+          {expertPrograms.length === 0 && (
+            <div className="w-full rounded-2xl border border-dashed border-[#E2E8F0] bg-[#F8FAFC] p-5 text-center text-sm font-medium text-[#94A3B8]">
+              No assigned programs yet.
+            </div>
+          )}
+          {expertPrograms.map((prog, i) => {
             const title =
               typeof prog === "string" ? prog : prog.title || "Program";
             const count =
@@ -237,7 +283,7 @@ const ExpertCenterSide = ({ expert }) => {
             return (
               <div
                 key={i}
-                className="flex-1 min-w-[140px] p-4 bg-[#F8FAFC] border border-[#F1F5F9] rounded-2xl flex flex-col items-center justify-center text-center hover:border-[#E2E8F0] hover:shadow-sm transition-all cursor-default group"
+                className="group flex min-w-[120px] flex-1 cursor-default flex-col items-center justify-center rounded-2xl border border-[#F1F5F9] bg-[#F8FAFC] p-4 text-center transition-all hover:border-[#E2E8F0] hover:shadow-sm sm:min-w-[140px]"
               >
                 <span className="text-sm font-bold text-[#334155] mb-1 group-hover:text-[#0A4F48] transition-colors">
                   {title}
@@ -254,13 +300,13 @@ const ExpertCenterSide = ({ expert }) => {
       </div>
 
       {/* 3. Assigned Clients */}
-      <div className="bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] flex-1 min-h-[400px] overflow-hidden flex flex-col">
-        <div className="px-6 py-5 border-b border-[#F1F5F9] flex items-center justify-between shrink-0">
+      <div className="flex min-h-[340px] flex-1 flex-col overflow-hidden rounded-3xl border border-[#EEF2F6] bg-white shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] sm:min-h-[400px]">
+        <div className="flex shrink-0 flex-col gap-3 border-b border-[#F1F5F9] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-5">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-orange-50 border border-orange-100 flex items-center justify-center text-orange-600">
               <Users size={18} />
             </div>
-            <div className="flex items-baseline gap-2">
+            <div className="flex flex-wrap items-baseline gap-2">
               <h3 className="font-bold text-[#1E293B] text-lg">
                 Assigned Clients
               </h3>
@@ -274,7 +320,66 @@ const ExpertCenterSide = ({ expert }) => {
           </button> */}
         </div>
 
-        <div className="flex-1 overflow-auto h-0 min-h-0">
+        <div className="flex-1 overflow-y-auto p-4 md:hidden">
+          {displayedClients.length === 0 ? (
+            <div className="flex h-full min-h-[180px] flex-col items-center justify-center text-slate-400">
+              <Users size={24} className="mb-2 opacity-50" />
+              <span className="text-xs font-medium">No clients assigned yet</span>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {displayedClients.map((client, i) => {
+                const complianceValue = client.compliance || 0;
+                const complianceStyles = getComplianceStyles(complianceValue);
+                const statusStyles = getStatusStyles(client);
+
+                return (
+                  <div
+                    key={i}
+                    className="rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] p-3"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-bold text-[#334155]">
+                          {client.name || "Unknown"}
+                        </p>
+                        <p className="truncate text-[11px] text-[#94A3B8]">
+                          {client.email || "No email"}
+                        </p>
+                      </div>
+                      <span
+                        className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-bold ${statusStyles.badge}`}
+                      >
+                        <span className={`h-1.5 w-1.5 rounded-full ${statusStyles.dot}`} />
+                        {statusStyles.label}
+                      </span>
+                    </div>
+
+                    <div className="mt-3 flex items-center justify-between gap-3">
+                      <span className="inline-flex max-w-[65%] truncate rounded-md border border-slate-100 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600">
+                        {client.programType?.title ||
+                          client.program ||
+                          "Standard Plan"}
+                      </span>
+                      <span className={`text-sm font-bold ${complianceStyles.text}`}>
+                        {complianceValue}%
+                      </span>
+                    </div>
+
+                    <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className={`h-full rounded-full ${complianceStyles.bar}`}
+                        style={{ width: `${complianceValue}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="hidden h-0 min-h-0 flex-1 overflow-auto md:block">
           <table className="w-full min-w-[600px] border-collapse relative">
             <thead className="sticky top-0 z-10 bg-[#F8FAFC]">
               <tr className="border-b border-[#F1F5F9]">
@@ -305,11 +410,16 @@ const ExpertCenterSide = ({ expert }) => {
                   </td>
                 </tr>
               ) : (
-                displayedClients.map((client, i) => (
-                  <tr
-                    key={i}
-                    className="group hover:bg-[#F8FAFC] transition-colors"
-                  >
+                displayedClients.map((client, i) => {
+                  const complianceValue = client.compliance || 0;
+                  const complianceStyles = getComplianceStyles(complianceValue);
+                  const statusStyles = getStatusStyles(client);
+
+                  return (
+                    <tr
+                      key={i}
+                      className="group hover:bg-[#F8FAFC] transition-colors"
+                    >
                     <td className="py-4 px-6 pl-8">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-[#E2E8F0] border-2 border-white shadow-sm flex items-center justify-center text-xs font-bold text-[#475569] shrink-0">
@@ -334,59 +444,30 @@ const ExpertCenterSide = ({ expert }) => {
                     </td>
                     <td className="py-4 px-4 text-center">
                       <div className="inline-flex flex-col items-center">
-                        <span
-                          className={`text-sm font-bold ${
-                            (client.compliance || 0) > 75
-                              ? "text-emerald-600"
-                              : (client.compliance || 0) > 40
-                                ? "text-amber-500"
-                                : "text-rose-500"
-                          }`}
-                        >
-                          {client.compliance || 0}%
+                        <span className={`text-sm font-bold ${complianceStyles.text}`}>
+                          {complianceValue}%
                         </span>
-                        <div className="w-12 h-1 bg-slate-100 rounded-full mt-1 overflow-hidden">
+                        <div className="mt-1 h-1 w-12 overflow-hidden rounded-full bg-slate-100">
                           <div
-                            className={`h-full rounded-full ${
-                              (client.compliance || 0) > 75
-                                ? "bg-emerald-500"
-                                : (client.compliance || 0) > 40
-                                  ? "bg-amber-400"
-                                  : "bg-rose-400"
-                            }`}
-                            style={{ width: `${client.compliance || 0}%` }}
+                            className={`h-full rounded-full ${complianceStyles.bar}`}
+                            style={{ width: `${complianceValue}%` }}
                           />
                         </div>
                       </div>
                     </td>
                     <td className="py-4 px-6 pr-8 text-right">
                       <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border ${
-                          client.status?.toLowerCase() === "active" ||
-                          client.isActive === true ||
-                          !client.status
-                            ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                            : "bg-slate-50 text-slate-500 border-slate-100"
+                        className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold ${
+                          statusStyles.badge
                         }`}
                       >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${
-                            client.status?.toLowerCase() === "active" ||
-                            client.isActive === true ||
-                            !client.status
-                              ? "bg-emerald-500"
-                              : "bg-slate-400"
-                          }`}
-                        />
-                        {client.status?.toLowerCase() === "active" ||
-                        client.isActive === true ||
-                        !client.status
-                          ? "Active"
-                          : "Inactive"}
+                        <span className={`h-1.5 w-1.5 rounded-full ${statusStyles.dot}`} />
+                        {statusStyles.label}
                       </span>
                     </td>
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -394,22 +475,22 @@ const ExpertCenterSide = ({ expert }) => {
 
         {/* Pagination */}
         {totalClientPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-[#F1F5F9] bg-white shrink-0">
+          <div className="flex shrink-0 flex-col gap-3 border-t border-[#F1F5F9] bg-white px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div className="flex items-center gap-2">
               <span className="text-xs font-medium text-[#64748B]">
-                Showing {(clientPage - 1) * clientsPerPage + 1}-
+                Showing {(safeClientPage - 1) * clientsPerPage + 1}-
                 {Math.min(
-                  clientPage * clientsPerPage,
+                  safeClientPage * clientsPerPage,
                   assignedClientsList.length,
                 )}{" "}
                 of {assignedClientsList.length}
               </span>
             </div>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 self-end sm:self-auto">
               <button
                 onClick={() => setClientPage((c) => Math.max(1, c - 1))}
-                disabled={clientPage === 1}
+                disabled={safeClientPage === 1}
                 className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft size={16} />
@@ -421,7 +502,7 @@ const ExpertCenterSide = ({ expert }) => {
                     key={idx}
                     onClick={() => setClientPage(idx + 1)}
                     className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all ${
-                      clientPage === idx + 1
+                      safeClientPage === idx + 1
                         ? "bg-[#0A4F48] text-white shadow-md shadow-emerald-900/10"
                         : "border border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC]"
                     }`}
@@ -433,7 +514,7 @@ const ExpertCenterSide = ({ expert }) => {
                 onClick={() =>
                   setClientPage((c) => Math.min(totalClientPages, c + 1))
                 }
-                disabled={clientPage === totalClientPages}
+                disabled={safeClientPage === totalClientPages}
                 className="w-8 h-8 flex items-center justify-center rounded-lg border border-[#E2E8F0] text-[#64748B] hover:bg-[#F8FAFC] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronRight size={16} />

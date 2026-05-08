@@ -9,7 +9,6 @@ import {
   Phone,
   X,
   Briefcase,
-  Layers,
   Clock,
   Loader2,
   Copy,
@@ -178,16 +177,16 @@ const ExpertLeftSide = ({ expert }) => {
   ];
 
   return (
-    <div className="flex flex-col bg-white rounded-3xl border border-[#EEF2F6] shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] overflow-hidden transition-all hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.05)] group relative">
+    <div className="relative flex flex-col overflow-hidden rounded-3xl border border-[#EEF2F6] bg-white shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)] transition-all group hover:shadow-[0_8px_30px_-6px_rgba(0,0,0,0.05)]">
       {/* Header Background */}
-      <div className="relative h-28 bg-linear-to-r from-[#0A4F48] to-[#116D63] overflow-hidden shrink-0">
+      <div className="relative h-24 shrink-0 overflow-hidden bg-linear-to-r from-[#0A4F48] to-[#116D63] sm:h-28">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_top_right,var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
-        <div className="absolute top-4 right-4 text-white/10">
+        <div className="absolute right-4 top-3 text-white/10 sm:top-4">
           <Briefcase size={80} />
         </div>
-        <div className="absolute top-4 right-4 flex gap-2">
+        <div className="absolute right-3 top-3 flex gap-2 sm:right-4 sm:top-4">
           <span
-            className={`px-2.5 py-0.5 rounded-lg text-[10px] uppercase font-bold tracking-wider backdrop-blur-md border shadow-sm ${
+            className={`rounded-lg border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider shadow-sm backdrop-blur-md sm:px-2.5 ${
               expert?.status
                 ? "bg-emerald-400/20 text-emerald-50 border-emerald-400/30"
                 : "bg-gray-400/20 text-gray-50 border-gray-400/30"
@@ -199,9 +198,9 @@ const ExpertLeftSide = ({ expert }) => {
       </div>
 
       {/* Profile Info */}
-      <div className="px-6 flex flex-col relative shrink-0">
-        <div className="-mt-12 mb-3 self-start">
-          <div className="w-20 h-20 rounded-2xl bg-white p-1.5 shadow-lg group-hover:scale-105 transition-transform duration-300 ease-out rotate-3 group-hover:rotate-0">
+      <div className="relative flex shrink-0 flex-col px-4 sm:px-6">
+        <div className="-mt-10 mb-3 self-start sm:-mt-12">
+          <div className="h-16 w-16 rounded-2xl bg-white p-1.5 shadow-lg transition-transform duration-300 ease-out rotate-3 group-hover:rotate-0 group-hover:scale-105 sm:h-20 sm:w-20">
             <div className="w-full h-full bg-gray-100 rounded-xl overflow-hidden flex items-center justify-center border border-gray-100">
               {expert?.image ? (
                 <img
@@ -216,11 +215,11 @@ const ExpertLeftSide = ({ expert }) => {
           </div>
         </div>
 
-        <div className="flex flex-col mb-6">
-          <h2 className="text-xl font-bold text-[#1E293B] tracking-tight wrap-break-word">
+        <div className="mb-5 flex flex-col sm:mb-6">
+          <h2 className="break-words text-lg font-bold tracking-tight text-[#1E293B] sm:text-xl">
             {expert?.name}
           </h2>
-          <p className="text-xs text-[#64748B] font-medium flex items-center gap-1.5 mt-1">
+          <p className="mt-1 flex items-center gap-1.5 break-words text-xs font-medium text-[#64748B]">
             <Briefcase size={12} className="text-[#0A4F48]" />
             {expert?.specialization?.join(", ") || "General Expert"}
           </p>
@@ -230,7 +229,7 @@ const ExpertLeftSide = ({ expert }) => {
         {user?.role === "admin" && (
           <button
             onClick={() => setIsChatMonitorOpen(true)}
-            className="w-full mb-6 py-2.5 bg-[#F0FDF4] hover:bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all duration-200 shadow-sm"
+            className="mb-5 flex w-full items-center justify-center gap-2 rounded-xl border border-[#BBF7D0] bg-[#F0FDF4] py-2.5 text-sm font-bold text-[#166534] shadow-sm transition-all duration-200 hover:bg-[#DCFCE7] sm:mb-6"
           >
             <MessageSquare size={16} />
             <span>Monitor Chats</span>
@@ -239,14 +238,14 @@ const ExpertLeftSide = ({ expert }) => {
       </div>
 
       {/* Details List */}
-      <div className="px-6 pb-6 overflow-y-visible">
-        <div className="space-y-6">
+      <div className="overflow-y-visible px-4 pb-5 sm:px-6 sm:pb-6">
+        <div className="space-y-5 sm:space-y-6">
           {/* Stats Grid */}
           <div>
             <h3 className="text-[11px] uppercase font-bold text-[#94A3B8] tracking-wider mb-3">
               Professional Stats
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 2xl:grid-cols-2">
               {profileDetails.map((item, i) => (
                 <div
                   key={i}
@@ -275,17 +274,17 @@ const ExpertLeftSide = ({ expert }) => {
               {contactDetails.map((item, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between group/item"
+                  className="group/item flex items-center justify-between gap-3"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center text-[#64748B]">
                       <item.icon size={14} />
                     </div>
-                    <div className="flex flex-col">
+                    <div className="flex min-w-0 flex-col">
                       <span className="text-[10px] text-[#94A3B8] font-medium">
                         {item.label}
                       </span>
-                      <span className="text-sm font-semibold text-[#334155] break-all line-clamp-1">
+                      <span className="line-clamp-1 break-all text-sm font-semibold text-[#334155] sm:break-words">
                         {item.value}
                       </span>
                     </div>
@@ -293,10 +292,9 @@ const ExpertLeftSide = ({ expert }) => {
                   {item.copy && (
                     <button
                       onClick={() => handleCopy(item.value)}
-                      className="opacity-100 lg:opacity-0 group-hover/item:opacity-100 p-1.5 hover:bg-slate-100 rounded-lg text-slate-400 transition-all"
+                      className="shrink-0 rounded-lg p-1.5 text-slate-400 opacity-100 transition-all hover:bg-slate-100 lg:opacity-0 group-hover/item:opacity-100"
                     >
-                      <Copy size={14} className="rotate-90" />{" "}
-                      {/* Using Layers as Copy icon replacement if Copy not imported, but keeping it simple */}
+                      <Copy size={14} className="rotate-90" />
                     </button>
                   )}
                 </div>
@@ -334,7 +332,7 @@ const ExpertLeftSide = ({ expert }) => {
 
             <div className="flex-1 flex flex-col sm:flex-row overflow-hidden">
               {/* Client List */}
-              <div className="w-full sm:w-[34%] sm:min-w-[180px] sm:max-w-[300px] border-b sm:border-b-0 sm:border-r border-[#F1F5F9] overflow-y-auto max-h-40 sm:max-h-none bg-[#F8FAFC]">
+              <div className="w-full border-b border-[#F1F5F9] bg-[#F8FAFC] max-h-40 overflow-y-auto sm:w-[34%] sm:min-w-[180px] sm:max-w-[300px] sm:max-h-none sm:border-b-0 sm:border-r">
                 {assignedClients.length === 0 ? (
                   <div className="p-4 text-center text-xs text-gray-400">
                     No clients assigned
@@ -386,7 +384,7 @@ const ExpertLeftSide = ({ expert }) => {
                       return (
                         <div
                           key={idx}
-                          className={`flex flex-col ${isExpert ? "items-end" : "items-start"} max-w-[85%] ${isExpert ? "ml-auto" : "mr-auto"}`}
+                          className={`flex max-w-[92%] flex-col sm:max-w-[85%] ${isExpert ? "ml-auto items-end" : "mr-auto items-start"}`}
                         >
                           <div
                             className={`px-3 py-2 rounded-xl text-xs ${isExpert ? "bg-[#0A4F48] text-white rounded-br-none" : "bg-white border border-gray-200 text-gray-700 rounded-bl-none shadow-sm"}`}
@@ -396,7 +394,7 @@ const ExpertLeftSide = ({ expert }) => {
                               <img
                                 src={getFileUrl(msg.mediaUrl)}
                                 alt="attachment"
-                                className="max-w-[150px] rounded-lg"
+                                className="max-w-[160px] rounded-lg sm:max-w-[220px]"
                               />
                             )}
                             {type === "voice" && (

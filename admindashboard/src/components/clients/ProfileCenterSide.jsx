@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUserSubmissions } from "@/redux/features/tasks/task.thunk";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 import {
   deleteExtension,
   getUserExtensions,
@@ -35,6 +36,8 @@ const statusConfig = {
 const ProfileCenterSide = ({ client }) => {
   const dispatch = useDispatch();
   const { selectedUserTasks } = useSelector((state) => state.tasks);
+  const user = useSelector(selectUser);
+  const isAdmin = user?.role?.toLowerCase() === "admin";
   const [isExtendModalOpen, setIsExtendModalOpen] = useState(false);
   const [pendingExtension, setPendingExtension] = useState(null);
   const [isDeletingExtension, setIsDeletingExtension] = useState(false);
@@ -62,8 +65,12 @@ const ProfileCenterSide = ({ client }) => {
   };
 
   useEffect(() => {
+    if (!isAdmin) {
+      setPendingExtension(null);
+      return;
+    }
     fetchPendingExtension();
-  }, [client?._id]);
+  }, [client?._id, isAdmin]);
 
   const handleDeleteExtension = async () => {
     if (!pendingExtension?._id || isDeletingExtension) return;
@@ -208,26 +215,27 @@ const ProfileCenterSide = ({ client }) => {
             </div>
             <h2 className="font-bold text-[#1E293B] text-lg">Current Plan</h2>
           </div>
-          {pendingExtension ? (
-            <button
-              onClick={handleDeleteExtension}
-              disabled={isDeletingExtension}
-              className="flex items-center gap-2 px-3 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors text-sm font-semibold group disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              {isDeletingExtension ? "Deleting..." : "Delete Extension"}
-            </button>
-          ) : (
-            <button
-              onClick={() => setIsExtendModalOpen(true)}
-              className="flex items-center gap-2 px-3 py-2 bg-[#0A4F48] text-white rounded-lg hover:bg-[#084240] transition-colors text-sm font-semibold group"
-            >
-              <Plus
-                size={16}
-                className="group-hover:scale-110 transition-transform"
-              />
-              Extend Plan
-            </button>
-          )}
+          {isAdmin &&
+            (pendingExtension ? (
+              <button
+                onClick={handleDeleteExtension}
+                disabled={isDeletingExtension}
+                className="flex items-center gap-2 px-3 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors text-sm font-semibold group disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {isDeletingExtension ? "Deleting..." : "Delete Extension"}
+              </button>
+            ) : (
+              <button
+                onClick={() => setIsExtendModalOpen(true)}
+                className="flex items-center gap-2 px-3 py-2 bg-[#0A4F48] text-white rounded-lg hover:bg-[#084240] transition-colors text-sm font-semibold group"
+              >
+                <Plus
+                  size={16}
+                  className="group-hover:scale-110 transition-transform"
+                />
+                Extend Plan
+              </button>
+            ))}
         </div>
 
         <div className="flex flex-col gap-6">
@@ -339,14 +347,16 @@ const ProfileCenterSide = ({ client }) => {
       </div>
 
       {/* Extend Program Modal */}
-      <ExtendProgramModal
-        isOpen={isExtendModalOpen}
-        onClose={() => setIsExtendModalOpen(false)}
-        client={client}
-        onSuccess={() => {
-          fetchPendingExtension();
-        }}
-      />
+      {isAdmin && (
+        <ExtendProgramModal
+          isOpen={isExtendModalOpen}
+          onClose={() => setIsExtendModalOpen(false)}
+          client={client}
+          onSuccess={() => {
+            fetchPendingExtension();
+          }}
+        />
+      )}
     </div>
   );
 };

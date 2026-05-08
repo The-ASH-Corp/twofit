@@ -39,7 +39,7 @@ export const getUserComplianceStats = async (
     try {
         const userSubmission = await TaskSubmission.findOne({ userId });
 
-        if (!userSubmission || !programPlan) {
+        if (!userSubmission || (!programPlan && !therapyPlan)) {
             return {
                 overall: 0,
                 workout: 0,
@@ -51,8 +51,8 @@ export const getUserComplianceStats = async (
             };
         }
         // Calculate total expected tasks per type
-        const totalDays = programPlan.duration.split(" ")[0] || 0;
-        const daysWithPlan = programPlan.weeks?.flatMap((week, weekIndex) =>
+        const totalDays = programPlan ? (programPlan.duration.split(" ")[0] || 0) : (therapyPlan?.duration?.split(" ")[0] || 0);
+        const daysWithPlan = programPlan?.weeks?.flatMap((week, weekIndex) =>
             week.days.map((day, dayIndex) => ({
                 weekIndex: weekIndex + 1,
                 dayIndex: dayIndex + 1,
@@ -75,7 +75,7 @@ export const getUserComplianceStats = async (
         const mealCountPerDay = isWeightLoss ? 4 : 5;
 
         // Calculate Total Program Days for overall completion stats
-        const totalProgramDays = parseInt(programPlan.duration.split(" ")[0] || 0);
+        const totalProgramDays = parseInt(programPlan ? (programPlan.duration.split(" ")[0] || 0) : (therapyPlan?.duration?.split(" ")[0] || 0));
 
         let expectedWorkouts = 0;
         let expectedMeals = mealCountPerDay * totalProgramDays;
