@@ -55,7 +55,7 @@ export default function FinanceKpi() {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-4  w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4  w-full">
           <KpiCard
             title="Total Employees"
             value={count}
@@ -68,6 +68,15 @@ export default function FinanceKpi() {
             iconClass="bg-[#0A4F48]"
             bg="#0A4F48"
           />
+          <KpiCard
+            title="Total Base Salary"
+            value={`₹ ${totalBaseSalary?.toLocaleString("en-IN")}`}
+            icon={
+              <Banknote size={20} className="text-[#ffffff] md:w-6 md:h-6" />
+            }
+            iconClass="bg-[#0A4F48]"
+            bg="#0A4F48"
+          />  
           <KpiCard
             title="Total Incentive"
             value={`₹ ${totalIncentive?.toLocaleString("en-IN")}`}
@@ -101,15 +110,7 @@ export default function FinanceKpi() {
             iconClass="bg-[#F4DBC7]"
             bg="#F4DBC7"
           />
-          <KpiCard
-            title="Total Base Salary"
-            value={`₹ ${totalBaseSalary?.toLocaleString("en-IN")}`}
-            icon={
-              <Banknote size={20} className="text-[#ffffff] md:w-6 md:h-6" />
-            }
-            iconClass="bg-[#0A4F48]"
-            bg="#0A4F48"
-          />
+
           <KpiCard
             title="Total Payroll"
             value={`₹ ${totalPayroll?.toLocaleString("en-IN")}`}

@@ -52,29 +52,30 @@ export const FinanceColumns = [
   {
     accessorKey: "baseSalary",
     header: "Base Salary",
-    // cell: ({ row }) => formatINR(row.original.salary),
+    cell: ({ row }) => <span>{formatINR(row.original.baseSalary)}</span>,
   },
   {
     accessorKey: "incentive",
     header: "Incentives",
+    cell: ({ row }) => <span>{formatINR(row.original.incentive)}</span>,
   },
 
   {
     accessorKey: "bonus",
     header: "Bonus",
+    cell: ({ row }) => <span>{formatINR(row.original.bonus)}</span>,
   },
 
   {
     accessorKey: "deduction",
     header: "Deduction",
+    cell: ({ row }) => <span>{formatINR(row.original.deduction)}</span>,
   },
 
   {
     accessorKey: "netSalary",
     header: "Net Salary",
-    cell: ({ row }) => (
-      <span className="font-semibold">{formatINR(row.original.netSalary)}</span>
-    ),
+    cell: ({ row }) => <span>{formatINR(row.original.netSalary)}</span>,
   },
 
   {
