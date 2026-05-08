@@ -85,12 +85,10 @@ export const sendTemplateMessage = async ({
     );
 
     const data = await response.json();
-console.log("WhatsApp API response:", data);
     if (!response.ok) {
       throw new Error(data?.error?.message || "Failed to send WhatsApp message");
     }
 
-    console.log("Message sent to:", normalizedTo);
     return data;
   } catch (error) {
     console.error("WhatsApp error:", error.message);

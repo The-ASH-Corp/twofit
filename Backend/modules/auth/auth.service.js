@@ -54,7 +54,7 @@ export const adminCreateUser = async (userData) => {
       workoutExperience: userData.workoutExperience || "beginner",
       programType: userData.programType,
       therapyType: userData.therapyType || null,
-      duration: userData.duration,
+      duration: parseInt(userData.duration.split(" ")[0]),
       programEndDate: userData.endDate,
       programStartDate: userData.startDate,
       dietition: userData.dietician || null,
