@@ -39,10 +39,6 @@ export const activateExtensionsCron = () => {
         extendedProgramStartDate: { $lte: today },
       });
 
-      console.log(
-        `[Cron] Found ${extensionsToActivate.length} extensions to activate`
-      );
-
       for (const extension of extensionsToActivate) {
         try {
           const user = await User.findById(extension.userId).select(
@@ -72,9 +68,6 @@ export const activateExtensionsCron = () => {
             isActivated: true,
           });
 
-          console.log(
-            `[Cron] Activated extension for user ${extension.userId} on ${today}`
-          );
         } catch (error) {
           console.error(
             `[Cron] Error activating extension ${extension._id}: ${error.message}`
@@ -82,7 +75,6 @@ export const activateExtensionsCron = () => {
         }
       }
 
-      console.log("[Cron] Program extension activation check completed");
     } catch (error) {
       console.error(
         `[Cron] Error in activateExtensionsCron: ${error.message}`

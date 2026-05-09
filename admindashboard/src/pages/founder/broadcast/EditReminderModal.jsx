@@ -9,11 +9,13 @@ const EditReminderModal = ({ isOpen, onClose, reminder }) => {
   const dispatch = useDispatch();
 
   const [message, setMessage] = useState("");
+  const [templateName, setTemplateName] = useState("");
   const [settings, setSettings] = useState([]);
 
   useEffect(() => {
     if (isOpen && reminder) {
       setMessage(reminder.message || "");
+      setTemplateName(reminder.templateName || "");
       setSettings(reminder.settings || []);
     }
   }, [isOpen, reminder]);
@@ -65,7 +67,7 @@ const EditReminderModal = ({ isOpen, onClose, reminder }) => {
     await dispatch(
       updateReminder({
         type: reminder.type,
-        data: { message, settings },
+        data: { message, settings, templateName },
       }),
     );
 
@@ -78,12 +80,27 @@ const EditReminderModal = ({ isOpen, onClose, reminder }) => {
       <div className="bg-white p-6 rounded-xl w-[400px] space-y-4">
         <h2 className="font-bold text-lg">Edit Reminder</h2>
 
+        {/* Template Name */}
+        <div className="space-y-1">
+          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Template Name (Meta)</label>
+          <input
+            type="text"
+            className="w-full border rounded p-2 text-sm"
+            value={templateName}
+            onChange={(e) => setTemplateName(e.target.value)}
+            placeholder="e.g. meal_plan_reminder"
+          />
+        </div>
+
         {/* Message */}
-        <textarea
-          className="w-full border rounded p-2 text-sm"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
+        <div className="space-y-1">
+          <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Message Content (Variable)</label>
+          <textarea
+            className="w-full border rounded p-2 text-sm h-24"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+        </div>
 
         {/* Times */}
         {settings.map((item, idx) => (

@@ -170,11 +170,6 @@ export const adminCreateUser = async (userData) => {
         password: escapeHTML(password),
       });
 
-      console.log("EMAIL DEBUG:", {
-        email: userData.email,
-        fullName: userData.fullname,
-        password: password,
-      });
     } catch (err) {
       console.error("Failed to send user credentials email:", err.message);
     }

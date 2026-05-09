@@ -50,11 +50,6 @@ export const createHead = async (head) => {
       password: plainPassword,
     });
 
-    console.log("EMAIL DEBUG:", {
-      email: head.email,
-      fullName: head.name,
-      password: plainPassword,
-    });
   } catch (err) {
     console.error("❌ Failed to send email:", err.message);
   }

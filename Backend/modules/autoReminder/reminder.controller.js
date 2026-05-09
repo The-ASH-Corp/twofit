@@ -73,21 +73,3 @@ export const toggleReminderController = async (req, res) => {
   }
 };
 
-// ✅ Send Test
-export const sendTestReminderController = async (req, res) => {
-  try {
-    const { type } = req.params;
-
-    const data = await reminderService.sendTestReminder(type);
-
-    res.status(200).json({
-      success: true,
-      data,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};

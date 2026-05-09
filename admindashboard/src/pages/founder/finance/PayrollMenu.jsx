@@ -49,7 +49,6 @@ const PayrollMenu = ({ EmployeeList, setPayrollOpen, payrollOpen }) => {
           delete payload.employeeType;
         }
 
-        console.log(payload);
 
         await dispatch(createPayroll(payload)).unwrap();
 
