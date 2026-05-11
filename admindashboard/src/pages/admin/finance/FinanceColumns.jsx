@@ -17,6 +17,19 @@ export const FinanceColumns = [
     header: "Incentives ",
     cell: () => "N/A",
   },
+
+  {
+    accessorKey: "bonus",
+    header: "Bonus",
+    cell: ({ row }) => formatINR(row?.original?.bonus),
+  },
+
+  {
+    accessorKey: "deduction",
+    header: "Deduction",
+    cell: ({ row }) => formatINR(row?.original?.deduction),
+  },
+
   {
     accessorKey: "netSalary",
     header: "Net Salary ",

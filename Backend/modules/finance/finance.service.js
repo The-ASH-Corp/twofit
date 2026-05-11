@@ -143,59 +143,13 @@ export const allEmployees = async (page, limit) => {
   };
 };
 
-// finance.service.js
 
-export const getAllPayrollHistory = async (
-  page,
-  limit,
-  month,
-  year,
-) => {
-  try {
-    page = Number(page) || 1;
-    limit = Number(limit) || 10;
-
-    const skip = (page - 1) * limit;
-
-    // ✅ Dynamic filter
-    const filter = {};
-
-    if (month) {
-      filter.month = Number(month);
-    }
-
-    if (year) {
-      filter.year = Number(year);
-    }
-
-    // ✅ Get payroll data
-    const totalCount = await PayrollModel.countDocuments(filter);
-
-    const payrolls = await PayrollModel.find(filter)
-      .sort({ year: -1, month: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-    // ✅ Format response
-    
-
-    return {
-      totalCount,
-      currentPage: page,
-      totalPages: Math.ceil(totalCount / limit),
-      data: payrolls,
-    };
-  } catch (error) {
-    throw error;
-  }
-};
 
 
 export const generateMonthlyPayroll = async () => {
   try {
     const now = new Date();
-    const month = now.getMonth() + 1;
+    const month = now.getMonth();
     const year = now.getFullYear();
 
     const alreadyGenerated = await PayrollModel.exists({ month, year });

@@ -23,6 +23,7 @@ export default function FinanceTable() {
   const count = useAppSelector(selectEmployeeHistoryCount);
   const error = useAppSelector(selectEmployeeError);
   const status = useAppSelector(selectEmployeeStatus);
+  console.log(data)
   if (status === "loading")
     return (
       <div className="flex justify-center items-center h-[calc(100vh-120px)]">
