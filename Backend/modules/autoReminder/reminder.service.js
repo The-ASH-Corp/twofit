@@ -140,6 +140,7 @@ export const sendAutomatedReminders = async (type, label, reminderData = null) =
       role: "user",
       automatedReminder: true,
       status: "Active",
+      currentGlobalDay: { $lte: 10 },
     }).select("phone name");
 
     if (!users.length) return;
