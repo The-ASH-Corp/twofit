@@ -1065,9 +1065,7 @@ export const ensureNotificationIndexes = async () => {
 
     if (legacyTtlIndex?.name) {
       await NotificationModel.collection.dropIndex(legacyTtlIndex.name);
-      console.log(
-        `Dropped legacy notification TTL index: ${legacyTtlIndex.name}`,
-      );
+    
     }
 
     await NotificationModel.syncIndexes();

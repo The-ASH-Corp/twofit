@@ -96,11 +96,6 @@ export const addNewAdmin = async (adminData) => {
     password: plainPassword,
   });
 
-  console.log("EMAIL DEBUG:", {
-    email: adminData.email,
-    fullName: adminData.fullname,
-    password: plainPassword,
-  });
 } catch (err) {
   console.error("Failed to send admin credentials email:", err.message);
 }

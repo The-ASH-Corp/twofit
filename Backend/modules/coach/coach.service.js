@@ -177,11 +177,6 @@ export const createCoach = async (coach) => {
         password: plainPassword,
       });
 
-      console.log("EMAIL DEBUG:", {
-        email: coach.email,
-        fullName: coach.fullname,
-        password: plainPassword,
-      });
     } catch (err) {
       console.error("Failed to send coach credentials email:", err.message);
     }

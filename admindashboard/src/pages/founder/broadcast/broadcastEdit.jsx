@@ -181,7 +181,7 @@ const BroadcastEdit = () => {
                   Edit Broadcast
                 </h1>
                 <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Modify your broadcast content and settings
+                  Modify your broadcast content and settings ( <span className="text-xs text-red-500 font-bold mt-0.5"> * do the Same edit in the Meta Business Manager also.</span>)
                 </p>
               </div>
 

@@ -15,6 +15,7 @@ import { ensureNotificationIndexes } from "./modules/notification/notification.s
 import { activateExtensionsCron } from "./utils/extensionActivation.cron.js";
 import "./utils/payroll.cron.js";
 import "./utils/SOPLog.cron.js";
+import { startReminderCron } from "./utils/reminder.cron.js";
 import { seedReminders } from "./modules/autoReminder/reminder.service.js";
 
 
@@ -115,6 +116,7 @@ const startServer = async () => {
     startImageCleanupTask();
     startNotificationCron();
     activateExtensionsCron();
+    startReminderCron();
 
     const port = Number(process.env.PORT) || 5000;
     server.listen(port, () => {
