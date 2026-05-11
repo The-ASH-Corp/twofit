@@ -40,15 +40,3 @@ export const toggleReminder = createAsyncThunk(
   },
 );
 
-// TEST
-export const sendTestReminder = createAsyncThunk(
-  "reminder/test",
-  async (type, { rejectWithValue }) => {
-    try {
-      const res = await axiosInstance.post(`/reminder/test/${type}`);
-      return res.data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message);
-    }
-  },
-);

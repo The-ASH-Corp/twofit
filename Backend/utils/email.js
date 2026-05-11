@@ -78,8 +78,6 @@ export async function sendEmail({ email, password, fullName
         },
       },
     );
-    console.log("Sending:", [fullName, email, password]);
-    console.log("✅ Email sent:", response.data);
   } catch (error) {
     console.log("FULL ERROR:", error.response?.data);
   }
@@ -116,8 +114,6 @@ export async function sendOTPEmail({ fullName, otp,email }) {
         },
       }
     );
-
-    console.log("✅ OTP Email sent:", response.data);
   } catch (error) {
     console.log("FULL ERROR:", error.response?.data);
   }

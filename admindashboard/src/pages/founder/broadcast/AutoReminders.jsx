@@ -5,16 +5,18 @@ import {
   Utensils,
   Dumbbell,
   HeartPulse,
-  Send,
   Edit3,
 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectReminders } from "@/redux/features/autoReminder/reminder.selectors";
-import { getReminders, toggleReminder } from "@/redux/features/autoReminder/reminder.thunk";
+import {
+  getReminders,
+  toggleReminder,
+} from "@/redux/features/autoReminder/reminder.thunk";
 import EditReminderModal from "./EditReminderModal";
+import { toast } from "react-toastify";
 
 const AutoReminders = () => {
-
   const dispatch = useDispatch();
   const reminders = useSelector(selectReminders);
 
@@ -24,38 +26,37 @@ const AutoReminders = () => {
   const [openModal, setOpenModal] = useState(false);
   const [selectedReminder, setSelectedReminder] = useState(null);
 
-   const getIcon = (type) => {
-     switch (type) {
-       case "meal":
-         return <Utensils size={18} />;
-       case "workout":
-         return <Dumbbell size={18} />;
-       case "therapy":
-         return <HeartPulse size={18} />;
-       default:
-         return <Bell size={18} />;
-     }
-   };
+  const getIcon = (type) => {
+    switch (type) {
+      case "meal":
+        return <Utensils size={18} />;
+      case "workout":
+        return <Dumbbell size={18} />;
+      case "therapy":
+        return <HeartPulse size={18} />;
+      default:
+        return <Bell size={18} />;
+    }
+  };
 
-   const getIconColorClass = (type) => {
-     switch (type) {
-       case "meal":
-         return "text-orange-600 bg-orange-100/50";
-       case "workout":
-         return "text-blue-600 bg-blue-100/50";
-       case "therapy":
-         return "text-purple-600 bg-purple-100/50";
-       default:
-         return "text-[#0A4F48] bg-emerald-100/50";
-     }
-   };
+  const getIconColorClass = (type) => {
+    switch (type) {
+      case "meal":
+        return "text-orange-600 bg-orange-100/50";
+      case "workout":
+        return "text-blue-600 bg-blue-100/50";
+      case "therapy":
+        return "text-purple-600 bg-purple-100/50";
+      default:
+        return "text-[#0A4F48] bg-emerald-100/50";
+    }
+  };
 
-   const handelToggle = async (type)=> {
-    dispatch(toggleReminder(type))
-    .then(() => {
-          dispatch(getReminders());
-        });
-   }
+  const handelToggle = async (type) => {
+    dispatch(toggleReminder(type)).then(() => {
+      dispatch(getReminders());
+    });
+  };
 
   return (
     <div className="flex-1 flex flex-col gap-6 bg-[#F0F4F8] pb-8 overflow-auto no-scrollbar h-[calc(100vh-130px)] pr-2">
@@ -66,7 +67,7 @@ const AutoReminders = () => {
             Automatic Reminders
           </h1>
           <p className="text-xs text-gray-500 font-medium">
-            Configure scheduled notifications for the community
+            Configure scheduled notifications for the community <span className="text-xs text-red-500 font-bold mt-0.5">(This message will send to only those users who have enabled the notifications in their profile.)</span>
           </p>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-[#0A4F48] rounded-xl border border-emerald-100">
@@ -144,14 +145,10 @@ const AutoReminders = () => {
                   setOpenModal(true);
                   setSelectedReminder(items);
                 }}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-white text-gray-700 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 hover:border-gray-300 transition-all"
+                className="w-full flex items-center justify-center gap-2 py-2.5 bg-white text-gray-700 border border-gray-200 rounded-xl text-xs font-bold hover:bg-gray-50 hover:border-gray-300 transition-all"
               >
                 <Edit3 size={14} />
                 Edit Settings
-              </button>
-              <button className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#0A4F48] text-white rounded-xl text-xs font-bold hover:bg-[#073a35] transition-all shadow-sm">
-                <Send size={14} />
-                Send Test
               </button>
             </div>
             {selectedReminder && (

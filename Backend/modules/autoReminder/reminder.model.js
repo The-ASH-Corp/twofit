@@ -25,6 +25,10 @@ const reminderSchema = new mongoose.Schema(
     message: {
       type: String,
     },
+
+    templateName: {
+      type: String,
+    },
   },
   { timestamps: true },
 );

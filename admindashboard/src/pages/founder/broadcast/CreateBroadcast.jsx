@@ -192,7 +192,7 @@ const CreateBroadcast = () => {
             <div className="flex items-center justify-between px-8 py-5 bg-white border-b border-slate-200 shrink-0">
               <div className="flex flex-col">
                 <h1 className="text-xl font-bold text-slate-800">New Broadcast</h1>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">Draft your message to the community</p>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">Draft your message to the community (<span className="text-xs text-red-500 font-bold mt-0.5">*You also need to create same template in Meta Business Manager </span>) </p>
               </div>
               
               <div className="flex items-center gap-3">
