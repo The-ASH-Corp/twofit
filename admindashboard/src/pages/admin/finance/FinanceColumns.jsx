@@ -9,7 +9,7 @@ export const FinanceColumns = [
   {
     accessorKey: "baseSalary",
     header: "Base Salary",
-    cell: ({ row }) => formatINR(row.original.baseSalary),
+    cell: ({ row }) => formatINR(row?.original?.baseSalary),
   },
 
   {
@@ -33,6 +33,6 @@ export const FinanceColumns = [
   {
     accessorKey: "netSalary",
     header: "Net Salary ",
-    cell: ({ row }) => formatINR(row.original.netSalary),
+    cell: ({ row }) => formatINR(row?.original?.netSalary),
   },
 ];
