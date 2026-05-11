@@ -67,7 +67,7 @@ const AutoReminders = () => {
             Automatic Reminders
           </h1>
           <p className="text-xs text-gray-500 font-medium">
-            Configure scheduled notifications for the community
+            Configure scheduled notifications for the community <span className="text-xs text-red-500 font-bold mt-0.5">(This message will send to only those users who have enabled the notifications in their profile.)</span>
           </p>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-[#0A4F48] rounded-xl border border-emerald-100">
