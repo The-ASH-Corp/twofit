@@ -39,7 +39,7 @@ export const FinanceColumns = [
     accessorKey: "role",
     header: "Role",
     cell: ({ row }) => {
-      const role = row.original.role;
+      const role = row?.original?.role;
       const expertColor = expertColors[role] || "bg-gray-200 text-gray-700";
 
       return (
@@ -52,30 +52,30 @@ export const FinanceColumns = [
   {
     accessorKey: "baseSalary",
     header: "Base Salary",
-    cell: ({ row }) => <span>{formatINR(row.original.baseSalary)}</span>,
+    cell: ({ row }) => <span>{formatINR(row?.original?.baseSalary)}</span>,
   },
   {
     accessorKey: "incentive",
     header: "Incentives",
-    cell: ({ row }) => <span>{formatINR(row.original.incentive)}</span>,
+    cell: ({ row }) => <span>{formatINR(row?.original?.incentive)}</span>,
   },
 
   {
     accessorKey: "bonus",
     header: "Bonus",
-    cell: ({ row }) => <span>{formatINR(row.original.bonus)}</span>,
+    cell: ({ row }) => <span>{formatINR(row?.original?.bonus)}</span>,
   },
 
   {
     accessorKey: "deduction",
     header: "Deduction",
-    cell: ({ row }) => <span>{formatINR(row.original.deduction)}</span>,
+    cell: ({ row }) => <span>{formatINR(row?.original?.deduction)}</span>,
   },
 
   {
     accessorKey: "netSalary",
     header: "Net Salary",
-    cell: ({ row }) => <span>{formatINR(row.original.netSalary)}</span>,
+    cell: ({ row }) => <span>{formatINR(row?.original?.netSalary)}</span>,
   },
 
   {
