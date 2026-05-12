@@ -175,7 +175,7 @@ const TemplateSummary = () => {
               Broadcast Summary
             </h1>
             <p className="text-xs text-gray-500">
-              Review your broadcast details before sending
+              Review your broadcast details before sending (<span className="text-xs text-red-500 font-bold mt-0.5"> * Before senting the broadcast ensure that this template is correct and verified.</span>)
             </p>
           </div>
         </div>

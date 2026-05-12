@@ -66,10 +66,10 @@ const DonutChart = ({
       </svg>
 
       {/* Center Text */}
-      <div className="absolute text-center">
+      {/* <div className="absolute text-center">
         <p className="text-[#66706D] text-[11px]">Avg Compliance</p>
         <p className="text-[#0A4F48] text-[16px] font-bold">{percentage}%</p>
-      </div>
+      </div> */}
     </div>
   );
 };
