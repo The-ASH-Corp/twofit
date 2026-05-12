@@ -257,9 +257,9 @@ const upsertWebhookStatus = async (statusObj = {}) => {
       ...(incomingStatus === "failed" ? { failedAt: eventDate } : {}),
       ...(incomingStatus === "failed"
         ? {
-            failureCode: eventLog.errorCode,
-            failureReason: eventLog.errorMessage || eventLog.errorTitle || "Failed by webhook status",
-          }
+          failureCode: eventLog.errorCode,
+          failureReason: eventLog.errorMessage || eventLog.errorTitle || "Failed by webhook status",
+        }
         : {}),
       webhookLastPayload: statusObj,
       statusEvents: [eventLog],
@@ -364,5 +364,26 @@ export const getBroadcastStatusSummary = async (broadcastId) => {
     total: docs.length,
     counts,
     items: docs,
+  };
+};
+
+export const getAllMessages = async (page = 1, limit = 10) => {
+  const skip = (page - 1) * limit;
+  const [messages, totalCount] = await Promise.all([
+    WhatsAppMessage.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate('recipientUserId', 'name email')
+      .populate('broadcastId', 'title')
+      .lean(),
+    WhatsAppMessage.countDocuments()
+  ]);
+
+  return {
+    data: messages,
+    totalCount,
+    currentPage: page,
+    totalPages: Math.ceil(totalCount / limit)
   };
 };

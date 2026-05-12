@@ -46,6 +46,7 @@ import FounderTemplateSummary from "./pages/founder/broadcast/TemplateSummary";
 import FounderBroadcastCreate from "./pages/founder/broadcast/CreateBroadcast";
 import FounderBroadcastAutoReminder from "./pages/founder/broadcast/AutoReminders";
 import FounderBroadcastDelete from "./pages/founder/broadcast/broadcastDeletePopUp";
+import FounderBroadcastStatus from "./pages/founder/broadcast/Status";
 import FounderBroadcastEdit from "./pages/founder/broadcast/broadcastEdit";
 import FounderRecipeList from "./pages/founder/recipe/RecipeList";
 import FounderRecipeForm from "./pages/founder/recipe/Recipeform";
@@ -231,6 +232,10 @@ function App() {
           <Route
             path="auto-remainder"
             element={<FounderBroadcastAutoReminder />}
+          />
+          <Route
+            path="broadcast/status"
+            element={<FounderBroadcastStatus />}
           />
           <Route path="profile" element={<Profile />} />
           <Route path="notifications" element={<Notifications />} />
