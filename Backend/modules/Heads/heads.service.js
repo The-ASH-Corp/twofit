@@ -527,41 +527,65 @@ export const founderHeadList = async (page, limit) => {
         },
       },
 
-      // ===== Admins under head =====
+      // ===== Admins by category programs =====
       {
         $lookup: {
           from: "admins",
-          localField: "_id",
-          foreignField: "headId",
-          as: "admins",
-        },
-      },
-
-      // ===== Coaches under admins =====
-      {
-        $lookup: {
-          from: "coaches",
-          localField: "admins._id",
-          foreignField: "adminId",
-          as: "coaches",
-        },
-      },
-
-      // ===== Users under coaches =====
-      {
-        $lookup: {
-          from: "users",
-          let: { coachIds: "$coaches._id" },
+          let: { programIds: "$programs._id" },
           pipeline: [
             {
               $match: {
                 $expr: {
-                  $or: [
-                    { $in: ["$trainer", "$$coachIds"] },
-                    { $in: ["$therapist", "$$coachIds"] },
-                    { $in: ["$dietition", "$$coachIds"] },
+                  $gt: [
+                    {
+                      $size: {
+                        $setIntersection: ["$program", "$$programIds"],
+                      },
+                    },
+                    0,
                   ],
                 },
+              },
+            },
+          ],
+          as: "admins",
+        },
+      },
+
+      // ===== Coaches by category programs =====
+      {
+        $lookup: {
+          from: "coaches",
+          let: { programIds: "$programs._id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $gt: [
+                    {
+                      $size: {
+                        $setIntersection: ["$assignedPrograms", "$$programIds"],
+                      },
+                    },
+                    0,
+                  ],
+                },
+              },
+            },
+          ],
+          as: "coaches",
+        },
+      },
+
+      // ===== Users by category programs =====
+      {
+        $lookup: {
+          from: "users",
+          let: { programIds: "$programs._id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $in: ["$programType", "$$programIds"] },
               },
             },
           ],
