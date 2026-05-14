@@ -669,8 +669,6 @@ export const editAdmin = async (adminId, adminData) => {
 
 
 export const getAdminByProgram = async ({ programId, page, limit }) => {
-
-  
   try {
     page = Number(page);
     limit = Number(limit);
@@ -685,7 +683,33 @@ export const getAdminByProgram = async ({ programId, page, limit }) => {
         }
       },
       { $skip: skip },
-      { $limit: limit }
+      { $limit: limit },
+      {
+        $lookup: {
+          from: "users",
+          let: { programIds: "$program" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: ["$programType", "$$programIds"]
+                }
+              }
+            }
+          ],
+          as: "matchedUsers"
+        }
+      },
+      {
+        $addFields: {
+          totalUsers: { $size: "$matchedUsers" }
+        }
+      },
+      {
+        $project: {
+          matchedUsers: 0
+        }
+      }
     ]);
 
     const totalCount = await AdminModel.countDocuments({
