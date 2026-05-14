@@ -596,6 +596,7 @@ export const founderAdminList = async (page, limit) => {
           _id: 0,
           _id: "$_id",
           adminName: "$name",
+          email:"$email",
           status: "$status",
 
           headName: {
