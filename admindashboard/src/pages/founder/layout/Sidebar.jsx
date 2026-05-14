@@ -30,6 +30,7 @@ const menuItems = [
       { label: "Templates", path: "/founder/broadcasts" },
       { label: "Add New", path: "/founder/broadcast/add-Template" },
       { label: "Auto Reminders", path: "/founder/auto-remainder" },
+      { label: "Status", path: "/founder/broadcast/status" },
     ],
   },
 ];

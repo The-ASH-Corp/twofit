@@ -237,6 +237,7 @@ export default function ClientForm() {
           options: [
             { label: "Peanuts", value: "peanuts" },
             { label: "Seafood", value: "seafood" },
+            {label:"none", value:"none"}
           ],
           allowCustom: true,
         },

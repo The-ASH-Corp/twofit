@@ -73,7 +73,7 @@ export const AdminColumns = [
       const programCount = Number(row.original.programCount || 0);
 
       if (programCount > 0) {
-        return <span className="text-xs font-semibold text-slate-400">-</span>;
+        return null;
       }
 
       const handleDelete = () => {
