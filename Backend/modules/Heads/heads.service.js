@@ -576,6 +576,7 @@ export const founderHeadList = async (page, limit) => {
           _id: "$_id",
           headName: "$name",
           status: "$status",
+          email: "$email",
 
           categoryName: {
             $arrayElemAt: ["$category.name", 0],

@@ -31,8 +31,7 @@ export const ExpertColumns = [
   //   ),
   // },
   { accessorKey: "coachName", header: "Expert Name" },
-  { accessorKey: "headName", header: "Head Name" },
-  { accessorKey: "adminName", header: "Admin Name" },
+  { accessorKey: "adminName", header: "Created by" },
   {
     accessorKey: "role",
     header: "Role",

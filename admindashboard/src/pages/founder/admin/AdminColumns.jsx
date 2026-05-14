@@ -33,6 +33,8 @@ export const AdminColumns = [
   //   ),
   // },
   { accessorKey: "adminName", header: "Admin Name" },
+  { accessorKey: "email", header: "Email" },
+  { accessorKey: "headName", header: "Created by" },
   // {
   //   accessorKey: "role",
   //   header: "Role",
@@ -47,10 +49,7 @@ export const AdminColumns = [
   //     );
   //   },
   // },
-  { accessorKey: "headName", header: "Head Name" },
-  { accessorKey: "categoryName", header: "Assigned Category" },
-  { accessorKey: "programCount", header: "Programs" },
-  { accessorKey: "coachCount", header: "Experts" },
+
   { accessorKey: "userCount", header: "Clients" },
 
   {
