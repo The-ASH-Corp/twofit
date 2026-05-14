@@ -449,36 +449,35 @@ export const getAllCoachesByHead = async (headId, page, limit) => {
 };
 
 export const getAllUsersByHead = async (headId, page, limit) => {
-  const totalAdmins = await AdminModel.find({ headId });
+  const head = await HeadsModel.findById(headId).populate("programCategory");
+  if (!head) {
+    throw new Error("Head not found");
+  }
+  
+  // Get all programs under the head's category
+  const programs = await ProgramModel.find({
+    category: head.programCategory._id,
+  }).select("_id");
+  
+  const programIds = programs.map((program) => program._id);
+  
+  const skip = (page - 1) * limit;
 
-  // Fetch all coaches to get all potential users
-  const coaches = await Promise.all(
-    totalAdmins.map((admin) =>
-      CoachModel.find({ adminId: admin._id }).populate("assignedUsers"),
-    ),
-  );
-
-  const allUsers = coaches.flat().flatMap((coach) => coach.assignedUsers);
-
-  const uniqueUsersMap = new Map();
-  allUsers.forEach((user) => {
-    if (user && user._id) {
-      uniqueUsersMap.set(user._id.toString(), user);
-    }
+  // Get total count of users with programType in these programs
+  const totalCount = await User.countDocuments({
+    programType: { $in: programIds },
   });
-
-  const uniqueUsersList = Array.from(uniqueUsersMap.values());
-
-  const totalCount = uniqueUsersList.length;
-
-  // Apply pagination
-  const startIndex = (page - 1) * limit;
-  const endIndex = startIndex + limit;
-  const paginatedUsers = uniqueUsersList.slice(startIndex, endIndex);
-
+  
+  // Get paginated users
+  const users = await User.find({
+    programType: { $in: programIds },
+  })
+  .skip(skip)
+  .limit(limit);
+  
   return {
-    users: paginatedUsers,
-    totalCount: totalCount,
+    users,
+    totalCount,
   };
 };
 
