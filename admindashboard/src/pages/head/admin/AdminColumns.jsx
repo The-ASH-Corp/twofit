@@ -14,26 +14,26 @@ const statusColors = {
 };
 
 export const AdminColumns = [
-  
   { accessorKey: "name", header: "Admin Name" },
-   { accessorKey: "role", header: "Role",
-    cell:({row})=>{
-        const role=row.original.role
-        const expertColor=expertColors[role] || "bg-gray-200 text-gray-700"
+  {
+    accessorKey: "role",
+    header: "Role",
+    cell: ({ row }) => {
+      const role = row.original.role;
+      const expertColor = expertColors[role] || "bg-gray-200 text-gray-700";
 
-        return (
+      return (
         <span className={`px-2 py-1 text-[11px] rounded-xl ${expertColor}`}>
           {role}
         </span>
       );
-
-    }
-   },
-     { accessorKey: "specialization", header: "Specialisation" },
-       {
-    accessorKey: "experts",
-    header: "Experts",
-    cell: ({ row }) => row.original.experts?.length || 0,
+    },
+  },
+  { accessorKey: "specialization", header: "Specialisation" },
+  {
+    accessorKey: "clients",
+    header: "Clients",
+    cell: ({ row }) => row.original.totalUsers || 0,
   },
   {
     accessorKey: "status",
@@ -49,9 +49,9 @@ export const AdminColumns = [
       );
     },
   },
-  { 
-    id: "actions", 
-    header: "Action", 
+  {
+    id: "actions",
+    header: "Action",
     cell: ({ row }) => {
       const handleDelete = () => {
         const expertsCount = row.original.experts?.length || 0;
@@ -59,19 +59,21 @@ export const AdminColumns = [
           toast.error("Remove the experts and clients for delete admin");
           return;
         }
-        
+
         // Dispatch to AdminsList for Delete or navigate
-        const event = new CustomEvent('open-delete-admin', { detail: { id: row.original._id, name: row.original.name } });
+        const event = new CustomEvent("open-delete-admin", {
+          detail: { id: row.original._id, name: row.original.name },
+        });
         window.dispatchEvent(event);
       };
 
       return (
-        <ActionMenu 
-          row={row} 
-          editActionPath="/head/admins/edit/" 
-          onDelete={handleDelete} 
+        <ActionMenu
+          row={row}
+          editActionPath="/head/admins/edit/"
+          onDelete={handleDelete}
         />
       );
-    } 
+    },
   },
 ];
