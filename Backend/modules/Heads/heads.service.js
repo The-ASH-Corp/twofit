@@ -168,85 +168,88 @@ export const getDashboardData = async (id, duration) => {
   const months = parseInt(duration) || 3; // Default to 3 months if not provided
   startDate.setMonth(startDate.getMonth() - months);
 
-  const head = await HeadsModel.find({ _id: id }).populate("programCategory");
-  const totalAdmins = await AdminModel.find({ headId: id });
+  const head = await HeadsModel.findById(id).populate("programCategory");
+  if (!head) {
+    throw new Error("Head not found");
+  }
 
-  const totalExpertsResults = await Promise.all(
-    totalAdmins.map(async (admin) => {
-      return await CoachModel.find({ adminId: admin._id }).populate(
-        "assignedUsers",
-      );
+  const programs = await ProgramModel.find({
+    category: head.programCategory._id,
+  }).select("_id");
+
+  const programIds = programs.map((program) => program._id);
+
+  const [
+    totalAdmins,
+    totalExperts,
+    totalTrainers,
+    totalDietitians,
+    totalTherapists,
+    totalClients,
+  ] = await Promise.all([
+    AdminModel.countDocuments({
+      program: { $in: programIds },
     }),
-  );
-  const totalExperts = totalExpertsResults.flat();
+    CoachModel.countDocuments({
+      assignedPrograms: { $in: programIds },
+    }),
+    CoachModel.countDocuments({
+      assignedPrograms: { $in: programIds },
+      role: "Trainer",
+    }),
+    CoachModel.countDocuments({
+      assignedPrograms: { $in: programIds },
+      role: "Dietician",
+    }),
+    CoachModel.countDocuments({
+      assignedPrograms: { $in: programIds },
+      role: "Therapist",
+    }),
+    User.countDocuments({
+      programType: { $in: programIds },
+      status: "Active",
+    }),
+  ]);
 
-  const uniqueClientIds = new Set();
-  totalExperts.forEach((expert) => {
-    if (expert.assignedUsers && expert.assignedUsers.length > 0) {
-      expert.assignedUsers.forEach((user) =>
-        uniqueClientIds.add(user._id ? user._id.toString() : user.toString()),
-      );
-    }
-  });
-
-  const clientIds = Array.from(uniqueClientIds);
-  const totalClients = clientIds.length;
+  const matchedExperts = await CoachModel.find({
+    assignedPrograms: { $in: programIds },
+  }).select("maxClient role feedback createdAt");
 
   const totalPrograms = await ProgramModel.countDocuments({
-    category: head[0].programCategory._id,
+    category: head.programCategory._id,
   });
-
-  const totalTrainers = totalExperts.filter(
-    (expert) => expert.role === "Trainer",
-  ).length;
-
-  const totalDietitians = totalExperts.filter(
-    (expert) => expert.role === "Dietician",
-  ).length;
-
-  const totalTherapists = totalExperts.filter(
-    (expert) => expert.role === "Therapist",
-  ).length;
 
   const newProgramsCount = await ProgramModel.countDocuments({
-    category: head[0].programCategory._id,
-    createdAt: { $gte: startDate },
+    category: head.programCategory._id,
   });
 
-  const newExpertsCount = totalExperts.filter(
-    (expert) => new Date(expert.createdAt) >= startDate,
-  ).length;
-
-  let newClientsCount = 0;
-  const processedUserIds = new Set();
-  totalExperts.forEach((expert) => {
-    if (expert.assignedUsers && expert.assignedUsers.length > 0) {
-      expert.assignedUsers.forEach((user) => {
-        const uId = user._id ? user._id.toString() : user.toString();
-        if (!processedUserIds.has(uId)) {
-          if (user.createdAt && new Date(user.createdAt) >= startDate) {
-            newClientsCount++;
-          }
-          // If createdAt is missing (e.g. not selected in populate), this will be 0.
-          // Assuming standard populate returns all fields or at least timestamps.
-          processedUserIds.add(uId);
-        }
-      });
-    }
+  const newExpertsCount = await CoachModel.countDocuments({
+    assignedPrograms: { $in: programIds },
   });
 
-  // --- Expert Performance Metrics ---
+  const newClientsCount = await User.countDocuments({
+    programType: { $in: programIds },
+  });
 
-  // Filter by submission date >= startDate
+  const sumMaxCapacity = matchedExperts.reduce(
+    (acc, expert) => acc + (expert.maxClient || 0),
+    0,
+  );
+
+  const matchedClientIds = await User.find({
+    programType: { $in: programIds },
+  }).select("_id");
+
+  const clientIds = matchedClientIds.map((user) => user._id);
+
   const clientCompletionRates = await TaskSubmission.aggregate([
     {
       $match: {
-        userId: { $in: clientIds.map((id) => new mongoose.Types.ObjectId(id)) },
+        userId: { $in: clientIds },
       },
     },
     { $unwind: "$dailySubmissions" },
     { $unwind: "$dailySubmissions.exercises" },
-    // Filter by dailySubmissions.exercises.createdAt or updatedAt
     { $match: { "dailySubmissions.exercises.updatedAt": { $gte: startDate } } },
     {
       $group: {
@@ -289,13 +292,11 @@ export const getDashboardData = async (id, duration) => {
       ? Math.round(clientCompletionRates[0].averageCompletionRate)
       : 0;
 
-  // 2. Average Rating (Filtered)
   let totalRating = 0;
   let ratingCount = 0;
-  totalExperts.forEach((expert) => {
+  matchedExperts.forEach((expert) => {
     if (expert.feedback && expert.feedback.length > 0) {
       expert.feedback.forEach((f) => {
-        // Assuming feedback has a date or createdAt field
         if (f.rating && (!f.createdAt || new Date(f.createdAt) >= startDate)) {
           totalRating += f.rating;
           ratingCount++;
@@ -303,33 +304,22 @@ export const getDashboardData = async (id, duration) => {
       });
     }
   });
+
   const averageRating =
-    ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : 0;
+    ratingCount > 0 ? Number((totalRating / ratingCount).toFixed(1)) : 0;
 
-  // 3. Clients Assigned Rate (unique clients / Sum of Max Capacities)
-  const sumMaxCapacity = totalExperts.reduce(
-    (acc, c) => acc + (c.maxClient || 0),
-    0,
-  );
-
-  // Use unique clients count (totalClients calculated above) as per user request
   const clientsAssignedRate =
     sumMaxCapacity > 0 ? Math.round((totalClients / sumMaxCapacity) * 100) : 0;
 
-  // --- Latest Progress Reports ---
   const latestReports = await TaskSubmission.aggregate([
     {
       $match: {
-        userId: { $in: clientIds.map((id) => new mongoose.Types.ObjectId(id)) },
-        // ensure exercises exist and have been updated/acted upon (optional check)
+        userId: { $in: clientIds },
         "dailySubmissions.exercises": { $exists: true, $ne: [] },
       },
     },
     { $unwind: "$dailySubmissions" },
-
     { $unwind: "$dailySubmissions.exercises" },
-    // Filter out items without timestamp if necessary, or just sort
-    // Assuming 'updatedAt' exists per admin functionality
     {
       $sort: {
         "dailySubmissions.exercises.updatedAt": -1,
@@ -383,7 +373,6 @@ export const getDashboardData = async (id, duration) => {
     },
   ]);
 
-  // Format for frontend
   const formattedReports = latestReports.map((report) => {
     let expertName = "N/A";
     let expertType = "N/A";
@@ -413,20 +402,20 @@ export const getDashboardData = async (id, duration) => {
   return {
     totalClients,
     totalPrograms,
-    totalAdmins: totalAdmins.length,
-    totalExperts: totalExperts.length,
+    totalAdmins,
+    totalExperts,
     totalTrainers,
     totalDietitians,
     totalTherapists,
     adminPerformance: {
-      programs: newProgramsCount, // Filtered
-      experts: newExpertsCount, // Filtered
-      clients: newClientsCount, // Filtered
+      programs: newProgramsCount,
+      experts: newExpertsCount,
+      clients: newClientsCount,
     },
     expertPerformance: {
-      taskCompletion: taskCompletionRate, // Filtered
-      rating: averageRating, // Filtered
-      clientsAssigned: clientsAssignedRate, // Updated Logic
+      taskCompletion: taskCompletionRate,
+      rating: averageRating,
+      clientsAssigned: clientsAssignedRate,
       totalClientsAssigned: totalClients,
       totalCapacity: sumMaxCapacity,
     },
