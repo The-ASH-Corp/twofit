@@ -9,12 +9,34 @@ import { CoachModel } from "../coach/coach.model.js";
 import { FounderModel } from "../../seeds/createAdmin.js";
 import { calculateCoachIncentives } from "../incentive/incentive.service.js";
 import { sendEmail, sendOTPEmail } from "../../utils/email.js";
+import { sendTemplateMessage } from "../../utils/whatsapp.js";
 import { capitalizeFirst } from "../../middleware/capitalizeFirst.js";
 import {
   createNotification,
   createNotificationFromEvent,
 } from "../notification/notification.service.js";
 import { assertEmailUnique } from "../../utils/checkEmailUnique.js";
+import ProgramModel from "../allPrograms/allPrograma.model.js";
+
+const formatDateString = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return dateString;
+  return date.toLocaleDateString("en-IN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
+const buildWelcomeTemplateVariables = async(user) => {
+  const prgm = await ProgramModel.findOneById(user.programType);
+  return [
+    user.name || "",
+    prgm?.title || "",
+    formatDateString(user.programStartDate),
+  ].filter(Boolean);
+};
 
 export const adminCreateUser = async (userData) => {
   try {
@@ -101,6 +123,21 @@ export const adminCreateUser = async (userData) => {
       metadata: { userId: user._id },
       dedupeKey: `welcome-message:${user._id}`,
     });
+
+    if (user.autoSendWelcome && user.phone) {
+      try {
+        await sendTemplateMessage({
+          to: user.phone,
+          templateName: "welcome_message",
+          variables: await buildWelcomeTemplateVariables(user),
+        });
+      } catch (error) {
+        console.error(
+          `Failed to send WhatsApp welcome message to ${user.phone}:`,
+          error.message,
+        );
+      }
+    }
 
     await createNotificationFromEvent("plan_ready_message", {
       recipientRole: "user",
