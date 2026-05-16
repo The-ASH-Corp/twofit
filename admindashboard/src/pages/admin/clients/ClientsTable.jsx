@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import BaseTable from "../../../components/table/BaseTable";
 import { getClientColumns } from "./ClientColumns";
 import { useDispatch } from "react-redux";
@@ -10,7 +10,6 @@ import {
 } from "@/redux/features/client/client.selectors";
 import { getClientsBasedOnCoach } from "@/redux/features/client/client.thunk";
 import { useNavigate } from "react-router-dom";
-import { getAllCoachesByAdminId } from "@/redux/features/admins/admin.thunk";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { SyncLoader } from "react-spinners";
 
@@ -27,27 +26,27 @@ export default function ClientsTable() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
-  const fetchClientData = async () => {
-    // First fetch coaches using the program-based API (same as ExpertTable)
-    const coaches = await dispatch(
-      getAllCoachesByAdminId({ adminId: user?._id, page: 1, limit: 10000 })
-    ).unwrap();
+  const fetchClientData = useCallback(async () => {
+    if (!user?._id) return;
 
-    // Extract coach IDs from the program-based results
-    const coachIds = coaches?.map((coach) => coach._id) || [];
+    const programIds = Array.isArray(user?.program)
+      ? user.program.map((program) =>
+          typeof program === "object" ? program._id : program,
+        )
+      : [];
 
-    if (coachIds.length === 0) {
+    if (programIds.length === 0) {
       setClients([]);
       setClientsLength(0);
       return;
     }
 
     const client = await dispatch(
-      getClientsBasedOnCoach({ coachIds, page, limit })
+      getClientsBasedOnCoach({ programIds, page, limit }),
     ).unwrap();
     setClients(client.data);
     setClientsLength(client.total);
-  };
+  }, [dispatch, page, limit, user]);
 
   const columns = useMemo(() => getClientColumns(fetchClientData), [fetchClientData]);
 
@@ -77,7 +76,7 @@ export default function ClientsTable() {
 
   useEffect(() => {
     fetchClientData();
-  }, [page, limit, dispatch]);
+  }, [page, limit, dispatch, fetchClientData]);
 
   if (status === "loading")
     return (

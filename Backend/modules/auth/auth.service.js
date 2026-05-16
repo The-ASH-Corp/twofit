@@ -30,11 +30,12 @@ const formatDateString = (dateString) => {
 };
 
 const buildWelcomeTemplateVariables = async(user) => {
-  const prgm = await ProgramModel.findOneById(user.programType);
+  const prgm = await ProgramModel.findOne({ _id: user.programType });
   return [
     user.name || "",
     prgm?.title || "",
-    formatDateString(user.programStartDate),
+    user?.duration ? `${user.duration} days` : "",
+    prgm?.title || ""
   ].filter(Boolean);
 };
 
