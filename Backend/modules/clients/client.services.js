@@ -256,20 +256,23 @@ export const deleteOneClient = async (id) => {
 };
 
 
-export const getClientsBasedOnCoach = async (coachIds, page, limit) => {
+export const getClientsBasedOnCoach = async (
+  coachIds,
+  page,
+  limit,
+  programIds = [],
+) => {
   const skip = (page - 1) * limit;
+  const programs = Array.isArray(programIds)
+    ? programIds.filter(Boolean)
+    : [];
 
-  // Ensure coachIds is an array
-  const ids = Array.isArray(coachIds) ? coachIds : [coachIds];
-
-  const query = {
-    $or: [
-      { trainer: { $in: ids } },
-      { dietition: { $in: ids } },
-      { therapist: { $in: ids } },
-    ],
-    role: "user",
-  };
+  const query = { role: "user" };
+  if (programs.length > 0) {
+    query.programType = { $in: programs };
+  } else {
+    query._id = null;
+  }
 
   const totalCount = await User.countDocuments(query);
   const clients = await User.find(query)

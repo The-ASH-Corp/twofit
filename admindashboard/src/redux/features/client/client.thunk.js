@@ -29,14 +29,17 @@ export const getClient = createAsyncThunk(
 
 export const getClientsBasedOnCoach = createAsyncThunk(
   "client/getClientsBasedOnCoach",
-  async ({ coachIds, page, limit }, { rejectWithValue }) => {
+  async ({ coachIds, programIds, page, limit }, { rejectWithValue }) => {
     try {
-      const data = await axiosInstance.post(`/clients/get-all-users-based-on-coach-for-admin`, { coachIds, page, limit });
+      const data = await axiosInstance.post(
+        `/clients/get-all-users-based-on-coach-for-admin`,
+        { coachIds, programIds, page, limit },
+      );
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to get clients");
     }
-  }
+  },
 );
 
 export const createFeedback = createAsyncThunk(
