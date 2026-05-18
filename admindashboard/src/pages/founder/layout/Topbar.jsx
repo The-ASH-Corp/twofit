@@ -53,7 +53,6 @@ export default function Topbar({ onToggleSidebar }) {
             alt="Profile"
             className="h-9 w-9 rounded-full border border-[#dce4dc] object-cover"
           />
-<<<<<<< Updated upstream
         </div> */}
 
         {/* Action icons */}
@@ -93,14 +92,6 @@ export default function Topbar({ onToggleSidebar }) {
                 />
               )}
               <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
-=======
-          <div className="hidden md:block">
-            <div className="text-sm font-bold text-[#214f48]">
-              {user?.name || "Founder"}
-            </div>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#98a49e]">
-              {user?.role || "Founder"}
->>>>>>> Stashed changes
             </div>
           </div>
         </button>
