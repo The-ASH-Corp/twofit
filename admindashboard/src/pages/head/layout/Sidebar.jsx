@@ -9,21 +9,12 @@ const menuItems = [
   { label: "Dashboard", icon: assets.dashboard, path: "/head" },
   { label: "Programs", icon: assets.programs, path: "/head/programs" },
   { label: "Therapy", icon: assets.therapy, path: "/head/therapy" },
-<<<<<<< Updated upstream
   { label: "Admins", icon: assets.admin, path: "/head/admins" },
   { label: "Experts", icon: assets.experts, path: "/head/experts" },
   { label: "Clients", icon: assets.clients, path: "/head/clients" },
   { label: "Finance", icon: assets.finance, path: "/head/finance" },
   { label: "Growth Support", icon: assets.therapy, path: "/head/growth-support" },
 ];
-=======
-  { label: "Admins", icon: assets.admin, path: "/head/admins" },
-  { label: "Experts", icon: assets.experts, path: "/head/experts" },
-  { label: "Clients", icon: assets.clients, path: "/head/clients" },
-  { label: "TwoFit Support", icon: assets.feedback, path: "/head/twofit-support" },
-  { label: "Finance", icon: assets.finance, path: "/head/finance" },
-];
->>>>>>> Stashed changes
 
 export default function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
