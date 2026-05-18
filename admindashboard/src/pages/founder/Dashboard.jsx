@@ -179,7 +179,7 @@ const Dashboard = () => {
       // clientsAssigned: 0,
     };
     return {
-      labels: ["Task Completion", "Rating", "Clients Assigned"],
+      labels: ["Task Completion", "Rating"],
       datasets: [
         {
           data: [
@@ -187,7 +187,7 @@ const Dashboard = () => {
             (perf.rating / 5) * 100,
             // perf.clientsAssigned,
           ],
-          backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
+          backgroundColor: ["#0A4F48", "#EBF3F2"],
           borderWidth: 0,
           cutout: "75%",
           hoverOffset: 1,
