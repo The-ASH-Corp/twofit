@@ -39,11 +39,19 @@ const menuItems = [
           path:"/expert/weekly-habit"
 
         }
+<<<<<<< Updated upstream
       ]),
   { label: "Finance", icon: assets.finance, path: "/expert/finance" },
   { label: "Chats", icon: assets.chats, path: "/expert/chats" },
   { label: "Growth Support", icon: assets.therapy, path: "/expert/growth-support" },
 ];
+=======
+      ]),
+  { label: "TwoFit Support", icon: assets.feedback, path: "/expert/twofit-support" },
+  { label: "Finance", icon: assets.finance, path: "/expert/finance" },
+  { label: "Chats", icon: assets.chats, path: "/expert/chats" },
+];
+>>>>>>> Stashed changes
 
 
   const navigate = useNavigate();

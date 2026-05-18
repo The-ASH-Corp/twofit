@@ -17,6 +17,7 @@ const menuItems = [
   { label: "Finance", icon: assets.finance, path: "/admin/finance" },
   { label: "Growth Support", icon: assets.therapy, path: "/admin/growth-support" },
 ];
+ 
 
 export default function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
