@@ -266,21 +266,12 @@ function App() {
           />
           <Route path="admins/profile/:id" element={<HeadAdminProfile />} />
           <Route path="clients/profile/:Id" element={<HeadClientProfile />} />
-<<<<<<< Updated upstream
           <Route path="programs" element={<HeadProgramTable />} />
           <Route path="profile" element={<Profile />} />
           <Route path="notifications" element={<Notifications />} />
           <Route path="therapy" element={<HeadTherapyList />} />
           <Route path="therapy/plan/:id" element={<HeadTherapyPlan />} />
           <Route path="growth-support" element={<ReceivedSupport />} />
-=======
-          <Route path="programs" element={<HeadProgramTable />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="notifications" element={<Notifications />} />
-          <Route path="twofit-support" element={<TwofitSupport />} />
-          <Route path="therapy" element={<HeadTherapyList />} />
-          <Route path="therapy/plan/:id" element={<HeadTherapyPlan />} />
->>>>>>> Stashed changes
         </Route>
 
         {/* ADMIN */}
