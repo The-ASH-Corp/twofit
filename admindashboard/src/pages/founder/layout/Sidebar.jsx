@@ -1,24 +1,32 @@
-import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import { assets } from "../../../assets/asset";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { useState } from "react";
+import {
+  ChevronDown,
+  Grid2x2,
+  LogOut,
+  Settings,
+  UserRound,
+  Users,
+  X,
+} from "lucide-react";
 import { logout } from "@/redux/features/auth/auth.thunk";
-import { useState, useEffect } from "react";
-import { X, ChevronDown, LogOut } from "lucide-react";
 
 const menuItems = [
-  { label: "Dashboard", icon: assets.dashboard, path: "/founder" },
-  { label: "Heads", icon: assets.head, path: "/founder/heads" },
-  { label: "Admins", icon: assets.admin, path: "/founder/admins" },
-  { label: "Experts", icon: assets.experts, path: "/founder/experts" },
-  { label: "Clients", icon: assets.clients, path: "/founder/clients" },
+  { label: "Dashboard", path: "/founder", icon: Grid2x2 },
+  { label: "Admins", path: "/founder/admins", icon: UserRound },
+  { label: "Experts", path: "/founder/experts", icon: UserRound },
+  { label: "Clients", path: "/founder/clients", icon: Users },
+  { label: "Growth Support", path: "/founder/growth", icon: Users },
   {
     label: "Programs",
-    icon: assets.programs,
+    icon: Users,
     children: [
       { label: "Categories", path: "/founder/categories" },
       { label: "Programs", path: "/founder/programs" },
     ],
   },
+<<<<<<< Updated upstream
   { label: "Therapy", icon: assets.therapy, path: "/founder/therapy" },
   {label:"Recipe Library" ,icon:assets.therapy,path:"/founder/recipe"},
   {label:"Growth Support",icon:assets.therapy,path:"/founder/growth"},
@@ -33,23 +41,16 @@ const menuItems = [
       { label: "Status", path: "/founder/broadcast/status" },
     ],
   },
+=======
+  { label: "Settings", path: "/founder/profile", icon: Settings },
+>>>>>>> Stashed changes
 ];
 
 export default function Sidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
-
   const [openMenu, setOpenMenu] = useState(null);
-
-  useEffect(() => {
-    const activeParent = menuItems.find(item => 
-      item.children?.some(child => location.pathname.startsWith(child.path))
-    );
-    if (activeParent) {
-      setOpenMenu(activeParent.label);
-    }
-  }, [location.pathname]);
 
   const handleLogout = async () => {
     await dispatch(logout());
@@ -57,140 +58,106 @@ export default function Sidebar({ isOpen, onClose }) {
     navigate("/login");
   };
 
-  const handleToggleMenu = (label) => {
-    setOpenMenu(openMenu === label ? null : label);
-  };
-
   return (
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 z-40 bg-black/25 lg:hidden"
           onClick={onClose}
         />
       )}
 
       <aside
-        className={`
-          fixed lg:static inset-y-0 left-0 z-50
-          w-[260px] bg-white flex flex-col h-screen
-          transform transition-transform duration-300 cubic-bezier(0.4, 0, 0.2, 1)
-          ${isOpen ? "translate-x-0 shadow-2xl" : "-translate-x-full lg:translate-x-0"}
-          border-r border-gray-100 shadow-[4px_0_24px_rgba(0,0,0,0.02)]
-        `}
+        className={`fixed inset-y-0 left-0 z-50 flex h-screen w-[252px] flex-col border-r border-[#e8ece5] bg-[#f8f9f5] transition-transform duration-300 lg:static ${
+          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        }`}
       >
-        <div className="flex flex-col items-center justify-center pt-8 pb-6 px-6 relative">
-          <div
-            className="relative group cursor-pointer"
+        <div className="px-8 pb-7 pt-7">
+          <button
+            type="button"
             onClick={() => navigate("/founder")}
+            className="text-left"
           >
-            <div className="absolute -inset-2 bg-linear-to-r from-emerald-100 to-teal-100 rounded-full blur-lg opacity-0 group-hover:opacity-50 transition duration-500"></div>
-            <img
-              src={assets.logo}
-              alt="logo"
-              className="h-10 relative z-10 drop-shadow-sm transition-transform duration-300 group-hover:scale-105"
-            />
-          </div>
+            <div className="text-[20px] font-black tracking-[-0.04em] text-[#14736a]">
+              TwoFit
+            </div>
+            <div className="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[#a0aaa3]">
+              Editorial Wellness
+            </div>
+          </button>
 
           <button
             onClick={onClose}
-            className="absolute right-0 top-0 bg-emerald-50/80 p-2 lg:hidden text-gray-400 hover:text-gray-600 hover:bg-gray-100/50 rounded-bl-xl transition-colors"
+            className="absolute right-4 top-4 rounded-xl p-2 text-[#88948e] lg:hidden"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-4 py-2 space-y-1 no-scrollbar">
-          <div className="px-4 py-2 mb-2">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-              Main Menu
-            </h3>
-          </div>
-
-          <nav className="space-y-1.5">
+        <div className="flex-1 overflow-y-auto px-5">
+          <nav className="space-y-1">
             {menuItems.map((item) => {
-              const isMenuOpen = openMenu === item.label;
-             
-              const hasChildren = !!item.children;
+              const hasChildren = Array.isArray(item.children);
               const isChildActive =
                 hasChildren &&
-                item.children.some((child) => location.pathname === child.path);
-                
+                item.children.some((child) =>
+                  location.pathname.startsWith(child.path),
+                );
 
               if (hasChildren) {
-                return (
-                  <div key={item.label} className="space-y-1">
-                    <button
-                      onClick={() => handleToggleMenu(item.label)}
-                      className={`
-                        w-full flex items-center justify-between px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group relative
-                        ${
-                          isMenuOpen || isChildActive
-                            ? "bg-gray-100 text-emerald-900"
-                            : "text-gray-500 hover:bg-gray-50 hover:text-emerald-700"
-                        }
-                      `}
-                    >
-                      <div className="flex items-center gap-3.5 relative z-10">
-                        <div
-                          className={`
-                          w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-300
-                          ${isMenuOpen || isChildActive ? "bg-white shadow-sm" : "bg-gray-50 group-hover:bg-white group-hover:shadow-sm"}
-                        `}
-                        >
-                          <img
-                            src={item.icon}
-                            className={`w-4 h-4 object-contain transition-all duration-300 
-                              ${
-                                isMenuOpen || isChildActive
-                                  ? "grayscale opacity-100   scale-110"
-                                  : "grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105"
-                              }
-                            `}
-                          />
-                        </div>
-                        <span className="font-semibold tracking-wide">
-                          {item.label}
-                        </span>
-                      </div>
+                const Icon = item.icon;
+                const isOpenMenu = openMenu === item.label;
 
+                return (
+                  <div key={item.label}>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setOpenMenu(isOpenMenu ? null : item.label)
+                      }
+                      className={`flex w-full items-center justify-between rounded-[14px] px-4 py-3 text-sm font-medium ${
+                        isChildActive || isOpenMenu
+                          ? "bg-white text-[#136d64]"
+                          : "text-[#6d7e76] hover:bg-white"
+                      }`}
+                    >
+                      <span className="flex items-center gap-3">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-[10px] bg-[#f1f3ee]">
+                          <Icon size={16} />
+                        </span>
+                        {item.label}
+                      </span>
                       <ChevronDown
                         size={16}
-                        className={`transition-transform duration-300  ${isMenuOpen ? "rotate-180 text-[#0A4F48]" : "text-gray-400"}`}
+                        className={isOpenMenu ? "rotate-180" : ""}
                       />
                     </button>
 
-                    <div
-                      className={`
-                        overflow-hidden transition-all duration-300 ease-in-out
-                        ${isMenuOpen ? "max-h-[500px] opacity-100 translate-y-0" : "max-h-0 opacity-0 -translate-y-2"}
-                      `}
-                    >
-                      <div className="pl-12 pr-2 py-1 space-y-1">
+                    {isOpenMenu && (
+                      <div className="mt-1 space-y-1 pl-12">
                         {item.children.map((child) => (
                           <NavLink
                             key={child.label}
                             to={child.path}
-                            onClick={() =>
-                              window.innerWidth < 1024 && onClose()
-                            }
-                            className={({ isActive }) => `
-                              block px-4 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 relative
-                              ${
+                            onClick={() => window.innerWidth < 1024 && onClose()}
+                            className={({ isActive }) =>
+                              `block rounded-xl px-3 py-2 text-sm ${
                                 isActive
-                                  ? "bg-linear-to-r from-[#0A4F48] to-[#116D63] text-white shadow-sm shadow-emerald-900/20 before:absolute before:right-2 before:animate-pulse before:top-1/2 before:-translate-y-1/2 before:w-1 before:h-1 before:rounded-full before:bg-white/40"
-                                  : "text-gray-500 hover:text-emerald-800 hover:bg-gray-50"
-                              }
-                            `}
+                                  ? "bg-white font-semibold text-[#136d64]"
+                                  : "text-[#7b8c84] hover:bg-white"
+                              }`
+                            }
                           >
                             {child.label}
                           </NavLink>
                         ))}
                       </div>
-                    </div>
+                    )}
                   </div>
                 );
               }
+
+              const Icon = item.icon;
 
               return (
                 <NavLink
@@ -198,41 +165,24 @@ export default function Sidebar({ isOpen, onClose }) {
                   to={item.path}
                   end={item.path === "/founder"}
                   onClick={() => window.innerWidth < 1024 && onClose()}
-                  className={({ isActive }) => `
-                    flex items-center gap-3.5 px-4 py-3 text-sm font-semibold rounded-xl transition-all duration-300 group relative overflow-hidden
-                    ${
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-[14px] px-4 py-3 text-sm font-medium ${
                       isActive
-                        ? "bg-linear-to-r from-[#0A4F48] to-[#116D63] text-white shadow-lg shadow-emerald-900/20 translate-x-1"
-                        : "text-gray-500 hover:bg-gray-50 hover:text-emerald-800"
-                    }
-                  `}
+                        ? "bg-white text-[#136d64]"
+                        : "text-[#6d7e76] hover:bg-white"
+                    }`
+                  }
                 >
                   {({ isActive }) => (
                     <>
-                      <div
-                        className={`
-                        w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-300
-                        ${isActive ? "bg-white/20" : "bg-gray-50 group-hover:bg-white group-hover:shadow-sm"}
-                      `}
+                      <span
+                        className={`flex h-8 w-8 items-center justify-center rounded-[10px] ${
+                          isActive ? "bg-[#ecf5f1]" : "bg-[#f1f3ee]"
+                        }`}
                       >
-                        <img
-                          src={item.icon}
-                          className={`w-4 h-4 object-contain transition-all duration-300  
-                            ${
-                              isActive
-                                ? "brightness-0 invert scale-115 opacity-100"
-                                : "grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110"
-                            }
-                          `}
-                        />
-                      </div>
-                      <span className="relative z-10 tracking-wide">
-                        {item.label}
+                        <Icon size={16} />
                       </span>
-
-                      {isActive && (
-                        <div className="absolute right-3 w-1.5 h-1.5 bg-white/40 rounded-full animate-pulse"></div>
-                      )}
+                      {item.label}
                     </>
                   )}
                 </NavLink>
@@ -241,16 +191,14 @@ export default function Sidebar({ isOpen, onClose }) {
           </nav>
         </div>
 
-        <div className="border-t border-gray-100 bg-gray-50/30">
+        <div className="px-5 pb-6 pt-4">
           <button
+            type="button"
             onClick={handleLogout}
-            className="flex items-center justify-center w-full gap-2 px-4 py-3 text-sm font-semibold text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all duration-300 group border border-transparent hover:border-red-100"
+            className="flex w-full items-center justify-center gap-2 rounded-full border border-[#dfe6de] bg-white px-4 py-3 text-sm font-semibold text-[#66766f]"
           >
-            <LogOut
-              size={18}
-              className="group-hover:-translate-x-1 transition-transform duration-200"
-            />
-            <span>Sign Out</span>
+            <LogOut size={16} />
+            Sign Out
           </button>
         </div>
       </aside>

@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import PublicRoutes from "./routes/PublicRoutes";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
+import TwofitSupport from "./pages/TwofitSupport";
 import Unauthorized from "./pages/Unauthorized";
 import ForgotPasswordEmail from "./pages/ForgotPassword";
 import ReceivedSupport from "./pages/shared/growth/ReceivedSupport";
@@ -318,6 +319,7 @@ function App() {
           <Route path="programs/plans" element={<AdminPlanView />} />
           <Route path="profile" element={<Profile />} />
           <Route path="notifications" element={<Notifications />} />
+          <Route path="twofit-support" element={<TwofitSupport />} />
           <Route path="therapy" element={<AdminTherapyList />} />
           <Route path="finance" element={<AdminFinance />} />
 
@@ -347,6 +349,7 @@ function App() {
           <Route path="programs/viewPlan" element={<ExpertPlanDetails />} />
           <Route path="profile" element={<Profile />} />
           <Route path="notifications" element={<Notifications />} />
+          <Route path="twofit-support" element={<TwofitSupport />} />
           <Route path="finance" element={<ExpertFinance />} />
 
           <Route path="therapy" element={<ExpertTherapyList />} />

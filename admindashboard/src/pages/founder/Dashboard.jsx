@@ -176,7 +176,7 @@ const Dashboard = () => {
     const perf = founder?.data?.expertPerformance || {
       taskCompletion: 0,
       rating: 0,
-      clientsAssigned: 0,
+      // clientsAssigned: 0,
     };
     return {
       labels: ["Task Completion", "Rating", "Clients Assigned"],
@@ -185,7 +185,7 @@ const Dashboard = () => {
           data: [
             perf.taskCompletion,
             (perf.rating / 5) * 100,
-            perf.clientsAssigned,
+            // perf.clientsAssigned,
           ],
           backgroundColor: ["#0A4F48", "#EBF3F2", "#F4DBC7"],
           borderWidth: 0,
@@ -198,7 +198,7 @@ const Dashboard = () => {
       raw: {
         taskCompletion: perf.taskCompletion,
         rating: perf.rating,
-        clientsAssigned: perf.clientsAssigned,
+        // clientsAssigned: perf.clientsAssigned,
       },
       isZero:
         perf.taskCompletion === 0 &&
@@ -235,9 +235,9 @@ const Dashboard = () => {
         },
       ],
       raw: {
-        programs: toPct(perf.programs),
-        experts: toPct(perf.experts),
-        clients: toPct(perf.clients),
+        programs: perf.programs,
+        experts: perf.experts,
+        clients: perf.clients,
       },
       isZero: total === 0,
     };
@@ -653,7 +653,7 @@ const Dashboard = () => {
                         </span>
                       </div>
                       <span className="text-base md:text-lg font-bold text-[#0A4F48] group-hover:scale-110 transition-transform">
-                        {item.val}%
+                        {item.val}
                       </span>
                     </div>
                   ))}
@@ -690,19 +690,22 @@ const Dashboard = () => {
                   {[
                     {
                       label: "Tasks",
-                      val: `${expertPerformanceData?.raw?.taskCompletion}%`,
+                      val: expertPerformanceData?.raw?.taskCompletion
+                        ? `${expertPerformanceData.raw.taskCompletion}%`
+                        : 0,
                       color: "bg-[#0A4F48]",
                     },
                     {
                       label: "Rating",
-                      val: expertPerformanceData?.raw?.rating,
+                      val: expertPerformanceData?.raw?.rating ?? 0,
+                      suffix: "/5",
                       color: "bg-[#EBF3F2]",
                     },
-                    {
-                      label: "Assigned",
-                      val: expertPerformanceData?.raw?.clientsAssigned,
-                      color: "bg-[#F4DBC7]",
-                    },
+                    // {
+                    //   label: "Assigned",
+                    //   val: expertPerformanceData?.raw?.clientsAssigned ?? 0,
+                    //   color: "bg-[#F4DBC7]",
+                    // },
                   ].map((item, idx) => (
                     <div
                       key={idx}
@@ -717,7 +720,7 @@ const Dashboard = () => {
                         </span>
                       </div>
                       <span className="text-base md:text-lg font-bold text-[#0A4F48] group-hover:scale-110 transition-transform">
-                        {item.val}
+                        {item.val}{item.suffix || ""}
                       </span>
                     </div>
                   ))}

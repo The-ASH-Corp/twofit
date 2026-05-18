@@ -87,7 +87,13 @@ const ExpertLeftSide = ({ expert }) => {
         ).unwrap();
 
         if (!isMounted) return;
-        setMonitorMessages(Array.isArray(response?.messages) ? response.messages : []);
+        const messages = Array.isArray(response?.messages) ? response.messages : [];
+        const sortedMessages = [...messages].sort((a, b) => {
+          const aTime = new Date(a.time || a.createdAt || a.updatedAt || 0).getTime();
+          const bTime = new Date(b.time || b.createdAt || b.updatedAt || 0).getTime();
+          return aTime - bTime;
+        });
+        setMonitorMessages(sortedMessages);
       } catch (error) {
         if (!isMounted) return;
         setMonitorMessages([]);
@@ -381,33 +387,37 @@ const ExpertLeftSide = ({ expert }) => {
                     monitorMessages.map((msg, idx) => {
                       const isExpert = msg.sender === expert._id;
                       const type = getMessageType(msg);
+                      const messageText = msg.message || msg.content || "";
+                      const timestamp = new Date(msg.time || msg.createdAt || msg.updatedAt || null);
+                      const isValidTime = timestamp instanceof Date && !Number.isNaN(timestamp.getTime());
+
                       return (
                         <div
-                          key={idx}
+                          key={`${msg._id || msg.time || idx}-${idx}`}
                           className={`flex max-w-[92%] flex-col sm:max-w-[85%] ${isExpert ? "ml-auto items-end" : "mr-auto items-start"}`}
                         >
                           <div
                             className={`px-3 py-2 rounded-xl text-xs ${isExpert ? "bg-[#0A4F48] text-white rounded-br-none" : "bg-white border border-gray-200 text-gray-700 rounded-bl-none shadow-sm"}`}
                           >
-                            {type === "text" && <p>{msg.content}</p>}
-                            {type === "image" && (
+                            {type === "text" && <p>{messageText || "—"}</p>}
+                            {type === "image" && msg.mediaUrl && (
                               <img
                                 src={getFileUrl(msg.mediaUrl)}
-                                alt="attachment"
+                                alt={msg.mediaMeta?.name || "attachment"}
                                 className="max-w-[160px] rounded-lg sm:max-w-[220px]"
                               />
                             )}
-                            {type === "voice" && (
-                              <span className="italic opacity-80">
-                                🎤 Voice Message
-                              </span>
+                            {type === "voice" && msg.mediaUrl && (
+                              <audio controls src={getFileUrl(msg.mediaUrl)} className="max-w-full w-[180px]" />
                             )}
                           </div>
                           <span className="text-[10px] text-gray-400 mt-1">
-                            {new Date(msg.createdAt).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
+                            {isValidTime
+                              ? timestamp.toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
+                              : ""}
                           </span>
                         </div>
                       );

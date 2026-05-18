@@ -50,76 +50,87 @@ export default function PlanDetailsView() {
     }
   };
 
-  const fetchPlanById = async () => {
-    const data = await dispatch(getPlanByProgramId(planData?.programId));
-    if (data.payload) {
-      setPlanId(data.payload._id);
-      // Collect all unique media from exercises
-      const allMedia = new Map();
-      
-      data.payload.weeks.forEach((week) => {
-        week.days.forEach((day) => {
-          day.exercises.forEach((ex) => {
-            if (ex.mediaName && ex.mediaName !== "N/A" && ex.url && ex.url !== "N/A") {
-              // Use URL as unique key to avoid duplicates
-              if (!allMedia.has(ex.url)) {
-                allMedia.set(ex.url, {
-                  name: ex.mediaName,
-                  url: ex.url,
-                  type: ex.url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
-                  size: '' // Size not available in data
-                });
+  useEffect(() => {
+    const fetchPlanById = async () => {
+      const data = await dispatch(getPlanByProgramId(planData?.programId));
+      if (data.payload) {
+        setPlanId(data.payload._id);
+        // Collect all unique media from exercises
+        const allMedia = new Map();
+        
+        data.payload.weeks.forEach((week) => {
+          week.days.forEach((day) => {
+            day.exercises.forEach((ex) => {
+              if (ex.mediaName && ex.mediaName !== "N/A" && ex.url && ex.url !== "N/A") {
+                // Use URL as unique key to avoid duplicates
+                if (!allMedia.has(ex.url)) {
+                  allMedia.set(ex.url, {
+                    name: ex.mediaName,
+                    url: ex.url,
+                    type: ex.url.toLowerCase().includes('.pdf') ? 'pdf' : 'image',
+                    size: '' // Size not available in data
+                  });
+                }
               }
-            }
+            });
           });
         });
-      });
 
-      setProgramDetails({
-        name: data.payload.name,
-        duration: data.payload.duration,
-        clients: data.payload.clients || 0,
-        planMedia: Array.from(allMedia.values()),
-      });
+        setProgramDetails({
+          name: data.payload.name,
+          duration: data.payload.duration,
+          clients: data.payload.clients || 0,
+          planMedia: Array.from(allMedia.values()),
+        });
 
-      const formattedWeeks = data.payload.weeks.map((week, index) => ({
-        ...week,
-        id: week?._id,
-        expanded: index === 0,
-        days: week.days.map((day, dIndex) => {
-          // Remove duplicate exercises within the same day
-          const uniqueExercises = [];
-          const seen = new Set();
-          
-          day.exercises.forEach((ex) => {
-            const key = `${ex.name}-${ex.url}-${ex.mediaName}`;
-            if (!seen.has(key)) {
-              seen.add(key);
-              uniqueExercises.push({
-                exercise: ex.name || "N/A",
-                notes: ex.notes || "N/A",
-                url: ex.url || "N/A",
-                media: ex.mediaName || "N/A",
-              });
-            }
-          });
+        const formattedWeeks = data.payload.weeks.map((week, index) => ({
+          ...week,
+          id: week?._id,
+          expanded: index === 0,
+          days: week.days.map((day, dIndex) => {
+            // Remove duplicate exercises within the same day
+            const uniqueExercises = [];
+            const seen = new Set();
+            
+            day.exercises.forEach((ex) => {
+              const key = `${ex.name}-${ex.url}-${ex.mediaName}`;
+              if (!seen.has(key)) {
+                seen.add(key);
+                uniqueExercises.push({
+                  exercise: ex.name || "N/A",
+                  notes: ex.notes || "N/A",
+                  url: ex.url || "N/A",
+                  media: ex.mediaName || "N/A",
+                });
+              }
+            });
 
-          return {
-            ...day,
-            id: day?._id,
-            expanded: dIndex === 0,
-            workoutPlan: uniqueExercises,
-          };
-        }),
-      }));
-      setWeeks(formattedWeeks);
-    }
-  };
+            return {
+              ...day,
+              id: day?._id,
+              expanded: dIndex === 0,
+              workoutPlan: uniqueExercises,
+            };
+          }),
+        }));
+        setWeeks(formattedWeeks);
+      }
+    };
 
-  useEffect(() => {
     fetchPlanById();
-  }, []);
+  }, [dispatch, planData?.programId]);
   const user = useAppSelector(selectUser);
+
+  const planProgramId =
+    planData?.programId || planData?.program?._id || planData?.program || null;
+
+  const hasAssignedProgram = Array.isArray(user?.program)
+    ? user.program.some(
+        (program) =>
+          (typeof program === "string" ? program : program?._id?.toString()) ===
+          planProgramId?.toString(),
+      )
+    : false;
 
   // Sample data structure - replace with actual data from API
 
@@ -198,40 +209,42 @@ export default function PlanDetailsView() {
           <h2 className="text-lg font-bold text-[#0A4F48]">
             Weekly Plan Structure
           </h2>
-          
-          <div className="relative">
-            <button 
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowMenu(!showMenu);
-              }}
-            >
-              <MoreHorizontal size={20} className="text-[#66706D]" />
-            </button>
-            
-            {showMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-10 overflow-hidden">
-                <button 
-                  onClick={handleEdit}
-                  className="w-full text-left px-4 py-2.5 text-sm text-[#011412] hover:bg-gray-50 flex items-center gap-2"
-                >
-                  <Edit size={16} />
-                  Edit Plan
-                </button>
-                
-                {(!programDetails?.clients || programDetails.clients.length === 0) && (
-                  <button 
-                    onClick={handleDelete}
-                    className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 border-t border-gray-50"
+
+          {hasAssignedProgram ? (
+            <div className="relative">
+              <button
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMenu(!showMenu);
+                }}
+              >
+                <MoreHorizontal size={20} className="text-[#66706D]" />
+              </button>
+
+              {showMenu ? (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-1 z-10 overflow-hidden">
+                  <button
+                    onClick={handleEdit}
+                    className="w-full text-left px-4 py-2.5 text-sm text-[#011412] hover:bg-gray-50 flex items-center gap-2"
                   >
-                    <Trash2 size={16} />
-                    Delete Plan
+                    <Edit size={16} />
+                    Edit Plan
                   </button>
-                )}
-              </div>
-            )}
-          </div>
+
+                  {(!programDetails?.clients || programDetails.clients.length === 0) && (
+                    <button
+                      onClick={handleDelete}
+                      className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 border-t border-gray-50"
+                    >
+                      <Trash2 size={16} />
+                      Delete Plan
+                    </button>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
         {/* Weeks List */}
@@ -396,7 +409,7 @@ const DetailField = ({ label, value, isLink = false }) => (
         {value}
       </a>
     ) : (
-      <p className="text-sm text-[#011412] break-words leading-relaxed">
+      <p className="text-sm text-[#011412] wrap-break-word leading-relaxed">
         {value || "-"}
       </p>
     )}

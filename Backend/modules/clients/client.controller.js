@@ -150,18 +150,18 @@ export const deleteClient = async (req, res) => {
 
 export const getClientsBasedOnCoach = async (req, res) => {
   try {
-    const { coachIds, page, limit } = req.body;
-
+    const { coachIds, programIds, page, limit } = req.body;
 
     const { clients, totalCount } = await service.getClientsBasedOnCoach(
       coachIds,
       parseInt(page),
-      parseInt(limit)
+      parseInt(limit),
+      programIds,
     );
     res.status(200).json({
       success: true,
       data: clients,
-      total: totalCount
+      total: totalCount,
     });
   } catch (err) {
     res.status(400).json({ success: false, message: err.message });
