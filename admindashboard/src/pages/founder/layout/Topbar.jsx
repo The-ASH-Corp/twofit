@@ -1,57 +1,146 @@
-import { Bell, Menu, Search, Settings } from "lucide-react";
+import { Bell, Settings, ChevronRight, Menu, Search } from "lucide-react";
+import { assets } from "../../../assets/asset";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
-import { assets } from "@/assets/asset";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Topbar({ onToggleSidebar }) {
   const user = useSelector(selectUser);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isIdSegment = (segment) => {
+    // MongoDB ObjectId (24 hex chars)
+    if (/^[a-f\d]{24}$/i.test(segment)) return true;
+
+    // Long random IDs / UUID-like strings
+    if (segment.length > 10 && /[0-9]/.test(segment)) return true;
+
+    return false;
+  };
+
+  const getBreadcrumbs = () => {
+    const pathSegments = location.pathname.split("/").filter(Boolean);
+
+    const filteredSegments = pathSegments.filter(
+      (segment) =>
+        !["founder", "admin", "client", "expert", "head"].includes(
+          segment.toLowerCase(),
+        ) && !isIdSegment(segment), // ⬅️ skip ID
+    );
+
+    const baseRole = pathSegments[0] || "founder";
+
+    const breadcrumbs = [{ name: "Dashboard", path: `/${baseRole}` }];
+
+    let currentPath = `/${baseRole}`;
+
+    filteredSegments.forEach((segment) => {
+      currentPath += `/${segment}`;
+
+      const formattedName = segment
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+
+      breadcrumbs.push({
+        name: formattedName,
+        path: currentPath,
+      });
+    });
+
+    return breadcrumbs;
+  };
+
+  const breadcrumbs = getBreadcrumbs();
+  const currentPage = breadcrumbs[breadcrumbs.length - 1]?.name || "Dashboard";
 
   return (
-    <div className="sticky top-0 z-30 flex items-center gap-4 rounded-[20px] border border-[#e6ebe5] bg-white px-4 py-4 shadow-[0_8px_20px_-18px_rgba(31,52,45,0.18)] md:px-5">
-      <button
-        onClick={onToggleSidebar}
-        className="rounded-xl p-2 text-[#73857d] lg:hidden"
-      >
-        <Menu size={20} />
-      </button>
+    <div className="flex justify-between items-center gap-4 bg-white/50 backdrop-blur-sm px-4 py-3 rounded-2xl border border-white/60 shadow-sm sticky top-0 z-30 transition-all duration-300">
+      <div className="flex items-center gap-3 min-w-0 flex-1 lg:flex-none">
+        {/* Hamburger Menu - Only on mobile */}
+        <button
+          onClick={onToggleSidebar}
+          className="p-2 lg:hidden text-[#66706D] hover:bg-[#EBF3F2] hover:text-[#0A4F48] rounded-xl transition-colors shrink-0"
+        >
+          <Menu size={24} />
+        </button>
+        <div className="min-w-0 flex-1">
+          {/* Desktop Title & Breadcrumbs */}
+          <div className="hidden lg:block">
+            <h2 className="text-xl md:text-2xl font-bold text-[#0A4F48] truncate tracking-tight">
+              {currentPage}
+            </h2>
+            {breadcrumbs.length > 1 && (
+              <div className="flex items-center gap-2 mt-0.5 overflow-x-auto no-scrollbar flex-nowrap pb-1">
+                {breadcrumbs.map((breadcrumb, index) => (
+                  <div
+                    key={breadcrumb.path}
+                    className="flex items-center gap-2 shrink-0"
+                  >
+                    {index > 0 && (
+                      <ChevronRight
+                        size={12}
+                        className="text-gray-300 shrink-0"
+                      />
+                    )}
+                    <span
+                      className={`text-[11px] font-medium cursor-pointer transition-colors uppercase tracking-wide whitespace-nowrap
+                        ${index === breadcrumbs.length - 1 ? "text-[#0A4F48]" : "text-[#94A3B8] hover:text-[#0A4F48]"}
+                      `}
+                      onClick={() => navigate(breadcrumb.path)}
+                    >
+                      {breadcrumb.name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
 
-      <div className="hidden min-w-0 flex-1 items-center rounded-full bg-[#f4f5f1] px-4 py-3 md:flex">
-        <Search size={16} className="text-[#b2bbb6]" />
-        <input
-          type="text"
-          placeholder="Search across wellness reports..."
-          className="w-full bg-transparent px-3 text-sm text-[#51645d] outline-none placeholder:text-[#b2bbb6]"
-        />
+          {/* Mobile "Minimum Back Page" View */}
+          <div className="lg:hidden min-w-0">
+            {breadcrumbs.length > 1 ? (
+              <div
+                className="flex items-center gap-2 cursor-pointer group"
+                onClick={() =>
+                  navigate(breadcrumbs[breadcrumbs.length - 2]?.path)
+                }
+              >
+                <div className="p-1.5 bg-gray-50 rounded-lg text-gray-400 group-hover:text-[#0A4F48] group-hover:bg-[#EBF3F2] transition-colors">
+                  <ChevronRight size={16} className="rotate-180" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">
+                    Back to
+                  </p>
+                  <h2 className="text-lg font-bold text-[#0A4F48] leading-none">
+                    {breadcrumbs[breadcrumbs.length - 2]?.name}
+                  </h2>
+                </div>
+              </div>
+            ) : (
+              <h2 className="text-xl font-bold text-[#0A4F48] truncate tracking-tight">
+                {currentPage}
+              </h2>
+            )}
+          </div>
+        </div>
       </div>
 
-      <div className="ml-auto flex items-center gap-2 md:gap-3">
-        <button
-          type="button"
-          onClick={() => navigate("/founder/notifications")}
-          className="rounded-full p-2 text-[#6f8179] transition-colors hover:bg-[#f3f5f1]"
-        >
-          <Bell size={18} />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => navigate("/founder/profile")}
-          className="rounded-full p-2 text-[#6f8179] transition-colors hover:bg-[#f3f5f1]"
-        >
-          <Settings size={18} />
-        </button>
-
-        <button
-          type="button"
-          onClick={() => navigate("/founder/profile")}
-          className="flex items-center gap-3 rounded-full pl-1 text-left"
-        >
+      <div className="flex items-center gap-3 md:gap-6 flex-1 justify-end max-w-full">
+        {/* Search Bar - Hidden on small screens, shown as icon or collapsed */}
+        {/* <div className="hidden sm:flex items-center bg-white px-3 rounded-xl border border-gray-100 shadow-sm flex-1 max-w-[400px]">
+          <Search size={18} className="text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search anything"
+            className="w-full px-3 py-2.5 text-sm bg-white focus:outline-none placeholder:text-gray-400"
+          />
           <img
-            src={assets.profileVector}
-            alt="Profile"
-            className="h-9 w-9 rounded-full border border-[#dce4dc] object-cover"
+            src={assets.filter}
+            className="w-4 h-4 cursor-pointer opacity-60 hover:opacity-100 transition-opacity"
+            alt="Filter"
           />
         </div> */}
 
@@ -94,7 +183,7 @@ export default function Topbar({ onToggleSidebar }) {
               <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
             </div>
           </div>
-        </button>
+        </div>
       </div>
     </div>
   );
