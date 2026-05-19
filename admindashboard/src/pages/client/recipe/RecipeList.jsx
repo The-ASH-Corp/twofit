@@ -332,22 +332,24 @@ export default function RecipeList() {
                 </div>
 
                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                  <div className="rounded-[14px] border border-[#E3ECE7] bg-white p-4">
+                  <div className="h-[250px] rounded-[14px] border border-[#E3ECE7] bg-white p-4 flex flex-col">
                     <p className="text-[11px] font-black uppercase tracking-[0.12em] text-[#7B8C84]">
                       Ingredients
                     </p>
                     {featuredIngredients.length > 0 ? (
-                      <ul className="mt-3 space-y-2">
-                        {featuredIngredients.map((ingredient, index) => (
-                          <li
-                            key={`featured-ingredient-${index}`}
-                            className="flex items-start gap-2 text-[13px] font-semibold text-[#2E3F38]"
-                          >
-                            <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#0A7B4E]" />
-                            <span>{ingredient}</span>
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="mt-3 min-h-0 flex-1 overflow-auto no-scrollbar">
+                        <ul className="min-w-max space-y-2 pr-1">
+                          {featuredIngredients.map((ingredient, index) => (
+                            <li
+                              key={`featured-ingredient-${index}`}
+                              className="flex items-start gap-2 text-[13px] font-semibold text-[#2E3F38] whitespace-nowrap"
+                            >
+                              <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#0A7B4E]" />
+                              <span>{ingredient}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     ) : (
                       <p className="mt-3 text-[13px] font-medium text-[#8B9A93]">
                         Ingredients not available.
@@ -355,24 +357,26 @@ export default function RecipeList() {
                     )}
                   </div>
 
-                  <div className="rounded-[14px] border border-[#E3ECE7] bg-white p-4">
+                  <div className="h-[250px] rounded-[14px] border border-[#E3ECE7] bg-white p-4 flex flex-col">
                     <p className="text-[11px] font-black uppercase tracking-[0.12em] text-[#7B8C84]">
                       Steps
                     </p>
                     {featuredSteps.length > 0 ? (
-                      <ol className="mt-3 space-y-2">
-                        {featuredSteps.map((step, index) => (
-                          <li
-                            key={`featured-step-${index}`}
-                            className="flex items-start gap-2 text-[13px] font-semibold text-[#2E3F38]"
-                          >
-                            <span className="mt-[1px] inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#E8F5EF] px-1 text-[11px] font-black text-[#0A7B4E]">
-                              {index + 1}
-                            </span>
-                            <span>{step}</span>
-                          </li>
-                        ))}
-                      </ol>
+                      <div className="mt-3 min-h-0 flex-1 overflow-auto no-scrollbar">
+                        <ol className="min-w-max space-y-2 pr-1">
+                          {featuredSteps.map((step, index) => (
+                            <li
+                              key={`featured-step-${index}`}
+                              className="flex items-start gap-2 text-[13px] font-semibold text-[#2E3F38] whitespace-nowrap"
+                            >
+                              <span className="mt-[1px] inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#E8F5EF] px-1 text-[11px] font-black text-[#0A7B4E]">
+                                {index + 1}
+                              </span>
+                              <span>{step}</span>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
                     ) : (
                       <p className="mt-3 text-[13px] font-medium text-[#8B9A93]">
                         Steps not available.
