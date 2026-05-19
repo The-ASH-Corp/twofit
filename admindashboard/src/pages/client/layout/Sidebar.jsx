@@ -16,6 +16,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
 
   const [openMenu, setOpenMenu] = useState(null);
+  const hasTherapyAssigned = Boolean(user?.therapyType);
 
   const menuItems = [
   {
@@ -24,13 +25,13 @@ export default function Sidebar({ isOpen, onClose }) {
     path: "/client",
   },
   { label: "Daily Plan", icon: Calendar, path: "/client/daily-plan" },
-  {
+  ...(hasTherapyAssigned ? [{
     label: "Habit Tracker",
     icon: RefreshCcw,
     path: "/client/habit-tracker",
-  },
+  }] : []),
   { label: "Workout", icon: Dumbbell, path: "/client/workout" },
-   ...(user?.therapyType ? [{
+   ...(hasTherapyAssigned ? [{
     label: "Therapy",
     icon: Activity,
     path: "/client/therapy",
