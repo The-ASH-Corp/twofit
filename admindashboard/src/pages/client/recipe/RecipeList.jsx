@@ -22,6 +22,33 @@ function toHeadline(value = "") {
     .join(" ");
 }
 
+function parseArrayLike(value) {
+  if (Array.isArray(value)) return value;
+  if (typeof value !== "string") return [];
+
+  const trimmed = value.trim();
+  if (!trimmed) return [];
+
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (Array.isArray(parsed)) return parsed;
+  } catch {
+    // Fallback below
+  }
+
+  if (trimmed.includes("\n")) {
+    return trimmed
+      .split("\n")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  return trimmed
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 export default function RecipeList() {
   const dispatch = useDispatch();
   const featuredSectionRef = useRef(null);
@@ -44,11 +71,9 @@ export default function RecipeList() {
   }, [recipes]);
 
   useEffect(() => {
-    dispatch(getRecipesThunk())
-      .unwrap()
-      .catch(() => {
-        toast.error("Failed to load recipes");
-      });
+    dispatch(getRecipesThunk()).unwrap().catch(() => {
+      toast.error("Failed to load recipes");
+    });
   }, [dispatch]);
 
   useEffect(() => {
@@ -70,6 +95,18 @@ export default function RecipeList() {
     if (typeof item === "number") return String(item);
     if (!item || typeof item !== "object") return "";
 
+    if (
+      item.quantity !== undefined ||
+      item.unit !== undefined ||
+      item.name !== undefined
+    ) {
+      const quantity = item.quantity != null ? String(item.quantity).trim() : "";
+      const unit = item.unit != null ? String(item.unit).trim() : "";
+      const name = item.name != null ? String(item.name).trim() : "";
+      const merged = [quantity, unit, name].filter(Boolean).join(" ").trim();
+      if (merged) return merged;
+    }
+
     return (
       item.name ||
       item.title ||
@@ -84,8 +121,10 @@ export default function RecipeList() {
 
   const normalizeList = useCallback(
     (value) => {
-      if (!Array.isArray(value)) return [];
-      return value.map((item) => toDisplayText(item).trim()).filter(Boolean);
+      const source = parseArrayLike(value);
+      return source
+        .map((item) => toDisplayText(item).trim())
+        .filter(Boolean);
     },
     [toDisplayText],
   );
@@ -117,14 +156,7 @@ export default function RecipeList() {
 
     const others = baseFiltered.filter((recipe) => recipe._id !== featuredId);
     return [featured, ...others];
-  }, [
-    recipes,
-    activeCategory,
-    searchText,
-    showBookmarkedOnly,
-    featuredId,
-    normalizeList,
-  ]);
+  }, [recipes, activeCategory, searchText, showBookmarkedOnly, featuredId, normalizeList]);
 
   const toggleBookmark = async (id) => {
     try {
@@ -162,23 +194,21 @@ export default function RecipeList() {
     [featuredRecipe?.ingredients, normalizeList],
   );
 
-  const featuredDescription = useMemo(() => {
-    if (featuredIngredients.length > 0) {
-      return `Rich in ${featuredIngredients.slice(0, 4).join(", ")}. Precision-crafted nutrition for better recovery and sustained energy.`;
-    }
-    const steps = normalizeList(featuredRecipe?.steps);
-    if (steps.length > 0) {
-      return steps[0];
-    }
-    return "Precision-crafted nutritional meals that fuel your wellness goals and keep your momentum high.";
-  }, [featuredIngredients, featuredRecipe?.steps, normalizeList]);
+  // const featuredDescription = useMemo(() => {
+  //   if (featuredIngredients.length > 0) {
+  //     return `Rich in ${featuredIngredients.slice(0, 4).join(", ")}. Precision-crafted nutrition for better recovery and sustained energy.`;
+  //   }
+  //   const steps = normalizeList(featuredRecipe?.steps);
+  //   if (steps.length > 0) {
+  //     return steps[0];
+  //   }
+  //   return "Precision-crafted nutritional meals that fuel your wellness goals and keep your momentum high.";
+  // }, [featuredIngredients, featuredRecipe?.steps, normalizeList]);
 
-  const featuredCarbs = useMemo(() => {
-    const calories = Number(featuredRecipe?.calories) || 0;
-    const protein = Number(featuredRecipe?.protein) || 0;
-    const estimate = Math.max(Math.round((calories - protein * 4) / 4), 0);
-    return Number.isFinite(estimate) ? estimate : 0;
-  }, [featuredRecipe?.calories, featuredRecipe?.protein]);
+  const featuredSteps = useMemo(
+    () => normalizeList(featuredRecipe?.steps),
+    [featuredRecipe?.steps, normalizeList],
+  );
 
   const featuredPrep = useMemo(() => {
     const stepsCount = normalizeList(featuredRecipe?.steps).length;
@@ -276,9 +306,7 @@ export default function RecipeList() {
                 >
                   <Bookmark
                     size={18}
-                    fill={
-                      featuredRecipe?.isBookmarked ? "currentColor" : "none"
-                    }
+                    fill={featuredRecipe?.isBookmarked ? "currentColor" : "none"}
                   />
                 </button>
               </div>
@@ -292,40 +320,65 @@ export default function RecipeList() {
                 <h2 className="mt-4 text-[52px] leading-[1.02] font-black text-[#1F2D27]">
                   {featuredRecipe?.name || "Featured Recipe"}
                 </h2>
-                
 
-                <p className="mt-4 text-[17px] font-medium leading-relaxed text-[#66766E]">
+                {/* <p className="mt-4 text-[17px] font-medium leading-relaxed text-[#66766E]">
                   {featuredDescription}
-                </p>
-
-                <div className="mt-4 grid grid-cols-2">
-                  {featuredRecipe?.ingredients?.map((step, index) => (
-                    <p
-                      key={index}
-                      className="text-[17px] font-medium leading-relaxed text-[#66766E] mb-2"
-                    >
-                      Ing {index + 1}: {step}
-                    </p>
-                  ))}
-                </div>
-                <div className="mt-4 grid grid-cols-2">
-                  {featuredRecipe?.steps?.map((step, index) => (
-                    <p
-                      key={index}
-                      className="text-[17px] font-medium leading-relaxed text-[#66766E] mb-2"
-                    >
-                      Step {index + 1}: {step}
-                    </p>
-                  ))}
-                </div>
+                </p> */}
 
                 <div className="mt-5 grid grid-cols-3 gap-3">
                   <StatBox label="KCAL" value={featuredRecipe?.calories || 0} />
-                  <StatBox
-                    label="PROTEIN"
-                    value={`${featuredRecipe?.protein || 0}g`}
-                  />
+                  <StatBox label="PROTEIN" value={`${featuredRecipe?.protein || 0}g`} />
                   {/* <StatBox label="CARBS" value={`${featuredCarbs}g`} /> */}
+                </div>
+
+                <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-[14px] border border-[#E3ECE7] bg-white p-4">
+                    <p className="text-[11px] font-black uppercase tracking-[0.12em] text-[#7B8C84]">
+                      Ingredients
+                    </p>
+                    {featuredIngredients.length > 0 ? (
+                      <ul className="mt-3 space-y-2">
+                        {featuredIngredients.map((ingredient, index) => (
+                          <li
+                            key={`featured-ingredient-${index}`}
+                            className="flex items-start gap-2 text-[13px] font-semibold text-[#2E3F38]"
+                          >
+                            <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#0A7B4E]" />
+                            <span>{ingredient}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="mt-3 text-[13px] font-medium text-[#8B9A93]">
+                        Ingredients not available.
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="rounded-[14px] border border-[#E3ECE7] bg-white p-4">
+                    <p className="text-[11px] font-black uppercase tracking-[0.12em] text-[#7B8C84]">
+                      Steps
+                    </p>
+                    {featuredSteps.length > 0 ? (
+                      <ol className="mt-3 space-y-2">
+                        {featuredSteps.map((step, index) => (
+                          <li
+                            key={`featured-step-${index}`}
+                            className="flex items-start gap-2 text-[13px] font-semibold text-[#2E3F38]"
+                          >
+                            <span className="mt-[1px] inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-[#E8F5EF] px-1 text-[11px] font-black text-[#0A7B4E]">
+                              {index + 1}
+                            </span>
+                            <span>{step}</span>
+                          </li>
+                        ))}
+                      </ol>
+                    ) : (
+                      <p className="mt-3 text-[13px] font-medium text-[#8B9A93]">
+                        Steps not available.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -342,14 +395,6 @@ export default function RecipeList() {
                 ingredients.slice(0, 2).join(", ") ||
                 normalizeList(recipe.steps).slice(0, 1).join(" ") ||
                 "Balanced nutrition designed for consistent progress.";
-              const recipeCarbs = Math.max(
-                Math.round(
-                  (Number(recipe?.calories || 0) -
-                    Number(recipe?.protein || 0) * 4) /
-                    4,
-                ),
-                0,
-              );
 
               const proteinTag =
                 Number(recipe?.protein || 0) >= 30
@@ -428,6 +473,7 @@ export default function RecipeList() {
                           {recipe?.calories || 0}
                         </p>
                       </div>
+                     
                     </div>
                   </div>
                 </article>
