@@ -44,9 +44,11 @@ export default function RecipeList() {
   }, [recipes]);
 
   useEffect(() => {
-    dispatch(getRecipesThunk()).unwrap().catch(() => {
-      toast.error("Failed to load recipes");
-    });
+    dispatch(getRecipesThunk())
+      .unwrap()
+      .catch(() => {
+        toast.error("Failed to load recipes");
+      });
   }, [dispatch]);
 
   useEffect(() => {
@@ -83,9 +85,7 @@ export default function RecipeList() {
   const normalizeList = useCallback(
     (value) => {
       if (!Array.isArray(value)) return [];
-      return value
-        .map((item) => toDisplayText(item).trim())
-        .filter(Boolean);
+      return value.map((item) => toDisplayText(item).trim()).filter(Boolean);
     },
     [toDisplayText],
   );
@@ -117,7 +117,14 @@ export default function RecipeList() {
 
     const others = baseFiltered.filter((recipe) => recipe._id !== featuredId);
     return [featured, ...others];
-  }, [recipes, activeCategory, searchText, showBookmarkedOnly, featuredId, normalizeList]);
+  }, [
+    recipes,
+    activeCategory,
+    searchText,
+    showBookmarkedOnly,
+    featuredId,
+    normalizeList,
+  ]);
 
   const toggleBookmark = async (id) => {
     try {
@@ -269,7 +276,9 @@ export default function RecipeList() {
                 >
                   <Bookmark
                     size={18}
-                    fill={featuredRecipe?.isBookmarked ? "currentColor" : "none"}
+                    fill={
+                      featuredRecipe?.isBookmarked ? "currentColor" : "none"
+                    }
                   />
                 </button>
               </div>
@@ -283,14 +292,39 @@ export default function RecipeList() {
                 <h2 className="mt-4 text-[52px] leading-[1.02] font-black text-[#1F2D27]">
                   {featuredRecipe?.name || "Featured Recipe"}
                 </h2>
+                
 
                 <p className="mt-4 text-[17px] font-medium leading-relaxed text-[#66766E]">
                   {featuredDescription}
                 </p>
 
+                <div className="mt-4 grid grid-cols-2">
+                  {featuredRecipe?.ingredients?.map((step, index) => (
+                    <p
+                      key={index}
+                      className="text-[17px] font-medium leading-relaxed text-[#66766E] mb-2"
+                    >
+                      Ing {index + 1}: {step}
+                    </p>
+                  ))}
+                </div>
+                <div className="mt-4 grid grid-cols-2">
+                  {featuredRecipe?.steps?.map((step, index) => (
+                    <p
+                      key={index}
+                      className="text-[17px] font-medium leading-relaxed text-[#66766E] mb-2"
+                    >
+                      Step {index + 1}: {step}
+                    </p>
+                  ))}
+                </div>
+
                 <div className="mt-5 grid grid-cols-3 gap-3">
                   <StatBox label="KCAL" value={featuredRecipe?.calories || 0} />
-                  <StatBox label="PROTEIN" value={`${featuredRecipe?.protein || 0}g`} />
+                  <StatBox
+                    label="PROTEIN"
+                    value={`${featuredRecipe?.protein || 0}g`}
+                  />
                   {/* <StatBox label="CARBS" value={`${featuredCarbs}g`} /> */}
                 </div>
               </div>
@@ -394,7 +428,6 @@ export default function RecipeList() {
                           {recipe?.calories || 0}
                         </p>
                       </div>
-                     
                     </div>
                   </div>
                 </article>
