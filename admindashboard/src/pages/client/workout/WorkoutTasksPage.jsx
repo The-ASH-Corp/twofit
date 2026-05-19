@@ -31,41 +31,41 @@ import MobileBottomNav from "../components/MobileBottomNav";
 import { cn } from "@/lib/utils";
 import bgImage from "/src/assets/workout-bg.jpg";
 import { CgGym } from "react-icons/cg";
+import sandyloading from "../../../assets/Sandy Loading.json";
+import Lottie from "lottie-react";
 
-
-const workoutQuotes =[
+const workoutQuotes = [
   "Your body can handle more than your mind thinks.",
-"Every workout is a step closer to your strongest self.",
-"Push yourself today so your future self can thank you.",
-"Sweat is proof that you showed up for yourself.",
-"Results come from consistency, not excuses.",
-"Train with purpose, not with comfort.",
-"Strong habits create strong bodies.",
-"The pain you feel today becomes the strength you feel tomorrow.",
-"Don’t stop when it gets hard. Stop when you’re done.",
-"Fitness is built one workout at a time.",
-"Your only competition is who you were yesterday.",
-"Discipline in the gym creates confidence outside it.",
-"A small workout is still better than no workout.",
-"The hardest part is starting. After that, keep moving.",
-"Your body changes when your excuses end.",
-"Every rep is an investment in yourself.",
-"Strength grows through struggle.",
-"You won’t always feel motivated. Train anyway.",
-"Consistency beats intensity when intensity doesn’t last.",
-"Wake up with determination. Sleep with satisfaction.",
-"One hour of effort can change your entire mindset.",
-"Fitness is not punishment. It’s self-respect.",
-"Push through the weakness to discover your power.",
-"Your goals don’t work unless you do.",
-"The gym is where excuses lose and discipline wins.",
-"Every drop of sweat carries you closer to your goal.",
-"Train your mind and your body will follow.",
-"You are stronger than your comfort zone.",
-"Keep lifting, keep running, keep growing.",
-"No shortcuts. No excuses. Just effort and progress.",
-]
-
+  "Every workout is a step closer to your strongest self.",
+  "Push yourself today so your future self can thank you.",
+  "Sweat is proof that you showed up for yourself.",
+  "Results come from consistency, not excuses.",
+  "Train with purpose, not with comfort.",
+  "Strong habits create strong bodies.",
+  "The pain you feel today becomes the strength you feel tomorrow.",
+  "Don’t stop when it gets hard. Stop when you’re done.",
+  "Fitness is built one workout at a time.",
+  "Your only competition is who you were yesterday.",
+  "Discipline in the gym creates confidence outside it.",
+  "A small workout is still better than no workout.",
+  "The hardest part is starting. After that, keep moving.",
+  "Your body changes when your excuses end.",
+  "Every rep is an investment in yourself.",
+  "Strength grows through struggle.",
+  "You won’t always feel motivated. Train anyway.",
+  "Consistency beats intensity when intensity doesn’t last.",
+  "Wake up with determination. Sleep with satisfaction.",
+  "One hour of effort can change your entire mindset.",
+  "Fitness is not punishment. It’s self-respect.",
+  "Push through the weakness to discover your power.",
+  "Your goals don’t work unless you do.",
+  "The gym is where excuses lose and discipline wins.",
+  "Every drop of sweat carries you closer to your goal.",
+  "Train your mind and your body will follow.",
+  "You are stronger than your comfort zone.",
+  "Keep lifting, keep running, keep growing.",
+  "No shortcuts. No excuses. Just effort and progress.",
+];
 
 const rpeScale = [
   {
@@ -374,6 +374,13 @@ export default function WorkoutTasksPage() {
     return (
       <>
         <div className="mx-auto mt-20 max-w-lg rounded-[32px] border border-[#0A4F48]/10 bg-white p-8 text-center shadow-[0_4px_30px_rgba(0,0,0,0.02)]">
+          <Lottie
+            animationData={sandyloading}
+            loop
+            autoplay
+            className="w-40 h-40 m-auto"
+          />
+
           <h2 className="text-xl font-black text-[#0A4F48]">
             Program Not Started
           </h2>
@@ -502,11 +509,10 @@ export default function WorkoutTasksPage() {
 
             {/* Active Focal Module Detail */}
             <div className="client-card rounded-[24px] border border-[#E8EEEB] bg-[#FCFDFC] p-6 sm:p-7 shadow-[0_6px_24px_rgba(30,44,38,0.02)]">
-             
               <div className="inline-flex gap-2 items-center rounded-full border border-[#D1E0D7] bg-[#F5F9F7] px-3 py-1.5 text-[12px] font-black uppercase tracking-[0.13em] text-[#0A7B4E]">
-              <CgGym size={25}  />  Active Focal Module
+                <CgGym size={25} /> Active Focal Module
               </div>
-              
+
               <h2 className="mt-4 text-[22px] leading-tight font-black text-[#1A2621] sm:text-[26px] lg:text-[30px] flex items-center gap-2">
                 {selectedTask?.name || "Exercise Overview"}{" "}
                 <span className="text-[15.5px] leading-relaxed font-medium text-[#5A6D63]">
@@ -730,7 +736,11 @@ export default function WorkoutTasksPage() {
                 Coach Insight
               </div>
               <p className="mt-4 text-[17px] font-semibold leading-relaxed text-[#4D6158]">
-                {workoutQuotes[Math.floor(Math.random() * workoutQuotes.length)]}
+                {
+                  workoutQuotes[
+                    Math.floor(Math.random() * workoutQuotes.length)
+                  ]
+                }
               </p>
             </section>
           </div>

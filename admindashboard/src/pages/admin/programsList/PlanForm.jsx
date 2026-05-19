@@ -657,7 +657,26 @@ const PlanSection = ({
                   setFormState({ ...formState, name: e.target.value })
                 }
               />
-              <InputGroup
+              {/* <InputGroup
+                  label="No.of sets"
+                  readOnly={true}
+                  placeholder="Paste link here"
+                  value={formState.url}
+                  onChange={(e) =>
+                    setFormState({ ...formState, url: e.target.value })
+                  }
+                />
+                <InputGroup
+                  label="No.of reps"
+                  readOnly={true}
+                  placeholder="Paste link here"
+                  value={formState.url}
+                  onChange={(e) =>
+                    setFormState({ ...formState, url: e.target.value })
+                  }
+                /> */}
+              
+               <InputGroup
                 label={
                   type === "Workout" || type === "Meal" ? "Notes" : "Attach URL"
                 }

@@ -30,6 +30,8 @@ import {
 } from "@/redux/features/tasks/task.thunk";
 import MobileBottomNav from "../components/MobileBottomNav";
 import { cn } from "@/lib/utils";
+import Lottie from "lottie-react";
+import sandyloading from "../../../assets/Sandy Loading.json"
 
 const dieteMotivationalQuotes = [
 "Your diet is an investment in your future self.",
@@ -489,9 +491,20 @@ export default function DietTasksPage() {
   if (!isProgramStarted) {
     return (
       <>
-        <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-[#0A4F48]/10">
-          <h2 className="text-xl font-bold text-[#0A4F48]">Program Not Started</h2>
-          <p className="text-gray-500 mt-2">Diet tasks will appear once your program starts.</p>
+        <div className="mx-auto mt-20 max-w-lg rounded-[32px] border border-[#0A4F48]/10 bg-white p-8 text-center shadow-[0_4px_30px_rgba(0,0,0,0.02)]">
+          <Lottie
+            animationData={sandyloading}
+            loop
+            autoplay
+            className="w-40 h-40 m-auto"
+          />
+
+          <h2 className="text-xl font-black text-[#0A4F48]">
+            Program Not Started
+          </h2>
+          <p className="mt-2 font-medium text-gray-500">
+            Workout tasks will appear once your program begins.
+          </p>
         </div>
         <MobileBottomNav />
       </>
