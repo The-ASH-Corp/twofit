@@ -291,7 +291,7 @@ export default function RecipeList() {
                 <div className="mt-5 grid grid-cols-3 gap-3">
                   <StatBox label="KCAL" value={featuredRecipe?.calories || 0} />
                   <StatBox label="PROTEIN" value={`${featuredRecipe?.protein || 0}g`} />
-                  <StatBox label="CARBS" value={`${featuredCarbs}g`} />
+                  {/* <StatBox label="CARBS" value={`${featuredCarbs}g`} /> */}
                 </div>
               </div>
             </div>
@@ -394,14 +394,7 @@ export default function RecipeList() {
                           {recipe?.calories || 0}
                         </p>
                       </div>
-                      <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.09em] text-[#9AA8A1]">
-                          Carbs
-                        </p>
-                        <p className="text-[24px] leading-none font-black text-[#1F2D27]">
-                          {recipeCarbs}g
-                        </p>
-                      </div>
+                     
                     </div>
                   </div>
                 </article>
