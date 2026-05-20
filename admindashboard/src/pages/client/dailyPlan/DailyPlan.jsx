@@ -368,6 +368,17 @@ export default function DailyPlan() {
       );
 
       if (extensionStartDate) {
+        const displayProgramEndDate = new Date(effectiveProgramStartDate);
+        displayProgramEndDate.setDate(
+          displayProgramEndDate.getDate() + sortedDays.length - 1,
+        );
+        displayProgramEndDate.setHours(0, 0, 0, 0);
+
+        const previewStartDate =
+          extensionStartDate <= displayProgramEndDate
+            ? new Date(displayProgramEndDate.getTime() + 24 * 60 * 60 * 1000)
+            : extensionStartDate;
+
         const extensionTitle = String(
           extensionProgram?.title ||
             pendingExtension?.extendedProgramId?.title ||
@@ -382,9 +393,9 @@ export default function DailyPlan() {
           extensionDefaultMealCount;
 
         sortedExtensionDays.forEach((extensionDay) => {
-          const extensionDate = new Date(extensionStartDate);
+          const extensionDate = new Date(previewStartDate);
           extensionDate.setDate(
-            extensionStartDate.getDate() + (extensionDay.globalIndex - 1),
+            previewStartDate.getDate() + (extensionDay.globalIndex - 1),
           );
           extensionDate.setHours(0, 0, 0, 0);
 
