@@ -21,6 +21,8 @@ const PayrollMenu = ({ EmployeeList, setPayrollOpen, payrollOpen }) => {
     { label: "November", value: 11 },
     { label: "December", value: 12 },
   ];
+  const currentMonth = new Date().getMonth() + 1;
+  const currentYear = new Date().getFullYear();
 
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
@@ -233,7 +235,11 @@ const PayrollMenu = ({ EmployeeList, setPayrollOpen, payrollOpen }) => {
             className="border border-[#DBDEDD] rounded-xl py-1.5 px-2 w-full"
           >
             {months.map((month) => (
-              <option key={month.value} value={month.value}>
+              <option
+                key={month.value}
+                value={month.value}
+                disabled={month.value < currentMonth}
+              >
                 {month.label}
               </option>
             ))}
@@ -241,17 +247,22 @@ const PayrollMenu = ({ EmployeeList, setPayrollOpen, payrollOpen }) => {
         </div>
 
         {/* Year */}
+        {/* Year */}
         <div className="flex flex-col items-start gap-2 w-full">
           <p className="text-[12px]">Year</p>
 
-          <input
-            type="number"
+          <select
             name="year"
             value={formik.values.year}
             onChange={formik.handleChange}
-            placeholder="Enter Year"
             className="border border-[#DBDEDD] rounded-xl py-1.5 px-2 w-full"
-          />
+          >
+            {[currentYear, currentYear + 1, currentYear + 2].map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
