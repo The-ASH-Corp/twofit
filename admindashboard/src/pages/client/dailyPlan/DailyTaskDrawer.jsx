@@ -1,16 +1,14 @@
 import React from "react";
 import { X, Activity, Utensils, Heart, CheckCircle2, Circle } from "lucide-react";
-import { useAppSelector } from "@/redux/store/hooks";
-import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 export default function DailyTaskDrawer({
   selectedDate,
   tasks,
   allMissed,
+  isExtensionPreview,
   onClose,
   onTaskClick,
 }) {
-  const user = useAppSelector(selectUser);
   if (!selectedDate) return null;
 
   const statusStyles = {
@@ -67,6 +65,11 @@ export default function DailyTaskDrawer({
             <h2 className="text-[32px] font-bold text-gray-900 leading-tight">
               {formattedDate}
             </h2>
+            {isExtensionPreview && (
+              <span className="mt-3 inline-flex rounded-full bg-[#0A4F48] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
+                Extended Plan
+              </span>
+            )}
           </div>
           <button
             onClick={onClose}
