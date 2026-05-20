@@ -24,6 +24,11 @@ import { SyncLoader } from "react-spinners";
 import { addDays, format, startOfWeek } from "date-fns";
 import MobileBottomNav from "../components/MobileBottomNav";
 import { motivationQuotes } from "../dailyPlan/DailyPlan";
+import { useAppSelector } from "@/redux/store/hooks";
+import { selectSelectedClient } from "@/redux/features/client/client.selectors";
+import Lottie from "lottie-react";
+import sandyloading from "../../../assets/Sandy Loading.json"
+
 
 export const dualEdgeDepthShadow = {
   boxShadow:
@@ -49,6 +54,8 @@ export default function HabitTracker() {
     (state) => state.habit,
   );
   const [streak, setStreak] = useState(0);
+    const clientUser = useAppSelector(selectSelectedClient);
+  
 
   useEffect(() => {
     if (clientId) {
@@ -127,6 +134,19 @@ export default function HabitTracker() {
     return { dayMetrics, average };
   }, [processedHabits, totalHabits, todayKey]);
 
+  const isProgramStarted = useMemo(() => {
+      const startDate = clientUser?.programStartDate || user?.programStartDate;
+      if (!startDate) return true;
+  
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+  
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+  
+      return today >= start;
+    }, [clientUser?.programStartDate, user?.programStartDate]);
+
   const handleChecklistToggle = (habitId, currentStatus) => {
     let nextStatus = "done";
     if (currentStatus === "done") nextStatus = "missed";
@@ -154,6 +174,28 @@ export default function HabitTracker() {
     if (lowered.includes("sleep") || lowered.includes("bed")) return Moon;
     return Target;
   };
+    if (!isProgramStarted) {
+      return (
+        <>
+          <div className="mx-auto mt-20 max-w-lg rounded-[32px] border border-[#0A4F48]/10 bg-white p-8 text-center shadow-[0_4px_30px_rgba(0,0,0,0.02)]">
+            <Lottie
+              animationData={sandyloading}
+              loop
+              autoplay
+              className="w-40 h-40 m-auto"
+            />
+  
+            <h2 className="text-xl font-black text-[#0A4F48]">
+              Program Not Started
+            </h2>
+            <p className="mt-2 font-medium text-gray-500">
+              Workout tasks will appear once your program begins.
+            </p>
+          </div>
+          <MobileBottomNav />
+        </>
+      );
+    }
 
   if (loading) {
     return (
@@ -162,6 +204,8 @@ export default function HabitTracker() {
       </div>
     );
   }
+
+
 
   if (!habits || !habits.habits?.length) {
     return (
@@ -174,6 +218,7 @@ export default function HabitTracker() {
       </div>
     );
   }
+ 
 
   return (
     <div className="client-page-container p-5 sm:p-6 lg:p-7">

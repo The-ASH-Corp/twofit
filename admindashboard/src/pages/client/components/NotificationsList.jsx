@@ -26,7 +26,7 @@ export default function NotificationsList() {
         <h3 className="client-title text-[14px]">Recent Notifications</h3>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 w-full">
         {loading ? (
           <div className="animate-pulse space-y-3">
             {[1, 2].map((i) => (
@@ -41,10 +41,14 @@ export default function NotificationsList() {
           </div>
         ) : (
           notificationsToRender.map((notification) => (
-            <div key={notification._id} className="flex items-center gap-2.5">
+            <div
+              key={notification._id}
+              className="flex items-start gap-2.5 w-full"
+            >
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[rgba(10,79,72,0.12)] bg-white text-[#0A4F48] shadow-[0_3px_10px_rgba(38,58,45,0.09)]">
                 <Bell size={14} fill="#0A4F48" fillOpacity={0.2} />
               </div>
+
               <div className="min-w-0 flex-1">
                 <p className="client-title text-[12px] leading-tight whitespace-normal break-words">
                   {notification.message}
