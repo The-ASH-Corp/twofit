@@ -66,7 +66,6 @@ export default function ExpertEditForm() {
         { name: "email", label: "Email Address", type: "email" },
         { name: "phone", label: "Phone Number", type: "text" },
         { name: "address", label: "Address", type: "text" },
-        { name: "password", label: "Password (leave blank to keep current)", type: "text" },
       ],
     },
 
