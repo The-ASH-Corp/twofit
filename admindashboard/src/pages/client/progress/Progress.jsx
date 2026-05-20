@@ -468,12 +468,7 @@ const progressQuotes = [
               <p className="mt-4 text-[17px] font-medium leading-relaxed text-[#6D7C75]">
                {progressQuotes[Math.floor(Math.random() * progressQuotes.length)]}
               </p>
-              <button
-                type="button"
-                className="mt-5 rounded-full bg-[#087B44] px-6 py-2.5 text-[14px] font-black text-white shadow-[0_10px_20px_rgba(8,123,68,0.25)]"
-              >
-                View Full Report
-              </button>
+            
             </div>
 
             <div className="hidden rounded-[16px] bg-[#E8F1EC] p-4 text-[#BFD3C8] md:block">

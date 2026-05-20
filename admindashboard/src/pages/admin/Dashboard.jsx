@@ -408,7 +408,7 @@ export default function Dashboard() {
       subTextColor: "text-white/80",
     },
     {
-      label: "Total Programs",
+      label: "Assigned Programs",
       value: dashboardData?.totalPrograms || 0,
       icon: <BookOpen size={20} className="text-[#DAA520] md:w-6 md:h-6" />,
       bg: "bg-white hover:bg-[#FAF3E0]/30",

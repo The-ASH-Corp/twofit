@@ -5,7 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser } from "@/redux/features/auth/auth.selectores";
 import { getAllPrograms } from "@/redux/features/program/program.thunk";
 import { useEffect, useState } from "react";
-import { getAllCoachesByAdmin, getAllTherapists } from "@/redux/features/coach/coach.thunk";
+import {
+  getAllTherapists,
+  getAllCoaches,
+} from "@/redux/features/coach/coach.thunk";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { fetchTherapyPlans } from "@/redux/features/therapy/therapy.thunk";
@@ -125,8 +128,10 @@ export default function ClientForm() {
       );
       setProgram(programRes?.payload?.data || []);
 
-      const coachessOfAdmin = await dispatch(getAllCoachesByAdmin(user?.experts));
-      setCoachesOfAdmin(coachessOfAdmin?.payload || []);
+      const allCoachesRes = await dispatch(
+        getAllCoaches({ page: 1, limit: 10000 }),
+      );
+      setCoachesOfAdmin(allCoachesRes?.payload || []);
 
       const allTherapistsRes = await dispatch(getAllTherapists());
       setAllTherapists(allTherapistsRes?.payload || []);
@@ -181,7 +186,8 @@ export default function ClientForm() {
   const selectedPlanDuration =
     (typeof selectedProgram?.plan === "string"
       ? selectedProgram?.plan
-      : selectedProgram?.plan?.duration)?.trim() || "";
+      : selectedProgram?.plan?.duration
+    )?.trim() || "";
   const selectedPlanDaysOnly = selectedPlanDuration.split(/\s+/)[0] || "";
 
   const fields = [
@@ -237,7 +243,7 @@ export default function ClientForm() {
           options: [
             { label: "Peanuts", value: "peanuts" },
             { label: "Seafood", value: "seafood" },
-            {label:"none", value:"none"}
+            { label: "none", value: "none" },
           ],
           allowCustom: true,
         },
@@ -374,39 +380,43 @@ export default function ClientForm() {
           name: "dietician",
           label: "Dietician",
           type: "select",
-          options: coachesOfAdmin
-            ? coachesOfAdmin
-                ?.filter((coach) => {
-                  if (coach?.role !== "Dietician") return false;
-                  // If a program is selected, only show dieticians assigned to that program
-                  if (selectedProgram?._id) {
-                    return coach.assignedPrograms?.some(
-                      (p) => p?._id === selectedProgram?._id,
+          options:
+            selectedProgram?._id && coachesOfAdmin?.length > 0
+              ? coachesOfAdmin
+                  .filter((coach) => {
+                    return (
+                      coach?.role === "Dietician" &&
+                      coach?.assignedPrograms?.some(
+                        (p) => (p?._id || p) === selectedProgram?._id,
+                      )
                     );
-                  }
-                  return true;
-                })
-                ?.map((coach) => ({ label: coach.name, value: coach?._id }))
-            : [],
+                  })
+                  .map((coach) => ({
+                    label: coach.name,
+                    value: coach?._id,
+                  }))
+              : [],
         },
         {
           name: "trainer",
           label: "Trainer",
           type: "select",
-          options: coachesOfAdmin
-            ? coachesOfAdmin
-                ?.filter((coach) => {
-                  if (coach?.role !== "Trainer") return false;
-                  // If a program is selected, only show trainers assigned to that program
-                  if (selectedProgram?._id) {
-                    return coach.assignedPrograms?.some(
-                      (p) => p?._id === selectedProgram?._id,
+          options:
+            selectedProgram?._id && coachesOfAdmin?.length > 0
+              ? coachesOfAdmin
+                  .filter((coach) => {
+                    return (
+                      coach?.role === "Trainer" &&
+                      coach?.assignedPrograms?.some(
+                        (p) => (p?._id || p) === selectedProgram?._id,
+                      )
                     );
-                  }
-                  return true;
-                })
-                ?.map((coach) => ({ label: coach.name, value: coach?._id }))
-            : [],
+                  })
+                  .map((coach) => ({
+                    label: coach.name,
+                    value: coach?._id,
+                  }))
+              : [],
         },
       ],
     },

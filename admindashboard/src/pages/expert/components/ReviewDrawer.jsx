@@ -4,6 +4,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import { createPortal } from "react-dom";
 import { useDispatch } from "react-redux";
 import { verifyTask, rejectTask } from "@/redux/features/tasks/task.thunk";
 import { toast } from "react-toastify";
@@ -85,7 +86,7 @@ export default function ReviewDrawer({ review, onClose }) {
     onClose();
   };
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex justify-end">
       {/* Overlay */}
       <div
@@ -355,6 +356,7 @@ export default function ReviewDrawer({ review, onClose }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

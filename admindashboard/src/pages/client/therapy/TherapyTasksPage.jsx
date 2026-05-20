@@ -27,6 +27,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import bgimage from "/src/assets/therapy-bg.jpg";
 import { Link } from "react-router-dom";
+import Lottie from "lottie-react";
+import sandyloading from "../../../assets/Sandy Loading.json"
+
 
 export default function TherapyTasksPage() {
   const dispatch = useDispatch();
@@ -288,12 +291,19 @@ export default function TherapyTasksPage() {
   if (!isProgramStarted) {
     return (
       <>
-        <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-[#0A4F48]/10">
-          <h2 className="text-xl font-bold text-[#0A4F48]">
+        <div className="mx-auto mt-20 max-w-lg rounded-[32px] border border-[#0A4F48]/10 bg-white p-8 text-center shadow-[0_4px_30px_rgba(0,0,0,0.02)]">
+          <Lottie
+            animationData={sandyloading}
+            loop
+            autoplay
+            className="w-40 h-40 m-auto"
+          />
+
+          <h2 className="text-xl font-black text-[#0A4F48]">
             Program Not Started
           </h2>
-          <p className="text-gray-500 mt-2">
-            Therapy tasks will appear once your program starts.
+          <p className="mt-2 font-medium text-gray-500">
+            Workout tasks will appear once your program begins.
           </p>
         </div>
         <MobileBottomNav />
