@@ -50,12 +50,11 @@ export default function NotificationsList() {
               </div>
 
               <div className="min-w-0 flex-1">
-                <p className="client-title text-[12px] leading-tight whitespace-normal overflow-visible text-clip wrap-break-words">
+                <p className="client-title text-[12px] leading-tight whitespace-normal break-words">
                   {notification.message}
                 </p>
-                <p className="client-subtitle mt-0.5 text-[10.5px]">
-                  {notification.time ||
-                    formatNotificationTime(notification.createdAt)}
+                <p className="client-subtitle mt-0.5 text-[10.5px] whitespace-normal break-words">
+                  {notification.time || formatNotificationTime(notification.createdAt)}
                 </p>
               </div>
             </div>
