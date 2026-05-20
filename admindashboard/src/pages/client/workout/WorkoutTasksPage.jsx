@@ -33,6 +33,7 @@ import bgImage from "/src/assets/workout-bg.jpg";
 import { CgGym } from "react-icons/cg";
 import sandyloading from "../../../assets/Sandy Loading.json";
 import Lottie from "lottie-react";
+import workout2 from "/src/assets/workout.png";
 
 const workoutQuotes = [
   "Your body can handle more than your mind thinks.",
@@ -67,6 +68,8 @@ const workoutQuotes = [
   "No shortcuts. No excuses. Just effort and progress.",
 ];
 
+
+const previewImages=[bgImage,workout2,bgImage,workout2]
 const rpeScale = [
   {
     value: 1,
@@ -641,6 +644,7 @@ export default function WorkoutTasksPage() {
                             muted
                             playsInline
                             preload="metadata"
+                              poster={previewImages[idx % previewImages.length]}
                             className={cn(
                               "h-full w-full object-cover transition-all duration-700",
                               !isActive &&

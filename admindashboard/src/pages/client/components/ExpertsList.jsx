@@ -13,7 +13,7 @@ export default function ExpertsList({ expert }) {
   const expertsToRender = experts.length ? experts.filter(Boolean) : fallbackExperts;
 
   const getExpertImage = (exp) => {
-    if (exp?.image) return exp.image;
+    if (exp?.profilePhoto) return exp.image;
     if (exp?.user?.profileImage) return exp.user.profileImage;
     if (exp?.user?.avatar) return exp.user.avatar;
     if (exp?.user?.photo) return exp.user.photo;
@@ -38,7 +38,7 @@ export default function ExpertsList({ expert }) {
             <div className="flex min-w-0 items-center gap-3">
               <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[#e4ece3] bg-white shadow-[0_3px_8px_rgba(35,54,42,0.12)]">
                 <img
-                  src={getExpertImage(exp)}
+                 src={`${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}${exp?.profilePhoto}`}
                   alt={exp?.user?.name || exp?.name || "Expert"}
                   className="h-full w-full object-cover"
                 />
