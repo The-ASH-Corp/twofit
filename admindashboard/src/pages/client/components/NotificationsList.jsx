@@ -46,10 +46,10 @@ export default function NotificationsList() {
                 <Bell size={14} fill="#0A4F48" fillOpacity={0.2} />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="client-title truncate text-[12px] leading-tight">
+                <p className="client-title text-[12px] leading-tight whitespace-normal break-words">
                   {notification.message}
                 </p>
-                <p className="client-subtitle mt-0.5 text-[10.5px]">
+                <p className="client-subtitle mt-0.5 text-[10.5px] whitespace-normal break-words">
                   {notification.time || formatNotificationTime(notification.createdAt)}
                 </p>
               </div>

@@ -265,8 +265,6 @@
 .client-title {
   color: var(--client-text-heading);
   font-weight: 700;
-
-  width: 300px;
 }
 
 .client-subtitle {
