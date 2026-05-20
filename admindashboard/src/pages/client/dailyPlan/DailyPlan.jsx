@@ -71,6 +71,7 @@ export default function DailyPlan() {
   const [currentMonth, setCurrentMonth] = useState(currentDate.getMonth());
   const [currentYear, setCurrentYear] = useState(currentDate.getFullYear());
   const [program, setProgram] = useState(null);
+  const [extensionProgram, setExtensionProgram] = useState(null);
   const [therapyPlan, setTherapyPlan] = useState(null);
   const [calendarData, setCalendarData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
@@ -102,6 +103,22 @@ export default function DailyPlan() {
         const extensionData = await dispatch(getPendingExtension(user?._id)).unwrap();
         if (extensionData) {
           setPendingExtension(extensionData);
+          const extensionProgramId =
+            typeof extensionData.extendedProgramId === "object"
+              ? extensionData.extendedProgramId?._id
+              : extensionData.extendedProgramId;
+
+          if (extensionProgramId) {
+            const extensionProgramData = await dispatch(
+              getProgramById(extensionProgramId),
+            ).unwrap();
+            setExtensionProgram(extensionProgramData?.data || null);
+          } else {
+            setExtensionProgram(null);
+          }
+        } else {
+          setPendingExtension(null);
+          setExtensionProgram(null);
         }
 
         // Fetch compliance and streaks
@@ -141,6 +158,29 @@ export default function DailyPlan() {
     return today >= start;
   }, [user?.programStartDate, clientUser?.programStartDate]);
 
+  const extensionInfo = React.useMemo(() => {
+    if (!pendingExtension) return null;
+
+    const formatDate = (dateStr) => {
+      const parsed = new Date(dateStr);
+      if (Number.isNaN(parsed.getTime())) return dateStr;
+      return parsed.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+    };
+
+    return {
+      title:
+        extensionProgram?.title ||
+        pendingExtension?.extendedProgramId?.title ||
+        "Extended Program",
+      startLabel: formatDate(pendingExtension.extendedProgramStartDate),
+      endLabel: formatDate(pendingExtension.extendedProgramEndDate),
+    };
+  }, [pendingExtension, extensionProgram]);
+
   // Calculate calendar data
   useEffect(() => {
     if (!program || !tasks) return;
@@ -149,8 +189,59 @@ export default function DailyPlan() {
     const programStartDateStr = clientUser?.programStartDate || user?.programStartDate;
     if (!programStartDateStr) return;
 
-    let iteratorDate = new Date(programStartDateStr);
-    iteratorDate.setHours(0, 0, 0, 0);
+    const toLocalDateOnly = (dateLike) => {
+      const date = new Date(dateLike);
+      if (Number.isNaN(date.getTime())) return null;
+      date.setHours(0, 0, 0, 0);
+      return date;
+    };
+
+    const programStartDate = new Date(programStartDateStr);
+    if (Number.isNaN(programStartDate.getTime())) return;
+    programStartDate.setHours(0, 0, 0, 0);
+
+    // Keep calendar aligned with when day-1 was actually submitted.
+    // This prevents expert verification timing from visually shifting day mapping.
+    let effectiveProgramStartDate = new Date(programStartDate);
+    const dayOneSubmittedDates = tasks
+      .filter((task) => Number(task?.globalDayIndex) === 1)
+      .map((task) => toLocalDateOnly(task?.createdAt || task?.updatedAt))
+      .filter(Boolean)
+      .sort((a, b) => a.getTime() - b.getTime());
+
+    if (dayOneSubmittedDates.length > 0) {
+      effectiveProgramStartDate = dayOneSubmittedDates[0];
+    } else {
+      let anchorTask = null;
+
+      tasks.forEach((task) => {
+        const taskDay = Number(task?.globalDayIndex);
+        const taskDate = toLocalDateOnly(task?.createdAt || task?.updatedAt);
+        if (!Number.isFinite(taskDay) || taskDay <= 0 || !taskDate) return;
+
+        if (!anchorTask) {
+          anchorTask = { taskDay, taskDate };
+          return;
+        }
+
+        if (
+          taskDay < anchorTask.taskDay ||
+          (taskDay === anchorTask.taskDay &&
+            taskDate.getTime() < anchorTask.taskDate.getTime())
+        ) {
+          anchorTask = { taskDay, taskDate };
+        }
+      });
+
+      if (anchorTask) {
+        effectiveProgramStartDate = new Date(anchorTask.taskDate);
+        effectiveProgramStartDate.setDate(
+          effectiveProgramStartDate.getDate() - (anchorTask.taskDay - 1),
+        );
+        effectiveProgramStartDate.setHours(0, 0, 0, 0);
+      }
+    }
+
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -159,131 +250,229 @@ export default function DailyPlan() {
         d.getDate(),
       ).padStart(2, "0")}`;
 
-    const sortedDays =
-      program?.plan?.weeks
-        ?.flatMap((week, weekIndex) =>
-          week.days.map((day, dayIndex) => ({
+    const flattenDaysWithGlobalIndex = (weeks = []) => {
+      let globalIndex = 0;
+      return weeks.flatMap((week, weekIndex) =>
+        (week?.days || []).map((day, dayIndex) => {
+          globalIndex += 1;
+          return {
             ...day,
             weekIndex: weekIndex + 1,
             dayIndex: dayIndex + 1,
-            globalIndex: weekIndex * 7 + dayIndex + 1,
-          })),
-        )
-        .sort((a, b) => a.globalIndex - b.globalIndex) || [];
-
-    const sortedTherapyDays =
-      therapyPlan?.weeks?.flatMap((week, weekIndex) =>
-        week.days.map((day, dayIndex) => ({
-          ...day,
-          weekIndex: weekIndex + 1,
-          dayIndex: dayIndex + 1,
-          globalIndex: weekIndex * 7 + dayIndex + 1,
-        })),
-      ) || [];
-
-    let programIndex = 0;
-    const MAX_DAYS = 1000;
-    let loopCount = 0;
-
-    while (programIndex < sortedDays.length && loopCount < MAX_DAYS) {
-      loopCount++;
-      const currentPDay = sortedDays[programIndex];
-      const currentTherapyDay = sortedTherapyDays.find(
-        (d) => d.globalIndex === currentPDay.globalIndex,
+            globalIndex,
+          };
+        }),
       );
+    };
 
-      const dateKey = getDateKey(iteratorDate);
-      const isBeforeToday = iteratorDate < today;
-      const isDayToday = dateKey === getDateKey(today);
+    const sortedDays = flattenDaysWithGlobalIndex(program?.plan?.weeks || []);
+    const sortedExtensionDays = flattenDaysWithGlobalIndex(
+      extensionProgram?.plan?.weeks || [],
+    );
+    const sortedTherapyDays = flattenDaysWithGlobalIndex(therapyPlan?.weeks || []);
+    const therapyDayMap = new Map(
+      sortedTherapyDays.map((day) => [day.globalIndex, day]),
+    );
 
-      if (isDayToday) {
-        setActiveDate(dateKey);
-        setSelectedDate(dateKey);
-        // Ensure drawer is closed on initial load
-        setIsDrawerOpen(false);
+    const isWeightLoss = program?.title?.toLowerCase().includes("weight loss");
+    const defaultMealCount = isWeightLoss ? 5 : 6;
+    const mealCount =
+      clientUser?.dietPlanMealCount || user?.dietPlanMealCount || defaultMealCount;
+
+    let todayDateKey = null;
+
+    sortedDays.forEach((currentPDay) => {
+      const currentTherapyDay = therapyDayMap.get(currentPDay.globalIndex);
+      const dayDate = new Date(effectiveProgramStartDate);
+      dayDate.setDate(
+        effectiveProgramStartDate.getDate() + (currentPDay.globalIndex - 1),
+      );
+      dayDate.setHours(0, 0, 0, 0);
+
+      const dateKey = getDateKey(dayDate);
+      const isBeforeToday = dayDate < today;
+
+      if (dayDate.getTime() === today.getTime()) {
+        todayDateKey = dateKey;
       }
 
       const dayTasks = tasks.filter(
-        (t) => t.globalDayIndex === currentPDay.globalIndex,
+        (t) => Number(t.globalDayIndex) === Number(currentPDay.globalIndex),
       );
 
-      const hasActivityOnDate = dayTasks.some((t) => {
-        if (t.status === "todo") return false;
-        const tDate = new Date(t.updatedAt);
-        tDate.setHours(0, 0, 0, 0);
-        return tDate.getTime() === iteratorDate.getTime();
-      });
-
-      let mapDayToDate = isBeforeToday ? hasActivityOnDate : true;
-
-      if (mapDayToDate) {
-        const taskList = [];
-        const isWeightLoss = program?.title?.toLowerCase().includes("weight loss");
-        const defaultMealCount = isWeightLoss ? 5 : 6;
-        const mealCount = clientUser?.dietPlanMealCount || user?.dietPlanMealCount || defaultMealCount;
-
-        const processItem = (idx, type, name, meta = {}) => {
-          const submission = dayTasks.find(
-            (t) => t.exerciseIndex === idx && t.taskType === type,
-          );
-          let status = submission ? submission.status : "todo";
-          taskList.push({
-            name,
-            status,
-            type,
-            globalDayIndex: currentPDay.globalIndex,
-            weekIndex: currentPDay.weekIndex,
-            dayIndex: currentPDay.dayIndex,
-            exerciseIndex: idx,
-            programId: program?._id,
-            ...meta,
-          });
-        };
-
-        currentPDay.exercises?.forEach((ex, idx) => {
-          processItem(idx, "Workout", ex.name || `Exercise ${idx + 1}`);
+      const taskList = [];
+      const processItem = (idx, type, name, meta = {}) => {
+        const submission = dayTasks.find(
+          (t) => Number(t.exerciseIndex) === Number(idx) && t.taskType === type,
+        );
+        const status = submission ? submission.status : "todo";
+        taskList.push({
+          name,
+          status,
+          type,
+          globalDayIndex: currentPDay.globalIndex,
+          weekIndex: currentPDay.weekIndex,
+          dayIndex: currentPDay.dayIndex,
+          exerciseIndex: idx,
+          programId: program?._id,
+          ...meta,
         });
-        for (let i = 0; i < mealCount; i++) {
-          processItem(100 + i, "Meal", `Meal ${i + 1}`);
-        }
-        if (currentTherapyDay?.therapies) {
-          currentTherapyDay.therapies.forEach((therapy, idx) => {
-            processItem(idx, "Therapy", therapy.type || "Therapy Task", {
-              notes: therapy.notes,
-              mediaUrl: therapy.url,
+      };
+
+      currentPDay.exercises?.forEach((ex, idx) => {
+        processItem(idx, "Workout", ex.name || `Exercise ${idx + 1}`);
+      });
+      for (let i = 0; i < mealCount; i++) {
+        processItem(100 + i, "Meal", `Meal ${i + 1}`);
+      }
+      if (currentTherapyDay?.therapies) {
+        currentTherapyDay.therapies.forEach((therapy, idx) => {
+          processItem(idx, "Therapy", therapy.type || "Therapy Task", {
+            notes: therapy.notes,
+            mediaUrl: therapy.url,
+          });
+        });
+      }
+
+      const stats = {
+        verified: taskList.filter((t) => t.status === "verified").length,
+        pending: taskList.filter((t) => t.status === "pending").length,
+        rejected: taskList.filter((t) => t.status === "rejected").length,
+        skipped: taskList.filter((t) => t.status === "skipped").length,
+        missed: taskList.filter((t) => t.status === "missed").length,
+        todo: taskList.filter((t) => t.status === "todo").length,
+      };
+
+      const hasAnySubmittedStatus =
+        stats.verified + stats.pending + stats.rejected + stats.skipped + stats.missed > 0;
+      const allMissed = isBeforeToday && !hasAnySubmittedStatus;
+
+      newCalendarData[dateKey] = {
+        tasks: allMissed ? [] : taskList,
+        verified: allMissed ? 0 : stats.verified,
+        pending: allMissed ? 0 : stats.pending,
+        rejected: allMissed ? 0 : stats.rejected,
+        skipped: allMissed ? 0 : stats.skipped,
+        missed: allMissed ? 0 : stats.missed,
+        todo: allMissed ? 0 : stats.todo,
+        totalExpected: allMissed ? 0 : taskList.length,
+        allMissed,
+        programDay: currentPDay.globalIndex,
+      };
+    });
+
+    // Add upcoming pending extension program days to calendar preview.
+    if (pendingExtension && sortedExtensionDays.length > 0) {
+      const extensionStartDate = toLocalDateOnly(
+        pendingExtension.extendedProgramStartDate,
+      );
+
+      if (extensionStartDate) {
+        const displayProgramEndDate = new Date(effectiveProgramStartDate);
+        displayProgramEndDate.setDate(
+          displayProgramEndDate.getDate() + sortedDays.length - 1,
+        );
+        displayProgramEndDate.setHours(0, 0, 0, 0);
+
+        const previewStartDate =
+          extensionStartDate <= displayProgramEndDate
+            ? new Date(displayProgramEndDate.getTime() + 24 * 60 * 60 * 1000)
+            : extensionStartDate;
+
+        const extensionTitle = String(
+          extensionProgram?.title ||
+            pendingExtension?.extendedProgramId?.title ||
+            "",
+        ).toLowerCase();
+        const extensionDefaultMealCount = extensionTitle.includes("weight loss")
+          ? 5
+          : 6;
+        const extensionMealCount =
+          clientUser?.dietPlanMealCount ||
+          user?.dietPlanMealCount ||
+          extensionDefaultMealCount;
+
+        sortedExtensionDays.forEach((extensionDay) => {
+          const extensionDate = new Date(previewStartDate);
+          extensionDate.setDate(
+            previewStartDate.getDate() + (extensionDay.globalIndex - 1),
+          );
+          extensionDate.setHours(0, 0, 0, 0);
+
+          const extensionDateKey = getDateKey(extensionDate);
+          if (newCalendarData[extensionDateKey]) return;
+
+          const extensionTaskList = [];
+          extensionDay.exercises?.forEach((ex, idx) => {
+            extensionTaskList.push({
+              name: ex.name || `Exercise ${idx + 1}`,
+              status: "todo",
+              type: "Workout",
+              globalDayIndex: extensionDay.globalIndex,
+              weekIndex: extensionDay.weekIndex,
+              dayIndex: extensionDay.dayIndex,
+              exerciseIndex: idx,
+              programId:
+                extensionProgram?._id ||
+                (typeof pendingExtension.extendedProgramId === "object"
+                  ? pendingExtension.extendedProgramId?._id
+                  : pendingExtension.extendedProgramId),
             });
           });
-        }
 
-        const stats = {
-          verified: taskList.filter((t) => t.status === "verified").length,
-          pending: taskList.filter((t) => t.status === "pending").length,
-          rejected: taskList.filter((t) => t.status === "rejected").length,
-          skipped: taskList.filter((t) => t.status === "skipped").length,
-          missed: taskList.filter((t) => t.status === "missed").length,
-          todo: taskList.filter((t) => t.status === "todo").length,
-        };
+          for (let i = 0; i < extensionMealCount; i++) {
+            extensionTaskList.push({
+              name: `Meal ${i + 1}`,
+              status: "todo",
+              type: "Meal",
+              globalDayIndex: extensionDay.globalIndex,
+              weekIndex: extensionDay.weekIndex,
+              dayIndex: extensionDay.dayIndex,
+              exerciseIndex: 100 + i,
+              programId:
+                extensionProgram?._id ||
+                (typeof pendingExtension.extendedProgramId === "object"
+                  ? pendingExtension.extendedProgramId?._id
+                  : pendingExtension.extendedProgramId),
+            });
+          }
 
-        newCalendarData[dateKey] = {
-          tasks: taskList,
-          ...stats,
-          totalExpected: taskList.length,
-          allMissed: false,
-          programDay: currentPDay.globalIndex,
-        };
-        programIndex++;
-      } else {
-        newCalendarData[dateKey] = {
-          tasks: [],
-          verified: 0, pending: 0, rejected: 0, skipped: 0, missed: 0, todo: 0,
-          totalExpected: 0,
-          allMissed: true,
-        };
+          newCalendarData[extensionDateKey] = {
+            tasks: extensionTaskList,
+            verified: 0,
+            pending: 0,
+            rejected: 0,
+            skipped: 0,
+            missed: 0,
+            todo: extensionTaskList.length,
+            totalExpected: extensionTaskList.length,
+            allMissed: false,
+            programDay: extensionDay.globalIndex,
+            isExtensionPreview: true,
+          };
+        });
       }
-      iteratorDate.setDate(iteratorDate.getDate() + 1);
     }
+
+    if (todayDateKey) {
+      setActiveDate(todayDateKey);
+      setSelectedDate(todayDateKey);
+      // Ensure drawer is closed on initial load
+      setIsDrawerOpen(false);
+    }
+
     setCalendarData(newCalendarData);
-  }, [program, therapyPlan, tasks, user?.programStartDate, clientUser?.programStartDate]);
+  }, [
+    program,
+    therapyPlan,
+    extensionProgram,
+    pendingExtension,
+    tasks,
+    user?.programStartDate,
+    clientUser?.programStartDate,
+    user?.dietPlanMealCount,
+    clientUser?.dietPlanMealCount,
+  ]);
 
   const handleSkipTask = async (task) => {
     if (task.type !== "Meal") return;
@@ -385,6 +574,19 @@ export default function DailyPlan() {
           </div>
         </div>
 
+        {extensionInfo && (
+          <div className="mb-8 rounded-2xl border border-[#CDE9E4] bg-[#F3FBF9] p-4 sm:p-5">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="rounded-full bg-[#0A4F48] px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
+                Plan Extended
+              </span>
+              <p className="text-sm font-semibold text-[#0A4F48]">
+                {extensionInfo.title}: {extensionInfo.startLabel} to {extensionInfo.endLabel}
+              </p>
+            </div>
+          </div>
+        )}
+
         <div className="flex flex-col lg:flex-row gap-10">
           {/* Calendar Side */}
           <div className="flex-1">
@@ -431,7 +633,9 @@ export default function DailyPlan() {
 
                     {!isActive && dayData && (
                       <div className="absolute bottom-5 left-4 right-4 flex flex-col gap-2">
-                         {dayData.allMissed ? (
+                         {dayData.isExtensionPreview ? (
+                           <div className="text-[9px] font-black text-[#0A4F48] uppercase tracking-tight">Extended</div>
+                         ) : dayData.allMissed ? (
                            <div className="text-[9px] font-black text-gray-300 uppercase tracking-tight">Offline Day</div>
                          ) : dayData.totalExpected > 0 && dayData.verified === dayData.totalExpected ? (
                            <div className="flex items-center gap-1.5">
@@ -497,6 +701,11 @@ export default function DailyPlan() {
                 <h3 className="text-[15px] font-bold text-gray-800">
                   Schedule for {selectedDate ? `Day ${calendarData[selectedDate]?.programDay || '?'}` : 'Selected Day'}
                 </h3>
+                {selectedDayData?.isExtensionPreview && (
+                  <span className="ml-auto rounded-full bg-[#0A4F48] px-3 py-1 text-[9px] font-black uppercase tracking-widest text-white">
+                    Extended Plan
+                  </span>
+                )}
               </div>
               <div className="p-6 flex-1 min-h-[300px]">
                  {selectedDayData?.tasks?.length > 0 ? (
@@ -553,6 +762,7 @@ export default function DailyPlan() {
           selectedDate={selectedDate}
           tasks={calendarData[selectedDate]?.tasks}
           allMissed={calendarData[selectedDate]?.allMissed}
+          isExtensionPreview={calendarData[selectedDate]?.isExtensionPreview}
           onClose={() => setIsDrawerOpen(false)}
           onSkip={handleSkipTask}
         />
