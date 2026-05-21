@@ -280,15 +280,58 @@ export default function DailyPlan() {
       clientUser?.dietPlanMealCount || user?.dietPlanMealCount || defaultMealCount;
 
     let todayDateKey = null;
+    let currentDatePointer = new Date(effectiveProgramStartDate);
+    let displayProgramEndDate = new Date(effectiveProgramStartDate);
 
     sortedDays.forEach((currentPDay) => {
       const currentTherapyDay = therapyDayMap.get(currentPDay.globalIndex);
-      const dayDate = new Date(effectiveProgramStartDate);
-      dayDate.setDate(
-        effectiveProgramStartDate.getDate() + (currentPDay.globalIndex - 1),
-      );
-      dayDate.setHours(0, 0, 0, 0);
-
+      
+      let dayDate = null;
+      let foundDate = null;
+      
+      const candidateDate = new Date(currentDatePointer);
+      while (!foundDate) {
+        candidateDate.setHours(0, 0, 0, 0);
+        const dateKey = getDateKey(candidateDate);
+        
+        if (candidateDate < today) {
+          // Check if user has task submissions on this calendar date 'candidateDate'
+          const hasSubmissionsOnDate = tasks.some((task) => {
+            const taskDate = toLocalDateOnly(task?.createdAt || task?.updatedAt);
+            return taskDate && taskDate.getTime() === candidateDate.getTime();
+          });
+          
+          const isStartDate = candidateDate.getTime() === effectiveProgramStartDate.getTime();
+          
+          if (hasSubmissionsOnDate || isStartDate) {
+            foundDate = new Date(candidateDate);
+          } else {
+            // No submissions on a past date -> "Offline Day"
+            newCalendarData[dateKey] = {
+              tasks: [],
+              verified: 0,
+              pending: 0,
+              rejected: 0,
+              skipped: 0,
+              missed: 0,
+              todo: 0,
+              totalExpected: 0,
+              allMissed: true,
+              programDay: null,
+            };
+            candidateDate.setDate(candidateDate.getDate() + 1);
+          }
+        } else {
+          // Today or future dates are active program days sequentially mapped
+          foundDate = new Date(candidateDate);
+        }
+      }
+      
+      dayDate = foundDate;
+      currentDatePointer = new Date(dayDate);
+      currentDatePointer.setDate(currentDatePointer.getDate() + 1);
+      displayProgramEndDate = new Date(dayDate);
+      
       const dateKey = getDateKey(dayDate);
       const isBeforeToday = dayDate < today;
 
@@ -368,15 +411,12 @@ export default function DailyPlan() {
       );
 
       if (extensionStartDate) {
-        const displayProgramEndDate = new Date(effectiveProgramStartDate);
-        displayProgramEndDate.setDate(
-          displayProgramEndDate.getDate() + sortedDays.length - 1,
-        );
-        displayProgramEndDate.setHours(0, 0, 0, 0);
+        const extensionPreviewStartDate = new Date(displayProgramEndDate);
+        extensionPreviewStartDate.setHours(0, 0, 0, 0);
 
         const previewStartDate =
-          extensionStartDate <= displayProgramEndDate
-            ? new Date(displayProgramEndDate.getTime() + 24 * 60 * 60 * 1000)
+          extensionStartDate <= extensionPreviewStartDate
+            ? new Date(extensionPreviewStartDate.getTime() + 24 * 60 * 60 * 1000)
             : extensionStartDate;
 
         const extensionTitle = String(
