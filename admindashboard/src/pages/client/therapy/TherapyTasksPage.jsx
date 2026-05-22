@@ -28,8 +28,9 @@ import { useDispatch } from "react-redux";
 import bgimage from "/src/assets/therapy-bg.jpg";
 import { Link } from "react-router-dom";
 import Lottie from "lottie-react";
-import sandyloading from "../../../assets/Sandy Loading.json"
-
+import sandyloading from "../../../assets/Sandy Loading.json";
+import { GiMeditation } from "react-icons/gi";
+import { FaSpa, FaHeart } from "react-icons/fa";
 
 export default function TherapyTasksPage() {
   const dispatch = useDispatch();
@@ -79,6 +80,7 @@ export default function TherapyTasksPage() {
     fetchPageData();
   }, [dispatch, user?._id, user?.programType]);
 
+  const therapyLogos = [<GiMeditation />, <FaSpa />, <FaHeart />];
   const currentGlobalDay =
     clientUser?.currentGlobalDay || user?.currentGlobalDay || 1;
 
@@ -277,7 +279,6 @@ export default function TherapyTasksPage() {
     }
   };
 
-
   const clientStatus = clientUser?.status || user?.status;
 
   if (isLoading) {
@@ -475,22 +476,29 @@ export default function TherapyTasksPage() {
                       {/* Compact Thumbnail */}
                       <div className="relative aspect-video h-16 w-24 shrink-0 overflow-hidden rounded-[14px] bg-[#1E2C26]">
                         {task.mediaUrl ? (
-                          <video
-                            muted
-                            playsInline
-                            preload="metadata"
-                            className={cn(
-                              "h-full w-full object-cover transition-all duration-700",
-                              !isActive &&
-                                "opacity-60 grayscale group-hover:grayscale-0",
-                              isActive && "scale-110",
-                            )}
-                            src={task.mediaUrl}
-                          />
+                          <>
+                            <video
+                              muted
+                              playsInline
+                              preload="metadata"
+                              className={cn(
+                                "h-full w-full object-cover transition-all duration-700",
+                                !isActive &&
+                                  "opacity-60 grayscale group-hover:grayscale-0",
+                                isActive && "scale-110",
+                              )}
+                              src={task.mediaUrl}
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-[#0A7B4E] backdrop-blur-sm">
+                              {" "}
+                              <div className="text-white text-5xl opacity-80">
+                                {therapyLogos[idx % therapyLogos.length]}
+                              </div>
+                            </div>
+                          </>
                         ) : (
                           <div className="h-full w-full flex items-center justify-center opacity-20">
                             <IconComp size={16} />
-                            
                           </div>
                         )}
 
