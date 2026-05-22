@@ -30,9 +30,11 @@ import {
 import MobileBottomNav from "../components/MobileBottomNav";
 import { cn } from "@/lib/utils";
 import bgImage from "/src/assets/workout-bg.jpg";
-import { CgGym } from "react-icons/cg";
 import sandyloading from "../../../assets/Sandy Loading.json";
 import Lottie from "lottie-react";
+import { CgGym } from "react-icons/cg";
+import { FaDumbbell } from "react-icons/fa";
+import { GiMuscleUp } from "react-icons/gi";
 
 const workoutQuotes = [
   "Your body can handle more than your mind thinks.",
@@ -66,6 +68,8 @@ const workoutQuotes = [
   "Keep lifting, keep running, keep growing.",
   "No shortcuts. No excuses. Just effort and progress.",
 ];
+
+const logos = [<CgGym />, <FaDumbbell />, <GiMuscleUp />];
 
 const rpeScale = [
   {
@@ -637,21 +641,33 @@ export default function WorkoutTasksPage() {
                       {/* Compact Thumbnail */}
                       <div className="relative aspect-video h-16 w-24 shrink-0 overflow-hidden rounded-[14px] bg-[#1E2C26]">
                         {task.url ? (
-                          <video
-                            muted
-                            playsInline
-                            preload="metadata"
-                            className={cn(
-                              "h-full w-full object-cover transition-all duration-700",
-                              !isActive &&
-                                "opacity-60 grayscale group-hover:grayscale-0",
-                              isActive && "scale-110",
-                            )}
-                            src={task.url}
-                          />
+                          <>
+                            <video
+                              muted
+                              playsInline
+                              preload="metadata"
+                              // poster={previewImages[idx % previewImages.length]}
+                              className={cn(
+                                "h-full w-full object-cover transition-all duration-700",
+                                !isActive &&
+                                  "opacity-60 grayscale group-hover:grayscale-0",
+                                isActive && "scale-110",
+                              )}
+                              src={task.url}
+                            />
+
+                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none bg-[#0A7B4E] backdrop-blur-sm">
+                              {" "}
+                              <div className="text-white text-5xl   opacity-80">
+                                {logos[idx % logos.length]}
+                              </div>
+                            </div>
+                          </>
                         ) : (
-                          <div className="h-full w-full flex items-center justify-center opacity-20">
-                            <Zap size={16} />
+                          <div className="h-full w-full flex items-center justify-center">
+                            <div className="text-5xl text-white/70">
+                              {logos[idx % logos.length]}
+                            </div>
                           </div>
                         )}
 
