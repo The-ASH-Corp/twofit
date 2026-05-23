@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Calendar, AlertCircle, CheckCircle2, Clock, SkipForward, Play } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Calendar,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
+  SkipForward,
+  Play,
+} from "lucide-react";
 import DailyTaskDrawer from "./DailyTaskDrawer";
 import MobileBottomNav from "../components/MobileBottomNav";
 import { useDispatch } from "react-redux";
@@ -20,43 +29,52 @@ import { assets } from "@/assets/asset";
 import { toast } from "react-toastify";
 import { SyncLoader } from "react-spinners";
 import { dualEdgeDepthShadow } from "../habit/HabitTracker";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination } from "swiper/modules";
+
+import "swiper/css";
+import "swiper/css/pagination";
 
 const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-
 export const motivationQuotes = [
-"Don’t wait for perfect conditions. Keep moving and let the process shape you.",
-"Progress is built by the people who continue when others stop.",
-"The process may be slow, but stopping guarantees failure.",
-"You don’t need instant results. You need consistency.",
-"Every small step forward is proof that you refused to quit.",
-"Growth happens quietly while you keep showing up.",
-"Success belongs to the people who stay in the process long enough.",
-"Keep going, even when the progress is invisible.",
-"Discipline is choosing the process over temporary comfort.",
-"The strongest people are not the fastest; they are the most consistent.",
-"You are closer than you think. Don’t stop now.",
-"The process is painful sometimes, but regret hurts longer.",
-"Keep building, even on the days you doubt yourself.",
-"Momentum is created by continuing, not by waiting.",
-"One more step today can change your entire future.",
-"Trust the process, especially when the results take time.",
-"Winners are ordinary people with extraordinary persistence.",
-"Keep moving forward, even if it’s only one inch at a time.",
-"Your future is being shaped by what you consistently do today.",
-"The journey rewards the people who refuse to stop.",
-"Don’t chase motivation every day. Build habits that keep you going.",
-"Every repetition, every effort, every struggle is part of your transformation.",
-"Some days will test you. Keep going anyway.",
-"You don’t fail when it gets hard. You fail when you stop.",
-"The process is turning you into someone stronger than yesterday.",
-"Great things take time. Stay patient and keep working.",
-"Your consistency will take you places motivation never can.",
-"Small progress repeated daily becomes massive success.",
-"Keep showing up for yourself, no matter how difficult it feels.",
-"Never stop the process. Just keep going, one step at a time.",
+  "Don’t wait for perfect conditions. Keep moving and let the process shape you.",
+  "Progress is built by the people who continue when others stop.",
+  "The process may be slow, but stopping guarantees failure.",
+  "You don’t need instant results. You need consistency.",
+  "Every small step forward is proof that you refused to quit.",
+  "Growth happens quietly while you keep showing up.",
+  "Success belongs to the people who stay in the process long enough.",
+  "Keep going, even when the progress is invisible.",
+  "Discipline is choosing the process over temporary comfort.",
+  "The strongest people are not the fastest; they are the most consistent.",
+  "You are closer than you think. Don’t stop now.",
+  "The process is painful sometimes, but regret hurts longer.",
+  "Keep building, even on the days you doubt yourself.",
+  "Momentum is created by continuing, not by waiting.",
+  "One more step today can change your entire future.",
+  "Trust the process, especially when the results take time.",
+  "Winners are ordinary people with extraordinary persistence.",
+  "Keep moving forward, even if it’s only one inch at a time.",
+  "Your future is being shaped by what you consistently do today.",
+  "The journey rewards the people who refuse to stop.",
+  "Don’t chase motivation every day. Build habits that keep you going.",
+  "Every repetition, every effort, every struggle is part of your transformation.",
+  "Some days will test you. Keep going anyway.",
+  "You don’t fail when it gets hard. You fail when you stop.",
+  "The process is turning you into someone stronger than yesterday.",
+  "Great things take time. Stay patient and keep working.",
+  "Your consistency will take you places motivation never can.",
+  "Small progress repeated daily becomes massive success.",
+  "Keep showing up for yourself, no matter how difficult it feels.",
+  "Never stop the process. Just keep going, one step at a time.",
 ];
 
+const sliderImages = [
+  "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200",
+  "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=1200",
+  "https://images.unsplash.com/photo-1517963879433-6ad2b056d712?w=1200",
+];
 export default function DailyPlan() {
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
@@ -98,9 +116,11 @@ export default function DailyPlan() {
         }
 
         await dispatch(getUserTaskStatus()).unwrap();
-        
+
         // Fetch pending extension
-        const extensionData = await dispatch(getPendingExtension(user?._id)).unwrap();
+        const extensionData = await dispatch(
+          getPendingExtension(user?._id),
+        ).unwrap();
         if (extensionData) {
           setPendingExtension(extensionData);
           const extensionProgramId =
@@ -122,7 +142,9 @@ export default function DailyPlan() {
         }
 
         // Fetch compliance and streaks
-        const complianceRes = await dispatch(fetchClientComplianceStats(user?._id)).unwrap();
+        const complianceRes = await dispatch(
+          fetchClientComplianceStats(user?._id),
+        ).unwrap();
         if (complianceRes) {
           setCompliance(complianceRes.overall || 0);
           setStreak(complianceRes.streaks?.activeStreak || 0);
@@ -186,7 +208,8 @@ export default function DailyPlan() {
     if (!program || !tasks) return;
 
     const newCalendarData = {};
-    const programStartDateStr = clientUser?.programStartDate || user?.programStartDate;
+    const programStartDateStr =
+      clientUser?.programStartDate || user?.programStartDate;
     if (!programStartDateStr) return;
 
     const toLocalDateOnly = (dateLike) => {
@@ -269,7 +292,9 @@ export default function DailyPlan() {
     const sortedExtensionDays = flattenDaysWithGlobalIndex(
       extensionProgram?.plan?.weeks || [],
     );
-    const sortedTherapyDays = flattenDaysWithGlobalIndex(therapyPlan?.weeks || []);
+    const sortedTherapyDays = flattenDaysWithGlobalIndex(
+      therapyPlan?.weeks || [],
+    );
     const therapyDayMap = new Map(
       sortedTherapyDays.map((day) => [day.globalIndex, day]),
     );
@@ -277,7 +302,9 @@ export default function DailyPlan() {
     const isWeightLoss = program?.title?.toLowerCase().includes("weight loss");
     const defaultMealCount = isWeightLoss ? 5 : 6;
     const mealCount =
-      clientUser?.dietPlanMealCount || user?.dietPlanMealCount || defaultMealCount;
+      clientUser?.dietPlanMealCount ||
+      user?.dietPlanMealCount ||
+      defaultMealCount;
 
     let todayDateKey = null;
     let currentDatePointer = new Date(effectiveProgramStartDate);
@@ -285,24 +312,27 @@ export default function DailyPlan() {
 
     sortedDays.forEach((currentPDay) => {
       const currentTherapyDay = therapyDayMap.get(currentPDay.globalIndex);
-      
+
       let dayDate = null;
       let foundDate = null;
-      
+
       const candidateDate = new Date(currentDatePointer);
       while (!foundDate) {
         candidateDate.setHours(0, 0, 0, 0);
         const dateKey = getDateKey(candidateDate);
-        
+
         if (candidateDate < today) {
           // Check if user has task submissions on this calendar date 'candidateDate'
           const hasSubmissionsOnDate = tasks.some((task) => {
-            const taskDate = toLocalDateOnly(task?.createdAt || task?.updatedAt);
+            const taskDate = toLocalDateOnly(
+              task?.createdAt || task?.updatedAt,
+            );
             return taskDate && taskDate.getTime() === candidateDate.getTime();
           });
-          
-          const isStartDate = candidateDate.getTime() === effectiveProgramStartDate.getTime();
-          
+
+          const isStartDate =
+            candidateDate.getTime() === effectiveProgramStartDate.getTime();
+
           if (hasSubmissionsOnDate || isStartDate) {
             foundDate = new Date(candidateDate);
           } else {
@@ -326,12 +356,12 @@ export default function DailyPlan() {
           foundDate = new Date(candidateDate);
         }
       }
-      
+
       dayDate = foundDate;
       currentDatePointer = new Date(dayDate);
       currentDatePointer.setDate(currentDatePointer.getDate() + 1);
       displayProgramEndDate = new Date(dayDate);
-      
+
       const dateKey = getDateKey(dayDate);
       const isBeforeToday = dayDate < today;
 
@@ -387,7 +417,12 @@ export default function DailyPlan() {
       };
 
       const hasAnySubmittedStatus =
-        stats.verified + stats.pending + stats.rejected + stats.skipped + stats.missed > 0;
+        stats.verified +
+          stats.pending +
+          stats.rejected +
+          stats.skipped +
+          stats.missed >
+        0;
       const allMissed = isBeforeToday && !hasAnySubmittedStatus;
 
       newCalendarData[dateKey] = {
@@ -416,7 +451,9 @@ export default function DailyPlan() {
 
         const previewStartDate =
           extensionStartDate <= extensionPreviewStartDate
-            ? new Date(extensionPreviewStartDate.getTime() + 24 * 60 * 60 * 1000)
+            ? new Date(
+                extensionPreviewStartDate.getTime() + 24 * 60 * 60 * 1000,
+              )
             : extensionStartDate;
 
         const extensionTitle = String(
@@ -565,8 +602,13 @@ export default function DailyPlan() {
     return (
       <div className="w-full flex flex-col items-center justify-center min-h-[60vh] p-4 text-center">
         <Calendar className="w-12 h-12 text-[#0A4F48] opacity-20 mb-4" />
-        <h2 className="text-xl font-bold text-[#0A4F48] mb-2">Program Hasn't Started Yet</h2>
-        <p className="text-gray-500 max-w-md">Scheduled to start on <b>{new Date(startDate).toLocaleDateString()}</b></p>
+        <h2 className="text-xl font-bold text-[#0A4F48] mb-2">
+          Program Hasn't Started Yet
+        </h2>
+        <p className="text-gray-500 max-w-md">
+          Scheduled to start on{" "}
+          <b>{new Date(startDate).toLocaleDateString()}</b>
+        </p>
         <MobileBottomNav />
       </div>
     );
@@ -575,42 +617,124 @@ export default function DailyPlan() {
   const firstDay = new Date(currentYear, currentMonth, 1).getDay();
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const calendarDates = [];
-  for (let i = 0; i < firstDay; i++) calendarDates.push({ day: null, isCurrentMonth: false });
-  for (let i = 1; i <= daysInMonth; i++) calendarDates.push({ day: i, isCurrentMonth: true });
+  for (let i = 0; i < firstDay; i++)
+    calendarDates.push({ day: null, isCurrentMonth: false });
+  for (let i = 1; i <= daysInMonth; i++)
+    calendarDates.push({ day: i, isCurrentMonth: true });
 
-  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-  
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
   const selectedDayData = selectedDate ? calendarData[selectedDate] : null;
 
   // Stats for indicators card
-  const totalVerified = Object.values(calendarData).reduce((acc, curr) => acc + (curr.verified || 0), 0);
-  const totalTodo = Object.values(calendarData).reduce((acc, curr) => acc + (curr.todo || 0), 0);
-  const totalSkipped = Object.values(calendarData).reduce((acc, curr) => acc + (curr.skipped || 0), 0);
+  const totalVerified = Object.values(calendarData).reduce(
+    (acc, curr) => acc + (curr.verified || 0),
+    0,
+  );
+  const totalTodo = Object.values(calendarData).reduce(
+    (acc, curr) => acc + (curr.todo || 0),
+    0,
+  );
+  const totalSkipped = Object.values(calendarData).reduce(
+    (acc, curr) => acc + (curr.skipped || 0),
+    0,
+  );
 
   return (
     <div className="client-page-container p-5 sm:p-6 lg:p-7">
       <div className="client-page-shell">
+        {/* <div className="relative rounded-[32px] overflow-hidden aspect-10/3 group cursor-pointer shadow-xl ">
+               <img 
+                 src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&auto=format&fit=crop&q=80" 
+                 alt="Fitness" 
+                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+               />
+               <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
+               <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                  <p className="text-white text-5xl font-bold leading-tight mb-2">"{motivationQuotes[Math.floor(Math.random() * motivationQuotes.length)]}"</p>
+                  <p className="text-white text-sm font-medium leading-tight mb-2">- Twofit Team</p>
+               </div>
+            </div> */}
+
+        <div className="relative rounded-[32px] overflow-hidden aspect-10/3 shadow-xl">
+          <Swiper
+            modules={[Autoplay, Pagination]}
+            autoplay={{ delay: 3000 }}
+            pagination={{ clickable: true }}
+            loop={true}
+            className="h-full"
+          >
+            {sliderImages.map((img, index) => (
+              <SwiperSlide key={index}>
+                <div className="relative w-full h-full">
+                  <img
+                    src={img}
+                    alt="Fitness"
+                    className="w-full h-full object-cover"
+                  />
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                  <div className="absolute inset-0 p-8 flex flex-col justify-end">
+                    <p className="text-white text-5xl font-bold leading-tight mb-2">
+                     "{motivationQuotes[Math.floor(Math.random() * motivationQuotes.length)]}"
+                    </p>
+
+                    <p className="text-white text-sm font-medium">
+                      - Twofit Team
+                    </p>
+                  </div>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
         {/* Header Section */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12 mt-8">
           <div className="flex items-center gap-8">
-            <h1 className="text-[28px] font-bold text-gray-900">{monthNames[currentMonth]} {currentYear}</h1>
+            <h1 className="text-[28px] font-bold text-gray-900">
+              {monthNames[currentMonth]} {currentYear}
+            </h1>
             <div className="flex items-center bg-white rounded-full p-1 shadow-sm border border-gray-100">
-              <button onClick={handlePrevMonth} className="p-2 hover:bg-gray-50 rounded-full transition-colors"><ChevronLeft className="w-5 h-5 text-gray-400" /></button>
-              <button onClick={handleNextMonth} className="p-2 hover:bg-gray-50 rounded-full transition-colors"><ChevronRight className="w-5 h-5 text-gray-400" /></button>
+              <button
+                onClick={handlePrevMonth}
+                className="p-2 hover:bg-gray-50 rounded-full transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5 text-gray-400" />
+              </button>
+              <button
+                onClick={handleNextMonth}
+                className="p-2 hover:bg-gray-50 rounded-full transition-colors"
+              >
+                <ChevronRight className="w-5 h-5 text-gray-400" />
+              </button>
             </div>
           </div>
           <div className="flex items-center gap-4 bg-white px-6 py-3 rounded-2xl shadow-sm border border-gray-100">
-             <span className="text-sm font-semibold text-gray-400">Filter:</span>
-             <select 
-               className="text-sm font-bold text-[#0A4F48] bg-transparent outline-none cursor-pointer"
-               value={selectedStatus}
-               onChange={(e) => setSelectedStatus(e.target.value)}
-             >
-               <option>All Statuses</option>
-               <option>Verified</option>
-               <option>Todo</option>
-               <option>Skipped</option>
-             </select>
+            <span className="text-sm font-semibold text-gray-400">Filter:</span>
+            <select
+              className="text-sm font-bold text-[#0A4F48] bg-transparent outline-none cursor-pointer"
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+            >
+              <option>All Statuses</option>
+              <option>Verified</option>
+              <option>Todo</option>
+              <option>Skipped</option>
+            </select>
           </div>
         </div>
 
@@ -621,7 +745,8 @@ export default function DailyPlan() {
                 Plan Extended
               </span>
               <p className="text-sm font-semibold text-[#0A4F48]">
-                {extensionInfo.title}: {extensionInfo.startLabel} to {extensionInfo.endLabel}
+                {extensionInfo.title}: {extensionInfo.startLabel} to{" "}
+                {extensionInfo.endLabel}
               </p>
             </div>
           </div>
@@ -631,12 +756,19 @@ export default function DailyPlan() {
           {/* Calendar Side */}
           <div className="flex-1">
             <div className="grid grid-cols-7 gap-4">
-              {days.map(d => (
-                <div key={d} className="text-center text-[12px] font-bold text-gray-400 tracking-widest mb-4 uppercase">{d}</div>
+              {days.map((d) => (
+                <div
+                  key={d}
+                  className="text-center text-[12px] font-bold text-gray-400 tracking-widest mb-4 uppercase"
+                >
+                  {d}
+                </div>
               ))}
               {calendarDates.map((dateObj, idx) => {
                 const { day, isCurrentMonth } = dateObj;
-                const fullDate = isCurrentMonth ? `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}` : null;
+                const fullDate = isCurrentMonth
+                  ? `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+                  : null;
                 const dayData = fullDate ? calendarData[fullDate] : null;
                 const isActive = fullDate === activeDate;
                 const isSelected = fullDate === selectedDate;
@@ -644,28 +776,34 @@ export default function DailyPlan() {
                 if (!day) return <div key={idx} className="aspect-4/5" />;
 
                 return (
-                  <div 
+                  <div
                     key={idx}
                     onClick={() => {
                       setSelectedDate(fullDate);
                       setIsDrawerOpen(true);
                     }}
                     className={`relative aspect-4/5 p-4 rounded-[28px] cursor-pointer transition-all duration-300 group
-                      ${isActive ? 'bg-[#0A4F48] text-white shadow-xl shadow-[#0A4F48]/20 scale-105 z-10' : 'bg-white text-gray-900 hover:shadow-lg border border-gray-50'}
-                      ${isSelected && !isActive ? 'ring-2 ring-[#0A4F48]/20 bg-[#F0F7F5]' : ''}
+                      ${isActive ? "bg-[#0A4F48] text-white shadow-xl shadow-[#0A4F48]/20 scale-105 z-10" : "bg-white text-gray-900 hover:shadow-lg border border-gray-50"}
+                      ${isSelected && !isActive ? "ring-2 ring-[#0A4F48]/20 bg-[#F0F7F5]" : ""}
                     `}
                   >
-                    <span className={`text-[17px] font-extrabold ${isActive ? 'text-white' : 'text-gray-800'}`}>
+                    <span
+                      className={`text-[17px] font-extrabold ${isActive ? "text-white" : "text-gray-800"}`}
+                    >
                       {String(day).padStart(2, "0")}
                     </span>
 
                     {isActive && (
                       <div className="absolute bottom-6 left-4 right-4">
-                        <div className="text-[10px] font-black tracking-widest mb-2 opacity-80 uppercase">Active</div>
+                        <div className="text-[10px] font-black tracking-widest mb-2 opacity-80 uppercase">
+                          Active
+                        </div>
                         <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-white transition-all duration-1000" 
-                            style={{ width: `${dayData?.totalExpected ? (dayData.verified / dayData.totalExpected) * 100 : 0}%` }}
+                          <div
+                            className="h-full bg-white transition-all duration-1000"
+                            style={{
+                              width: `${dayData?.totalExpected ? (dayData.verified / dayData.totalExpected) * 100 : 0}%`,
+                            }}
                           />
                         </div>
                       </div>
@@ -673,29 +811,39 @@ export default function DailyPlan() {
 
                     {!isActive && dayData && (
                       <div className="absolute bottom-5 left-4 right-4 flex flex-col gap-2">
-                         {dayData.isExtensionPreview ? (
-                           <div className="text-[9px] font-black text-[#0A4F48] uppercase tracking-tight">Extended</div>
-                         ) : dayData.allMissed ? (
-                           <div className="text-[9px] font-black text-gray-300 uppercase tracking-tight">Offline Day</div>
-                         ) : dayData.totalExpected > 0 && dayData.verified === dayData.totalExpected ? (
-                           <div className="flex items-center gap-1.5">
-                             <CheckCircle2 className="w-3 h-3 text-[#0A4F48]" />
-                             <span className="text-[9px] font-black text-[#0A4F48] uppercase tracking-tight leading-none pt-0.5">Completed</span>
-                           </div>
-                         ) : dayData.totalExpected > 0 && dayData.verified > 0 ? (
-                           <div className="w-full">
-                             <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                               <div 
-                                 className="h-full bg-[#0A4F48] opacity-60 transition-all duration-1000" 
-                                 style={{ width: `${(dayData.verified / dayData.totalExpected) * 100}%` }}
-                               />
-                             </div>
-                           </div>
-                         ) : dayData.totalExpected > 0 ? (
-                           <div className="flex gap-1">
-                             <div className="w-1.5 h-1.5 rounded-full bg-gray-200" />
-                           </div>
-                         ) : null}
+                        {dayData.isExtensionPreview ? (
+                          <div className="text-[9px] font-black text-[#0A4F48] uppercase tracking-tight">
+                            Extended
+                          </div>
+                        ) : dayData.allMissed ? (
+                          <div className="text-[9px] font-black text-gray-300 uppercase tracking-tight">
+                            Offline Day
+                          </div>
+                        ) : dayData.totalExpected > 0 &&
+                          dayData.verified === dayData.totalExpected ? (
+                          <div className="flex items-center gap-1.5">
+                            <CheckCircle2 className="w-3 h-3 text-[#0A4F48]" />
+                            <span className="text-[9px] font-black text-[#0A4F48] uppercase tracking-tight leading-none pt-0.5">
+                              Completed
+                            </span>
+                          </div>
+                        ) : dayData.totalExpected > 0 &&
+                          dayData.verified > 0 ? (
+                          <div className="w-full">
+                            <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-[#0A4F48] opacity-60 transition-all duration-1000"
+                                style={{
+                                  width: `${(dayData.verified / dayData.totalExpected) * 100}%`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        ) : dayData.totalExpected > 0 ? (
+                          <div className="flex gap-1">
+                            <div className="w-1.5 h-1.5 rounded-full bg-gray-200" />
+                          </div>
+                        ) : null}
                       </div>
                     )}
                   </div>
@@ -707,39 +855,62 @@ export default function DailyPlan() {
           {/* Sidebar Section */}
           <div className="lg:w-[380px] flex flex-col gap-8">
             {/* Task Indicators */}
-            <div className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-50" style={dualEdgeDepthShadow}>
-              <h3 className="text-lg font-bold text-gray-900 mb-6">Task Indicators</h3>
+            <div
+              className="bg-white rounded-[32px] p-8 shadow-sm border border-gray-50"
+              style={dualEdgeDepthShadow}
+            >
+              <h3 className="text-lg font-bold text-gray-900 mb-6">
+                Task Indicators
+              </h3>
               <div className="space-y-5">
-                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                       <div className="w-2.5 h-2.5 rounded-full bg-[#0A4F48]" />
-                       <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Verified</span>
-                    </div>
-                    <span className="text-lg font-black text-[#0A4F48]">{totalVerified}</span>
-                 </div>
-                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                       <div className="w-2.5 h-2.5 rounded-full bg-[#34D399]" />
-                       <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Todo</span>
-                    </div>
-                    <span className="text-lg font-black text-gray-800">{totalTodo}</span>
-                 </div>
-                 <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                       <div className="w-2.5 h-2.5 rounded-full bg-gray-200" />
-                       <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">Skipped</span>
-                    </div>
-                    <span className="text-lg font-black text-gray-800">{totalSkipped}</span>
-                 </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#0A4F48]" />
+                    <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">
+                      Verified
+                    </span>
+                  </div>
+                  <span className="text-lg font-black text-[#0A4F48]">
+                    {totalVerified}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2.5 h-2.5 rounded-full bg-[#34D399]" />
+                    <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">
+                      Todo
+                    </span>
+                  </div>
+                  <span className="text-lg font-black text-gray-800">
+                    {totalTodo}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-2.5 h-2.5 rounded-full bg-gray-200" />
+                    <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">
+                      Skipped
+                    </span>
+                  </div>
+                  <span className="text-lg font-black text-gray-800">
+                    {totalSkipped}
+                  </span>
+                </div>
               </div>
             </div>
 
             {/* Schedule View */}
-            <div className="bg-white rounded-[32px] overflow-hidden border border-gray-50 shadow-sm flex flex-col" style={dualEdgeDepthShadow}>
+            <div
+              className="bg-white rounded-[32px] overflow-hidden border border-gray-50 shadow-sm flex flex-col"
+              style={dualEdgeDepthShadow}
+            >
               <div className="bg-[#F0F7F5] p-6 flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-[#0A4F48]" />
                 <h3 className="text-[15px] font-bold text-gray-800">
-                  Schedule for {selectedDate ? `Day ${calendarData[selectedDate]?.programDay || '?'}` : 'Selected Day'}
+                  Schedule for{" "}
+                  {selectedDate
+                    ? `Day ${calendarData[selectedDate]?.programDay || "?"}`
+                    : "Selected Day"}
                 </h3>
                 {selectedDayData?.isExtensionPreview && (
                   <span className="ml-auto rounded-full bg-[#0A4F48] px-3 py-1 text-[9px] font-black uppercase tracking-widest text-white">
@@ -748,40 +919,50 @@ export default function DailyPlan() {
                 )}
               </div>
               <div className="p-6 flex-1 min-h-[300px]">
-                 {selectedDayData?.tasks?.length > 0 ? (
-                   <div className="space-y-8 relative">
-                      <div className="absolute left-[3px] top-2 bottom-2 w-[2px] bg-gray-100" />
-                      {selectedDayData.tasks.slice(0, 4).map((task, idx) => (
-                        <div key={idx} className="relative pl-8">
-                           <div className={`absolute left-0 top-1.5 w-2 h-2 rounded-full border-2 border-white ring-2 ${task.status === 'verified' ? 'ring-[#0A4F48] bg-[#0A4F48]' : 'ring-gray-200 bg-white'}`} />
-                           <div className="flex flex-col gap-0.5">
-                              <span className={`text-[10px] font-black uppercase tracking-widest ${task.status === 'verified' ? 'text-[#0A4F48]' : 'text-gray-400'}`}>
-                                {10 + idx}:00 AM
-                              </span>
-                              <h4 className="text-[15px] font-extrabold text-gray-800">{task.name}</h4>
-                              <p className="text-[11px] font-medium text-gray-400">Type: {task.type}</p>
-                           </div>
+                {selectedDayData?.tasks?.length > 0 ? (
+                  <div className="space-y-8 relative">
+                    <div className="absolute left-[3px] top-2 bottom-2 w-[2px] bg-gray-100" />
+                    {selectedDayData.tasks.slice(0, 4).map((task, idx) => (
+                      <div key={idx} className="relative pl-8">
+                        <div
+                          className={`absolute left-0 top-1.5 w-2 h-2 rounded-full border-2 border-white ring-2 ${task.status === "verified" ? "ring-[#0A4F48] bg-[#0A4F48]" : "ring-gray-200 bg-white"}`}
+                        />
+                        <div className="flex flex-col gap-0.5">
+                          <span
+                            className={`text-[10px] font-black uppercase tracking-widest ${task.status === "verified" ? "text-[#0A4F48]" : "text-gray-400"}`}
+                          >
+                            {10 + idx}:00 AM
+                          </span>
+                          <h4 className="text-[15px] font-extrabold text-gray-800">
+                            {task.name}
+                          </h4>
+                          <p className="text-[11px] font-medium text-gray-400">
+                            Type: {task.type}
+                          </p>
                         </div>
-                      ))}
-                      
-                      <button 
-                        onClick={() => setIsDrawerOpen(true)}
-                        className="w-full py-4 mt-4 bg-[#F0F7F5] text-[#0A4F48] text-[13px] font-black rounded-2xl hover:bg-[#E6F3EF] transition-all"
-                      >
-                        View All
-                      </button>
-                   </div>
-                 ) : (
-                   <div className="flex flex-col items-center justify-center h-full text-center py-10">
-                      <Clock className="w-10 h-10 text-gray-100 mb-3" />
-                      <p className="text-sm font-medium text-gray-400">No tasks scheduled</p>
-                   </div>
-                 )}
+                      </div>
+                    ))}
+
+                    <button
+                      onClick={() => setIsDrawerOpen(true)}
+                      className="w-full py-4 mt-4 bg-[#F0F7F5] text-[#0A4F48] text-[13px] font-black rounded-2xl hover:bg-[#E6F3EF] transition-all"
+                    >
+                      View All
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-center py-10">
+                    <Clock className="w-10 h-10 text-gray-100 mb-3" />
+                    <p className="text-sm font-medium text-gray-400">
+                      No tasks scheduled
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Quote Card */}
-            <div className="relative rounded-[32px] overflow-hidden aspect-4/3 group cursor-pointer shadow-xl">
+            {/* <div className="relative rounded-[32px] overflow-hidden aspect-4/3 group cursor-pointer shadow-xl">
                <img 
                  src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&auto=format&fit=crop&q=80" 
                  alt="Fitness" 
@@ -792,7 +973,7 @@ export default function DailyPlan() {
                   <p className="text-white text-lg font-bold leading-tight mb-2">"{motivationQuotes[Math.floor(Math.random() * motivationQuotes.length)]}"</p>
                   <p className="text-white text-sm font-medium leading-tight mb-2">- Twofit Team</p>
                </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
