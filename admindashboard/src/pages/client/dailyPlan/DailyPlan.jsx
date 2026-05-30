@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Calendar, AlertCircle, CheckCircle2, Clock, SkipForward, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, AlertCircle, CheckCircle2, Clock, SkipForward, Play, Quote } from "lucide-react";
 import DailyTaskDrawer from "./DailyTaskDrawer";
 import MobileBottomNav from "../components/MobileBottomNav";
 import { useDispatch } from "react-redux";
@@ -17,6 +17,7 @@ import {
 } from "@/redux/features/client/client.thunk";
 import { selectSelectedClient } from "@/redux/features/client/client.selectors";
 import { assets } from "@/assets/asset";
+import workoutBg from "@/assets/workout-bg.jpg";
 import { toast } from "react-toastify";
 import { SyncLoader } from "react-spinners";
 import { dualEdgeDepthShadow } from "../habit/HabitTracker";
@@ -62,6 +63,27 @@ export default function DailyPlan() {
   const user = useAppSelector(selectUser);
   const clientUser = useAppSelector(selectSelectedClient);
   const { tasks } = useAppSelector((state) => state.tasks);
+
+  const initialQuoteIndex = React.useMemo(() => {
+    const today = new Date();
+    const dateSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    return dateSeed % motivationQuotes.length;
+  }, []);
+
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(initialQuoteIndex);
+  const dailyQuote = motivationQuotes[currentQuoteIndex];
+
+  const handleNextQuote = () => {
+    setCurrentQuoteIndex((prev) => (prev + 1) % motivationQuotes.length);
+  };
+
+  const greeting = React.useMemo(() => {
+    const hours = new Date().getHours();
+    const name = user?.name ? user.name.split(" ")[0] : "Champion";
+    if (hours < 12) return `Good morning, ${name}! ✨`;
+    if (hours < 17) return `Good afternoon, ${name}! ☀️`;
+    return `Good evening, ${name}! 🌙`;
+  }, [user?.name]);
 
   const [selectedStatus, setSelectedStatus] = useState("All Statuses");
   const [selectedDate, setSelectedDate] = useState(null);
@@ -591,7 +613,7 @@ export default function DailyPlan() {
     <div className="client-page-container p-5 sm:p-6 lg:p-7">
       <div className="client-page-shell">
         {/* Header Section */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
           <div className="flex items-center gap-8">
             <h1 className="text-[28px] font-bold text-gray-900">{monthNames[currentMonth]} {currentYear}</h1>
             <div className="flex items-center bg-white rounded-full p-1 shadow-sm border border-gray-100">
@@ -611,6 +633,48 @@ export default function DailyPlan() {
                <option>Todo</option>
                <option>Skipped</option>
              </select>
+          </div>
+        </div>
+
+        {/* Daily Motivation Quote Banner */}
+        <div 
+          onClick={handleNextQuote}
+          className="relative overflow-hidden rounded-[32px] p-6 sm:p-8 text-white shadow-xl border border-white/5 mb-8 group cursor-pointer transition-all duration-500 hover:shadow-2xl hover:shadow-[#0A4F48]/20 select-none active:scale-[0.99]"
+        >
+          {/* Background Image */}
+          <img 
+            src={workoutBg} 
+            alt="Workout Motivation" 
+            className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+          />
+          {/* Dark brand gradient overlays for extreme visual style & contrast */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0A4F48]/95 via-[#0A4F48]/80 to-[#12665D]/65 mix-blend-multiply opacity-90 transition-opacity duration-500 group-hover:opacity-95" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10" />
+
+          {/* Decorative background glow blur blobs */}
+          <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-[#34D399] opacity-20 blur-3xl group-hover:opacity-25 transition-opacity duration-500 pointer-events-none" />
+          <div className="absolute -left-16 -bottom-16 w-64 h-64 rounded-full bg-emerald-300 opacity-15 blur-3xl group-hover:opacity-20 transition-opacity duration-500 pointer-events-none" />
+          
+          {/* Quote icon watermark */}
+          <Quote className="absolute right-8 top-1/2 -translate-y-1/2 w-32 h-32 text-white/5 pointer-events-none transform rotate-180 transition-all duration-700 group-hover:rotate-0 group-hover:scale-110" />
+          
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6 max-w-4xl">
+            <div className="space-y-4">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-emerald-200 text-xs font-semibold tracking-wider uppercase backdrop-blur-md border border-white/10">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                {greeting}
+              </span>
+              <h2 className="text-xl sm:text-2xl font-bold leading-relaxed text-emerald-50/95 italic font-serif transition-all duration-300">
+                "{dailyQuote}"
+              </h2>
+              <div className="flex flex-wrap items-center gap-4 text-white/60 text-xs font-semibold uppercase tracking-wider">
+                <span className="flex items-center gap-2">
+                  <span className="w-6 h-[1px] bg-white/30" />
+                  Twofit Team Guidance
+                </span>
+                
+              </div>
+            </div>
           </div>
         </div>
 
@@ -778,20 +842,6 @@ export default function DailyPlan() {
                    </div>
                  )}
               </div>
-            </div>
-
-            {/* Quote Card */}
-            <div className="relative rounded-[32px] overflow-hidden aspect-4/3 group cursor-pointer shadow-xl">
-               <img 
-                 src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=800&auto=format&fit=crop&q=80" 
-                 alt="Fitness" 
-                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-               />
-               <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
-               <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                  <p className="text-white text-lg font-bold leading-tight mb-2">"{motivationQuotes[Math.floor(Math.random() * motivationQuotes.length)]}"</p>
-                  <p className="text-white text-sm font-medium leading-tight mb-2">- Twofit Team</p>
-               </div>
             </div>
           </div>
         </div>
