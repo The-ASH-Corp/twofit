@@ -9,95 +9,148 @@ import {
   Upload,
   Check,
   Edit2,
-  X,
 } from "lucide-react";
 import { useDispatch } from "react-redux";
 import {
   createNewPlan,
   uploadPlanMedia,
   getPlanByProgramId,
-  updatePlan
+  updatePlan,
 } from "@/redux/features/plans/plan.thunk";
+import { getAllPrograms } from "@/redux/features/program/program.thunk";
 import { toast } from "react-toastify";
+
+const INITIAL_WEEKS = [
+  {
+    id: 1,
+    name: "Week 1",
+    title: "Foundation Phase",
+    expanded: true,
+    days: [
+      {
+        id: 1,
+        name: "Day 1",
+        expanded: true,
+        exercises: [],
+      },
+      {
+        id: 2,
+        name: "Day 2",
+        expanded: false,
+        exercises: [],
+      },
+    ],
+  },
+];
+
+const mapPlanWeeksToFormWeeks = (planWeeks = []) =>
+  (planWeeks || []).map((week, weekIndex) => ({
+    ...week,
+    id: weekIndex + 1,
+    name: week.name || `Week ${weekIndex + 1}`,
+    title: week.title || "",
+    expanded: weekIndex === 0,
+    days: (week.days || []).map((day, dayIndex) => ({
+      ...day,
+      id: dayIndex + 1,
+      name: day.name || `Day ${dayIndex + 1}`,
+      expanded: dayIndex === 0,
+      exercises: (day.exercises || []).map((exercise, exerciseIndex) => ({
+        ...exercise,
+        id:
+          exercise._id || `${weekIndex + 1}-${dayIndex + 1}-${exerciseIndex + 1}`,
+      })),
+    })),
+  }));
 
 export default function PlanForm() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
   const { programId: routeProgramId } = useParams();
+  const targetProgramId = location.state?.programId || routeProgramId;
+  const isEditMode = Boolean(routeProgramId);
 
-  const [weeks, setWeeks] = useState([
-    {
-      id: 1,
-      name: "Week 1",
-      title: "Foundation Phase",
-      expanded: true,
-      days: [
-        {
-          id: 1,
-          name: "Day 1",
-          expanded: true,
-          exercises: [], // Initial empty exercises
-        },
-        {
-          id: 2,
-          name: "Day 2",
-          expanded: false,
-          exercises: [],
-        },
-      ],
-    },
-  ]);
+  const [weeks, setWeeks] = useState(INITIAL_WEEKS);
 
   const [programDetails, setProgramDetails] = useState({
-    name: location.state?.title || "", 
+    name: location.state?.title || "",
     duration: "30 Days",
-    clients: []
+    clients: [],
   });
-  
+
   const [existingPlanId, setExistingPlanId] = useState(null);
+  const [sourcePrograms, setSourcePrograms] = useState([]);
+  const [selectedSourceProgramId, setSelectedSourceProgramId] = useState("");
+  const [isFetchingSourcePrograms, setIsFetchingSourcePrograms] = useState(false);
+  const [isLoadingSourcePlan, setIsLoadingSourcePlan] = useState(false);
+  const [loadedFromProgramName, setLoadedFromProgramName] = useState("");
 
   useEffect(() => {
-    if (routeProgramId) {
-      const fetchPlan = async () => {
-        try {
-          // Fetch existing plan
-          const response = await dispatch(getPlanByProgramId(routeProgramId)).unwrap();
-          
-          if (response) {
-            // Store existing plan ID for update
-            setExistingPlanId(response._id);
-            setProgramDetails({
-               name: response.name,
-               duration: response.duration,
-               clients: response.clients || []
-            });
-
-            // Map weeks/days structure
-            if (response.weeks) {
-               const mappedWeeks = response.weeks.map((w, i) => ({
-                   ...w,
-                   id: i + 1, // Ensure numeric ID for UI logic
-                   expanded: i === 0,
-                   days: w.days.map((d, di) => ({
-                       ...d,
-                       id: di + 1,
-                       expanded: di === 0,
-                       exercises: (d.exercises || []).map(ex => ({ ...ex, id: ex._id || String(Date.now() + Math.random()) }))
-                   }))
-               }));
-               setWeeks(mappedWeeks);
-            }
-          }
-        } catch (error) {
-           toast.error(error || "Could not load plan for editing");
-        }
-      };
-      
-      fetchPlan();
+    if (!routeProgramId) {
+      return;
     }
-  }, [routeProgramId, dispatch]);
-  
+
+    const fetchPlanForEdit = async () => {
+      try {
+        const response = await dispatch(getPlanByProgramId(routeProgramId)).unwrap();
+        if (!response) {
+          return;
+        }
+
+        setExistingPlanId(response._id);
+        setProgramDetails({
+          name: response.name,
+          duration: response.duration || "30 Days",
+          clients: response.clients || [],
+        });
+        setWeeks(
+          response.weeks?.length
+            ? mapPlanWeeksToFormWeeks(response.weeks)
+            : INITIAL_WEEKS,
+        );
+      } catch (error) {
+        toast.error(error || "Could not load plan for editing");
+      }
+    };
+
+    fetchPlanForEdit();
+  }, [dispatch, routeProgramId]);
+
+  useEffect(() => {
+    if (isEditMode) {
+      return;
+    }
+
+    const fetchSourcePrograms = async () => {
+      setIsFetchingSourcePrograms(true);
+      try {
+        const response = await dispatch(
+          getAllPrograms({ page: 1, limit: 1000 }),
+        ).unwrap();
+
+        const availablePrograms = (response?.data || [])
+          .filter(
+            (program) =>
+              Boolean(program?.plan) &&
+              program?._id?.toString() !== targetProgramId?.toString(),
+          )
+          .map((program) => ({
+            _id: program._id,
+            title: program.title || "Untitled Program",
+          }));
+
+        setSourcePrograms(availablePrograms);
+      } catch {
+        toast.error("Could not load existing plans");
+      } finally {
+        setIsFetchingSourcePrograms(false);
+      }
+    };
+
+    fetchSourcePrograms();
+  }, [dispatch, isEditMode, targetProgramId]);
+
 
   const toggleWeek = (id) => {
     setWeeks(
@@ -251,7 +304,51 @@ export default function PlanForm() {
     );
   };
 
+  const handleLoadExistingPlan = async () => {
+    if (!selectedSourceProgramId) {
+      toast.error("Please select a source plan");
+      return;
+    }
+
+    setIsLoadingSourcePlan(true);
+    try {
+      const sourcePlan = await dispatch(
+        getPlanByProgramId(selectedSourceProgramId),
+      ).unwrap();
+
+      if (!sourcePlan?.weeks?.length) {
+        toast.error("Selected plan has no workout structure");
+        return;
+      }
+
+      setWeeks(mapPlanWeeksToFormWeeks(sourcePlan.weeks));
+      setProgramDetails((prev) => ({
+        ...prev,
+        duration: sourcePlan.duration || prev.duration,
+        clients: [],
+      }));
+
+      const sourceProgram = sourcePrograms.find(
+        (program) => program._id === selectedSourceProgramId,
+      );
+      setLoadedFromProgramName(sourceProgram?.title || sourcePlan?.name || "");
+      setExistingPlanId(null);
+      toast.success(
+        "Plan loaded. You can edit it and save it as a new plan for this program.",
+      );
+    } catch (error) {
+      toast.error(error || "Failed to load selected plan");
+    } finally {
+      setIsLoadingSourcePlan(false);
+    }
+  };
+
   const handleSave = async () => {
+    if (!targetProgramId) {
+      toast.error("Program details are missing. Please reopen this page from Programs.");
+      return;
+    }
+
     try {
       const cleanedWeeks = weeks.map((week) => ({
         name: week.name,
@@ -259,16 +356,16 @@ export default function PlanForm() {
         days: week.days.map((day) => ({
           name: day.name,
           exercises: (day.exercises || []).map((ex) => {
-            const { id, ...rest } = ex;
+            const { id: _idToStrip, ...rest } = ex;
             return rest;
           }),
         })),
       }));
 
       const planData = {
-        name: programDetails.name,
+        name: programDetails.name || location.state?.title || "",
         duration: programDetails.duration,
-        program: location.state?.programId || routeProgramId,
+        program: targetProgramId,
         weeks: cleanedWeeks,
       };
 
@@ -305,7 +402,7 @@ export default function PlanForm() {
               Program Name
             </label>
             <span className="text-sm font-bold text-[#0A4F48]">
-              {location.state?.title}
+              {location.state?.title || programDetails.name || "Untitled Program"}
             </span>
           </div>
           <hr className="border-gray-50" />
@@ -332,6 +429,65 @@ export default function PlanForm() {
             </div>
           </div>
         </div>
+
+        {!isEditMode && (
+          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <h3 className="text-sm font-bold text-[#0A4F48]">
+                Load Existing Plan
+              </h3>
+              <p className="text-xs text-[#66706D]">
+                Copy workouts from another program, edit what you need, and save as a new plan.
+              </p>
+            </div>
+
+            <div className="flex flex-col md:flex-row gap-3 md:items-end">
+              <div className="flex-1 flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-[#011412]">
+                  Source Program
+                </label>
+                <select
+                  value={selectedSourceProgramId}
+                  onChange={(event) => setSelectedSourceProgramId(event.target.value)}
+                  disabled={isFetchingSourcePrograms}
+                  className="w-full p-3 bg-white border border-gray-200 rounded-xl text-xs outline-none focus:border-[#0A4F48] text-[#011412] disabled:bg-gray-50 disabled:text-gray-400"
+                >
+                  <option value="">
+                    {isFetchingSourcePrograms
+                      ? "Loading available plans..."
+                      : sourcePrograms.length
+                        ? "Select a program with an existing plan"
+                        : "No reusable plans found"}
+                  </option>
+                  {sourcePrograms.map((program) => (
+                    <option key={program._id} value={program._id}>
+                      {program.title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleLoadExistingPlan}
+                disabled={
+                  !selectedSourceProgramId ||
+                  isFetchingSourcePrograms ||
+                  isLoadingSourcePlan
+                }
+                className="px-4 py-2.5 bg-[#0A4F48] text-white text-xs font-bold rounded-lg shadow-sm hover:bg-[#08443e] transition-all disabled:bg-[#9DB8B4] disabled:cursor-not-allowed"
+              >
+                {isLoadingSourcePlan ? "Loading..." : "Load Plan"}
+              </button>
+            </div>
+
+            {loadedFromProgramName && (
+              <p className="text-xs text-[#0A4F48] font-medium">
+                Loaded from: {loadedFromProgramName}
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Create/Edit Plan Structure Header */}
         <h2 className="text-lg font-bold text-[#0A4F48]">
