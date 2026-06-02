@@ -1,12 +1,37 @@
-
 import React, { useMemo } from "react";
-import { Target } from "lucide-react";
+import { Target, Calendar, Clock, Users, MessageSquare } from "lucide-react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
+import { useSelector } from "react-redux";
+import { selectUser } from "@/redux/features/auth/auth.selectores";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const ExpertRightSide = ({ expert }) => {
+  const user = useSelector(selectUser);
+
+  const formatWorkingDays = (days) => {
+    if (!Array.isArray(days) || days.length === 0) return "N/A";
+    const abbreviations = {
+      monday: "Mon", tuesday: "Tue", wednesday: "Wed",
+      thursday: "Thu", friday: "Fri", saturday: "Sat", sunday: "Sun"
+    };
+    return days.map(d => {
+      if (typeof d !== 'string') return d;
+      const lower = d.toLowerCase();
+      return abbreviations[lower] || (d.charAt(0).toUpperCase() + d.slice(1));
+    }).join(", ");
+  };
+
+  console.log(expert)
+  const workingDetails = useMemo(() => [
+    { label: "Working Days", value: formatWorkingDays(expert?.workingDays), icon: Calendar },
+    { label: "Working Hours", value: expert?.workingHours?.length > 0 ? expert.workingHours.map(h => `${h.startTime} - ${h.endTime}`).join(", ") : "N/A", icon: Clock },
+    { label: "Breaks", value: expert?.breakSlots?.length > 0 ? expert?.breakSlots.map(h => `${h.startTime} - ${h.endTime}`).join(", ") : "N/A", icon: Clock },
+    { label: "Max Consults", value: expert?.maxDailyConsults ?? "N/A", icon: Users },
+    { label: "Response Time", value: expert?.responseTime || "N/A", icon: MessageSquare },
+  ], [expert]);
+
   const complianceStats = useMemo(() => {
     const users = expert?.assignedUsers || [];
     if (users.length === 0) {
@@ -173,6 +198,47 @@ const ExpertRightSide = ({ expert }) => {
           </div>
         </div>
       </div>
+
+      {/* Working Details */}
+      {(user?.role === "founder" || user?.role === "head" || user?.role === "admin") && (
+        <div className="flex shrink-0 flex-col overflow-hidden rounded-3xl border border-[#EEF2F6] bg-white shadow-[0_2px_12px_-4px_rgba(0,0,0,0.02)]">
+          <div className="flex items-center gap-3 border-b border-[#F1F5F9] bg-[#FAFCFF] px-4 py-4 sm:px-6 sm:py-5">
+            <div className="w-10 h-10 rounded-xl bg-white border border-[#E2E8F0] shadow-sm flex items-center justify-center text-[#0A4F48]">
+              <Clock size={20} strokeWidth={2} />
+            </div>
+            <div>
+              <h2 className="text-[#1E293B] font-bold text-lg tracking-tight leading-none">
+                Working Details
+              </h2>
+              <p className="text-[11px] text-[#64748B] font-medium mt-1">
+                Operational metrics
+              </p>
+            </div>
+          </div>
+          <div className="p-4 sm:p-6 space-y-4">
+            {workingDetails.map((item, i) => (
+              <div
+                key={i}
+                className="group/item flex items-center justify-between gap-3"
+              >
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-[#F1F5F9] flex items-center justify-center text-[#64748B]">
+                    <item.icon size={14} />
+                  </div>
+                  <div className="flex min-w-0 flex-col">
+                    <span className="text-[10px] text-[#94A3B8] font-medium">
+                      {item.label}
+                    </span>
+                    <span className="text-sm font-semibold text-[#334155] sm:break-words">
+                      {item.value}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
