@@ -57,6 +57,7 @@ export default function NotificationsList() {
                   {notification.time || formatNotificationTime(notification.createdAt)}
                 </p>
               </div>
+              0
             </div>
           ))
         )}
