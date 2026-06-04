@@ -86,6 +86,7 @@ const EditReminderModal = ({ isOpen, onClose, reminder }) => {
           <input
             type="text"
             className="w-full border rounded p-2 text-sm"
+            readOnly
             value={templateName}
             onChange={(e) => setTemplateName(e.target.value)}
             placeholder="e.g. meal_plan_reminder"
