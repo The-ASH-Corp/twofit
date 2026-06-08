@@ -46,10 +46,7 @@ export default function HeroCard({ program, currentGlobalDay }) {
     .replace(/\s+/g, " ")
     .trim();
   const navigate = useNavigate();
-  console.log(program.image);
-  console.log(
-    `${import.meta.env.VITE_API_BASE_URL.replace("/api/v1", "")}/${program.image})`,
-  );
+  
 
   return (
     <div className="client-card hero-project-card  relative w-full min-h-[100px] sm:min-h-[100px] overflow-hidden px-3 py-3 sm:px-5 sm:py-5">
