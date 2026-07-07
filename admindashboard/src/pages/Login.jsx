@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { assets } from "../assets/asset";
 import { login } from "@/redux/features/auth/auth.thunk";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import LoginBgImage from "../assets/twofit_landing_bg2.jpeg";
 
 const Login = () => {
   useEffect(() => {
@@ -62,101 +62,141 @@ const Login = () => {
   };
 
   return (
-    <div className="h-[100vh] w-full flex items-center justify-center lg:justify-between overflow-hidden">
-      {/* image */}
-      <div className="hidden lg:flex lg:w-[50%] lg:h-full bg-[#0A4F48] flex-col items-center justify-start pt-20 xl:pt-30 gap-16 xl:gap-25 px-12 xl:px-16.5">
-        <h1 className="text-white font-bold text-[52px] xl:text-[60px] tracking-[-4%] text-center BricolageGrotesque leading-[100%]">
-          Your <br /> Transformation <br /> Starts Now
-        </h1>
-        <div className="w-full pb-0 p-[3px] bg-[#FFCDFD33] rounded-t-xl overflow-hidden flex justify-center">
-          <img
-            src={assets.loginPageImg}
-            alt="login page image"
-            className="rounded-t-xl object-cover object-center w-full"
-          />
-        </div>
+    <div className="relative min-h-[100svh] w-full overflow-x-hidden overflow-y-auto bg-[#f6f8f4] lg:grid lg:grid-cols-2">
+      <div
+        className="relative hidden min-h-[100svh] overflow-hidden lg:block"
+        aria-hidden="true"
+      >
+        <div
+          className="absolute inset-0 bg-[#0A4F48]"
+          style={{
+            backgroundImage: `url(${LoginBgImage})`,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            // backgroundPosition: "center",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-black/20 to-[#041815]/45" />
       </div>
-      {/* content */}
-      <div className="w-full lg:w-[50%] h-full flex flex-col items-center justify-center gap-6 sm:gap-8 lg:gap-10 px-4 sm:px-8 md:px-16 lg:px-20 xl:px-30 py-8 sm:py-12 lg:py-0">
-        {/* heading */}
-        <div className="flex flex-col items-center gap-4 sm:gap-6 w-full max-w-[500px]">
-          <img src={assets.NavBarLogo} alt="logo" className="w-[100px] sm:w-[120px] lg:w-[133px]" />
-          <div className="flex items-center flex-col justify-center gap-2">
-            <h2 className="font-bold text-[20px] sm:text-[22px] lg:text-[24px] tracking-[-4%] leading-[118%] text-[#0A4F48] text-center">
-              Login to Your Account
-            </h2>
-            <p className="text-[11px] sm:text-[12px] text-[#63716E] leading-[150%] text-center">
-              Access your dashboard securely.
-            </p>
-          </div>
-        </div>
-        {/* form */}
-        <div className="flex flex-col items-center w-full max-w-[500px] gap-6">
-          <form onSubmit={handleLogin} className="flex flex-col w-full gap-5 sm:gap-6">
-            <div className="flex flex-col items-start gap-2">
-              <label htmlFor="email" className="text-[11px] font-medium">
-                Email Address
-              </label>
-              <input
-                type="email"
-                id="email"
-                required
-                className="border w-full rounded-md h-10 sm:h-11 p-3 sm:p-4 text-[12px] sm:text-[13px] focus:outline-none focus:ring-2 focus:ring-[#0A4F48] focus:border-transparent"
-                placeholder="yourname@example.com"
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
-              />
-            </div>
-            <div className="relative flex flex-col items-start gap-2">
-              <label htmlFor="password" className="text-[11px] font-medium">
-                Password
-              </label>
-              <input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                required
-                className="border w-full rounded-md h-10 sm:h-11 p-3 sm:p-4 pr-12 text-[12px] sm:text-[13px] focus:outline-none focus:ring-2 focus:ring-[#0A4F48] focus:border-transparent"
-                placeholder="Enter your password"
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
-              />
-              <button
-                type="button"
-                className="absolute bottom-2.5 sm:bottom-3 right-3 p-1 text-[#64748B] hover:text-[#334155] transition-colors"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? (
-                  <EyeOff size={20} className="w-5 h-5" />
-                ) : (
-                  <Eye size={20} className="w-5 h-5" />
-                )}
-              </button>
-            </div>
-            <div className="w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2">
-              <div className="flex items-center justify-center gap-1.5 sm:gap-2">
-                <input
-                  type="checkbox"
-                  id="remember"
-                  className="h-4 w-4 appearance-none rounded-[4px] border border-[#DBDEDD] bg-[#F0F0F0] cursor-pointer"
-                />
-                <label htmlFor="remember" className="text-[11px] sm:text-[12px] cursor-pointer">Remember me</label>
+
+      <div className="relative flex min-h-[100svh] items-end justify-center px-4 pb-4 pt-6 sm:px-6 sm:pb-6 sm:pt-8 lg:items-center lg:px-8 lg:py-0 xl:px-12">
+        <div
+          className="pointer-events-none absolute inset-0 lg:hidden"
+          style={{
+            backgroundImage: `url(${LoginBgImage})`,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+        <div className="pointer-events-none absolute inset-0 lg:hidden bg-gradient-to-b from-[#061b18]/35 via-[#061b18]/60 to-[#061b18]/80" />
+
+        <div className="relative z-10 w-full max-w-[520px] overflow-hidden rounded-[28px] border border-white/20 bg-[#062f2a]/72 text-white shadow-[0_24px_80px_rgba(9,29,25,0.18)] backdrop-blur-lg sm:max-w-[560px] sm:rounded-[32px] lg:max-w-[620px] lg:rounded-[34px] lg:border-white/60 lg:bg-white/90 lg:text-[#0A4F48] lg:shadow-[0_26px_90px_rgba(9,29,25,0.14)] lg:backdrop-blur-md">
+          <div className="flex w-full flex-col gap-6 px-5 py-6 sm:px-8 sm:py-8 lg:px-14 lg:py-12 xl:px-16 xl:py-14">
+            <div className="flex flex-col items-center gap-4 sm:gap-6">
+              <div className="inline-flex items-center rounded-full bg-white/14 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-white lg:bg-[#0A4F48]/10 lg:text-[#0A4F48]">
+                Welcome back
               </div>
-              <button type="button" className="text-[11px] sm:text-[12px] font-semibold text-[#0A4F48] hover:underline" onClick={()=>navigate("/forgot-password")}>
-                Forgot Password?
-              </button>
+              <div className="flex flex-col items-center gap-2 text-center">
+                <h2 className="text-[20px] font-bold leading-tight tracking-[-0.04em] text-white sm:text-[22px] lg:text-[24px] lg:text-[#0A4F48]">
+                  Login to Your Account
+                </h2>
+
+                <p className="max-w-[30rem] text-[11px] leading-[1.5] text-white/75 sm:text-[12px] lg:text-[#63716E]">
+                  Access your dashboard securely on any screen.
+                </p>
+              </div>
             </div>
-            <div className="w-full">
-              <button
-                type="submit"
-                className="bg-[#0A4F48] w-full py-3 sm:py-3.5 rounded-lg text-white font-semibold text-[14px] sm:text-[15px] lg:text-[16px] hover:bg-[#083d38] transition-colors duration-200 active:scale-[0.98]"
+
+            <div className="flex w-full flex-col gap-6">
+              <form
+                onSubmit={handleLogin}
+                className="flex w-full flex-col gap-5 sm:gap-6"
               >
-                Login
-              </button>
+                <div className="flex flex-col items-start gap-2">
+                  <label
+                    htmlFor="email"
+                    className="text-[11px] font-medium text-white/90 lg:text-slate-900"
+                  >
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    autoComplete="email"
+                    required
+                    className="h-11 w-full rounded-md border border-white/20 bg-white p-3 text-[12px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-[#0A4F48] sm:h-12 sm:p-4 sm:text-[13px] lg:border-slate-200"
+                    placeholder="yourname@example.com"
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="flex flex-col items-start gap-2">
+                  <label
+                    htmlFor="password"
+                    className="text-[11px] font-medium text-white/90 lg:text-slate-900"
+                  >
+                    Password
+                  </label>
+                  <div className="relative w-full">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      id="password"
+                      name="password"
+                      autoComplete="current-password"
+                      required
+                      className="h-11 w-full rounded-md border border-white/20 bg-white p-3 pr-12 text-[12px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-[#0A4F48] sm:h-12 sm:p-4 sm:pr-14 sm:text-[13px] lg:border-slate-200"
+                      placeholder="Enter your password"
+                      onChange={(e) =>
+                        setFormData({ ...formData, password: e.target.value })
+                      }
+                    />
+                    <button
+                      type="button"
+                      className="absolute inset-y-0 right-3 flex items-center text-[#64748B] transition-colors hover:text-[#334155]"
+                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                    >
+                      {showPassword ? (
+                        <EyeOff size={20} className="w-5 h-5" />
+                      ) : (
+                        <Eye size={20} className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <div className="w-full flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex items-center justify-center gap-1.5 sm:gap-2">
+                    <input
+                      type="checkbox"
+                      id="remember"
+                      className="h-4 hidden w-4 cursor-pointer appearance-none rounded-[4px] border border-white/35 bg-white/10 lg:border-[#DBDEDD] lg:bg-[#F0F0F0]"
+                    />
+                  
+                  </div>
+                  <button
+                    type="button"
+                    className="text-[11px] font-semibold text-white/90 hover:underline sm:text-[12px] lg:text-[#0A4F48]"
+                    onClick={() => navigate("/forgot-password")}
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+                <div className="w-full">
+                  <button
+                    type="submit"
+                    className="w-full rounded-lg bg-white py-3 text-[14px] font-semibold text-[#0A4F48] transition-colors duration-200 hover:bg-white/90 active:scale-[0.98] sm:py-3.5 sm:text-[15px] lg:bg-[#0A4F48] lg:text-white lg:hover:bg-[#083d38] lg:text-[16px]"
+                  >
+                    Login
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
