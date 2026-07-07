@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import { assets } from "../assets/asset";
+import { Eye, EyeOff } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { GoArrowLeft } from "react-icons/go";
 import { useNavigate } from "react-router-dom";
 import { forgotPassword, resetPassword, verifyOTP } from "@/redux/features/auth/auth.thunk";
 import { toast } from "react-toastify";
+import LoginBgImage from "../assets/twofit_landing_bg2.jpeg";
 
 const ForgotPasswordEmail = () => {
   useEffect(() => {
@@ -118,225 +120,269 @@ const ForgotPasswordEmail = () => {
   };
  
   return (
-    <div className="h-screen w-full flex items-center justify-center lg:justify-between overflow-hidden">
-      {/* image */}
-      <div className="hidden lg:flex lg:w-[50%] lg:h-full bg-[#0A4F48] flex-col items-center justify-start pt-20 xl:pt-30 gap-16 xl:gap-25 px-12 xl:px-16.5">
-        <h1 className="text-white font-bold text-[52px] xl:text-[60px] tracking-[-4%] text-center BricolageGrotesque leading-[100%]">
-          Your <br /> Transformation <br /> Starts Now
-        </h1>
-        <div className="w-full pb-0 p-[3px] bg-[#FFCDFD33] rounded-t-xl overflow-hidden flex justify-center">
-          <img
-            src={assets.loginPageImg}
-            alt="login page image"
-            className="rounded-t-xl object-cover object-center w-full"
-          />
-        </div>
+    <div className="relative min-h-[100svh] w-full overflow-x-hidden overflow-y-auto bg-[#f6f8f4] lg:grid lg:grid-cols-2">
+      <div
+        className="relative hidden min-h-[100svh] overflow-hidden lg:block"
+        aria-hidden="true"
+      >
+        <div
+          className="absolute inset-0 bg-[#0A4F48]"
+          style={{
+            backgroundImage: `url(${LoginBgImage})`,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            // backgroundPosition: "center",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-black/20 to-[#041815]/45" />
       </div>
-      {/* content */}
-      <div className="w-full lg:w-[50%] h-full flex flex-col items-center justify-center gap-6 sm:gap-8 lg:gap-10 px-4 sm:px-8 md:px-16 lg:px-20 xl:px-30 py-8 sm:py-12 lg:py-0">
-        {/* heading */}
-        <div className="flex flex-col items-center gap-4 sm:gap-6 w-full max-w-[500px]">
-          <img
-            src={assets.NavBarLogo}
-            alt="logo"
-            className="w-[100px] sm:w-[120px] lg:w-[133px]"
-          />
-          <div className="flex items-center flex-col justify-center gap-2">
-            <h2 className="font-bold text-[20px] sm:text-[22px] lg:text-[24px] tracking-[-4%] leading-[118%] text-[#0A4F48] text-center">
-              {step === 1 && "Forgot Password?"}
-              {step === 2 && "Password reset"}
-              {step === 3 && "Set new password"}
-            </h2>
-            <p className="text-[11px] sm:text-[12px] text-[#63716E] leading-[150%] text-center">
-              {step === 1 && "No worries, we'll send you reset instructions."}
-              {step === 2 && `We sent a code to ${formData.email}`}
-              {step === 3 && "Must be at least 8 characters."}
-            </p>
-          </div>
-        </div>
-        {/* form */}
-        <div className="flex flex-col items-center w-full max-w-[500px] gap-6">
-          {error && (
-            <div className="w-full p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm text-center">
-              {error}
+
+      <div className="relative flex min-h-[100svh] items-end justify-center px-4 pb-4 pt-6 sm:px-6 sm:pb-6 sm:pt-8 lg:items-center lg:px-8 lg:py-0 xl:px-12">
+        <div
+          className="pointer-events-none absolute inset-0 lg:hidden"
+          style={{
+            backgroundImage: `url(${LoginBgImage})`,
+            backgroundRepeat: "no-repeat",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        />
+        <div className="pointer-events-none absolute inset-0 lg:hidden bg-gradient-to-b from-[#061b18]/20 via-[#061b18]/40 to-[#061b18]/75" />
+
+        <div className="relative z-10 w-full max-w-[520px] overflow-hidden rounded-[28px] border border-white/20 bg-[#062f2a]/72 text-white shadow-[0_24px_80px_rgba(9,29,25,0.18)] backdrop-blur-lg sm:max-w-[560px] sm:rounded-[32px] lg:max-w-[620px] lg:rounded-[34px] lg:border-white/60 lg:bg-white/90 lg:text-[#0A4F48] lg:shadow-[0_26px_90px_rgba(9,29,25,0.14)] lg:backdrop-blur-md">
+          <div className="flex w-full flex-col gap-6 px-5 py-6 sm:px-8 sm:py-8 lg:px-14 lg:py-12 xl:px-16 xl:py-14">
+            <div className="flex flex-col items-center gap-4 sm:gap-6">
+              <img
+                src={assets.NavBarLogo}
+                alt="logo"
+                className="w-[100px] sm:w-[120px] lg:w-[133px] invert brightness-0 lg:invert-0 lg:brightness-100"
+              />
+              <div className="flex flex-col items-center gap-2 text-center">
+                <h2 className="font-bold text-[20px] sm:text-[22px] lg:text-[24px] tracking-[-4%] leading-[118%] text-white lg:text-[#0A4F48]">
+                  {step === 1 && "Forgot Password?"}
+                  {step === 2 && "Password reset"}
+                  {step === 3 && "Set new password"}
+                </h2>
+                <p className="text-[11px] sm:text-[12px] text-white/75 leading-[150%] text-center lg:text-[#63716E]">
+                  {step === 1 && "No worries, we'll send you reset instructions."}
+                  {step === 2 && `We sent a code to ${formData.email}`}
+                  {step === 3 && "Must be at least 6 characters."}
+                </p>
+              </div>
             </div>
-          )}
 
-          {/* Step 1: Email Input */}
-          {step === 1 && (
-            <form
-              onSubmit={handleEmailSubmit}
-              className="flex flex-col w-full gap-5 sm:gap-6"
-            >
-              <div className="flex flex-col items-start gap-2">
-                <label htmlFor="email" className="text-[11px] font-medium">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  required
-                  value={formData.email}
-                  className="border w-full rounded-md h-10 sm:h-11 p-3 sm:p-4 text-[12px] sm:text-[13px] focus:outline-none focus:ring-2 focus:ring-[#0A4F48] focus:border-transparent"
-                  placeholder="yourname@example.com"
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
-                />
-              </div>
-              <div className="w-full">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-[#0A4F48] w-full py-3 sm:py-3.5 rounded-lg text-white font-semibold text-[14px] sm:text-[15px] lg:text-[16px] hover:bg-[#083d38] transition-colors duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? "Sending..." : "Reset Password"}
-                </button>
-              </div>
-              <div className="flex items-center justify-center gap-2 mt-4">
-                <GoArrowLeft className="w-5 h-5" />
-                <button
-                  type="button"
-                  onClick={() => navigate("/login")}
-                  className="font-bold cursor-pointer"
-                >
-                  Back to Login
-                </button>
-              </div>
-            </form>
-          )}
+            <div className="flex w-full flex-col gap-6">
+              {error && (
+                <div className="w-full rounded-lg border border-red-400/30 bg-red-500/10 p-3 text-center text-sm text-red-100 lg:border-red-200 lg:bg-red-50 lg:text-red-600">
+                  {error}
+                </div>
+              )}
 
-          {/* Step 2: OTP Input */}
-          {step === 2 && (
-            <form
-              onSubmit={handleOtpSubmit}
-              className="flex flex-col w-full gap-5 sm:gap-6"
-            >
-              <div className="flex flex-col items-center gap-4">
-                <div className="flex gap-3 justify-center w-full">
-                  {formData.otp.map((digit, index) => (
+              {step === 1 && (
+                <form
+                  onSubmit={handleEmailSubmit}
+                  className="flex w-full flex-col gap-5 sm:gap-6"
+                >
+                  <div className="flex flex-col items-start gap-2">
+                    <label
+                      htmlFor="email"
+                      className="text-[11px] font-medium text-white/90 lg:text-slate-900"
+                    >
+                      Email Address
+                    </label>
                     <input
-                      key={index}
-                      ref={(el) => (otpRefs.current[index] = el)}
-                      type="text"
-                      inputMode="numeric"
-                      maxLength={1}
-                      value={digit}
-                      onChange={(e) => handleOtpChange(index, e.target.value)}
-                      onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                      className="w-16 h-16 sm:w-20 sm:h-20 text-center text-2xl sm:text-3xl font-bold border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A4F48] focus:border-[#0A4F48] transition-all"
+                      type="email"
+                      id="email"
                       required
+                      value={formData.email}
+                      autoComplete="email"
+                      className="h-11 w-full rounded-md border border-white/20 bg-white p-3 text-[12px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-[#0A4F48] sm:h-12 sm:p-4 sm:text-[13px] lg:border-slate-200"
+                      placeholder="yourname@example.com"
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
                     />
-                  ))}
-                </div>
-              </div>
-              <div className="w-full">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-[#0A4F48] w-full py-3 sm:py-3.5 rounded-lg text-white font-semibold text-[14px] sm:text-[15px] lg:text-[16px] hover:bg-[#083d38] transition-colors duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? "Verifying..." : "Verify OTP"}
-                </button>
-                <div className="flex gap-2 mt-2 w-full justify-center">
-                <p className="text-gray-500">Didn't receive the email? </p>
-                <p className="font-bold underline cursor-pointer" onClick={handleEmailSubmit}>Click to resend</p>
-                </div>
-              </div>
-              <div className="flex items-center justify-center gap-2 mt-4">
-                <GoArrowLeft className="w-5 h-5" />
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="font-bold cursor-pointer"
-                >
-                  Back to Email
-                </button>
-              </div>
-            </form>
-          )}
+                  </div>
+                  <div className="w-full">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full rounded-lg bg-white py-3 text-[14px] font-semibold text-[#0A4F48] transition-colors duration-200 hover:bg-white/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:py-3.5 sm:text-[15px] lg:bg-[#0A4F48] lg:text-white lg:hover:bg-[#083d38] lg:text-[16px]"
+                    >
+                      {loading ? "Sending..." : "Reset Password"}
+                    </button>
+                  </div>
+                  <div className="mt-4 flex items-center justify-center gap-2">
+                    <GoArrowLeft className="h-5 w-5 text-white/90 lg:text-[#0A4F48]" />
+                    <button
+                      type="button"
+                      onClick={() => navigate("/login")}
+                      className="cursor-pointer font-bold text-white/90 lg:text-[#0A4F48]"
+                    >
+                      Back to Login
+                    </button>
+                  </div>
+                </form>
+              )}
 
-          {/* Step 3: New Password Input */}
-          {step === 3 && (
-            <form
-              onSubmit={handlePasswordReset}
-              className="flex flex-col w-full gap-5 sm:gap-6"
-            >
-              <div className="relative flex flex-col items-start gap-2">
-                <label htmlFor="newPassword" className="text-[11px] font-medium">
-                  New Password
-                </label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="newPassword"
-                  required
-                  value={formData.newPassword}
-                  className="border w-full rounded-md h-10 sm:h-11 p-3 sm:p-4 pr-12 text-[12px] sm:text-[13px] focus:outline-none focus:ring-2 focus:ring-[#0A4F48] focus:border-transparent"
-                  placeholder="Enter new password"
-                  onChange={(e) =>
-                    setFormData({ ...formData, newPassword: e.target.value })
-                  }
-                />
-                <button
-                  type="button"
-                  className="absolute bottom-2.5 sm:bottom-3 right-3 p-1 cursor-pointer"
-                  onClick={() => setShowPassword(!showPassword)}
+              {step === 2 && (
+                <form
+                  onSubmit={handleOtpSubmit}
+                  className="flex w-full flex-col gap-5 sm:gap-6"
                 >
-                  <img
-                    src={assets.HiddenIcon}
-                    alt="Toggle password visibility"
-                    className="w-5 h-5"
-                  />
-                </button>
-              </div>
-              <div className="relative flex flex-col items-start gap-2">
-                <label htmlFor="confirmPassword" className="text-[11px] font-medium">
-                  Confirm Password
-                </label>
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  id="confirmPassword"
-                  required
-                  value={formData.confirmPassword}
-                  className="border w-full rounded-md h-10 sm:h-11 p-3 sm:p-4 pr-12 text-[12px] sm:text-[13px] focus:outline-none focus:ring-2 focus:ring-[#0A4F48] focus:border-transparent"
-                  placeholder="Confirm new password"
-                  onChange={(e) =>
-                    setFormData({ ...formData, confirmPassword: e.target.value })
-                  }
-                />
-                <button
-                  type="button"
-                  className="absolute bottom-2.5 sm:bottom-3 right-3 p-1 cursor-pointer"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  <div className="flex flex-col items-center gap-4">
+                    <div className="flex w-full justify-center gap-2.5 sm:gap-3">
+                      {formData.otp.map((digit, index) => (
+                        <input
+                          key={index}
+                          ref={(el) => (otpRefs.current[index] = el)}
+                          type="text"
+                          inputMode="numeric"
+                          maxLength={1}
+                          value={digit}
+                          onChange={(e) => handleOtpChange(index, e.target.value)}
+                          onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                          className="h-14 w-14 rounded-lg border border-white/20 bg-white text-center text-xl font-bold text-slate-900 transition-all focus:border-[#0A4F48] focus:outline-none focus:ring-2 focus:ring-[#0A4F48] sm:h-20 sm:w-20 sm:text-3xl lg:border-slate-200"
+                          required
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="w-full">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full rounded-lg bg-white py-3 text-[14px] font-semibold text-[#0A4F48] transition-colors duration-200 hover:bg-white/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:py-3.5 sm:text-[15px] lg:bg-[#0A4F48] lg:text-white lg:hover:bg-[#083d38] lg:text-[16px]"
+                    >
+                      {loading ? "Verifying..." : "Verify OTP"}
+                    </button>
+                    <div className="mt-2 flex w-full flex-wrap justify-center gap-2 text-[11px] sm:text-[12px]">
+                      <span className="text-white/75 lg:text-gray-500">
+                        Didn't receive the email?
+                      </span>
+                      <button
+                        type="button"
+                        className="font-bold underline text-white/90 lg:text-[#0A4F48]"
+                        onClick={handleEmailSubmit}
+                      >
+                        Click to resend
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex items-center justify-center gap-2">
+                    <GoArrowLeft className="h-5 w-5 text-white/90 lg:text-[#0A4F48]" />
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="cursor-pointer font-bold text-white/90 lg:text-[#0A4F48]"
+                    >
+                      Back to Email
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {step === 3 && (
+                <form
+                  onSubmit={handlePasswordReset}
+                  className="flex w-full flex-col gap-5 sm:gap-6"
                 >
-                  <img
-                    src={assets.HiddenIcon}
-                    alt="Toggle password visibility"
-                    className="w-5 h-5"
-                  />
-                </button>
-              </div>
-              <div className="w-full">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-[#0A4F48] w-full py-3 sm:py-3.5 rounded-lg text-white font-semibold text-[14px] sm:text-[15px] lg:text-[16px] hover:bg-[#083d38] transition-colors duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? "Resetting..." : "Reset Password"}
-                </button>
-              </div>
-              <div className="flex items-center justify-center gap-2 mt-4">
-                <GoArrowLeft className="w-5 h-5" />
-                <button
-                  type="button"
-                  onClick={() => navigate("/login")}
-                  className="font-bold cursor-pointer"
-                >
-                  Back to Login
-                </button>
-              </div>
-            </form>
-          )}
+                  <div className="flex flex-col items-start gap-2">
+                    <label
+                      htmlFor="newPassword"
+                      className="text-[11px] font-medium text-white/90 lg:text-slate-900"
+                    >
+                      New Password
+                    </label>
+                    <div className="relative w-full">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        id="newPassword"
+                        required
+                        value={formData.newPassword}
+                        autoComplete="new-password"
+                        className="h-11 w-full rounded-md border border-white/20 bg-white p-3 pr-12 text-[12px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-[#0A4F48] sm:h-12 sm:p-4 sm:pr-14 sm:text-[13px] lg:border-slate-200"
+                        placeholder="Enter new password"
+                        onChange={(e) =>
+                          setFormData({ ...formData, newPassword: e.target.value })
+                        }
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-3 flex items-center text-[#64748B] transition-colors hover:text-[#334155]"
+                        onClick={() => setShowPassword(!showPassword)}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? (
+                          <EyeOff size={20} className="h-5 w-5" />
+                        ) : (
+                          <Eye size={20} className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-start gap-2">
+                    <label
+                      htmlFor="confirmPassword"
+                      className="text-[11px] font-medium text-white/90 lg:text-slate-900"
+                    >
+                      Confirm Password
+                    </label>
+                    <div className="relative w-full">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        id="confirmPassword"
+                        required
+                        value={formData.confirmPassword}
+                        autoComplete="new-password"
+                        className="h-11 w-full rounded-md border border-white/20 bg-white p-3 pr-12 text-[12px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-[#0A4F48] sm:h-12 sm:p-4 sm:pr-14 sm:text-[13px] lg:border-slate-200"
+                        placeholder="Confirm new password"
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            confirmPassword: e.target.value,
+                          })
+                        }
+                      />
+                      <button
+                        type="button"
+                        className="absolute inset-y-0 right-3 flex items-center text-[#64748B] transition-colors hover:text-[#334155]"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        aria-label={
+                          showConfirmPassword ? "Hide password" : "Show password"
+                        }
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff size={20} className="h-5 w-5" />
+                        ) : (
+                          <Eye size={20} className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="w-full">
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full rounded-lg bg-white py-3 text-[14px] font-semibold text-[#0A4F48] transition-colors duration-200 hover:bg-white/90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 sm:py-3.5 sm:text-[15px] lg:bg-[#0A4F48] lg:text-white lg:hover:bg-[#083d38] lg:text-[16px]"
+                    >
+                      {loading ? "Resetting..." : "Reset Password"}
+                    </button>
+                  </div>
+                  <div className="mt-4 flex items-center justify-center gap-2">
+                    <GoArrowLeft className="h-5 w-5 text-white/90 lg:text-[#0A4F48]" />
+                    <button
+                      type="button"
+                      onClick={() => navigate("/login")}
+                      className="cursor-pointer font-bold text-white/90 lg:text-[#0A4F48]"
+                    >
+                      Back to Login
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
