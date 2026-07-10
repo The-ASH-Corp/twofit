@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import LoginBgImage from "../assets/twofit_landing_bg2.jpeg";
+import MobileLoginBgImage from "../assets/twofit_Login_bg.png";
 
 const Login = () => {
   useEffect(() => {
@@ -62,9 +63,9 @@ const Login = () => {
   };
 
   return (
-    <div className="relative min-h-[100svh] w-full overflow-x-hidden overflow-y-auto bg-[#f6f8f4] lg:grid lg:grid-cols-2">
+    <div className="relative min-h-[100svh] w-full overflow-x-hidden overflow-y-auto bg-[#f6f8f4] md:grid md:grid-cols-2 lg:grid lg:grid-cols-2">
       <div
-        className="relative hidden min-h-[100svh] overflow-hidden lg:block"
+        className="relative hidden min-h-[100svh] overflow-hidden md:block lg:block"
         aria-hidden="true"
       >
         <div
@@ -73,7 +74,7 @@ const Login = () => {
             backgroundImage: `url(${LoginBgImage})`,
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
-            // backgroundPosition: "center",
+            backgroundPosition: "top center",
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-black/20 to-[#041815]/45" />
@@ -81,18 +82,18 @@ const Login = () => {
 
       <div className="relative flex min-h-[100svh] items-end justify-center px-4 pb-4 pt-6 sm:px-6 sm:pb-6 sm:pt-8 lg:items-center lg:px-8 lg:py-0 xl:px-12">
         <div
-          className="pointer-events-none absolute inset-0 lg:hidden"
+          className="pointer-events-none absolute inset-0 md:hidden lg:hidden"
           style={{
-            backgroundImage: `url(${LoginBgImage})`,
+            backgroundImage: `url(${MobileLoginBgImage})`,
             backgroundRepeat: "no-repeat",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         />
-        <div className="pointer-events-none absolute inset-0 lg:hidden bg-gradient-to-b from-[#061b18]/35 via-[#061b18]/60 to-[#061b18]/80" />
+        <div className="pointer-events-none absolute inset-0 lg:hidden bg-gradient-to-b from-[#061b18]/20 via-[#061b18]/40 to-[#061b18]/60" />
 
-        <div className="relative z-10 w-full max-w-[520px] overflow-hidden rounded-[28px] border border-white/20 bg-[#062f2a]/72 text-white shadow-[0_24px_80px_rgba(9,29,25,0.18)] backdrop-blur-lg sm:max-w-[560px] sm:rounded-[32px] lg:max-w-[620px] lg:rounded-[34px] lg:border-white/60 lg:bg-white/90 lg:text-[#0A4F48] lg:shadow-[0_26px_90px_rgba(9,29,25,0.14)] lg:backdrop-blur-md">
-          <div className="flex w-full flex-col gap-6 px-5 py-6 sm:px-8 sm:py-8 lg:px-14 lg:py-12 xl:px-16 xl:py-14">
+        <div className="relative z-10 mt-8 w-full max-w-[520px] overflow-hidden rounded-[28px] border border-white/20 bg-[#062f2a]/72 text-white shadow-[0_24px_80px_rgba(9,29,25,0.18)] backdrop-blur-lg sm:mt-6 sm:max-w-[560px] sm:rounded-[32px] md:mt-0 lg:mt-0 lg:max-w-[620px] lg:rounded-[34px] lg:border-white/60 lg:bg-white/90 lg:text-[#0A4F48] lg:shadow-[0_26px_90px_rgba(9,29,25,0.14)] lg:backdrop-blur-md">
+          <div className="flex w-full flex-col gap-6 px-5 py-4 sm:px-8 sm:py-6 lg:px-14 lg:py-12 xl:px-16 xl:py-14">
             <div className="flex flex-col items-center gap-4 sm:gap-6">
               <div className="inline-flex items-center rounded-full bg-white/14 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-white lg:bg-[#0A4F48]/10 lg:text-[#0A4F48]">
                 Welcome back
@@ -101,10 +102,6 @@ const Login = () => {
                 <h2 className="text-[20px] font-bold leading-tight tracking-[-0.04em] text-white sm:text-[22px] lg:text-[24px] lg:text-[#0A4F48]">
                   Login to Your Account
                 </h2>
-
-                <p className="max-w-[30rem] text-[11px] leading-[1.5] text-white/75 sm:text-[12px] lg:text-[#63716E]">
-                  Access your dashboard securely on any screen.
-                </p>
               </div>
             </div>
 
@@ -126,7 +123,7 @@ const Login = () => {
                     name="email"
                     autoComplete="email"
                     required
-                    className="h-11 w-full rounded-md border border-white/20 bg-white p-3 text-[12px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-[#0A4F48] sm:h-12 sm:p-4 sm:text-[13px] lg:border-slate-200"
+                    className="h-10 w-full rounded-md border border-white/20 bg-white p-3 text-[12px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-[#0A4F48] sm:h-11 sm:p-4 sm:text-[13px] lg:border-slate-200"
                     placeholder="yourname@example.com"
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
@@ -147,7 +144,7 @@ const Login = () => {
                       name="password"
                       autoComplete="current-password"
                       required
-                      className="h-11 w-full rounded-md border border-white/20 bg-white p-3 pr-12 text-[12px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-[#0A4F48] sm:h-12 sm:p-4 sm:pr-14 sm:text-[13px] lg:border-slate-200"
+                      className="h-10 w-full rounded-md border border-white/20 bg-white p-3 pr-12 text-[12px] text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-transparent focus:ring-2 focus:ring-[#0A4F48] sm:h-11 sm:p-4 sm:pr-14 sm:text-[13px] lg:border-slate-200"
                       placeholder="Enter your password"
                       onChange={(e) =>
                         setFormData({ ...formData, password: e.target.value })
@@ -189,7 +186,7 @@ const Login = () => {
                 <div className="w-full">
                   <button
                     type="submit"
-                    className="w-full rounded-lg bg-white py-3 text-[14px] font-semibold text-[#0A4F48] transition-colors duration-200 hover:bg-white/90 active:scale-[0.98] sm:py-3.5 sm:text-[15px] lg:bg-[#0A4F48] lg:text-white lg:hover:bg-[#083d38] lg:text-[16px]"
+                    className="w-full rounded-lg bg-white py-2.5 text-[14px] font-semibold text-[#0A4F48] transition-colors duration-200 hover:bg-white/90 active:scale-[0.98] sm:py-3.5 sm:text-[15px] lg:bg-[#0A4F48] lg:text-white lg:hover:bg-[#083d38] lg:text-[16px]"
                   >
                     Login
                   </button>
