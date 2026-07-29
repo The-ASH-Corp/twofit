@@ -129,7 +129,7 @@ export const adminCreateUser = async (userData) => {
       try {
         await sendTemplateMessage({
           to: user.phone,
-          templateName: "welcome_message",
+          templateName: "welcome_messages",
           variables: await buildWelcomeTemplateVariables(user),
         });
       } catch (error) {
