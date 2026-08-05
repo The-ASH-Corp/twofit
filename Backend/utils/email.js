@@ -1,45 +1,3 @@
-// import nodemailer from "nodemailer";
-
-// let transporter;
-// let initialized = false;
-
-// function initMailer() {
-//   if (initialized) return;
-
-//   const user = process.env.EMAIL_USER;
-//   const pass = process.env.EMAIL_PASS;
-
-//   if (!user) {
-//     throw new Error("EMAIL_USER missing");
-//   }
-
-//   if (!pass) {
-//     throw new Error("EMAIL_PASS missing");
-//   }
-
-//   transporter = nodemailer.createTransport({
-//     host: "smtp.gmail.com",
-//     port: 587,
-//     secure: false, // STARTTLS — required for port 587; port 465 (SSL) is blocked on most cloud servers
-//     auth: {
-//       user,
-//       pass,
-//     },
-//   });
-
-//   initialized = true;
-// }
-
-// export async function sendEmail({ to, subject, html }) {
-//   initMailer();
-
-//   return transporter.sendMail({
-//     from: `TwoFit App <${process.env.EMAIL_USER}>`,
-//     to,
-//     subject,
-//     html,
-//   });
-// }
 
 import axios from "axios";
 // import dotenv from "dotenv";
@@ -65,10 +23,10 @@ export async function sendEmail({ email, password, fullName
           },
         ],
         from: {
-          email: "noreply@twofit.co",
+          email: "no-reply@app.twofit.in",
           name: "TwoFit Team",
         },
-        domain: "twofit.co",
+        domain: "app.twofit.in",
         template_id: "template_13_04_2026_23_04_3",
       },
       {
@@ -101,10 +59,10 @@ export async function sendOTPEmail({ fullName, otp,email }) {
           },
         ],
         from: {
-          email: "noreply@twofit.co",
+          email: "no-reply@app.twofit.in",
           name: "TwoFit Team",
         },
-        domain: "twofit.co",
+        domain: "app.twofit.in",
         template_id: "template_14_04_2026_15_04_3",
       },
       {
